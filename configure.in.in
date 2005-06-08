@@ -1,4 +1,3 @@
-DO_NOT_COMPILE="$DO_NOT_COMPILE knemo"
 
 AM_INIT_AUTOMAKE(knemo, 0.3.1)
 
