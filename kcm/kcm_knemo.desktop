@@ -1,0 +1,25 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Exec=kcmshell kcm_knemo
+Icon=knemo
+
+X-KDE-ModuleType=Library
+X-KDE-Library=knemo
+X-KDE-FactoryName=knemo
+X-KDE-ParentApp=kcontrol
+
+Name=Network Monitor
+Name[de]=Netzwerk Monitor
+Name[it]=Monitor di rete
+Name[pl]=Monitor sieci
+Name[pt_BR]=Monitor de Rede
+Name[xx]=xxNetwork Monitorxx
+Comment=Monitor network interfaces
+Comment[de]=Überwacht Netzwerk-Schnittstellen
+Comment[it]=Controlla interfacce di rete
+Comment[pl]=Monitoruje interfejsy sieciowe
+Comment[pt_BR]=Monitor das interfaces de rede
+Comment[xx]=xxMonitor network interfacesxx
+
+Categories=Qt;KDE;X-KDE-settings-network

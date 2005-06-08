@@ -1,0 +1,51 @@
+KNemo - the KDE Network Monitor
+ 
+KNemo offers a network monitor similar to the one found in Windows.
+For every network interface it displays an icon in the systray. 
+ 
+Features of version 0.3.1 include:
+ * support for ethernet (including wireless) and ppp connections
+ * the icon shows incoming/outgoing traffic
+ * hiding of icon when the interface is not available
+ * hiding of icon when the interface does not exist (useful for
+   interfaces that are dynamically created and and removed)
+ * automatic detection of wireless extensions for ethernet interfaces
+ * left-clicking on an icon displays a status dialog with information
+   about the selected interface (2nd click hides dialog)
+ * middle-clicking on an icon displays a traffic plotter that was taken
+   from KSysGuard (2nd click hides dialog)
+ * configuration via context menu or control center module (Internet &
+   Network/Network Monitor)
+ * customizable tooltip for quick access to often needed information
+ * custom entries in the context menu. Useful to start/stop/restart
+   interfaces or to configure them using external tools like KNetworkConf
+   or NetGo.
+ * automatic detection of available interfaces (click on 'Default' in
+   the configuration dialog and KNemo will look under /proc/net/dev for
+   interfaces)
+ * support for notifications via sound and passive popups
+ * KNemo counts the number of transfered bytes and does not depend on the
+   output of 'ifconfig' for the total number of transfered bytes. This way 
+   KNemo can even display a hugh amount of traffic while 'ifconfig' has an
+   overflow at 4GB.
+ * support for different iconsets for every interface
+
+Let me know of any bugs or problems you encounter! If a tab is empty
+or shows wrong data please always include the output of 'ifconfig' or
+'iwconfig' and a screenshot. That way it is much easier for me to fix
+it.
+ 
+IMPORTANT: KNemo is not an executable but an KDED service. Therefore
+it has to be started using Control Center/KDE Components/Service
+Manager. Please also note, that the wireless-tab as seen in screenshot
+2 is only available, if the output of 'iwconfig' contains the
+appropriate interface.
+
+KNemo needs Qt 3.3 in order to compile!
+
+MANDRAKE 10.0 USERS: I have written a short instruction on how to
+successfully install KNemo on Mandrake 10.0:
+
+http://www.eris23.de/knemo/INSTALL.Mandrake
+
+Packages for Fedora 1 and 2, Red Hat 9 and Red Hat Enterprise Linux 3 are available at http://kde-redhat.sf.net.

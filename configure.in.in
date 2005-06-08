@@ -1,0 +1,36 @@
+#MIN_CONFIG
+
+AM_INIT_AUTOMAKE(knemo, 0.3.1)
+
+dnl These are common macros that you might or might not want to use
+
+dnl Image readers/writers
+KDE_CHECK_KIMGIO
+ 
+dnl Checks for header files.
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_HEADER_TIME
+AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h stdlib.h paths.h)
+AC_CHECK_FUNCS(usleep)
+
+dnl Check path to ifconfig, iwconfig and route.
+
+AC_PATH_PROG([PATH_IFCONFIG],[ifconfig],,
+             [$PATH:/sbin:/usr/sbin:/usr/local/sbin])
+AC_PATH_PROG([PATH_IWCONFIG],[iwconfig],,
+             [$PATH:/sbin:/usr/sbin:/usr/local/sbin])
+AC_PATH_PROG([PATH_ROUTE],[route],,
+             [$PATH:/sbin:/usr/sbin:/usr/local/sbin])
+if test -n "${PATH_IFCONFIG}"; then
+  AC_SUBST([PATH_IFCONFIG])
+  AC_DEFINE_UNQUOTED(PATH_IFCONFIG, "${PATH_IFCONFIG}", [Path of ifconfig program])
+fi
+if test -n "${PATH_IWCONFIG}"; then
+  AC_SUBST([PATH_IWCONFIG])
+  AC_DEFINE_UNQUOTED(PATH_IWCONFIG, "${PATH_IWCONFIG}", [Path of iwconfig program])
+fi
+if test -n "${PATH_ROUTE}"; then
+  AC_SUBST([PATH_ROUTE])
+  AC_DEFINE_UNQUOTED(PATH_ROUTE, "${PATH_ROUTE}", [Path of route program])
+fi

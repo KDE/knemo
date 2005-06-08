@@ -1,0 +1,134 @@
+Version 0.3.1 (birthday release):
+ * added Russian translation
+ * updated Brazilian Portuguese translation
+ * updated French translation
+ * it's possible to move the custom menu entries up and down
+ * added preview for iconsets
+ * if visible but not on top RMB and MMB will bring traffic plotter to front
+   instead of hiding it
+ * same for LMB and status dialog
+ * status dialog and traffic plotter store their position and size in the
+   config file so that they keep them between 2 KDE sessions
+ 
+Version 0.3.0:
+ * updated Czech translation
+ * updated Italian translation
+ * added support for dynamic number of entries in the context menu. Useful
+   to start/stop/restart interfaces or to configure them using external tools 
+   like KNetworkConf or NetGo.
+
+Version 0.2.3 (the illuminated release)
+ * updated Czech translation
+ * updated German translation
+ * updated Brazilian Portuguese translation
+ * updated Spanish translation
+ * updated French translation
+ * KNemo now supports iconsets. This is the same behaviour as the previous 
+   'indication of connection type'. This checkbox was removed and an entry
+   'Monitors' added to the combobox. The monitors are still default but now 
+   you can select a different set of icons for every interface.
+   Thanks to SarahB for this proposal.
+
+Version 0.2.2 (maintenance release):
+ * added Dutch translation
+ * updated Italian translation
+ * updated Brazilian Portuguese translation
+ * the system tray icon can indicate the connection type
+   drawback: you need to tell KNemo the type of connection as KNemo can
+   only detect the type when the interface is connected. So offline
+   interfaces would display the wrong icon. Automatic detection of the 
+   connection type will be turned off if the user sets it manually.
+ * traffic plotter now also accessible through context menu
+ * status dialog and traffic plotter store their position on the screen
+   between closing and reopening
+
+Version 0.2.1 (maintenance release):
+ * added French translation
+ * added Brazilian Portuguese translation
+ * updated Czech translation
+ * added KNemo application icon ( Danke Bernd ;-) )
+ * show correct uptime in the tooltip
+
+Version 0.2.0:
+ * added Italian translation
+ * added Czech translation
+ * fixed: selecting a different interface in the configuration dialog activated 
+   the 'Apply' button
+ * fixed the 4GB bug: Knemo reported 4GB of sent and received traffic
+   shortly after the connection was established
+ * added status information for ethernet interfaces: broadcast address
+   and default gateway
+ * added traffic information: transfer speed for up- and download
+ * added notification for 'interface does not exist'
+ * status dialog: made all labels on the IP-tab selectable making it possible
+   to copy&paste the information on this tab 
+ * middle-clicking on an icon displays a traffic plotter that was taken 
+   from KSysGuard (2nd click hides dialog)
+
+Version 0.1.10 (maintenance release):
+ * removed the entry 'Quit' in the context menu as it shouldn't be used
+   for daemons (moreover it doesn't work for them correctly)
+ * fixed the German translation
+ * updated Bulgarian and Spanish translation
+ * fixed a compile problem with KDE-CVS
+ * improved configure check of 'ifconfig' and 'iwconfig'
+ * don't display empty line in tooltip if no alias is set
+ * small fix for Bit Rate detection of wireless interfaces
+
+Version 0.1.9:
+ * fixed recognition of connection status for interfaces that are IPv6 enabled
+ * don't compile and install documentation as long as there is none
+ * added GPL header in all source files
+ * added Bulgarian translations by Malin Malinov <lgmim@club-35.com>
+ * ESSIDs can now contain any character
+ * KNemo counts the number of transfered bytes and no longer depends on the
+   output of 'ifconfig' for the total number of transfered bytes. This way 
+   KNemo can even display a hugh amount of traffic while 'ifconfig' has an
+   overflow at 4GB.
+ * added "About KNemo" dialog
+ * added "Report Bug" entry in context menu
+ * KNemo now distinguishs between the interface not being connected and
+   the interface not existing. Added an option to hide the icon when the
+   interface does not exist. This is useful for interfaces that are dynamically
+   created and destroyed, for example interfaces of bluetooth adapters.
+ * tooltips don't display uptime and wireless information when not connected
+   or the interface does not exist
+ * statusdialog uses correct icon and displays the interface name in the
+   title to avoid <2> etc in the title when opening more than one dialog
+ * 'ifconfig' and 'iwconfig' are now called with LANG and LC_ALL set to C
+   to avoid problems with localized output
+ * configure will now search for 'ifconfig' and 'iwconfig' so it is no
+   longer neccessary to setup the path in the config dialog
+
+Version 0.1.8:
+ * fixed a bug with localized output of 'ifconfig' (parsing of received
+   and send packets)
+ * fixed a bug with uptime using QDateTime::daysTo() which doesn't
+   give the correct results when you are interessted in complete days
+ * added support for notifications
+ * started with localization
+
+Version 0.1.7
+ * custom tooltips: the tooltips can now be configured to show some (or all)
+   of the information available in the status dialog. This is meant for easy
+   and quick access to often needed information.
+ * opening the control center module from the context menu will preselect
+   the interface the context menu belongs to
+ * fixed handling of 'Reset' in the control center
+
+Version 0.1.6
+ * left-clicking an icon toggles the status dialog
+ * 2 optional custom entries in the context menu to start and stop the
+   interface
+ * using the more standard icons
+   - network_disconnected
+   - network_connected
+   - network_incoming
+   - network_outgoing
+   - network_traffic
+ * install the icons under $KDEDIR/share/icons/crystalsvg/22x22/actions
+ * fixed a problem with QTime when uptime became negative after midnight
+
+Version 0.1.5
+ * Initial Release
+

@@ -1,0 +1,40 @@
+These are installation instructions for Mandrake 10.0. 
+
+They have been tested with Mandrake 10.0 Download Edition but should
+also work for the Official Edition.
+
+The simplest way to compile KNemo for Mandrake is:
+
+  1. `cd' to the directory containing KNemos source code and type
+     `./configure --prefix=/usr' to configure the package for Mandrake.
+
+  2. Open the file `knemod\interfaceicon.cpp' and go to line 257.
+     Change the line from
+
+     process << "kcmshell" << "kcm_knemo";
+
+     to
+
+     process << "kcmshell" << "/usr/share/applnk/Settings/Network/kcm_knemo";
+
+     Do the same in line 64 of `knemod\knemodaemon.cpp'
+
+  3. Save your changes.
+
+  4. Type `make' to compile the package.
+
+  5. Type `make install' to install the programs and any data files and
+     documentation.
+
+Now you should be able start KNemo as a KDE Service and open its
+configuration dialog from the context menu of the tray icon.
+
+IMPORTANT: If you already installed and started KNemo before doing the
+above changes it may be neccessary to open the configuration dialog
+manually by running
+ 
+  kcmshell /usr/share/applnk/Settings/Network/kcm_knemo
+ 
+on the console after you have installed KNemo with the above solution,
+because KNemo won't display any icons in the system traybar until it
+is configured to do so.

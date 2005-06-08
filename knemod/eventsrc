@@ -1,0 +1,35 @@
+[!Global!]
+IconName=knemo
+Comment=KDE Network Monitor
+Comment[de]=KDE Netzwerk Monitor
+Comment[it]=Monitor di rete di KDE
+
+[knemo_connected]
+Name=Connected
+Name[de]=Verbunden
+Comment=Interface is connected
+Comment[de]=Schnittstelle ist verbunden
+Comment[it]=L'interfaccia Ã¨ stata connessa
+Comment[pt_BR]=A interface está conectada
+default_sound=KDE_Dialog_Appear.wav
+default_presentation=17
+
+[knemo_disconnected]
+Name=Disconnected
+Name[de]=Getrennt
+Comment=Interface is disconnected
+Comment[de]=Schnittstelle ist getrennt
+Comment[it]=L'interfaccia Ã¨ stata disconnessa
+Comment[pt_BR]=A interface está desconectada
+default_sound=KDE_Dialog_Disappear.wav
+default_presentation=17
+
+[knemo_notexisting]
+Name=Not existing
+Name[de]=Nicht vorhanden
+Comment=Interface does not exist
+Comment[de]=Schnittstelle nicht vorhanden
+Comment[it]=L'interfaccia non esiste
+Comment[pt_BR]=A interface não existe
+default_sound=KDE_Notify.wav
+default_presentation=0
