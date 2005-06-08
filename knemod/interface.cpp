@@ -140,7 +140,7 @@ void Interface::showSignalPlotter( bool wasMiddleButton )
     // No plotter, create it.
     if ( mPlotter == 0L )
     {
-        mPlotter = new SignalPlotter( 0L, mName );
+        mPlotter = new SignalPlotter( 0L, mName.local8Bit() );
         mPlotter->setIcon( SmallIcon( "knemo" ) );
         mPlotter->setCaption( mName + " " + i18n( "Traffic" ) );
         mPlotter->setTitle( mName );

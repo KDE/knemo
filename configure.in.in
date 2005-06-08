@@ -1,7 +1,5 @@
 DO_NOT_COMPILE="$DO_NOT_COMPILE knemo"
 
-#MIN_CONFIG
-
 AM_INIT_AUTOMAKE(knemo, 0.3.1)
 
 dnl These are common macros that you might or might not want to use
