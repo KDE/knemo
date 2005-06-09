@@ -1,35 +1,60 @@
 [!Global!]
 IconName=knemo
 Comment=KDE Network Monitor
-Comment[de]=KDE Netzwerk Monitor
-Comment[it]=Monitor di rete di KDE
 
 [knemo_connected]
 Name=Connected
-Name[de]=Verbunden
+Name[br]=Kevreet
+Name[ca]=Connectat
+Name[da]=Forbundet
+Name[el]=Συνδεμένο
+Name[es]=Conectado
+Name[et]=Ühendatud
+Name[fr]=Connecté
+Name[ga]=Ceangailte
+Name[hi]=कनेक्टेड
+Name[it]=Connesso
+Name[nl]=Verbonden
+Name[pt]=Ligado
+Name[pt_BR]=Conectado
+Name[ru]=Соединено
+Name[sr]=Повезан
+Name[sr@Latn]=Povezan
+Name[sv]=Uppkopplad
+Name[ta]=இணைக்கப்பட்டது
+Name[tr]=Bağlı
 Comment=Interface is connected
-Comment[de]=Schnittstelle ist verbunden
-Comment[it]=L'interfaccia è stata connessa
-Comment[pt_BR]=A interface est� conectada
 default_sound=KDE_Dialog_Appear.wav
 default_presentation=17
 
 [knemo_disconnected]
 Name=Disconnected
-Name[de]=Getrennt
+Name[br]=Digevreet
+Name[ca]=Desconnectat
+Name[cs]=Odpojen
+Name[cy]=Datgysylltwyd
+Name[da]=Afbrudt
+Name[es]=Desconectado
+Name[et]=Lahutatud
+Name[fr]=Déconnecté
+Name[ga]=Dínasctha
+Name[hi]=डिस्कनेक्टेड
+Name[it]=Disconnesso
+Name[nl]=Niet verbonden
+Name[pt]=Desligado
+Name[pt_BR]=Desconectado
+Name[ru]=Отключено
+Name[sr]=Неповезан
+Name[sr@Latn]=Nepovezan
+Name[sv]=Nerkopplad
+Name[ta]=துண்டிக்கப்பட்டது
+Name[tr]=Bağlı değil
 Comment=Interface is disconnected
-Comment[de]=Schnittstelle ist getrennt
-Comment[it]=L'interfaccia è stata disconnessa
-Comment[pt_BR]=A interface est� desconectada
 default_sound=KDE_Dialog_Disappear.wav
 default_presentation=17
 
 [knemo_notexisting]
 Name=Not existing
-Name[de]=Nicht vorhanden
 Comment=Interface does not exist
-Comment[de]=Schnittstelle nicht vorhanden
-Comment[it]=L'interfaccia non esiste
-Comment[pt_BR]=A interface n�o existe
 default_sound=KDE_Notify.wav
 default_presentation=0
