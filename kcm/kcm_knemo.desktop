@@ -10,6 +10,10 @@ X-KDE-FactoryName=knemo
 X-KDE-ParentApp=kcontrol
 
 Name=Network Monitor
+Name[da]=Netværkovervågning
+Name[et]=Võrgumonitor
 Comment=Monitor network interfaces
+Comment[da]=Overvåger netvørskgrænseflader
+Comment[et]=Võrguliideste monitor
 
 Categories=Qt;KDE;X-KDE-settings-network

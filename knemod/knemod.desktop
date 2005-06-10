@@ -9,3 +9,5 @@ X-KDE-Kded-autoload=true
 X-KDE-Kded-load-on-demand=false
 Name=KNemo
 Comment=KDE Network Monitor
+Comment[da]=KDE's netværksovervågning
+Comment[et]=KDE võrgumonitor
