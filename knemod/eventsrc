@@ -3,6 +3,7 @@ IconName=knemo
 Comment=KDE Network Monitor
 Comment[da]=KDE's netværksovervågning
 Comment[et]=KDE võrgumonitor
+Comment[nl]=KDE networkmonitor
 
 [knemo_connected]
 Name=Connected
@@ -28,6 +29,7 @@ Name[tr]=Bağlı
 Comment=Interface is connected
 Comment[da]=Grænseflade er forbundet
 Comment[et]=Liides on ühendatud
+Comment[nl]=Interface is verbonden
 default_sound=KDE_Dialog_Appear.wav
 default_presentation=17
 
@@ -56,6 +58,7 @@ Name[tr]=Bağlı değil
 Comment=Interface is disconnected
 Comment[da]=Grænseflade er afbrudt
 Comment[et]=Liides on lahutatud
+Comment[nl]=Interface is niet verbonden
 default_sound=KDE_Dialog_Disappear.wav
 default_presentation=17
 
@@ -63,8 +66,10 @@ default_presentation=17
 Name=Not existing
 Name[da]=Eksisterer ikke
 Name[et]=Pole olemas
+Name[nl]=Niet-bestaand
 Comment=Interface does not exist
 Comment[da]=Grænsefladen eksisterer ikke
 Comment[et]=Liidest pole olemas
+Comment[nl]=De interface bestaat niet
 default_sound=KDE_Notify.wav
 default_presentation=0
