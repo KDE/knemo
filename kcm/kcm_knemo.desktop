@@ -12,10 +12,16 @@ X-KDE-ParentApp=kcontrol
 Name=Network Monitor
 Name[da]=Netværkovervågning
 Name[et]=Võrgumonitor
+Name[it]=Monitor di rete
 Name[nl]=Netwerkmonitor
+Name[sr]=Надгледање мреже
+Name[sr@Latn]=Nadgledanje mreže
 Comment=Monitor network interfaces
 Comment[da]=Overvåger netvørskgrænseflader
 Comment[et]=Võrguliideste monitor
+Comment[it]=Controlla le interfacce di rete
 Comment[nl]=Volg netwerkinterfaces
+Comment[sr]=Интерфејс надгледања мреже
+Comment[sr@Latn]=Interfejs nadgledanja mreže
 
 Categories=Qt;KDE;X-KDE-settings-network
