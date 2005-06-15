@@ -14,6 +14,8 @@ Name[da]=Netværkovervågning
 Name[et]=Võrgumonitor
 Name[it]=Monitor di rete
 Name[nl]=Netwerkmonitor
+Name[pt]=Monitor da Rede
+Name[pt_BR]=Monitor da Rede
 Name[sr]=Надгледање мреже
 Name[sr@Latn]=Nadgledanje mreže
 Comment=Monitor network interfaces
@@ -21,6 +23,8 @@ Comment[da]=Overvåger netvørskgrænseflader
 Comment[et]=Võrguliideste monitor
 Comment[it]=Controlla le interfacce di rete
 Comment[nl]=Volg netwerkinterfaces
+Comment[pt]=Vigia interfaces de rede
+Comment[pt_BR]=Vigia interfaces de rede
 Comment[sr]=Интерфејс надгледања мреже
 Comment[sr@Latn]=Interfejs nadgledanja mreže
 
