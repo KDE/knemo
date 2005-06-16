@@ -1,6 +1,7 @@
 [!Global!]
 IconName=knemo
 Comment=KDE Network Monitor
+Comment[cs]=KDE monitor sítě
 Comment[da]=KDE's netværksovervågning
 Comment[et]=KDE võrgumonitor
 Comment[it]=Monitor di rete di KDE
@@ -14,6 +15,7 @@ Comment[sr@Latn]=Nadgledanje mreže za KDE
 Name=Connected
 Name[br]=Kevreet
 Name[ca]=Connectat
+Name[cs]=Připojen
 Name[da]=Forbundet
 Name[el]=Συνδεμένο
 Name[es]=Conectado
@@ -32,6 +34,7 @@ Name[sv]=Uppkopplad
 Name[ta]=இணைக்கப்பட்டது
 Name[tr]=Bağlı
 Comment=Interface is connected
+Comment[cs]=Rozhraní je připojeno
 Comment[da]=Grænseflade er forbundet
 Comment[et]=Liides on ühendatud
 Comment[it]=L'interfaccia è connessa
@@ -66,6 +69,7 @@ Name[sv]=Nerkopplad
 Name[ta]=துண்டிக்கப்பட்டது
 Name[tr]=Bağlı değil
 Comment=Interface is disconnected
+Comment[cs]=Rozhraní je odpojeno
 Comment[da]=Grænseflade er afbrudt
 Comment[et]=Liides on lahutatud
 Comment[it]=L'interfaccia è disconnessa
@@ -79,6 +83,7 @@ default_presentation=17
 
 [knemo_notexisting]
 Name=Not existing
+Name[cs]=Neexistuje
 Name[da]=Eksisterer ikke
 Name[et]=Pole olemas
 Name[it]=Inesistente
@@ -88,6 +93,7 @@ Name[pt_BR]=Não existente
 Name[sr]=Не постоји
 Name[sr@Latn]=Ne postoji
 Comment=Interface does not exist
+Comment[cs]=Rozhraní neexistuje
 Comment[da]=Grænsefladen eksisterer ikke
 Comment[et]=Liidest pole olemas
 Comment[it]=L'interfaccia non esiste
