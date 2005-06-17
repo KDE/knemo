@@ -323,7 +323,7 @@ When reconnected the icon will be shown again.</string>
 hidden when the interface does not exist. 
 This is useful for interfaces that are dynamically
 created and destroyed, for example interfaces
-of bluetooth adapters.</string>
+of bluetooth adaptors.</string>
                                         </property>
                                     </widget>
                                 </hbox>
