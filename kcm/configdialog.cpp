@@ -1005,3 +1005,5 @@ void ConfigDialog::listViewCommandsRenamed( QListViewItem* item, int col, const 
     }
 }
 
+
+#include "configdialog.moc"
