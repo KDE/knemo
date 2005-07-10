@@ -106,6 +106,7 @@ void KNemoDaemon::readConfig()
             settings.customCommands = config->readBoolEntry( "CustomCommands" );
             settings.hideWhenNotAvailable = config->readBoolEntry( "HideWhenNotAvailable" );
             settings.hideWhenNotExisting = config->readBoolEntry( "HideWhenNotExisting" );
+            settings.trafficThreshold = config->readNumEntry( "TrafficThreshold", 0 );
             if ( settings.customCommands )
             {
                 int numCommands = config->readNumEntry( "NumCommands" );
@@ -180,6 +181,7 @@ void KNemoDaemon::reparseConfiguration()
             settings->customCommands = config->readBoolEntry( "CustomCommands" );
             settings->hideWhenNotAvailable = config->readBoolEntry( "HideWhenNotAvailable" );
             settings->hideWhenNotExisting = config->readBoolEntry( "HideWhenNotExisting" );
+            settings->trafficThreshold = config->readNumEntry( "TrafficThreshold", 0 );
             if ( settings->customCommands )
             {
                 int numCommands = config->readNumEntry( "NumCommands" );
@@ -258,6 +260,7 @@ void KNemoDaemon::reparseConfiguration()
         iface->getSettings().customCommands = setIt.current()->customCommands;
         iface->getSettings().hideWhenNotAvailable = setIt.current()->hideWhenNotAvailable;
         iface->getSettings().hideWhenNotExisting = setIt.current()->hideWhenNotExisting;
+        iface->getSettings().trafficThreshold = setIt.current()->trafficThreshold;
         iface->getSettings().commands = setIt.current()->commands;
         iface->configChanged();
     }

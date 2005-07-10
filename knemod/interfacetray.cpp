@@ -93,6 +93,8 @@ void InterfaceTray::showAboutDialog()
                       "percy@eris23.de" );
     data.addAuthor( "Percy Leonhardt", I18N_NOOP( "Author" ),
                     "percy@eris23.de" );
+    data.addAuthor( "Michael Olbrich", I18N_NOOP( "Threshold support" ),
+                    "michael.olbrich@gmx.net" );
     data.addAuthor( "Bernd Zimmer", I18N_NOOP( "German translation" ),
                     "berndzimmer@gmx.de" );
     data.addAuthor( "Raul Moratalla", I18N_NOOP( "Spanish translation" ),

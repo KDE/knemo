@@ -76,6 +76,7 @@ private slots:
     void iconSetChanged( int set );
     void checkBoxNotConnectedToggled( bool on );
     void checkBoxNotExistingToggled( bool on );
+    void spinBoxTrafficValueChanged( int value );
     void checkBoxCustomToggled( bool on );
     void listViewCommandsSelectionChanged();
     void listViewCommandsCheckListItemChanged( KNemoCheckListItem* item, bool state );

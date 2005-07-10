@@ -102,6 +102,7 @@ struct InterfaceSettings
       : iconSet( 0 ),
         numCommands( 0 ),
         toolTipContent( 2 ),
+        trafficThreshold( 0 ),
         hideWhenNotExisting( false ),
         hideWhenNotAvailable( false ),
         customCommands( false )
@@ -110,6 +111,7 @@ struct InterfaceSettings
     int iconSet;
     int numCommands;
     int toolTipContent;
+    int trafficThreshold;
     bool hideWhenNotExisting;
     bool hideWhenNotAvailable;
     bool customCommands;

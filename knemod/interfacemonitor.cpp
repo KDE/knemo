@@ -36,6 +36,7 @@ void InterfaceMonitor::checkStatus( Interface* interface )
     int currentState;
     int previousState = interface->getState();
     const InterfaceData& data = interface->getData();
+    int trafficThreshold = interface->getSettings().trafficThreshold;
 
     if ( !data.existing )
         // the interface does not exist
@@ -47,9 +48,9 @@ void InterfaceMonitor::checkStatus( Interface* interface )
     {
         // the interface is connected, look for traffic
         currentState = Interface::AVAILABLE;
-        if ( mData.rxPackets != data.rxPackets )
+        if ( ( data.rxPackets - mData.rxPackets ) > trafficThreshold )
             currentState |= Interface::RX_TRAFFIC;
-        if (  mData.txPackets != data.txPackets )
+        if ( ( data.txPackets - mData.txPackets ) > trafficThreshold )
             currentState |= Interface::TX_TRAFFIC;
     }
 

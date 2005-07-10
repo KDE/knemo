@@ -124,6 +124,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const char *name, const QStringList
              this, SLOT( checkBoxNotConnectedToggled ( bool ) ) );
     connect( mDlg->checkBoxNotExisting, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxNotExistingToggled ( bool ) ) );
+    connect( mDlg->spinBoxTrafficThreshold, SIGNAL( valueChanged( int ) ),
+             this, SLOT( spinBoxTrafficValueChanged ( int ) ) );
     connect( mDlg->checkBoxCustom, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxCustomToggled ( bool ) ) );
     connect( mDlg->listBoxInterfaces, SIGNAL( highlighted( const QString& ) ),
@@ -243,6 +245,7 @@ void ConfigDialog::load()
             settings->customCommands = config->readBoolEntry( "CustomCommands" );
             settings->hideWhenNotAvailable = config->readBoolEntry( "HideWhenNotAvailable" );
             settings->hideWhenNotExisting = config->readBoolEntry( "HideWhenNotExisting" );
+            settings->trafficThreshold = config->readNumEntry( "TrafficThreshold", 0 );
             int numCommands = config->readNumEntry( "NumCommands" );
             for ( int i = 0; i < numCommands; i++ )
             {
@@ -309,6 +312,7 @@ void ConfigDialog::save()
         config->writeEntry( "CustomCommands", settings->customCommands );
         config->writeEntry( "HideWhenNotAvailable", settings->hideWhenNotAvailable );
         config->writeEntry( "HideWhenNotExisting", settings->hideWhenNotExisting );
+        config->writeEntry( "TrafficThreshold", settings->trafficThreshold );
         config->writeEntry( "NumCommands", settings->commands.size() );
         for ( uint i = 0; i < settings->commands.size(); i++ )
         {
@@ -750,6 +754,7 @@ void ConfigDialog::interfaceSelected( const QString& interface )
     mDlg->checkBoxCustom->setChecked( settings->customCommands );
     mDlg->checkBoxNotConnected->setChecked( settings->hideWhenNotAvailable );
     mDlg->checkBoxNotExisting->setChecked( settings->hideWhenNotExisting );
+    mDlg->spinBoxTrafficThreshold->setValue( settings->trafficThreshold );
 
     mDlg->listViewCommands->clear();
     for ( int i = settings->commands.size() - 1; i >= 0; i-- )
@@ -836,6 +841,18 @@ void ConfigDialog::checkBoxNotExistingToggled( bool on )
 
     InterfaceSettings* settings = mSettingsDict[selected->text()];
     settings->hideWhenNotExisting = on;
+    if (!mLock) changed( true );
+}
+
+void ConfigDialog::spinBoxTrafficValueChanged( int value )
+{
+    QListBoxItem* selected = mDlg->listBoxInterfaces->selectedItem();
+
+    if ( selected == 0 )
+        return;
+
+    InterfaceSettings* settings = mSettingsDict[selected->text()];
+    settings->trafficThreshold = value;
     if (!mLock) changed( true );
 }
 
