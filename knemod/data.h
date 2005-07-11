@@ -43,7 +43,7 @@ struct GeneralData
 
 struct InterfaceData
 {
-    InterfaceData::InterfaceData()
+    InterfaceData()
       : existing( false ),
         available( false ),
         wirelessDevice( false ),
@@ -98,7 +98,7 @@ struct InterfaceCommand
 
 struct InterfaceSettings
 {
-    InterfaceSettings::InterfaceSettings()
+    InterfaceSettings()
       : iconSet( 0 ),
         numCommands( 0 ),
         toolTipContent( 2 ),
