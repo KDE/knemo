@@ -4,7 +4,8 @@ AM_INIT_AUTOMAKE(knemo, 0.3.1)
 dnl These are common macros that you might or might not want to use
 
 dnl Image readers/writers
-KDE_CHECK_KIMGIO
+dnl If you want to use this test, you have to define it somewhere
+dnl KDE_CHECK_KIMGIO 
  
 dnl Checks for header files.
 AC_HEADER_DIRENT
