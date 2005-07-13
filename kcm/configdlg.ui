@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
 <class>ConfigDlg</class>
 <widget class="QWidget">
     <property name="name">
@@ -11,9 +11,6 @@
             <width>477</width>
             <height>488</height>
         </rect>
-    </property>
-    <property name="caption">
-        <string>Form1</string>
     </property>
     <hbox>
         <property name="name">
@@ -93,9 +90,6 @@ for example 'eth0', 'wlan0' or 'ppp0'.</string>
                                 </property>
                                 <property name="text">
                                     <string>&amp;Display custom entries in context menu</string>
-                                </property>
-                                <property name="accel">
-                                    <string>Alt+D</string>
                                 </property>
                             </widget>
                             <widget class="QListView" row="1" column="0">
@@ -274,9 +268,6 @@ icons.</string>
                                 <property name="text">
                                     <string>Hide icon when &amp;not connected</string>
                                 </property>
-                                <property name="accel">
-                                    <string>Alt+N</string>
-                                </property>
                                 <property name="whatsThis" stdset="0">
                                     <string>When selected the icon for this interface will be
 hidden when the interface is not connected. 
@@ -314,9 +305,6 @@ When reconnected the icon will be shown again.</string>
                                         </property>
                                         <property name="text">
                                             <string>Hide icon &amp;when not existing</string>
-                                        </property>
-                                        <property name="accel">
-                                            <string>Alt+W</string>
                                         </property>
                                         <property name="whatsThis" stdset="0">
                                             <string>When selected the icon for this interface will be
@@ -600,9 +588,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 <property name="text">
                                     <string>&amp;Configure Sounds &amp;&amp; Events...</string>
                                 </property>
-                                <property name="accel">
-                                    <string>Alt+C</string>
-                                </property>
                             </widget>
                         </vbox>
                     </widget>
@@ -695,9 +680,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 <property name="text">
                                     <string>Automatic &amp;range detection</string>
                                 </property>
-                                <property name="accel">
-                                    <string>Alt+R</string>
-                                </property>
                             </widget>
                             <widget class="KIntSpinBox" row="1" column="1">
                                 <property name="name">
@@ -738,9 +720,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 <property name="text">
                                     <string>&amp;Labels</string>
                                 </property>
-                                <property name="accel">
-                                    <string>Alt+L</string>
-                                </property>
                             </widget>
                             <widget class="QCheckBox" row="1" column="0">
                                 <property name="name">
@@ -748,9 +727,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 </property>
                                 <property name="text">
                                     <string>Top &amp;bar</string>
-                                </property>
-                                <property name="accel">
-                                    <string>Alt+B</string>
                                 </property>
                             </widget>
                             <widget class="QLabel" row="2" column="0">
@@ -823,9 +799,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 <property name="text">
                                     <string>Vertic&amp;al lines</string>
                                 </property>
-                                <property name="accel">
-                                    <string>Alt+A</string>
-                                </property>
                             </widget>
                             <widget class="QCheckBox" row="1" column="0">
                                 <property name="name">
@@ -833,9 +806,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 </property>
                                 <property name="text">
                                     <string>V&amp;ertical lines scroll</string>
-                                </property>
-                                <property name="accel">
-                                    <string>Alt+E</string>
                                 </property>
                             </widget>
                             <widget class="KIntSpinBox" row="2" column="2">
@@ -869,9 +839,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 </property>
                                 <property name="text">
                                     <string>Hori&amp;zontal lines</string>
-                                </property>
-                                <property name="accel">
-                                    <string>Alt+Z</string>
                                 </property>
                             </widget>
                         </grid>
@@ -987,9 +954,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 <property name="text">
                                     <string>Sho&amp;w incoming traffic</string>
                                 </property>
-                                <property name="accel">
-                                    <string>Alt+W</string>
-                                </property>
                             </widget>
                             <widget class="QCheckBox">
                                 <property name="name">
@@ -997,9 +961,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 </property>
                                 <property name="text">
                                     <string>Show &amp;outgoing traffic</string>
-                                </property>
-                                <property name="accel">
-                                    <string>Alt+O</string>
                                 </property>
                             </widget>
                         </vbox>
