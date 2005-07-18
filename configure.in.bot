@@ -12,7 +12,7 @@ fi
 
 if test -z "$PATH_IWCONFIG"; then
   echo ""
-  echo "You're missing the program 'iwconig'."
+  echo "You're missing the program 'iwconfig'."
   echo "KNemo works without 'iwconfig' being installed but you won't be able"
   echo "to monitor the wireless extensions of wireless interfaces."
   echo "If you would like to have these additional features install"
