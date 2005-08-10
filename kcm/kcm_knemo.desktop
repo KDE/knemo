@@ -10,6 +10,7 @@ X-KDE-FactoryName=knemo
 X-KDE-ParentApp=kcontrol
 
 Name=Network Monitor
+Name[br]=Eveshaer ar rouedad
 Name[cs]=Monitor sítě
 Name[da]=Netværkovervågning
 Name[et]=Võrgumonitor
@@ -24,6 +25,7 @@ Name[sr]=Надгледање мреже
 Name[sr@Latn]=Nadgledanje mreže
 Name[sv]=Nätverksövervakare
 Comment=Monitor network interfaces
+Comment[br]=Eveshaer etrefasoù ar rouedad
 Comment[cs]=Rozhraní monitoru sítě
 Comment[da]=Overvåger netvørskgrænseflader
 Comment[et]=Võrguliideste monitor
