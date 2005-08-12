@@ -34,7 +34,7 @@
 QString KNemoDaemon::sSelectedInterface = QString::null;
 
 extern "C" {
-   KDEDModule *create_knemod(const QCString &name) {
+   KDE_EXPORT KDEDModule *create_knemod(const QCString &name) {
        return new KNemoDaemon(name);
    }
 }
