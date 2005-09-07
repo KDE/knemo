@@ -25,5 +25,4 @@ noinst_HEADERS   = configdialog.h
 # let automoc handle all of the meta source files (moc)
 METASOURCES = AUTO
 
-kcm_knemo_DATA = kcm_knemo.desktop
-kcm_knemodir = $(kde_appsdir)/Settings/Network
+xdg_apps_DATA = kcm_knemo.desktop
