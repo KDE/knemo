@@ -48,9 +48,9 @@ void InterfaceMonitor::checkStatus( Interface* interface )
     {
         // the interface is connected, look for traffic
         currentState = Interface::AVAILABLE;
-        if ( ( data.rxPackets - mData.rxPackets ) > trafficThreshold )
+        if ( ( data.rxPackets - mData.rxPackets ) > (unsigned int) trafficThreshold )
             currentState |= Interface::RX_TRAFFIC;
-        if ( ( data.txPackets - mData.txPackets ) > trafficThreshold )
+        if ( ( data.txPackets - mData.txPackets ) > (unsigned int) trafficThreshold )
             currentState |= Interface::TX_TRAFFIC;
     }
 

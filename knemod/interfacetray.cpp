@@ -89,7 +89,7 @@ void InterfaceTray::showAboutDialog()
 {
     KAboutData data ( "knemo", I18N_NOOP( "KNemo" ), version,
                       description, KAboutData::License_GPL,
-                      "(c) 2004, Percy Leonhardt\n\nSignal plotter taken from KSysGuard\n(c) 1999 - 2002, Chris Schlaeger", 0, 0,
+                      "(c) 2004, 2005, Percy Leonhardt\n\nSignal plotter taken from KSysGuard\n(c) 1999 - 2002, Chris Schlaeger", 0, 0,
                       "percy@eris23.de" );
     data.addAuthor( "Percy Leonhardt", I18N_NOOP( "Author" ),
                     "percy@eris23.de" );
@@ -119,11 +119,7 @@ void InterfaceTray::showAboutDialog()
                     "cs@kde.org" );
 
     KAboutApplication about( &data );
-#if KDE_IS_VERSION(3,2,90) // cvs
-    about.setIcon( KGlobal::iconLoader()->iconPath( "knemo", -1 ) );
-#else
-    about.setIcon( SmallIcon( "knemo" ) );
-#endif
+    about.setProgramLogo( DesktopIcon( "knemo" ) );
     about.exec();
 }
 
