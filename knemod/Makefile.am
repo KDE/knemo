@@ -12,7 +12,7 @@ SUBDIRS = . pics
 kde_module_LTLIBRARIES = kded_knemod.la
 
 # set the include path for X, qt and KDE
-INCLUDES         = $(all_includes)
+INCLUDES         = $(all_includes) -I../common
 
 # the library search path. 
 kded_knemod_la_LDFLAGS = -module -avoid-version $(all_libraries)
