@@ -22,6 +22,7 @@
 #include <kdebug.h>
 #include <kglobal.h>
 #include <klocale.h>
+#include <kbugreport.h>
 #include <kaboutdata.h>
 #include <kpopupmenu.h>
 #include <kiconloader.h>
@@ -125,8 +126,9 @@ void InterfaceTray::showAboutDialog()
 
 void InterfaceTray::showReportBugDialog()
 {
-    kapp->invokeMailer( "percy@eris23.de", i18n( "Bug report for" ) +
-                        " KNemo " + version );
+    KAboutData data ( "knemo", I18N_NOOP( "KNemo" ), version );
+    KBugReport bugReport( 0, true, &data );
+    bugReport.exec();
 }
 
 void InterfaceTray::showGraph()
