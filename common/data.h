@@ -31,8 +31,9 @@
 /**
  * This file contains data structures used to store information about
  * an interface, the wireless data and the user settings for an interface.
- *
- * @short Store interface information
+ * It is shared between the daemon and the control center module.
+*
+ * @short Shared data structures
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
