@@ -24,6 +24,7 @@
 
 #include <kdebug.h>
 #include <kprocess.h>
+#include <kio/global.h>
 
 #include "interfaceupdater.h"
 

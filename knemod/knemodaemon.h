@@ -25,6 +25,7 @@
 #include <qcstring.h>
 
 #include "data.h"
+#include "global.h"
 #include <kdedmodule.h>
 #include <knotifyclient.h>
 

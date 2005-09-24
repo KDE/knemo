@@ -29,6 +29,7 @@
 #include <kglobal.h>
 #include <kiconloader.h>
 #include <kactivelabel.h>
+#include <kio/global.h>
 
 #include "data.h"
 #include "interface.h"

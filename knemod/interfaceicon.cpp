@@ -23,6 +23,7 @@
 
 #include <kdebug.h>
 #include <kglobal.h>
+#include <klocale.h>
 #include <kprocess.h>
 #include <kpopupmenu.h>
 #include <kiconloader.h>

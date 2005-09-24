@@ -54,6 +54,16 @@ void InterfaceMonitor::checkStatus( Interface* interface )
             currentState |= Interface::TX_TRAFFIC;
     }
 
+    // update the statistics
+    if ( data.incomingBytes > 0 )
+    {
+        emit incomingTraffic( data.incomingBytes );
+    }
+    if ( data.outgoingBytes > 0 )
+    {
+        emit outgoingTraffic( data.outgoingBytes );
+    }
+
     mData = data; // backup current data
 
     if ( ( previousState == Interface::NOT_EXISTING ||

@@ -21,6 +21,8 @@
 #include <qstring.h>
 
 #include <kdebug.h>
+#include <klocale.h>
+#include <kio/global.h>
 
 #include "data.h"
 #include "interface.h"

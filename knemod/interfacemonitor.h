@@ -63,6 +63,10 @@ signals:
     void notExisting( int );
     // there was incoming and/or outgoing traffic
     void statusChanged( int );
+    // the amount of incoming traffic (for statistics)
+    void incomingTraffic( unsigned long );
+    // the amount of outgoing traffic (for statistics)
+    void outgoingTraffic( unsigned long );
 
 private:
     // store old interface data to compare new data against

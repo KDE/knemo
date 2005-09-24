@@ -25,13 +25,15 @@ kded_knemod_la_SOURCES = knemodaemon.cpp knemodaemon.skel interface.cpp \
                          interfaceicon.cpp interfacetray.cpp \
                          interfacemonitor.cpp interfaceupdater.cpp \
                          interfacestatusdlg.ui interfacestatusdialog.cpp \
-                         interfacetooltip.cpp signalplotter.cpp
+                         interfacetooltip.cpp signalplotter.cpp \
+						 interfacestatistics.cpp
 
 # these are the headers for your project
 noinst_HEADERS   = knemodaemon.h interface.h interfaceicon.h \
                    interfacemonitor.h interfaceupdater.h \
                    interfacestatusdialog.h interfacetray.h \
-                   interfacetooltip.h signalplotter.h
+                   interfacetooltip.h signalplotter.h \
+				   interfacestatistics.h global.h
 
 # let automoc handle all of the meta source files (moc)
 METASOURCES = AUTO

@@ -25,6 +25,7 @@
 #include <qdatetime.h>
 
 #include "data.h"
+#include "global.h"
 #include "interfaceicon.h"
 #include "interfacemonitor.h"
 
