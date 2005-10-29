@@ -58,6 +58,7 @@ struct InterfaceSettings
     int trafficThreshold;
     bool hideWhenNotExisting;
     bool hideWhenNotAvailable;
+	bool activateStatistics;
     bool customCommands;
     QString alias;
     QValueVector<InterfaceCommand> commands;
@@ -65,28 +66,28 @@ struct InterfaceSettings
 
 enum ToolTipEnums
 {
-    INTERFACE = 1,
-    ALIAS = 2,
-    STATUS = 4,
-    UPTIME = 8,
-    IP_ADDRESS = 16,
-    SUBNET_MASK = 32,
-    HW_ADDRESS = 64,
-    PTP_ADDRESS = 128,
-    RX_PACKETS = 256,
-    TX_PACKETS = 512,
-    RX_BYTES = 1024,
-    TX_BYTES = 2048,
-    ESSID = 4096,
-    MODE = 8192,
-    FREQUENCY = 16384,
-    BIT_RATE = 32768,
-    SIGNAL_NOISE = 65536,
-    LINK_QUALITY = 131072,
-    BCAST_ADDRESS = 262144,
-    GATEWAY = 524288,
-    DOWNLOAD_SPEED = 1048576,
-    UPLOAD_SPEED = 2097152
+    INTERFACE        = 0x00000001,
+    ALIAS            = 0x00000002,
+    STATUS           = 0x00000004,
+    UPTIME           = 0x00000008,
+    IP_ADDRESS       = 0x00000010,
+    SUBNET_MASK      = 0x00000020,
+    HW_ADDRESS       = 0x00000040,
+    PTP_ADDRESS      = 0x00000080,
+    RX_PACKETS       = 0x00000100,
+    TX_PACKETS       = 0x00000200,
+    RX_BYTES         = 0x00000400,
+    TX_BYTES         = 0x00000800,
+    ESSID            = 0x00001000,
+    MODE             = 0x00002000,
+    FREQUENCY        = 0x00004000,
+    BIT_RATE         = 0x00008000,
+    SIGNAL_NOISE     = 0x00010000,
+    LINK_QUALITY     = 0x00020000,
+    BCAST_ADDRESS    = 0x00040000,
+    GATEWAY          = 0x00080000,
+    DOWNLOAD_SPEED   = 0x00100000,
+    UPLOAD_SPEED     = 0x00200000
 };
 
 #endif // DATA_H
