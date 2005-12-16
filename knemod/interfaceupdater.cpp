@@ -214,8 +214,9 @@ void InterfaceUpdater::parseIfconfigOutput()
             interface->getData().existing = false;
             interface->getData().available = false;
         }
+        // JJ 2005-07-18: use RUNNING instead of UP to detect whether interface is connected
         else if ( !configs[key].contains( "inet " ) ||
-                  !configs[key].contains( "UP" ) )
+                  !configs[key].contains( "RUNNING" ) )
         {
             // The interface is up or has an IP assigned but not both
             interface->getData().existing = true;
@@ -399,7 +400,7 @@ void InterfaceUpdater::updateWirelessData( QString& config, WirelessData& data )
     if ( regExp.search( config ) > -1 )
         data.noise = regExp.cap( 1 );
 
-    regExp.setPattern( "Link Quality:([\\d/]*)" );
+    regExp.setPattern( "Link Quality[=:]([\\d/]*)" );
     if ( regExp.search( config ) > -1 )
         data.linkQuality = regExp.cap( 1 );
 }
