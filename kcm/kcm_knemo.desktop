@@ -31,6 +31,7 @@ Name[sv]=Nätverksövervakare
 Name[tr]=Ağ İzleyici
 Name[uk]=Монітор мережі
 Name[xx]=xxNetwork Monitorxx
+Name[zh_CN]=网络监视器
 Comment=Monitor network interfaces
 Comment[bg]=Показване на информация за мрежовите интерфейси
 Comment[br]=Eveshaer etrefasoù ar rouedad
@@ -53,5 +54,6 @@ Comment[sv]=Övervaka nätverksgränssnitt
 Comment[tr]=Ağ arayüzlerini izler
 Comment[uk]=Нагляд за мережними інтерфейсами
 Comment[xx]=xxMonitor network interfacesxx
+Comment[zh_CN]=监视网络接口
 
 Categories=Qt;KDE;X-KDE-settings-network
