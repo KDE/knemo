@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2005 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -41,6 +41,7 @@ InterfaceTray::InterfaceTray( const QString& ifname,
                               QWidget* parent, const char* name )
     : KSystemTray( parent, name )
 {
+    unsetCursor();
     actionCollection()->clear(); // remove the quit entry
 
     KPopupMenu* popup = contextMenu();
@@ -94,7 +95,7 @@ void InterfaceTray::showAboutDialog()
                       "percy@eris23.de" );
     data.addAuthor( "Percy Leonhardt", I18N_NOOP( "Author" ),
                     "percy@eris23.de" );
-    data.addAuthor( "Michael Olbrich", I18N_NOOP( "Threshold support" ),
+    data.addCredit( "Michael Olbrich", I18N_NOOP( "Threshold support" ),
                     "michael.olbrich@gmx.net" );
     data.addAuthor( "Bernd Zimmer", I18N_NOOP( "German translation" ),
                     "berndzimmer@gmx.de" );
@@ -116,7 +117,7 @@ void InterfaceTray::showAboutDialog()
                     "rinsedevries@kde.nl" );
     data.addAuthor( "Alexander Shiyan", I18N_NOOP( "Russian translation" ),
 	                "shc@milas.spb.ru" );
-	data.addAuthor( "Chris Schlaeger", I18N_NOOP( "Signal plotter" ),
+	data.addCredit( "Chris Schlaeger", I18N_NOOP( "Signal plotter" ),
                     "cs@kde.org" );
 
     KAboutApplication about( &data );
