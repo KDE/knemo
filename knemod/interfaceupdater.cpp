@@ -138,7 +138,7 @@ void InterfaceUpdater::routeProcessExited( KProcess* process )
 {
     if ( process == mRouteProcess )
     {
-        delete mRouteProcess;
+        mRouteProcess->deleteLater(); // we're in a slot connected to mRouteProcess
         mRouteProcess = 0L;
         parseRouteOutput();
     }
