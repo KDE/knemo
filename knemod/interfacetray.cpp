@@ -41,7 +41,6 @@ InterfaceTray::InterfaceTray( const QString& ifname,
                               QWidget* parent, const char* name )
     : KSystemTray( parent, name )
 {
-    unsetCursor();
     actionCollection()->clear(); // remove the quit entry
 
     KPopupMenu* popup = contextMenu();
