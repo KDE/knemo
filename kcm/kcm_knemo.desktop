@@ -59,6 +59,8 @@ Comment[zh_CN]=监视网络接口
 Keywords=knemo,network monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systray
 Keywords[et]=knemo,võrgumonitor,wlan monitor,wifi monitor,ethernet monitor,traadita võrgu monitor,süsteemne salv
 Keywords[it]=knemo,monitor di rete,wlan monitor,monitor senza fili,ethernet monitor,vassoio di sistema
+Keywords[pt]=knemo,monitor da rede,monitor de wlan,monitor wifi,monitor de ethernet,monitor sem-fios,bandeja do sistema
+Keywords[pt_BR]=knemo,monitor da rede,monitor de wlan,monitor wifi,monitor de ethernet,monitor sem-fios,bandeja do sistema
 Keywords[sv]=knemo,nätverksövervakning,WLAN-övervakning,WIFI-övervakning,Ethernet-övervakning,trådlös övervakning,systembricka
 
 Categories=Qt;KDE;X-KDE-settings-network
