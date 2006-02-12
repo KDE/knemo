@@ -10,5 +10,5 @@
    shown in tooltip)
  * add a button for context menu entries presets. I mean it would be great 
    if newbies could select entries for kppp, network start/stop/restart
-	 
-	 
+ * show two dynamic bars with the current netload instead of an icon 
+
