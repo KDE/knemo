@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -33,22 +33,42 @@
 
 #include "data.h"
 #include "interface.h"
+#include "interfacestatistics.h"
 #include "interfacestatusdialog.h"
 
 InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* parent, const char* name )
     : InterfaceStatusDlg( parent, name ),
       mPosInitialized( false ),
-      mInterface( interface )
+      mInterface( interface ),
+      mStatisticsTab( 0 )
 {
     setIcon( SmallIcon( "knemo" ) );
     setCaption( interface->getName() + " " + i18n( "Interface Status" ) );
     updateDialog();
     if ( interface->getData().available )
+    {
         enableNetworkTabs( 0 );
+    }
     else
+    {
         disableNetworkTabs( 0 );
+    }
     if ( !interface->getData().wirelessDevice )
-        tabWidget->removePage( tabWidget->page( 3 ) );
+    {
+        statisticsTabPos = 3;
+        QWidget* wirelessTab = tabWidget->page( 3 );
+        tabWidget->removePage( wirelessTab );
+        delete wirelessTab;
+    }
+    else
+    {
+        statisticsTabPos = 4;
+    }
+
+    if ( !interface->getSettings().activateStatistics )
+    {
+        hideStatisticsTab();
+    }
 
     // Restore window size and position.
     KConfig* config = new KConfig( "knemorc", false );
@@ -67,6 +87,8 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     }
     delete config;
 
+    statisticsChanged();
+
     mTimer = new QTimer();
     connect( mTimer, SIGNAL( timeout() ), this, SLOT( updateDialog() ) );
     mTimer->start( 1000 );
@@ -76,6 +98,13 @@ InterfaceStatusDialog::~InterfaceStatusDialog()
 {
     mTimer->stop();
     delete mTimer;
+
+    if ( mStatisticsTab != 0 )
+    {
+        // The tab is not inserted in the tabwidget so we have
+        // to remove it ourselves.
+        delete mStatisticsTab;
+    }
 
     // Store window size and position.
     KConfig* config = new KConfig( "knemorc", false );
@@ -107,6 +136,25 @@ void InterfaceStatusDialog::show()
      */
     if ( mPosInitialized )
         move( mPos );
+}
+
+void InterfaceStatusDialog::showStatisticsTab()
+{
+    if ( mStatisticsTab != 0 )
+    {
+        tabWidget->addTab( mStatisticsTab, i18n( "Statistics" ) );
+        mStatisticsTab = 0;
+    }
+}
+
+void InterfaceStatusDialog::hideStatisticsTab()
+{
+    if ( mStatisticsTab == 0 )
+    {
+        mStatisticsTab = tabWidget->page( statisticsTabPos );
+        tabWidget->setCurrentPage( 0 );
+        tabWidget->removePage( mStatisticsTab );
+    }
 }
 
 void InterfaceStatusDialog::updateDialog()
@@ -235,6 +283,32 @@ void InterfaceStatusDialog::disableNetworkTabs( int )
     tabWidget->setCurrentPage( 0 );
     tabWidget->setTabEnabled( ipTab, false );
     tabWidget->setTabEnabled( trafficTab, false );
+}
+
+void InterfaceStatusDialog::statisticsChanged()
+{
+    InterfaceStatistics* statistics = mInterface->getStatistics();
+
+    if ( statistics == 0 )
+    {
+        kdDebug() << "statisticsChanged: returning!!!" << endl;
+        return;
+    }
+
+    const StatisticEntry* entry = statistics->getCurrentDay();
+    textLabelTodaySent->setText( KIO::convertSize( entry->txBytes ) );
+    textLabelTodayReceived->setText( KIO::convertSize( entry->rxBytes ) );
+    textLabelTodayTotal->setText( KIO::convertSize( entry->txBytes + entry->rxBytes ) );
+
+    entry = statistics->getCurrentMonth();
+    textLabelMonthSent->setText( KIO::convertSize( entry->txBytes ) );
+    textLabelMonthReceived->setText( KIO::convertSize( entry->rxBytes ) );
+    textLabelMonthTotal->setText( KIO::convertSize( entry->txBytes + entry->rxBytes ) );
+
+    entry = statistics->getCurrentYear();
+    textLabelYearSent->setText( KIO::convertSize( entry->txBytes ) );
+    textLabelYearReceived->setText( KIO::convertSize( entry->rxBytes ) );
+    textLabelYearTotal->setText( KIO::convertSize( entry->txBytes + entry->rxBytes ) );
 }
 
 #include "interfacestatusdialog.moc"

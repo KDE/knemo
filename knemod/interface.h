@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -31,7 +31,9 @@
 
 class QTimer;
 class SignalPlotter;
+class InterfaceStatistics;
 class InterfaceStatusDialog;
+class InterfaceStatisticsDialog;
 
 /**
  * This class is the central place for all things that belong to an
@@ -100,6 +102,11 @@ public:
         return mWirelessData;
     }
 
+    InterfaceStatistics* getStatistics()
+    {
+        return mStatistics;
+    }
+
     /**
      * Called from reparseConfiguration() when the user changed
      * the settings.
@@ -153,16 +160,16 @@ public slots:
      */
     void showSignalPlotter( bool wasMiddleButton );
 
+    /*
+     * Called when the user selects the appropriate entry in the context menu.
+     */
+    void showStatisticsDialog();
+
 private slots:
     /**
      * Start the uptimer when the interface is connected
      */
     void setStartTime( int );
-
-    /**
-     * Reset the data counter when the interface goes offline
-     */
-    void resetDataCounter( int );
 
     /**
      * Update the signal plotter with new data
@@ -175,6 +182,16 @@ private slots:
     void configurePlotter();
 
 private:
+    /**
+     * Start the statistics and load previously saved ones
+     */
+    void startStatistics();
+
+    /**
+     * Store the statistics and stop collecting any further data
+     */
+    void stopStatistics();
+
     enum VisibleBeams
     {
         NONE = 0,
@@ -194,8 +211,10 @@ private:
     InterfaceData mData;
     InterfaceMonitor mMonitor;
     InterfaceSettings mSettings;
+    InterfaceStatistics* mStatistics;
     WirelessData mWirelessData;
-    InterfaceStatusDialog* mDialog;
+    InterfaceStatusDialog* mStatusDialog;
+    InterfaceStatisticsDialog* mStatisticsDialog;
     SignalPlotter* mPlotter;
     VisibleBeams mVisibleBeams;
     const PlotterSettings& mPlotterSettings;

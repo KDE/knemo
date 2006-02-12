@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -57,11 +57,11 @@ void InterfaceMonitor::checkStatus( Interface* interface )
     // update the statistics
     if ( data.incomingBytes > 0 )
     {
-        emit incomingTraffic( data.incomingBytes );
+        emit incomingData( data.incomingBytes );
     }
     if ( data.outgoingBytes > 0 )
     {
-        emit outgoingTraffic( data.outgoingBytes );
+        emit outgoingData( data.outgoingBytes );
     }
 
     mData = data; // backup current data

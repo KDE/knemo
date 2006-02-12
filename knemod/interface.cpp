@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -23,10 +23,13 @@
 #include <kdebug.h>
 #include <klocale.h>
 #include <kiconloader.h>
+#include <kstandarddirs.h>
 
 #include "interface.h"
 #include "signalplotter.h"
+#include "interfacestatistics.h"
 #include "interfacestatusdialog.h"
+#include "interfacestatisticsdialog.h"
 
 Interface::Interface( QString ifname, const PlotterSettings& plotterSettings )
     : QObject(),
@@ -35,10 +38,12 @@ Interface::Interface( QString ifname, const PlotterSettings& plotterSettings )
       mOutgoingPos( 0 ),
       mIncomingPos( 0 ),
       mName( ifname ),
-      mPlotterTimer( 0L ),
+      mPlotterTimer( 0 ),
       mIcon( this ),
-      mDialog( 0L ),
-      mPlotter( 0L ),
+      mStatistics( 0 ),
+      mStatusDialog( 0 ),
+      mStatisticsDialog(  0 ),
+      mPlotter( 0 ),
       mVisibleBeams( NONE ),
       mPlotterSettings( plotterSettings )
 {
@@ -52,22 +57,29 @@ Interface::Interface( QString ifname, const PlotterSettings& plotterSettings )
              &mIcon, SLOT( updateTrayStatus( int ) ) );
     connect( &mMonitor, SIGNAL( available( int ) ),
              this, SLOT( setStartTime( int ) ) );
-    connect( &mMonitor, SIGNAL( notAvailable( int ) ),
-             this, SLOT( resetDataCounter( int ) ) );
-    connect( &mMonitor, SIGNAL( notExisting( int ) ),
-             this, SLOT( resetDataCounter( int ) ) );
+    connect( &mIcon, SIGNAL( statisticsSelected() ),
+             this, SLOT( showStatisticsDialog() ) );
 }
 
 Interface::~Interface()
 {
-    if ( mDialog != 0L )
-        delete mDialog;
-    if ( mPlotter != 0L )
+    if ( mStatusDialog != 0 )
+    {
+        delete mStatusDialog;
+    }
+    if ( mPlotter != 0 )
+    {
         delete mPlotter;
-    if ( mPlotterTimer != 0L )
+    }
+    if ( mPlotterTimer != 0 )
     {
         mPlotterTimer->stop();
         delete mPlotterTimer;
+    }
+    if ( mStatistics != 0 )
+    {
+        // this will also delete a possibly open statistics dialog
+        stopStatistics();
     }
 }
 
@@ -79,8 +91,31 @@ void Interface::configChanged()
     mIcon.updateStatus( mState );
     mIcon.updateToolTip();
     mIcon.updateMenu();
+
     if ( mPlotter != 0L )
+    {
         configurePlotter();
+    }
+
+    if ( mSettings.activateStatistics && mStatistics == 0 )
+    {
+        // user turned on statistics
+        startStatistics();
+    }
+    else if ( !mSettings.activateStatistics && mStatistics != 0 )
+    {
+        // user turned off statistics
+        stopStatistics();
+    }
+
+    if ( mSettings.activateStatistics && mStatusDialog )
+    {
+        mStatusDialog->showStatisticsTab();
+    }
+    else if ( !mSettings.activateStatistics && mStatusDialog )
+    {
+        mStatusDialog->hideStatisticsTab();
+    }
 }
 
 void Interface::activateMonitor()
@@ -94,43 +129,41 @@ void Interface::setStartTime( int )
     mStartTime.setTime( QTime::currentTime() );
 }
 
-void Interface::resetDataCounter( int )
-{
-    mData.rxBytes = 0;
-    mData.txBytes = 0;
-    mData.prevRxBytes = 0;
-    mData.prevTxBytes = 0;
-}
-
 void Interface::showStatusDialog()
 {
     /* Toggle the status dialog.
      * First click will show the status dialog, second will hide it.
      */
-    if ( mDialog == 0L )
+    if ( mStatusDialog == 0L )
     {
-        mDialog = new InterfaceStatusDialog( this );
+        mStatusDialog = new InterfaceStatusDialog( this );
         connect( &mMonitor, SIGNAL( available( int ) ),
-                 mDialog, SLOT( enableNetworkTabs( int ) ) );
+                 mStatusDialog, SLOT( enableNetworkTabs( int ) ) );
         connect( &mMonitor, SIGNAL( notAvailable( int ) ),
-                 mDialog, SLOT( disableNetworkTabs( int ) ) );
+                 mStatusDialog, SLOT( disableNetworkTabs( int ) ) );
         connect( &mMonitor, SIGNAL( notExisting( int ) ),
-                 mDialog, SLOT( disableNetworkTabs( int ) ) );
-        mDialog->show();
+                 mStatusDialog, SLOT( disableNetworkTabs( int ) ) );
+        if ( mStatistics != 0 )
+        {
+            connect( mStatistics, SIGNAL( currentEntryChanged() ),
+                     mStatusDialog, SLOT( statisticsChanged() ) );
+            mStatusDialog->statisticsChanged();
+        }
+        mStatusDialog->show();
     }
     else
     {
-        // Toggle the signal plotter.
-        if ( mDialog->isHidden() )
-            mDialog->show();
+        // Toggle the status dialog.
+        if ( mStatusDialog->isHidden() )
+            mStatusDialog->show();
         else
         {
-            if ( mDialog->isActiveWindow() )
-                mDialog->hide();
+            if ( mStatusDialog->isActiveWindow() )
+                mStatusDialog->hide();
             else
             {
-                mDialog->raise();
-                mDialog->setActiveWindow();
+                mStatusDialog->raise();
+                mStatusDialog->setActiveWindow();
             }
         }
     }
@@ -183,6 +216,38 @@ void Interface::showSignalPlotter( bool wasMiddleButton )
             }
         }
     }
+}
+
+void Interface::showStatisticsDialog()
+{
+    if ( mStatisticsDialog == 0 )
+    {
+        mStatisticsDialog = new InterfaceStatisticsDialog( this );
+        if ( mStatistics == 0 )
+        {
+            // should never happen but you never know...
+            startStatistics();
+        }
+        connect( mStatistics, SIGNAL( dayStatisticsChanged() ),
+                 mStatisticsDialog, SLOT( updateDays() ) );
+        connect( mStatistics, SIGNAL( monthStatisticsChanged() ),
+                 mStatisticsDialog, SLOT( updateMonths() ) );
+        connect( mStatistics, SIGNAL( yearStatisticsChanged() ),
+                 mStatisticsDialog, SLOT( updateYears() ) );
+        connect( mStatistics, SIGNAL( currentEntryChanged() ),
+                 mStatisticsDialog, SLOT( updateCurrentEntry() ) );
+        connect( mStatisticsDialog, SIGNAL( clearDailyStatisticsClicked() ),
+                 mStatistics, SLOT( clearDayStatistics() ) );
+        connect( mStatisticsDialog, SIGNAL( clearMonthlyStatisticsClicked() ),
+                 mStatistics, SLOT( clearMonthStatistics() ) );
+        connect( mStatisticsDialog, SIGNAL( clearYearlyStatisticsClicked() ),
+                 mStatistics, SLOT( clearYearStatistics() ) );
+
+        mStatisticsDialog->updateDays();
+        mStatisticsDialog->updateMonths();
+        mStatisticsDialog->updateYears();
+    }
+    mStatisticsDialog->show();
 }
 
 void Interface::updatePlotter()
@@ -336,6 +401,41 @@ void Interface::configurePlotter()
     }
     mVisibleBeams = nextVisibleBeams;
     mPlotter->repaint();
+}
+
+void Interface::startStatistics()
+{
+    mStatistics = new InterfaceStatistics();
+    connect( &mMonitor, SIGNAL( incomingData( unsigned long ) ),
+             mStatistics, SLOT( addIncomingData( unsigned long ) ) );
+    connect( &mMonitor, SIGNAL( outgoingData( unsigned long ) ),
+             mStatistics, SLOT( addOutgoingData( unsigned long ) ) );
+    if ( mStatusDialog != 0 )
+    {
+        connect( mStatistics, SIGNAL( currentEntryChanged() ),
+                 mStatusDialog, SLOT( statisticsChanged() ) );
+        mStatusDialog->statisticsChanged();
+    }
+
+    QString fileName = KGlobal::dirs()->saveLocation( "data", "knemo/" );
+    fileName += "statistics_" + mName;
+    mStatistics->loadStatistics( fileName );
+}
+
+void Interface::stopStatistics()
+{
+    if ( mStatisticsDialog != 0 )
+    {
+        // this will close an open statistics dialog
+        delete mStatisticsDialog;
+        mStatisticsDialog = 0;
+    }
+    QString fileName = KGlobal::dirs()->saveLocation( "data", "knemo/" );
+    fileName += "statistics_" + mName;
+    mStatistics->saveStatistics( fileName );
+
+    delete mStatistics;
+    mStatistics = 0;
 }
 
 #include "interface.moc"

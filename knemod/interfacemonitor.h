@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -64,9 +64,9 @@ signals:
     // there was incoming and/or outgoing traffic
     void statusChanged( int );
     // the amount of incoming traffic (for statistics)
-    void incomingTraffic( unsigned long );
+    void incomingData( unsigned long );
     // the amount of outgoing traffic (for statistics)
-    void outgoingTraffic( unsigned long );
+    void outgoingData( unsigned long );
 
 private:
     // store old interface data to compare new data against

@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -56,6 +56,15 @@ public:
     void hide();
     void show();
 
+    /**
+     * Show the statistics tab when the user turned on statistics
+     */
+    void showStatisticsTab();
+    /**
+     * Hide the statistics tab when the user turned off statistics
+     */
+    void hideStatisticsTab();
+
 public slots:
     /**
      * Enable the network tabs when the interface is connected
@@ -65,6 +74,10 @@ public slots:
      * Disable the network tabs when the interface is not connected
      */
     void disableNetworkTabs( int );
+    /**
+     * Update the statistics tab when data changed
+     */
+    void statisticsChanged();
 
 private slots:
     void updateDialog();
@@ -75,6 +88,11 @@ private:
 
     QTimer* mTimer;
     Interface* mInterface;
+
+    // The position of the statistics tab depends on the wireless state
+    int statisticsTabPos;
+    // We remember the statistics tab to add it at a later time
+    QWidget* mStatisticsTab;
 };
 
 #endif // INTERFACESTATUSDIALOG_H

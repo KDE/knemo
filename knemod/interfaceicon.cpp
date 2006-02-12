@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2005 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -68,13 +68,21 @@ void InterfaceIcon::updateStatus( int status )
     // append the correct suffix to the filename.
     QString suffix;
     if ( mInterface->getSettings().iconSet == Interface::NETWORK )
+    {
         suffix = SUFFIX_LAN;
+    }
     else if ( mInterface->getSettings().iconSet == Interface::WIRELESS )
-            suffix = SUFFIX_WLAN;
+    {
+        suffix = SUFFIX_WLAN;
+    }
     else if ( mInterface->getSettings().iconSet == Interface::MODEM )
+    {
         suffix = SUFFIX_PPP;
+    }
     else
+    {
         suffix = ""; // use standard icons
+    }
 
     // Now set the correct icon depending on the status of the interface.
     if ( status == Interface::NOT_AVAILABLE ||
@@ -124,6 +132,13 @@ void InterfaceIcon::updateMenu()
         menu->removeItemAt( 6 );
 
     InterfaceSettings& settings = mInterface->getSettings();
+
+    // If the user wants statistics, add an entry to show them.
+    if ( settings.activateStatistics )
+    {
+        menu->insertItem( i18n( "Open &Statistics" ), this,
+                          SIGNAL( statisticsSelected() ) );
+    }
 
     // If the user wants custom commands, add them.
     if ( settings.customCommands )

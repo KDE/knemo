@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -106,6 +106,7 @@ void KNemoDaemon::readConfig()
             settings.customCommands = config->readBoolEntry( "CustomCommands" );
             settings.hideWhenNotAvailable = config->readBoolEntry( "HideWhenNotAvailable" );
             settings.hideWhenNotExisting = config->readBoolEntry( "HideWhenNotExisting" );
+            settings.activateStatistics = config->readBoolEntry( "ActivateStatistics" );
             settings.trafficThreshold = config->readNumEntry( "TrafficThreshold", 0 );
             if ( settings.customCommands )
             {
@@ -123,6 +124,7 @@ void KNemoDaemon::readConfig()
                     settings.commands.append( cmd );
                 }
             }
+            iface->configChanged(); // important to activate the statistics
         }
         mInterfaceDict.insert( interface, iface );
     }
@@ -181,6 +183,7 @@ void KNemoDaemon::reparseConfiguration()
             settings->customCommands = config->readBoolEntry( "CustomCommands" );
             settings->hideWhenNotAvailable = config->readBoolEntry( "HideWhenNotAvailable" );
             settings->hideWhenNotExisting = config->readBoolEntry( "HideWhenNotExisting" );
+            settings->activateStatistics = config->readBoolEntry( "ActivateStatistics" );
             settings->trafficThreshold = config->readNumEntry( "TrafficThreshold", 0 );
             if ( settings->customCommands )
             {
@@ -254,14 +257,16 @@ void KNemoDaemon::reparseConfiguration()
         else
             iface = mInterfaceDict[setIt.currentKey()];
 
-        iface->getSettings().toolTipContent = setIt.current()->toolTipContent;
-        iface->getSettings().alias = setIt.current()->alias;
-        iface->getSettings().iconSet = setIt.current()->iconSet;
-        iface->getSettings().customCommands = setIt.current()->customCommands;
-        iface->getSettings().hideWhenNotAvailable = setIt.current()->hideWhenNotAvailable;
-        iface->getSettings().hideWhenNotExisting = setIt.current()->hideWhenNotExisting;
-        iface->getSettings().trafficThreshold = setIt.current()->trafficThreshold;
-        iface->getSettings().commands = setIt.current()->commands;
+        InterfaceSettings& settings = iface->getSettings();
+        settings.toolTipContent = setIt.current()->toolTipContent;
+        settings.alias = setIt.current()->alias;
+        settings.iconSet = setIt.current()->iconSet;
+        settings.customCommands = setIt.current()->customCommands;
+        settings.hideWhenNotAvailable = setIt.current()->hideWhenNotAvailable;
+        settings.hideWhenNotExisting = setIt.current()->hideWhenNotExisting;
+        settings.activateStatistics = setIt.current()->activateStatistics;
+        settings.trafficThreshold = setIt.current()->trafficThreshold;
+        settings.commands = setIt.current()->commands;
         iface->configChanged();
     }
 }

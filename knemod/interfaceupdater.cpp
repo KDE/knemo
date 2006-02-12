@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -258,12 +258,17 @@ void InterfaceUpdater::updateInterfaceData( QString& config, InterfaceData& data
         if ( currentRxBytes < data.prevRxBytes )
         {
             // there was an overflow
-            data.rxBytes += 4294967295UL - data.prevRxBytes;
+            data.rxBytes += 0x7FFFFFFF - data.prevRxBytes;
             data.prevRxBytes = 0L;
         }
         if ( data.rxBytes == 0L )
+        {
             // on startup set to currently received bytes
             data.rxBytes = currentRxBytes;
+            // this is new: KNemo only counts the traffic transfered
+            // while it is running. Important to not falsify statistics!
+            data.prevRxBytes = currentRxBytes;
+        }
         else
             // afterwards only add difference to previous number of bytes
             data.rxBytes += currentRxBytes - data.prevRxBytes;
@@ -282,12 +287,17 @@ void InterfaceUpdater::updateInterfaceData( QString& config, InterfaceData& data
         if ( currentTxBytes < data.prevTxBytes )
         {
             // there was an overflow
-            data.txBytes += 4294967295UL - data.prevTxBytes;
+            data.txBytes += 0x7FFFFFFF - data.prevTxBytes;
             data.prevTxBytes = 0L;
         }
         if ( data.txBytes == 0L )
+        {
             // on startup set to currently transmitted bytes
             data.txBytes = currentTxBytes;
+            // this is new: KNemo only counts the traffic transfered
+            // while it is running. Important to not falsify statistics!
+            data.prevTxBytes = currentTxBytes;
+        }
         else
             // afterwards only add difference to previous number of bytes
             data.txBytes += currentTxBytes - data.prevTxBytes;

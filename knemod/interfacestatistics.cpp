@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2005 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2005, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -17,6 +17,9 @@
    Boston, MA 02110-1301, USA.
 */
 
+#include <qdom.h>
+#include <qfile.h>
+#include <qstring.h>
 #include <qdatetime.h>
 
 #include <kdebug.h>
@@ -39,49 +42,175 @@ InterfaceStatistics::~InterfaceStatistics()
     mYearStatistics.clear();
 }
 
-void InterfaceStatistics::loadStatistics( /*QString& fileName*/ )
+void InterfaceStatistics::loadStatistics( QString& fileName )
 {
-}
+    QDomDocument doc( "statistics" );
+    QFile file( fileName );
+    if ( !file.open( IO_ReadOnly ) )
+        return;
+    if ( !doc.setContent( &file ) )
+    {
+        file.close();
+        return;
+    }
+    file.close();
 
-void InterfaceStatistics::saveStatistics( /*QString& fileName*/ )
-{
-}
-
-void InterfaceStatistics::clearAll()
-{
     mDayStatistics.clear();
     mMonthStatistics.clear();
     mYearStatistics.clear();
 
+    QDomElement root = doc.documentElement();
+    QDomNode n = root.namedItem( "days" );
+    if ( !n.isNull() )
+    {
+        QDomNode dayNode = n.firstChild();
+        while ( !dayNode.isNull() )
+        {
+            QDomElement day = dayNode.toElement();
+            if ( !day.isNull() )
+            {
+                StatisticEntry* entry = new StatisticEntry();
+                entry->day = day.attribute( "day" ).toInt();
+                entry->month = day.attribute( "month" ).toInt();
+                entry->year = day.attribute( "year" ).toInt();
+                entry->rxBytes = day.attribute( "rxBytes" ).toULongLong();
+                entry->txBytes = day.attribute( "txBytes" ).toULongLong();
+                mDayStatistics.append( entry );
+            }
+            dayNode = dayNode.nextSibling();
+        }
+        mDayStatistics.sort();
+    }
+
+    n = root.namedItem( "months" );
+    if ( !n.isNull() )
+    {
+        QDomNode monthNode = n.firstChild();
+        while ( !monthNode.isNull() )
+        {
+            QDomElement month = monthNode.toElement();
+            if ( !month.isNull() )
+            {
+                StatisticEntry* entry = new StatisticEntry();
+                entry->day = 0;
+                entry->month = month.attribute( "month" ).toInt();
+                entry->year = month.attribute( "year" ).toInt();
+                entry->rxBytes = month.attribute( "rxBytes" ).toULongLong();
+                entry->txBytes = month.attribute( "txBytes" ).toULongLong();
+                mMonthStatistics.append( entry );
+            }
+            monthNode = monthNode.nextSibling();
+        }
+        mMonthStatistics.sort();
+    }
+
+    n = root.namedItem( "years" );
+    if ( !n.isNull() )
+    {
+        QDomNode yearNode = n.firstChild();
+        while ( !yearNode.isNull() )
+        {
+            QDomElement year = yearNode.toElement();
+            if ( !year.isNull() )
+            {
+                StatisticEntry* entry = new StatisticEntry();
+                entry->day = 0;
+                entry->month = 0;
+                entry->year = year.attribute( "year" ).toInt();
+                entry->rxBytes = year.attribute( "rxBytes" ).toULongLong();
+                entry->txBytes = year.attribute( "txBytes" ).toULongLong();
+                mYearStatistics.append( entry );
+            }
+            yearNode = yearNode.nextSibling();
+        }
+        mYearStatistics.sort();
+    }
     initStatistics();
 }
 
-const StatisticEntry* InterfaceStatistics::getCurrentDay()
+void InterfaceStatistics::saveStatistics( QString& fileName )
+{
+    QDomDocument doc( "statistics" );
+    QDomElement root = doc.createElement( "statistics" );
+    doc.appendChild( root );
+
+    QDomElement days = doc.createElement( "days" );
+    StatisticEntry* iterator = mDayStatistics.first();
+    while ( iterator )
+    {
+        QDomElement day = doc.createElement( "day" );
+        day.setAttribute( "day", iterator->day );
+        day.setAttribute( "month", iterator->month );
+        day.setAttribute( "year", iterator->year );
+        day.setAttribute( "rxBytes", (ulong) iterator->rxBytes );
+        day.setAttribute( "txBytes", (ulong) iterator->txBytes );
+        days.appendChild( day );
+        iterator = mDayStatistics.next();
+    }
+    root.appendChild( days );
+
+    QDomElement months = doc.createElement( "months" );
+    iterator = mMonthStatistics.first();
+    while ( iterator )
+    {
+        QDomElement month = doc.createElement( "month" );
+        month.setAttribute( "month", iterator->month );
+        month.setAttribute( "year", iterator->year );
+        month.setAttribute( "rxBytes", (ulong) iterator->rxBytes );
+        month.setAttribute( "txBytes", (ulong) iterator->txBytes );
+        months.appendChild( month );
+        iterator = mMonthStatistics.next();
+    }
+    root.appendChild( months );
+
+    QDomElement years = doc.createElement( "years" );
+    iterator = mYearStatistics.first();
+    while ( iterator )
+    {
+        QDomElement year = doc.createElement( "year" );
+        year.setAttribute( "year", iterator->year );
+        year.setAttribute( "rxBytes", (ulong) iterator->rxBytes );
+        year.setAttribute( "txBytes", (ulong) iterator->txBytes );
+        years.appendChild( year );
+        iterator = mYearStatistics.next();
+    }
+    root.appendChild( years );
+
+    QFile file( fileName );
+    if ( !file.open( IO_WriteOnly ) )
+        return;
+
+    QTextStream stream( &file );
+    stream << doc.toString();
+    file.close();
+}
+
+const StatisticEntry* InterfaceStatistics::getCurrentDay() const
 {
     return mCurrentDay;
 }
 
-const StatisticEntry* InterfaceStatistics::getCurrentMonth()
+const StatisticEntry* InterfaceStatistics::getCurrentMonth() const
 {
     return mCurrentMonth;
 }
 
-const StatisticEntry* InterfaceStatistics::getCurrentYear()
+const StatisticEntry* InterfaceStatistics::getCurrentYear() const
 {
     return mCurrentYear;
 }
 
-const QPtrList<StatisticEntry>& InterfaceStatistics::getDayStatistics()
+const StatisticsPtrList<StatisticEntry>& InterfaceStatistics::getDayStatistics() const
 {
    return mDayStatistics;
 }
 
-const QPtrList<StatisticEntry>& InterfaceStatistics::getMonthStatistics()
+const StatisticsPtrList<StatisticEntry>& InterfaceStatistics::getMonthStatistics() const
 {
     return mMonthStatistics;
 }
 
-const QPtrList<StatisticEntry>& InterfaceStatistics::getYearStatistics()
+const StatisticsPtrList<StatisticEntry>& InterfaceStatistics::getYearStatistics() const
 {
     return mYearStatistics;
 }
@@ -108,6 +237,24 @@ void InterfaceStatistics::addOutgoingData( unsigned long data )
     emit currentEntryChanged();
 }
 
+void InterfaceStatistics::clearDayStatistics()
+{
+    mDayStatistics.clear();
+    updateCurrentDay();
+}
+
+void InterfaceStatistics::clearMonthStatistics()
+{
+    mMonthStatistics.clear();
+    updateCurrentMonth();
+}
+
+void InterfaceStatistics::clearYearStatistics()
+{
+    mYearStatistics.clear();
+    updateCurrentYear();
+}
+
 void InterfaceStatistics::checkCurrentEntry()
 {
     if ( mCurrentDay->day != QDate::currentDate().day() ||
@@ -117,14 +264,14 @@ void InterfaceStatistics::checkCurrentEntry()
         // current day has changed
         updateCurrentDay();
 
-        if ( mCurrentDay->month != QDate::currentDate().month() ||
-             mCurrentDay->year != QDate::currentDate().year() )
+        if ( mCurrentMonth->month != QDate::currentDate().month() ||
+             mCurrentMonth->year != QDate::currentDate().year() )
         {
             // current month has also changed
             updateCurrentMonth();
         }
 
-        if ( mCurrentDay->year != QDate::currentDate().year() )
+        if ( mCurrentYear->year != QDate::currentDate().year() )
         {
             // current year has also changed
             updateCurrentYear();
@@ -134,100 +281,85 @@ void InterfaceStatistics::checkCurrentEntry()
 
 void InterfaceStatistics::initStatistics()
 {
-    mCurrentDay = new StatisticEntry();
-    mCurrentDay->day = QDate::currentDate().day();
-    mCurrentDay->month = QDate::currentDate().month();
-    mCurrentDay->year = QDate::currentDate().year();
-    mDayStatistics.append( mCurrentDay );
-
-    mCurrentMonth = new StatisticEntry();
-    mCurrentMonth->day = 0;
-    mCurrentMonth->month = QDate::currentDate().month();
-    mCurrentMonth->year = QDate::currentDate().year();
-    mMonthStatistics.append( mCurrentMonth );
-
-    mCurrentYear = new StatisticEntry();
-    mCurrentYear->day = 0;
-    mCurrentYear->month = 0;
-    mCurrentYear->year = QDate::currentDate().year();
-    mYearStatistics.append( mCurrentYear );
+    updateCurrentDay();
+    updateCurrentMonth();
+    updateCurrentYear();
 
     emit currentEntryChanged();
-    emit dayStatisticsChanged();
-    emit monthStatisticsChanged();
-    emit yearStatisticsChanged();
 }
 
 void InterfaceStatistics::updateCurrentDay()
 {
-    StatisticEntry* iterator = mDayStatistics.first();
-    while ( iterator )
+    mCurrentDay = mDayStatistics.first();
+    while ( mCurrentDay )
     {
-        if ( iterator->day == QDate::currentDate().day() &&
-             iterator->month == QDate::currentDate().month() &&
-             iterator->year == QDate::currentDate().year() )
+        if ( mCurrentDay->day == QDate::currentDate().day() &&
+             mCurrentDay->month == QDate::currentDate().month() &&
+             mCurrentDay->year == QDate::currentDate().year() )
         {
             // found current day in list
-            mCurrentDay = iterator;
             return;
         }
-        iterator = mDayStatistics.next();
+        mCurrentDay = mDayStatistics.next();
     }
 
     // the current day is not in the list
-    iterator = new StatisticEntry();
-    iterator->day = QDate::currentDate().day();
-    iterator->month = QDate::currentDate().month();
-    iterator->year = QDate::currentDate().year();
+    mCurrentDay = new StatisticEntry();
+    mCurrentDay->day = QDate::currentDate().day();
+    mCurrentDay->month = QDate::currentDate().month();
+    mCurrentDay->year = QDate::currentDate().year();
+    mCurrentDay->rxBytes = 0;
+    mCurrentDay->txBytes = 0;
     mDayStatistics.append( mCurrentDay ); // TODO: insert at correct position
     emit dayStatisticsChanged();
 }
 
 void InterfaceStatistics::updateCurrentMonth()
 {
-    StatisticEntry* iterator = mMonthStatistics.first();
-    while ( iterator )
+    mCurrentMonth = mMonthStatistics.first();
+    while ( mCurrentMonth )
     {
-        if ( iterator->month == QDate::currentDate().month() &&
-             iterator->year == QDate::currentDate().year() )
+        if ( mCurrentMonth->month == QDate::currentDate().month() &&
+             mCurrentMonth->year == QDate::currentDate().year() )
         {
             // found current month in list
-            mCurrentMonth = iterator;
             return;
         }
-        iterator = mMonthStatistics.next();
+        mCurrentMonth = mMonthStatistics.next();
     }
 
     // the current month is not in the list
-    iterator = new StatisticEntry();
-    iterator->day = 0;
-    iterator->month = QDate::currentDate().month();
-    iterator->year = QDate::currentDate().year();
+    mCurrentMonth = new StatisticEntry();
+    mCurrentMonth->day = 0;
+    mCurrentMonth->month = QDate::currentDate().month();
+    mCurrentMonth->year = QDate::currentDate().year();
+    mCurrentMonth->rxBytes = 0;
+    mCurrentMonth->txBytes = 0;
     mMonthStatistics.append( mCurrentMonth ); // TODO: insert at correct position
     emit monthStatisticsChanged();
 }
 
 void InterfaceStatistics::updateCurrentYear()
 {
-    StatisticEntry* iterator = mYearStatistics.first();
-    while ( iterator )
+    mCurrentYear = mYearStatistics.first();
+    while ( mCurrentYear )
     {
-        if ( iterator->year == QDate::currentDate().year() )
+        if ( mCurrentYear->year == QDate::currentDate().year() )
         {
             // found current year in list
-            mCurrentYear = iterator;
             return;
         }
-        iterator = mYearStatistics.next();
+        mCurrentYear = mYearStatistics.next();
     }
 
     // the current year is not in the list
-    iterator = new StatisticEntry();
-    iterator->day = 0;
-    iterator->month = 0;
-    iterator->year = QDate::currentDate().year();
+    mCurrentYear = new StatisticEntry();
+    mCurrentYear->day = 0;
+    mCurrentYear->month = 0;
+    mCurrentYear->year = QDate::currentDate().year();
+    mCurrentYear->rxBytes = 0;
+    mCurrentYear->txBytes = 0;
     mYearStatistics.append( mCurrentYear ); // TODO: insert at correct position
     emit yearStatisticsChanged();
 }
-
 
