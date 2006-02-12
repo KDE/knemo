@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2005 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -76,6 +76,7 @@ private slots:
     void iconSetChanged( int set );
     void checkBoxNotConnectedToggled( bool on );
     void checkBoxNotExistingToggled( bool on );
+    void checkBoxStatisticsToggled( bool on );
     void spinBoxTrafficValueChanged( int value );
     void checkBoxCustomToggled( bool on );
     void listViewCommandsSelectionChanged();

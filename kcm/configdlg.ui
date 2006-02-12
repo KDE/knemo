@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>ConfigDlg</class>
 <widget class="QWidget">
     <property name="name">
@@ -8,9 +8,12 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>477</width>
-            <height>488</height>
+            <width>468</width>
+            <height>484</height>
         </rect>
+    </property>
+    <property name="caption">
+        <string>ConfigDlg</string>
     </property>
     <hbox>
         <property name="name">
@@ -268,6 +271,9 @@ icons.</string>
                                 <property name="text">
                                     <string>Hide icon when &amp;not connected</string>
                                 </property>
+                                <property name="accel">
+                                    <string>Alt+N</string>
+                                </property>
                                 <property name="whatsThis" stdset="0">
                                     <string>When selected the icon for this interface will be
 hidden when the interface is not connected. 
@@ -315,6 +321,14 @@ of bluetooth adaptors.</string>
                                         </property>
                                     </widget>
                                 </hbox>
+                            </widget>
+                            <widget class="QCheckBox">
+                                <property name="name">
+                                    <cstring>checkBoxStatistics</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Activate statistics</string>
+                                </property>
                             </widget>
                             <widget class="QLayoutWidget">
                                 <property name="name">

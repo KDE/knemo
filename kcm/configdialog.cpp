@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -124,6 +124,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const char *name, const QStringList
              this, SLOT( checkBoxNotConnectedToggled ( bool ) ) );
     connect( mDlg->checkBoxNotExisting, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxNotExistingToggled ( bool ) ) );
+    connect( mDlg->checkBoxStatistics, SIGNAL( toggled( bool ) ),
+             this, SLOT( checkBoxStatisticsToggled ( bool ) ) );
     connect( mDlg->spinBoxTrafficThreshold, SIGNAL( valueChanged( int ) ),
              this, SLOT( spinBoxTrafficValueChanged ( int ) ) );
     connect( mDlg->checkBoxCustom, SIGNAL( toggled( bool ) ),
@@ -245,6 +247,7 @@ void ConfigDialog::load()
             settings->customCommands = config->readBoolEntry( "CustomCommands" );
             settings->hideWhenNotAvailable = config->readBoolEntry( "HideWhenNotAvailable" );
             settings->hideWhenNotExisting = config->readBoolEntry( "HideWhenNotExisting" );
+            settings->activateStatistics = config->readBoolEntry( "ActivateStatistics" );
             settings->trafficThreshold = config->readNumEntry( "TrafficThreshold", 0 );
             int numCommands = config->readNumEntry( "NumCommands" );
             for ( int i = 0; i < numCommands; i++ )
@@ -312,6 +315,7 @@ void ConfigDialog::save()
         config->writeEntry( "CustomCommands", settings->customCommands );
         config->writeEntry( "HideWhenNotAvailable", settings->hideWhenNotAvailable );
         config->writeEntry( "HideWhenNotExisting", settings->hideWhenNotExisting );
+        config->writeEntry( "ActivateStatistics", settings->activateStatistics );
         config->writeEntry( "TrafficThreshold", settings->trafficThreshold );
         config->writeEntry( "NumCommands", settings->commands.size() );
         for ( uint i = 0; i < settings->commands.size(); i++ )
@@ -380,6 +384,7 @@ void ConfigDialog::defaults()
                 settings->customCommands = false;
                 settings->hideWhenNotAvailable = false;
                 settings->hideWhenNotExisting = false;
+                settings->activateStatistics = false;
                 mSettingsDict.insert( interface, settings );
                 mDlg->listBoxInterfaces->insertItem( interface );
             }
@@ -393,6 +398,7 @@ void ConfigDialog::defaults()
                 mDlg->comboBoxIconSet->setCurrentItem( 0 );
                 mDlg->checkBoxNotConnected->setChecked( false );
                 mDlg->checkBoxNotExisting->setChecked( false );
+                mDlg->checkBoxStatistics->setChecked( false );
                 mDlg->checkBoxCustom->setChecked( false );
             }
         }
@@ -465,6 +471,9 @@ void ConfigDialog::buttonDeleteSelected()
     mDlg->checkBoxNotExisting->blockSignals( true );
     mDlg->checkBoxNotExisting->setChecked( false );
     mDlg->checkBoxNotExisting->blockSignals( false );
+    mDlg->checkBoxStatistics->blockSignals( true );
+    mDlg->checkBoxStatistics->setChecked( false );
+    mDlg->checkBoxStatistics->blockSignals( false );
     mDlg->checkBoxCustom->blockSignals( true );
     mDlg->checkBoxCustom->setChecked( false );
     mDlg->checkBoxCustom->blockSignals( false );
@@ -754,6 +763,7 @@ void ConfigDialog::interfaceSelected( const QString& interface )
     mDlg->checkBoxCustom->setChecked( settings->customCommands );
     mDlg->checkBoxNotConnected->setChecked( settings->hideWhenNotAvailable );
     mDlg->checkBoxNotExisting->setChecked( settings->hideWhenNotExisting );
+    mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
     mDlg->spinBoxTrafficThreshold->setValue( settings->trafficThreshold );
 
     mDlg->listViewCommands->clear();
@@ -841,6 +851,19 @@ void ConfigDialog::checkBoxNotExistingToggled( bool on )
 
     InterfaceSettings* settings = mSettingsDict[selected->text()];
     settings->hideWhenNotExisting = on;
+    if (!mLock) changed( true );
+}
+
+
+void ConfigDialog::checkBoxStatisticsToggled( bool on )
+{
+    QListBoxItem* selected = mDlg->listBoxInterfaces->selectedItem();
+
+    if ( selected == 0 )
+        return;
+
+    InterfaceSettings* settings = mSettingsDict[selected->text()];
+    settings->activateStatistics = on;
     if (!mLock) changed( true );
 }
 
