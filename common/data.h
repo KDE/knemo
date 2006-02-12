@@ -49,6 +49,7 @@ struct InterfaceSettings
         trafficThreshold( 0 ),
         hideWhenNotExisting( false ),
         hideWhenNotAvailable( false ),
+        activateStatistics( false ),
         customCommands( false )
     {}
 
@@ -58,7 +59,7 @@ struct InterfaceSettings
     int trafficThreshold;
     bool hideWhenNotExisting;
     bool hideWhenNotAvailable;
-	bool activateStatistics;
+    bool activateStatistics;
     bool customCommands;
     QString alias;
     QValueVector<InterfaceCommand> commands;
