@@ -90,8 +90,10 @@ void InterfaceTray::showAboutDialog()
 {
     KAboutData data ( "knemo", I18N_NOOP( "KNemo" ), version,
                       description, KAboutData::License_GPL,
-                      "(c) 2004, 2005, 2006 Percy Leonhardt\n\nSignal plotter taken from KSysGuard\n(c) 1999 - 2002, Chris Schlaeger", 0, 0,
-                      "percy@eris23.de" );
+                      "(c) 2004, 2005, 2006 Percy Leonhardt\n\nSignal plotter taken from KSysGuard\n(c) 1999 - 2002, Chris Schlaeger",
+		      0,
+		      "http://extragear.kde.org/apps/knemo/"
+                      );
     data.addAuthor( "Percy Leonhardt", I18N_NOOP( "Author" ),
                     "percy@eris23.de" );
     data.addCredit( "Michael Olbrich", I18N_NOOP( "Threshold support" ),
