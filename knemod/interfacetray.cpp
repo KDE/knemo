@@ -35,7 +35,7 @@
 static const char description[] =
    I18N_NOOP( "KNemo - the KDE Network Monitor" );
 
-static const char version[] = "0.3.1";
+static const char version[] = "0.4.0-svn";
 
 InterfaceTray::InterfaceTray( const QString& ifname,
                               QWidget* parent, const char* name )
@@ -90,7 +90,7 @@ void InterfaceTray::showAboutDialog()
 {
     KAboutData data ( "knemo", I18N_NOOP( "KNemo" ), version,
                       description, KAboutData::License_GPL,
-                      "(c) 2004, 2005, Percy Leonhardt\n\nSignal plotter taken from KSysGuard\n(c) 1999 - 2002, Chris Schlaeger", 0, 0,
+                      "(c) 2004, 2005, 2006 Percy Leonhardt\n\nSignal plotter taken from KSysGuard\n(c) 1999 - 2002, Chris Schlaeger", 0, 0,
                       "percy@eris23.de" );
     data.addAuthor( "Percy Leonhardt", I18N_NOOP( "Author" ),
                     "percy@eris23.de" );
