@@ -65,5 +65,6 @@ Keywords[nl]=knemo,netwerkmonitor,wlan-monitor,wifi-monitor,ethernetmonitor,wire
 Keywords[pt]=knemo,monitor da rede,monitor de wlan,monitor wifi,monitor de ethernet,monitor sem-fios,bandeja do sistema
 Keywords[pt_BR]=knemo,monitor da rede,monitor de wlan,monitor wifi,monitor de ethernet,monitor sem-fios,bandeja do sistema
 Keywords[sv]=knemo,nätverksövervakning,WLAN-övervakning,WIFI-övervakning,Ethernet-övervakning,trådlös övervakning,systembricka
+Keywords[xx]=xxknemo,network monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systrayxx
 
 Categories=Qt;KDE;X-KDE-settings-network
