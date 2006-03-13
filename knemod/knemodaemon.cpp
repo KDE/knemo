@@ -58,7 +58,7 @@ KNemoDaemon::KNemoDaemon( const QCString& name )
         config->sync();
         delete config;
 
-        KMessageBox::information( 0L, i18n( "It seems that you are running KNemo for the first time. In the following dialog please add all interfaces that you wish to monitor. Valid interfaces are e.g. 'eth2', 'wlan1' or 'ppp0'.\n\nHint: Select the button 'Defaults' in the setup dialog and KNemo will automatically scan for available interfaces." ), i18n( "Setting up KNemo" ) );
+        KMessageBox::information( 0L, i18n( "It seems that you are running KNemo for the first time. In the following dialog please add all interfaces that you wish to monitor. Valid interfaces are e.g. 'eth2', 'wlan1' or 'ppp0'.\n\nHint: Select the button 'Defaults' in the setup dialog and KNemo will automatically scan for available interfaces.\nYou can find the KNemo configuration dialog in the KDE Control Center -> Internet & Network -> Network Monitor. To start and stop KNemo use the entry under KDE Components -> Service Manager." ), i18n( "Setting up KNemo" ) );
 
         KProcess process;
         process << "kcmshell" << "kcm_knemo";
