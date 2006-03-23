@@ -60,6 +60,7 @@ Comment[zh_CN]=监视网络接口
 Keywords=knemo,network monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systray
 Keywords[da]=knemo,netværksovervågning,WLAN-overvågning,WIFI-overvågning,Ethernet-overvågning,trådløs overvågning,statusfelt
 Keywords[el]=knemo,επόπτης δικτύου,επόπτης wlan,επόπτης wifi,επόπτης ethernet, επόπτης wireless,πλαίσιο συστήματος
+Keywords[es]=knemo,monitor de red,monitor de wlan,monitor wifi,monitor de ethernet,monitor inalámbrico,bandeja del sistema
 Keywords[et]=knemo,võrgumonitor,wlan monitor,wifi monitor,ethernet monitor,traadita võrgu monitor,süsteemne salv
 Keywords[it]=knemo,monitor di rete,wlan monitor,monitor senza fili,ethernet monitor,vassoio di sistema
 Keywords[nl]=knemo,netwerkmonitor,wlan-monitor,wifi-monitor,ethernetmonitor,wireless-monitor,systeemvak
