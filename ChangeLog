@@ -1,3 +1,8 @@
+Version 0.4.0 (april fool release):
+ * added statistics for every day, month and year that show the
+   incoming, outgoing and total traffic.
+ * some minor improvements and changes
+
 Version 0.3.1 (birthday release):
  * added Russian translation
  * updated Brazilian Portuguese translation
