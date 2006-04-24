@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
 <class>ConfigDlg</class>
 <widget class="QWidget">
     <property name="name">
@@ -11,9 +11,6 @@
             <width>468</width>
             <height>484</height>
         </rect>
-    </property>
-    <property name="caption">
-        <string>ConfigDlg</string>
     </property>
     <hbox>
         <property name="name">
@@ -270,9 +267,6 @@ icons.</string>
                                 </property>
                                 <property name="text">
                                     <string>Hide icon when &amp;not connected</string>
-                                </property>
-                                <property name="accel">
-                                    <string>Alt+N</string>
                                 </property>
                                 <property name="whatsThis" stdset="0">
                                     <string>When selected the icon for this interface will be
