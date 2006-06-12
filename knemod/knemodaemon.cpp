@@ -17,6 +17,7 @@
    Boston, MA 02110-1301, USA.
 */
 
+#include <qtimer.h>
 #include <qstrlist.h>
 
 #include <kdebug.h>
@@ -70,10 +71,19 @@ KNemoDaemon::KNemoDaemon( const QCString& name )
 
     mInterfaceDict.setAutoDelete( true );
     mUpdater = new InterfaceUpdater( mInterfaceDict );
+
+    mPollTimer = new QTimer();
+    connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );
+    mPollTimer->start( mGeneralData.pollInterval * 1000 );
+
+    mLastUpdateTime.setDate( QDate::currentDate() );
+    mLastUpdateTime.setTime( QTime::currentTime() );
 }
 
 KNemoDaemon::~KNemoDaemon()
 {
+    mPollTimer->stop();
+    delete mPollTimer;
     delete mUpdater;
     delete mNotifyInstance;
     delete mInstance;
@@ -168,6 +178,10 @@ void KNemoDaemon::reparseConfiguration()
     mGeneralData.saveInterval = config->readNumEntry( "SaveInterval", 60 );
     mGeneralData.statisticsDir = config->readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
     mGeneralData.toolTipContent = config->readNumEntry( "ToolTipContent", 2 );
+
+    // restart the timer with the new interval
+    mPollTimer->changeInterval( mGeneralData.pollInterval * 1000 );
+
     QStrList list;
     int numEntries = config->readListEntry( "Interfaces", list );
 
@@ -284,6 +298,17 @@ QString KNemoDaemon::getSelectedInterface()
     sSelectedInterface = QString::null;
 
     return tmp;
+}
+
+void KNemoDaemon::updateInterfaces()
+{
+    mUpdater->checkConfig();
+
+    // needed to calculate the current speed
+    mGeneralData.secondsSinceLastUpdate = mLastUpdateTime.secsTo( QDateTime::currentDateTime() );
+    mLastUpdateTime.setDate( QDate::currentDate() );
+    mLastUpdateTime.setTime( QTime::currentTime() );
+
 }
 
 #include "knemodaemon.moc"

@@ -239,8 +239,10 @@ void InterfaceStatusDialog::updateDialog()
                                      "\n" + data.txString );
         textLabelBytesReceived->setText( KGlobal::locale()->formatNumber( (double) data.rxBytes, 0 ) +
                                          "\n" +data.rxString );
-        textLabelSpeedSend->setText( KIO::convertSize( data.outgoingBytes ) + i18n( "/s" ) );
-        textLabelSpeedReceived->setText( KIO::convertSize( data.incomingBytes ) + i18n( "/s" ) );
+        unsigned long bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().secondsSinceLastUpdate;
+        textLabelSpeedSend->setText( KIO::convertSize( bytesPerSecond  ) + i18n( "/s" ) );
+        bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().secondsSinceLastUpdate;
+        textLabelSpeedReceived->setText( KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) );
     }
 
     if ( data.wirelessDevice )

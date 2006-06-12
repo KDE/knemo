@@ -26,7 +26,6 @@
 #include "data.h"
 #include "interface.h"
 
-class QTimer;
 class KProcess;
 
 /**
@@ -52,8 +51,9 @@ public:
      */
     virtual ~InterfaceUpdater();
 
-private slots:
     void checkConfig();
+
+private slots:
     void routeProcessExited( KProcess* process );
     void routeProcessStdout( KProcess* process, char* buffer, int buflen );
     void ifconfigProcessExited( KProcess* process );
@@ -68,7 +68,6 @@ private:
     void parseIwconfigOutput();
     void updateWirelessData( QString& config, WirelessData& data );
 
-    QTimer* mTimer;
     QString mRouteStdout;
     QString mIfconfigStdout;
     QString mIwconfigStdout;

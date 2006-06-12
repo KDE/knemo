@@ -128,9 +128,15 @@ void InterfaceToolTip::setupText( QString& text )
         if ( toolTipContent & TX_BYTES )
             text += "<tr><td>" + mToolTips[11].first + "</td><td>" + data.txString + "</td></tr>";
         if ( toolTipContent & DOWNLOAD_SPEED )
-            text += "<tr><td>" + mToolTips[20].first + "</td><td>" + KIO::convertSize( data.incomingBytes ) + i18n( "/s" ) + "</td></tr>";
+        {
+            unsigned long bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().secondsSinceLastUpdate;
+            text += "<tr><td>" + mToolTips[20].first + "</td><td>" + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + "</td></tr>";
+        }
         if ( toolTipContent & UPLOAD_SPEED )
-            text += "<tr><td>" + mToolTips[21].first + "</td><td>" + KIO::convertSize( data.outgoingBytes ) + i18n( "/s" ) + "</td></tr>";
+        {
+            unsigned long bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().secondsSinceLastUpdate;
+            text += "<tr><td>" + mToolTips[21].first + "</td><td>" + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + "</td></tr>";
+        }
     }
 
     if ( data.available && data.wirelessDevice )

@@ -23,12 +23,15 @@
 #include <qdict.h>
 #include <qcolor.h>
 #include <qcstring.h>
+#include <qdatetime.h>
 
-#include "data.h"
-#include "global.h"
 #include <kdedmodule.h>
 #include <knotifyclient.h>
 
+#include "data.h"
+#include "global.h"
+
+class QTimer;
 class KInstance;
 class Interface;
 class InterfaceUpdater;
@@ -82,12 +85,25 @@ private:
      */
     void readConfig();
 
+private slots:
+    /**
+     * trigger the backend to update the interface informations
+     */
+    void updateInterfaces();
+
+private:
     QColor mColorVLines;
     QColor mColorHLines;
     QColor mColorIncoming;
     QColor mColorOutgoing;
     QColor mColorBackground;
 
+    // needed to calculate the number of
+    // seconds since the last update
+    QDateTime mLastUpdateTime;
+    // every time this timer expires we will
+    // gather new informations from the backend
+    QTimer* mPollTimer;
     // our own instance
     KInstance* mInstance;
     // needed so that KNotifyClient::event will work

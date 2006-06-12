@@ -33,6 +33,7 @@
 
 struct GeneralData
 {
+    int secondsSinceLastUpdate;
     int toolTipContent;
     int pollInterval;
     int saveInterval;

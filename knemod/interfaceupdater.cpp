@@ -18,7 +18,6 @@
 */
 
 #include <qmap.h>
-#include <qtimer.h>
 #include <qregexp.h>
 #include <qstringlist.h>
 
@@ -37,16 +36,10 @@ InterfaceUpdater::InterfaceUpdater( QDict<Interface>& interfaceDict )
       mIwconfigProcess(0L),
       mInterfaceDict( interfaceDict )
 {
-    mTimer = new QTimer();
-    connect( mTimer, SIGNAL( timeout() ), this, SLOT( checkConfig() ) );
-    mTimer->start( 1000 );
 }
 
 InterfaceUpdater::~InterfaceUpdater()
 {
-    mTimer->stop();
-    delete mTimer;
-
     if ( mRouteProcess )
     {
         mRouteProcess->kill();
