@@ -1,3 +1,10 @@
+Version 0.4.1:
+ * added Hungarian translation
+ * updated Russian translation
+ * added timer to store statistics periodically
+ * made location of statistic files configurable
+ * made update interval of interface informations configurable
+
 Version 0.4.0 (april fool release):
  * added statistics for every day, month and year that show the
    incoming, outgoing and total traffic.

@@ -1,4 +1,3 @@
- * add more statistics (logging)
  * redesign the status dialog
  * add MAC address of access point to WLAN infos
  * create the plotter (but keep it hidden) when an interface
