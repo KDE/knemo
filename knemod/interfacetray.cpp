@@ -117,8 +117,10 @@ void InterfaceTray::showAboutDialog()
     data.addAuthor( "Rinse de Vries", I18N_NOOP( "Dutch translation" ),
                     "rinsedevries@kde.nl" );
     data.addAuthor( "Alexander Shiyan", I18N_NOOP( "Russian translation" ),
-	                "shc@milas.spb.ru" );
-	data.addCredit( "Chris Schlaeger", I18N_NOOP( "Signal plotter" ),
+                    "shc@milas.spb.ru" );
+    data.addAuthor( "Charles Barcza", I18N_NOOP( "Hungarian translation" ),
+                    "kbarcza@blackpanther.hu" );
+    data.addCredit( "Chris Schlaeger", I18N_NOOP( "Signal plotter" ),
                     "cs@kde.org" );
 
     KAboutApplication about( &data );

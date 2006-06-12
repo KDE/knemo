@@ -30,13 +30,11 @@
 
 #include "config.h"
 
-InterfaceUpdater::InterfaceUpdater( QDict<Interface>& interfaceDict,
-                                    const GeneralData& generalData )
+InterfaceUpdater::InterfaceUpdater( QDict<Interface>& interfaceDict )
     : QObject(),
       mRouteProcess(0L),
       mIfconfigProcess(0L),
       mIwconfigProcess(0L),
-      mGeneralData( generalData ),
       mInterfaceDict( interfaceDict )
 {
     mTimer = new QTimer();

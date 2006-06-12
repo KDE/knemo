@@ -26,6 +26,7 @@
 #include <kprocess.h>
 #include <kinstance.h>
 #include <kmessagebox.h>
+#include <kstandarddirs.h>
 
 #include "knemodaemon.h"
 #include "interface.h"
@@ -68,7 +69,7 @@ KNemoDaemon::KNemoDaemon( const QCString& name )
         readConfig();
 
     mInterfaceDict.setAutoDelete( true );
-    mUpdater = new InterfaceUpdater( mInterfaceDict, mGeneralData );
+    mUpdater = new InterfaceUpdater( mInterfaceDict );
 }
 
 KNemoDaemon::~KNemoDaemon()
@@ -83,6 +84,9 @@ void KNemoDaemon::readConfig()
     KConfig* config = new KConfig( "knemorc", true );
 
     config->setGroup( "General" );
+    mGeneralData.pollInterval = config->readNumEntry( "PollInterval", 1 );
+    mGeneralData.saveInterval = config->readNumEntry( "SaveInterval", 60 );
+    mGeneralData.statisticsDir = config->readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
     mGeneralData.toolTipContent = config->readNumEntry( "ToolTipContent", 2 );
     QStrList list;
     int numEntries = config->readListEntry( "Interfaces", list );
@@ -93,14 +97,13 @@ void KNemoDaemon::readConfig()
     char* interface;
     for ( interface = list.first(); interface; interface = list.next() )
     {
-        Interface* iface = new Interface( interface, mPlotterSettings );
+        Interface* iface = new Interface( interface, mGeneralData, mPlotterSettings );
         QString group( "Interface_" );
         group += interface;
         if ( config->hasGroup( group ) )
         {
             config->setGroup( group );
             InterfaceSettings& settings = iface->getSettings();
-            settings.toolTipContent = mGeneralData.toolTipContent;
             settings.alias = config->readEntry( "Alias" );
             settings.iconSet = config->readNumEntry( "IconSet", 0 );
             settings.customCommands = config->readBoolEntry( "CustomCommands" );
@@ -161,6 +164,9 @@ void KNemoDaemon::reparseConfiguration()
     KConfig* config = new KConfig( "knemorc", false );
 
     config->setGroup( "General" );
+    mGeneralData.pollInterval = config->readNumEntry( "PollInterval", 1 );
+    mGeneralData.saveInterval = config->readNumEntry( "SaveInterval", 60 );
+    mGeneralData.statisticsDir = config->readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
     mGeneralData.toolTipContent = config->readNumEntry( "ToolTipContent", 2 );
     QStrList list;
     int numEntries = config->readListEntry( "Interfaces", list );
@@ -177,7 +183,6 @@ void KNemoDaemon::reparseConfiguration()
         if ( config->hasGroup( group ) )
         {
             config->setGroup( group );
-            settings->toolTipContent = mGeneralData.toolTipContent;
             settings->alias = config->readEntry( "Alias" );
             settings->iconSet = config->readNumEntry( "IconSet", 0 );
             settings->customCommands = config->readBoolEntry( "CustomCommands" );
@@ -251,14 +256,13 @@ void KNemoDaemon::reparseConfiguration()
         Interface* iface;
         if ( mInterfaceDict.find( setIt.currentKey() ) == 0 )
         {
-            iface = new Interface( setIt.currentKey(), mPlotterSettings );
+            iface = new Interface( setIt.currentKey(), mGeneralData, mPlotterSettings );
             mInterfaceDict.insert( setIt.currentKey(), iface );
         }
         else
             iface = mInterfaceDict[setIt.currentKey()];
 
         InterfaceSettings& settings = iface->getSettings();
-        settings.toolTipContent = setIt.current()->toolTipContent;
         settings.alias = setIt.current()->alias;
         settings.iconSet = setIt.current()->iconSet;
         settings.customCommands = setIt.current()->customCommands;

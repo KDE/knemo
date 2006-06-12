@@ -50,7 +50,9 @@ public:
     /**
      * Default Constructor
      */
-    Interface(QString ifname, const PlotterSettings& plotterSettings );
+    Interface(QString ifname,
+              const GeneralData& generalData,
+              const PlotterSettings& plotterSettings );
 
     /**
      * Default Destructor
@@ -77,12 +79,12 @@ public:
         return mState;
     }
 
-    QDateTime getStartTime() const
+    const QDateTime& getStartTime() const
     {
         return mStartTime;
     }
 
-    QString getName() const
+    const QString& getName() const
     {
         return mName;
     }
@@ -100,6 +102,11 @@ public:
     WirelessData& getWirelessData()
     {
         return mWirelessData;
+    }
+
+    const GeneralData& getGeneralData() const
+    {
+        return mGeneralData;
     }
 
     InterfaceStatistics* getStatistics()
@@ -217,6 +224,7 @@ private:
     InterfaceStatisticsDialog* mStatisticsDialog;
     SignalPlotter* mPlotter;
     VisibleBeams mVisibleBeams;
+    const GeneralData& mGeneralData;
     const PlotterSettings& mPlotterSettings;
 };
 

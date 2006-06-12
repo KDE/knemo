@@ -53,7 +53,7 @@ void InterfaceToolTip::maybeTip( const QPoint& )
 
 void InterfaceToolTip::setupText( QString& text )
 {
-    int toolTipContent = mInterface->getSettings().toolTipContent;
+    int toolTipContent = mInterface->getGeneralData().toolTipContent;
     InterfaceData& data = mInterface->getData();
 
     text += "<table cellspacing=0 cellpadding=0 border=0>";

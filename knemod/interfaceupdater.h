@@ -45,7 +45,7 @@ public:
     /**
      * Default Constructor
      */
-    InterfaceUpdater(QDict<Interface>& interfaceDict, const GeneralData& generalData );
+    InterfaceUpdater(QDict<Interface>& interfaceDict );
 
     /**
      * Default Destructor
@@ -75,7 +75,6 @@ private:
     KProcess* mRouteProcess;
     KProcess* mIfconfigProcess;
     KProcess* mIwconfigProcess;
-    const GeneralData& mGeneralData;
     const QDict<Interface>& mInterfaceDict;
 };
 

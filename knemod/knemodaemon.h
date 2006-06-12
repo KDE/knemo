@@ -57,11 +57,6 @@ public:
      */
     virtual ~KNemoDaemon();
 
-    const GeneralData& getGeneralData() const
-    {
-        return mGeneralData;
-    }
-
     // tell the control center module which interface the user selected
     static QString sSelectedInterface;
 

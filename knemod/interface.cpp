@@ -23,7 +23,6 @@
 #include <kdebug.h>
 #include <klocale.h>
 #include <kiconloader.h>
-#include <kstandarddirs.h>
 
 #include "interface.h"
 #include "signalplotter.h"
@@ -31,7 +30,9 @@
 #include "interfacestatusdialog.h"
 #include "interfacestatisticsdialog.h"
 
-Interface::Interface( QString ifname, const PlotterSettings& plotterSettings )
+Interface::Interface( QString ifname,
+                      const GeneralData& generalData,
+                      const PlotterSettings& plotterSettings )
     : QObject(),
       mType( UNKNOWN_TYPE ),
       mState( UNKNOWN_STATE ),
@@ -45,6 +46,7 @@ Interface::Interface( QString ifname, const PlotterSettings& plotterSettings )
       mStatisticsDialog(  0 ),
       mPlotter( 0 ),
       mVisibleBeams( NONE ),
+      mGeneralData( generalData ),
       mPlotterSettings( plotterSettings )
 {
     connect( &mMonitor, SIGNAL( statusChanged( int ) ),
@@ -95,6 +97,11 @@ void Interface::configChanged()
     if ( mPlotter != 0L )
     {
         configurePlotter();
+    }
+
+    if ( mStatistics != 0 )
+    {
+        mStatistics->configChanged();
     }
 
     if ( mSettings.activateStatistics && mStatistics == 0 )
@@ -405,7 +412,7 @@ void Interface::configurePlotter()
 
 void Interface::startStatistics()
 {
-    mStatistics = new InterfaceStatistics();
+    mStatistics = new InterfaceStatistics( this );
     connect( &mMonitor, SIGNAL( incomingData( unsigned long ) ),
              mStatistics, SLOT( addIncomingData( unsigned long ) ) );
     connect( &mMonitor, SIGNAL( outgoingData( unsigned long ) ),
@@ -417,9 +424,7 @@ void Interface::startStatistics()
         mStatusDialog->statisticsChanged();
     }
 
-    QString fileName = KGlobal::dirs()->saveLocation( "data", "knemo/" );
-    fileName += "statistics_" + mName;
-    mStatistics->loadStatistics( fileName );
+    mStatistics->loadStatistics();
 }
 
 void Interface::stopStatistics()
@@ -430,9 +435,8 @@ void Interface::stopStatistics()
         delete mStatisticsDialog;
         mStatisticsDialog = 0;
     }
-    QString fileName = KGlobal::dirs()->saveLocation( "data", "knemo/" );
-    fileName += "statistics_" + mName;
-    mStatistics->saveStatistics( fileName );
+
+    mStatistics->saveStatistics();
 
     delete mStatistics;
     mStatistics = 0;

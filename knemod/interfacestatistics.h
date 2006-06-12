@@ -25,6 +25,9 @@
 
 #include "global.h"
 
+class QTimer;
+class Interface;
+
 template<class type>
 class StatisticsPtrList : public QPtrList<type>
 {
@@ -78,7 +81,7 @@ public:
     /**
      * Default Constructor
      */
-    InterfaceStatistics( QObject* parent = 0L, const char* name = 0L );
+    InterfaceStatistics( Interface* interface );
 
     /**
      * Default Destructor
@@ -88,11 +91,13 @@ public:
     /**
      * Load the statistics from a xml file
      */
-    void loadStatistics( QString& fileName );
+    void loadStatistics();
+
     /**
-     * Save the statistics to a xml file
+     * Called from Interface::configChanged() when the user
+     * changed the settings.
      */
-    void saveStatistics( QString& fileName );
+    void configChanged();
 
     const StatisticEntry* getCurrentDay() const;
     const StatisticEntry* getCurrentMonth() const;
@@ -122,6 +127,11 @@ signals:
     void yearStatisticsChanged();
 
 public slots:
+    /**
+     * Save the statistics to a xml file
+     * (slot so it can be triggered by a timer signal)
+     */
+    void saveStatistics();
     /**
      * Add incoming data to the current day, month and year
      */
@@ -168,7 +178,8 @@ private:
      */
     void updateCurrentYear();
 
-
+    QTimer* mSaveTimer;
+    Interface* mInterface;
     StatisticEntry* mCurrentDay;
     StatisticEntry* mCurrentMonth;
     StatisticEntry* mCurrentYear;

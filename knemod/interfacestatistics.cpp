@@ -19,33 +19,45 @@
 
 #include <qdom.h>
 #include <qfile.h>
+#include <qtimer.h>
 #include <qstring.h>
 #include <qdatetime.h>
 
 #include <kdebug.h>
 
+#include "interface.h"
 #include "interfacestatistics.h"
 
-InterfaceStatistics::InterfaceStatistics( QObject* parent, const char* name )
-    : QObject( parent, name )
+InterfaceStatistics::InterfaceStatistics( Interface* interface )
+    : QObject(),
+      mInterface( interface )
 {
     mDayStatistics.setAutoDelete( true );
     mMonthStatistics.setAutoDelete( true );
     mYearStatistics.setAutoDelete( true );
     initStatistics();
+
+    mSaveTimer = new QTimer();
+    connect( mSaveTimer, SIGNAL( timeout() ), this, SLOT( saveStatistics() ) );
+    mSaveTimer->start( mInterface->getGeneralData().saveInterval * 1000 );
 }
 
 InterfaceStatistics::~InterfaceStatistics()
 {
+    mSaveTimer->stop();
+    delete mSaveTimer;
+
     mDayStatistics.clear();
     mMonthStatistics.clear();
     mYearStatistics.clear();
 }
 
-void InterfaceStatistics::loadStatistics( QString& fileName )
+void InterfaceStatistics::loadStatistics()
 {
     QDomDocument doc( "statistics" );
-    QFile file( fileName );
+    QString dir = mInterface->getGeneralData().statisticsDir;
+    QFile file( dir + "/statistics_" + mInterface->getName() );
+
     if ( !file.open( IO_ReadOnly ) )
         return;
     if ( !doc.setContent( &file ) )
@@ -73,8 +85,8 @@ void InterfaceStatistics::loadStatistics( QString& fileName )
                 entry->day = day.attribute( "day" ).toInt();
                 entry->month = day.attribute( "month" ).toInt();
                 entry->year = day.attribute( "year" ).toInt();
-                entry->rxBytes = day.attribute( "rxBytes" ).toULongLong();
-                entry->txBytes = day.attribute( "txBytes" ).toULongLong();
+                entry->rxBytes = (Q_UINT64) day.attribute( "rxBytes" ).toDouble();
+                entry->txBytes = (Q_UINT64) day.attribute( "txBytes" ).toDouble();
                 mDayStatistics.append( entry );
             }
             dayNode = dayNode.nextSibling();
@@ -95,8 +107,8 @@ void InterfaceStatistics::loadStatistics( QString& fileName )
                 entry->day = 0;
                 entry->month = month.attribute( "month" ).toInt();
                 entry->year = month.attribute( "year" ).toInt();
-                entry->rxBytes = month.attribute( "rxBytes" ).toULongLong();
-                entry->txBytes = month.attribute( "txBytes" ).toULongLong();
+                entry->rxBytes = (Q_UINT64) month.attribute( "rxBytes" ).toDouble();
+                entry->txBytes = (Q_UINT64) month.attribute( "txBytes" ).toDouble();
                 mMonthStatistics.append( entry );
             }
             monthNode = monthNode.nextSibling();
@@ -117,8 +129,8 @@ void InterfaceStatistics::loadStatistics( QString& fileName )
                 entry->day = 0;
                 entry->month = 0;
                 entry->year = year.attribute( "year" ).toInt();
-                entry->rxBytes = year.attribute( "rxBytes" ).toULongLong();
-                entry->txBytes = year.attribute( "txBytes" ).toULongLong();
+                entry->rxBytes = (Q_UINT64) year.attribute( "rxBytes" ).toDouble();
+                entry->txBytes = (Q_UINT64) year.attribute( "txBytes" ).toDouble();
                 mYearStatistics.append( entry );
             }
             yearNode = yearNode.nextSibling();
@@ -128,7 +140,7 @@ void InterfaceStatistics::loadStatistics( QString& fileName )
     initStatistics();
 }
 
-void InterfaceStatistics::saveStatistics( QString& fileName )
+void InterfaceStatistics::saveStatistics()
 {
     QDomDocument doc( "statistics" );
     QDomElement root = doc.createElement( "statistics" );
@@ -142,8 +154,8 @@ void InterfaceStatistics::saveStatistics( QString& fileName )
         day.setAttribute( "day", iterator->day );
         day.setAttribute( "month", iterator->month );
         day.setAttribute( "year", iterator->year );
-        day.setAttribute( "rxBytes", (ulong) iterator->rxBytes );
-        day.setAttribute( "txBytes", (ulong) iterator->txBytes );
+        day.setAttribute( "rxBytes", (double) iterator->rxBytes );
+        day.setAttribute( "txBytes", (double) iterator->txBytes );
         days.appendChild( day );
         iterator = mDayStatistics.next();
     }
@@ -156,8 +168,8 @@ void InterfaceStatistics::saveStatistics( QString& fileName )
         QDomElement month = doc.createElement( "month" );
         month.setAttribute( "month", iterator->month );
         month.setAttribute( "year", iterator->year );
-        month.setAttribute( "rxBytes", (ulong) iterator->rxBytes );
-        month.setAttribute( "txBytes", (ulong) iterator->txBytes );
+        month.setAttribute( "rxBytes", (double) iterator->rxBytes );
+        month.setAttribute( "txBytes", (double) iterator->txBytes );
         months.appendChild( month );
         iterator = mMonthStatistics.next();
     }
@@ -169,20 +181,27 @@ void InterfaceStatistics::saveStatistics( QString& fileName )
     {
         QDomElement year = doc.createElement( "year" );
         year.setAttribute( "year", iterator->year );
-        year.setAttribute( "rxBytes", (ulong) iterator->rxBytes );
-        year.setAttribute( "txBytes", (ulong) iterator->txBytes );
+        year.setAttribute( "rxBytes", (double) iterator->rxBytes );
+        year.setAttribute( "txBytes", (double) iterator->txBytes );
         years.appendChild( year );
         iterator = mYearStatistics.next();
     }
     root.appendChild( years );
 
-    QFile file( fileName );
+    QString dir = mInterface->getGeneralData().statisticsDir;
+    QFile file( dir + "/statistics_" + mInterface->getName() );
     if ( !file.open( IO_WriteOnly ) )
         return;
 
     QTextStream stream( &file );
     stream << doc.toString();
     file.close();
+}
+
+void InterfaceStatistics::configChanged()
+{
+    // restart the timer with the new value
+    mSaveTimer->changeInterval( mInterface->getGeneralData().saveInterval * 1000 );
 }
 
 const StatisticEntry* InterfaceStatistics::getCurrentDay() const

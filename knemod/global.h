@@ -34,6 +34,9 @@
 struct GeneralData
 {
     int toolTipContent;
+    int pollInterval;
+    int saveInterval;
+    QString statisticsDir;
 };
 
 struct InterfaceData
