@@ -42,7 +42,9 @@
 #include <kinputdialog.h>
 #include <kapplication.h>
 #include <knotifydialog.h>
+#include <kstandarddirs.h>
 #include <kgenericfactory.h>
+#include <kdirselectdialog.h>
 
 #include "configdlg.h"
 #include "configdialog.h"
@@ -116,6 +118,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const char *name, const QStringList
              this, SLOT( buttonRemoveToolTipSelected() ) );
     connect( mDlg->pushButtonNotifications, SIGNAL( clicked() ),
              this, SLOT( buttonNotificationsSelected() ) );
+    connect( mDlg->pushButtonStatisticsDir, SIGNAL( clicked() ),
+             this, SLOT( buttonStatisticsDirSelected() ) );
     connect( mDlg->lineEditAlias, SIGNAL( textChanged( const QString& ) ),
              this, SLOT( aliasChanged( const QString& ) ) );
     connect( mDlg->comboBoxIconSet, SIGNAL( activated( int ) ),
@@ -166,6 +170,10 @@ ConfigDialog::ConfigDialog( QWidget *parent, const char *name, const QStringList
              this, SLOT( spinBoxValueChanged( int ) ) );
     connect( mDlg->spinBoxMaxValue, SIGNAL( valueChanged( int ) ),
              this, SLOT( spinBoxValueChanged( int ) ) );
+    connect( mDlg->numInputPollInterval, SIGNAL( valueChanged( int ) ),
+             this, SLOT( spinBoxValueChanged( int ) ) );
+    connect( mDlg->numInputSaveInterval, SIGNAL( valueChanged( int ) ),
+             this, SLOT( spinBoxValueChanged( int ) ) );
     connect( mDlg->kColorButtonVLines, SIGNAL( changed( const QColor& ) ),
              this, SLOT( kColorButtonChanged( const QColor& ) ) );
     connect( mDlg->kColorButtonHLines, SIGNAL( changed( const QColor& ) ),
@@ -179,7 +187,7 @@ ConfigDialog::ConfigDialog( QWidget *parent, const char *name, const QStringList
 
     // In case the user opened the control center via the context menu
     // this call to the daemon will deliver the interface the menu
-    // belongs so. This way we can preselect the appropriate entry in the list.
+    // belongs to. This way we can preselect the appropriate entry in the list.
     QCString replyType;
     QByteArray replyData, arg;
     QString selectedInterface = QString::null;
@@ -226,6 +234,9 @@ void ConfigDialog::load()
     KConfig* config = new KConfig( "knemorc", true );
 
     config->setGroup( "General" );
+    mDlg->numInputPollInterval->setValue( config->readNumEntry( "PollInterval", 1 ) );
+    mDlg->numInputSaveInterval->setValue( config->readNumEntry( "SaveInterval", 60 ) );
+    mDlg->lineEditStatisticsDir->setText( config->readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) ) );
     mToolTipContent = config->readNumEntry( "ToolTipContent", 2 );
     QStrList list;
     int numEntries = config->readListEntry( "Interfaces", list );
@@ -331,6 +342,9 @@ void ConfigDialog::save()
     }
 
     config->setGroup( "General" );
+    config->writeEntry( "PollInterval", mDlg->numInputPollInterval->value() );
+    config->writeEntry( "SaveInterval", mDlg->numInputSaveInterval->value() );
+    config->writeEntry( "StatisticsDir",  mDlg->lineEditStatisticsDir->text() );
     config->writeEntry( "ToolTipContent", mToolTipContent );
     config->writeEntry( "Interfaces", list );
 
@@ -404,6 +418,11 @@ void ConfigDialog::defaults()
         }
         proc.close();
     }
+
+    // Default misc settings
+    mDlg->numInputPollInterval->setValue( 1 );
+    mDlg->numInputSaveInterval->setValue( 60 );
+    mDlg->lineEditStatisticsDir->setText( KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
 
     // Default tool tips
     mToolTipContent = 2;
@@ -752,6 +771,16 @@ void ConfigDialog::buttonNotificationsSelected()
     KNotifyDialog dialog( this );
     dialog.addApplicationEvents( "knemo" );
     dialog.exec();
+}
+
+void ConfigDialog:: buttonStatisticsDirSelected()
+{
+    KURL url = KDirSelectDialog::selectDirectory();
+    if ( url.path() != QString::null )
+    {
+        mDlg->lineEditStatisticsDir->setText( url.path() );
+        changed( true );
+    }
 }
 
 void ConfigDialog::interfaceSelected( const QString& interface )

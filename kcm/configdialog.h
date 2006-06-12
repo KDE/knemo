@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004, 2005 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2005, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -71,6 +71,7 @@ private slots:
     void buttonAddToolTipSelected();
     void buttonRemoveToolTipSelected();
     void buttonNotificationsSelected();
+    void buttonStatisticsDirSelected();
     void interfaceSelected( const QString& interface );
     void aliasChanged( const QString& text );
     void iconSetChanged( int set );
