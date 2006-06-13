@@ -35,7 +35,7 @@
 static const char description[] =
    I18N_NOOP( "KNemo - the KDE Network Monitor" );
 
-static const char version[] = "0.4.1";
+static const char version[] = "0.4.2";
 
 InterfaceTray::InterfaceTray( const QString& ifname,
                               QWidget* parent, const char* name )

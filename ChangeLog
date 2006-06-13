@@ -1,3 +1,6 @@
+Version 0.4.2:
+ * fixed crash when opening status dialog or tooltips
+
 Version 0.4.1:
  * added Hungarian translation
  * updated Russian translation
