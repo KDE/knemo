@@ -306,6 +306,10 @@ void KNemoDaemon::updateInterfaces()
 
     // needed to calculate the current speed
     mGeneralData.secondsSinceLastUpdate = mLastUpdateTime.secsTo( QDateTime::currentDateTime() );
+    if ( mGeneralData.secondsSinceLastUpdate < 1 )
+    {
+        mGeneralData.secondsSinceLastUpdate = 1;
+    }
     mLastUpdateTime.setDate( QDate::currentDate() );
     mLastUpdateTime.setTime( QTime::currentTime() );
 
