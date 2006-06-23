@@ -34,7 +34,7 @@
 class QTimer;
 class KInstance;
 class Interface;
-class InterfaceUpdater;
+class NetToolsBackend;
 class KNotifyClient::Instance;
 
 /**
@@ -112,8 +112,8 @@ private:
     GeneralData mGeneralData;
     // settings for the traffic plotter are stored here
     PlotterSettings mPlotterSettings;
-    // the interface updater
-    InterfaceUpdater* mUpdater;
+    // the backend used to update the interface informations
+    NetToolsBackend* mBackend;
     // a list of all interfaces the user wants to monitor
     QDict<Interface> mInterfaceDict;
 };

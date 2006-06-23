@@ -31,7 +31,7 @@
 
 #include "knemodaemon.h"
 #include "interface.h"
-#include "interfaceupdater.h"
+#include "nettoolsbackend.h"
 
 QString KNemoDaemon::sSelectedInterface = QString::null;
 
@@ -70,7 +70,7 @@ KNemoDaemon::KNemoDaemon( const QCString& name )
         readConfig();
 
     mInterfaceDict.setAutoDelete( true );
-    mUpdater = new InterfaceUpdater( mInterfaceDict );
+    mBackend = new NetToolsBackend( mInterfaceDict );
 
     mPollTimer = new QTimer();
     connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );
@@ -84,7 +84,7 @@ KNemoDaemon::~KNemoDaemon()
 {
     mPollTimer->stop();
     delete mPollTimer;
-    delete mUpdater;
+    delete mBackend;
     delete mNotifyInstance;
     delete mInstance;
 }
@@ -302,7 +302,7 @@ QString KNemoDaemon::getSelectedInterface()
 
 void KNemoDaemon::updateInterfaces()
 {
-    mUpdater->checkConfig();
+    mBackend->checkConfig();
 
     // needed to calculate the current speed
     mGeneralData.secondsSinceLastUpdate = mLastUpdateTime.secsTo( QDateTime::currentDateTime() );

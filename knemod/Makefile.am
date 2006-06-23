@@ -5,25 +5,25 @@ messages: rc.cpp
 
 # this has all of the subdirectories that make will recurse into.  if
 # there are none, comment this out
-SUBDIRS = . pics
+SUBDIRS = . pics backends
 
 # this is the program that gets installed.  it's name is used for all
 # of the other Makefile.am variables
 kde_module_LTLIBRARIES = kded_knemod.la
 
 # set the include path for X, qt and KDE
-INCLUDES         = $(all_includes) -I$(srcdir)/../common
+INCLUDES = $(all_includes) -I$(srcdir)/../common -I$(srcdir)/backends
 
 # the library search path. 
 kded_knemod_la_LDFLAGS = -module -avoid-version $(all_libraries)
 
 # the libraries to link against.
-kded_knemod_la_LIBADD = $(LIB_KIO) $(LIB_KUTILS)
+kded_knemod_la_LIBADD = $(LIB_KIO) $(LIB_KUTILS) backends/libknemo_backends.la
 
 # which sources should be compiled for knemo
 kded_knemod_la_SOURCES = knemodaemon.cpp knemodaemon.skel interface.cpp \
                          interfaceicon.cpp interfacetray.cpp \
-                         interfacemonitor.cpp interfaceupdater.cpp \
+                         interfacemonitor.cpp \
                          interfacestatusdlg.ui interfacestatusdialog.cpp \
                          interfacetooltip.cpp signalplotter.cpp \
 			 interfacestatistics.cpp interfacestatisticsdlg.ui \
@@ -31,7 +31,7 @@ kded_knemod_la_SOURCES = knemodaemon.cpp knemodaemon.skel interface.cpp \
 
 # these are the headers for your project
 noinst_HEADERS   = knemodaemon.h interface.h interfaceicon.h \
-                   interfacemonitor.h interfaceupdater.h \
+                   interfacemonitor.h \
                    interfacestatusdialog.h interfacetray.h \
                    interfacetooltip.h signalplotter.h \
 		   interfacestatistics.h global.h \

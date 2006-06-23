@@ -17,8 +17,8 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef INTERFACEUPDATER_H
-#define INTERFACEUPDATER_H
+#ifndef NETTOOLSBACKEND_H
+#define NETTOOLSBACKEND_H
 
 #include <qdict.h>
 #include <qobject.h>
@@ -29,27 +29,20 @@
 class KProcess;
 
 /**
- * The interface updater runs 'ifconfig', 'iwconfig' and 'route' every
- * second and parses their output. It then trigger the interface
+ * The nettools backend runs 'ifconfig', 'iwconfig' and 'route'
+ * and parses their output. It then triggers the interface
  * monitor to look for changes in the state of the interface.
  *
- * @short Update the information of the interfaces
+ * @short Update the information of the interfaces via nettools
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
-class InterfaceUpdater : public QObject
+class NetToolsBackend : public QObject
 {
     Q_OBJECT
 public:
-    /**
-     * Default Constructor
-     */
-    InterfaceUpdater(QDict<Interface>& interfaceDict );
-
-    /**
-     * Default Destructor
-     */
-    virtual ~InterfaceUpdater();
+    NetToolsBackend(QDict<Interface>& interfaceDict );
+    virtual ~NetToolsBackend();
 
     void checkConfig();
 
@@ -77,4 +70,4 @@ private:
     const QDict<Interface>& mInterfaceDict;
 };
 
-#endif // INTERFACEUPDATER_H
+#endif // NETTOOLSBACKEND_H

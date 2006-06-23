@@ -25,11 +25,11 @@
 #include <kprocess.h>
 #include <kio/global.h>
 
-#include "interfaceupdater.h"
+#include "nettoolsbackend.h"
 
 #include "config.h"
 
-InterfaceUpdater::InterfaceUpdater( QDict<Interface>& interfaceDict )
+NetToolsBackend::NetToolsBackend( QDict<Interface>& interfaceDict )
     : QObject(),
       mRouteProcess(0L),
       mIfconfigProcess(0L),
@@ -38,7 +38,7 @@ InterfaceUpdater::InterfaceUpdater( QDict<Interface>& interfaceDict )
 {
 }
 
-InterfaceUpdater::~InterfaceUpdater()
+NetToolsBackend::~NetToolsBackend()
 {
     if ( mRouteProcess )
     {
@@ -57,7 +57,7 @@ InterfaceUpdater::~InterfaceUpdater()
     }
 }
 
-void InterfaceUpdater::checkConfig()
+void NetToolsBackend::checkConfig()
 {
     if ( !mIfconfigProcess )
     {
@@ -125,7 +125,7 @@ void InterfaceUpdater::checkConfig()
 #endif
 }
 
-void InterfaceUpdater::routeProcessExited( KProcess* process )
+void NetToolsBackend::routeProcessExited( KProcess* process )
 {
     if ( process == mRouteProcess )
     {
@@ -135,12 +135,12 @@ void InterfaceUpdater::routeProcessExited( KProcess* process )
     }
 }
 
-void InterfaceUpdater::routeProcessStdout( KProcess*, char* buffer, int buflen )
+void NetToolsBackend::routeProcessStdout( KProcess*, char* buffer, int buflen )
 {
     mRouteStdout += QString::fromLatin1( buffer, buflen );
 }
 
-void InterfaceUpdater::ifconfigProcessExited( KProcess* process )
+void NetToolsBackend::ifconfigProcessExited( KProcess* process )
 {
     if ( process == mIfconfigProcess )
     {
@@ -150,12 +150,12 @@ void InterfaceUpdater::ifconfigProcessExited( KProcess* process )
     }
 }
 
-void InterfaceUpdater::ifconfigProcessStdout( KProcess*, char* buffer, int buflen )
+void NetToolsBackend::ifconfigProcessStdout( KProcess*, char* buffer, int buflen )
 {
     mIfconfigStdout += QString::fromLatin1( buffer, buflen );
 }
 
-void InterfaceUpdater::iwconfigProcessExited( KProcess* process )
+void NetToolsBackend::iwconfigProcessExited( KProcess* process )
 {
     if ( process == mIwconfigProcess )
     {
@@ -165,12 +165,12 @@ void InterfaceUpdater::iwconfigProcessExited( KProcess* process )
     }
 }
 
-void InterfaceUpdater::iwconfigProcessStdout( KProcess*, char* buffer, int buflen )
+void NetToolsBackend::iwconfigProcessStdout( KProcess*, char* buffer, int buflen )
 {
     mIwconfigStdout += QString::fromLatin1( buffer, buflen );
 }
 
-void InterfaceUpdater::parseIfconfigOutput()
+void NetToolsBackend::parseIfconfigOutput()
 {
     /* mIfconfigStdout contains the complete output of 'ifconfig' which we
      * are going to parse here.
@@ -230,7 +230,7 @@ void InterfaceUpdater::parseIfconfigOutput()
     }
 }
 
-void InterfaceUpdater::updateInterfaceData( QString& config, InterfaceData& data, int type )
+void NetToolsBackend::updateInterfaceData( QString& config, InterfaceData& data, int type )
 {
     QRegExp regExp( ".*RX.*:(\\d+).*:\\d+.*:\\d+.*:\\d+" );
     if ( regExp.search( config ) > -1 )
@@ -323,7 +323,7 @@ void InterfaceUpdater::updateInterfaceData( QString& config, InterfaceData& data
     }
 }
 
-void InterfaceUpdater::parseIwconfigOutput()
+void NetToolsBackend::parseIwconfigOutput()
 {
     /* mIwconfigStdout contains the complete output of 'iwconfig' which we
      * are going to parse here.
@@ -369,7 +369,7 @@ void InterfaceUpdater::parseIwconfigOutput()
     }
 }
 
-void InterfaceUpdater::updateWirelessData( QString& config, WirelessData& data )
+void NetToolsBackend::updateWirelessData( QString& config, WirelessData& data )
 {
     QRegExp regExp( "ESSID:\"?([^\"]*)\"?" );
     if ( regExp.search( config ) > -1 )
@@ -406,7 +406,7 @@ void InterfaceUpdater::updateWirelessData( QString& config, WirelessData& data )
         data.linkQuality = regExp.cap( 1 );
 }
 
-void InterfaceUpdater::parseRouteOutput()
+void NetToolsBackend::parseRouteOutput()
 {
     /* mRouteStdout contains the complete output of 'route' which we
      * are going to parse here.
@@ -447,5 +447,3 @@ void InterfaceUpdater::parseRouteOutput()
         }
     }
 }
-
-#include "interfaceupdater.moc"
