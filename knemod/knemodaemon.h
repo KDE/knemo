@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2004 Percy Leonhardt <percy@eris23.de>
+   Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -34,7 +34,7 @@
 class QTimer;
 class KInstance;
 class Interface;
-class NetToolsBackend;
+class BackendBase;
 class KNotifyClient::Instance;
 
 /**
@@ -113,7 +113,7 @@ private:
     // settings for the traffic plotter are stored here
     PlotterSettings mPlotterSettings;
     // the backend used to update the interface informations
-    NetToolsBackend* mBackend;
+    BackendBase* mBackend;
     // a list of all interfaces the user wants to monitor
     QDict<Interface> mInterfaceDict;
 };

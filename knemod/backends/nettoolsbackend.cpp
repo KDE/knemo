@@ -29,12 +29,12 @@
 
 #include "config.h"
 
-NetToolsBackend::NetToolsBackend( QDict<Interface>& interfaceDict )
+NetToolsBackend::NetToolsBackend( QDict<Interface>& interfaces )
     : QObject(),
+      BackendBase( interfaces ),
       mRouteProcess(0L),
       mIfconfigProcess(0L),
-      mIwconfigProcess(0L),
-      mInterfaceDict( interfaceDict )
+      mIwconfigProcess(0L)
 {
 }
 
@@ -57,7 +57,12 @@ NetToolsBackend::~NetToolsBackend()
     }
 }
 
-void NetToolsBackend::checkConfig()
+BackendBase* NetToolsBackend::createInstance( QDict<Interface>& interfaces )
+{
+    return new NetToolsBackend( interfaces );
+}
+
+void NetToolsBackend::update()
 {
     if ( !mIfconfigProcess )
     {
@@ -192,7 +197,7 @@ void NetToolsBackend::parseIfconfigOutput()
      * we update its data, otherwise we mark it as
      * 'not existing'.
      */
-    QDictIterator<Interface> ifIt( mInterfaceDict );
+    QDictIterator<Interface> ifIt( mInterfaces );
     for ( ; ifIt.current(); ++ifIt )
     {
         QString key = ifIt.currentKey();
@@ -226,7 +231,7 @@ void NetToolsBackend::parseIfconfigOutput()
             interface->getData().available = true;
             updateInterfaceData( configs[key], interface->getData(), interface->getType() );
         }
-        interface->activateMonitor();
+        updateComplete();
     }
 }
 
@@ -344,7 +349,7 @@ void NetToolsBackend::parseIwconfigOutput()
      * If we find the interface in the output of 'iwconfig'
      * we update its data.
      */
-    QDictIterator<Interface> ifIt( mInterfaceDict );
+    QDictIterator<Interface> ifIt( mInterfaces );
     for ( ; ifIt.current(); ++ifIt )
     {
         QString key = ifIt.currentKey();
@@ -428,7 +433,7 @@ void NetToolsBackend::parseRouteOutput()
      * If we find the interface in the output of 'route' we update
      * the data of the interface.
      */
-    QDictIterator<Interface> ifIt( mInterfaceDict );
+    QDictIterator<Interface> ifIt( mInterfaces );
     for ( ; ifIt.current(); ++ifIt )
     {
         QString key = ifIt.currentKey();

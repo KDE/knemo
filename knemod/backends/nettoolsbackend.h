@@ -20,11 +20,9 @@
 #ifndef NETTOOLSBACKEND_H
 #define NETTOOLSBACKEND_H
 
-#include <qdict.h>
 #include <qobject.h>
 
-#include "data.h"
-#include "interface.h"
+#include "backendbase.h"
 
 class KProcess;
 
@@ -37,14 +35,16 @@ class KProcess;
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
-class NetToolsBackend : public QObject
+class NetToolsBackend : public QObject, BackendBase
 {
     Q_OBJECT
 public:
-    NetToolsBackend(QDict<Interface>& interfaceDict );
+    NetToolsBackend(QDict<Interface>& interfaces );
     virtual ~NetToolsBackend();
 
-    void checkConfig();
+    static BackendBase* createInstance( QDict<Interface>& interfaces );
+
+    void update();
 
 private slots:
     void routeProcessExited( KProcess* process );
@@ -67,7 +67,6 @@ private:
     KProcess* mRouteProcess;
     KProcess* mIfconfigProcess;
     KProcess* mIwconfigProcess;
-    const QDict<Interface>& mInterfaceDict;
 };
 
 #endif // NETTOOLSBACKEND_H
