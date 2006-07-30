@@ -74,6 +74,13 @@ ConfigDialog::ConfigDialog( QWidget *parent, const char *name, const QStringList
 {
     KGlobal::locale()->insertCatalogue("kcm_knemo");
     setupToolTipArray();
+
+    // fill the backends combobox
+    for ( int i = 0; KCMRegistry[i].name != QString::null; i++ )
+    {
+        mDlg->comboBoxBackends->insertItem( KCMRegistry[i].name );
+    }
+
     load();
 
     QVBoxLayout* top = new QVBoxLayout(this);
@@ -101,12 +108,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const char *name, const QStringList
     mSettingsDict.setAutoDelete( true );
     setButtons( KCModule::Default | KCModule::Apply );
 
-    // fill the backends combobox
-    for ( int i = 0; KCMRegistry[i].name != QString::null; i++ )
-    {
-        mDlg->comboBoxBackends->insertItem( KCMRegistry[i].name );
-    }
-
     connect( mDlg->pushButtonNew, SIGNAL( clicked() ),
              this, SLOT( buttonNewSelected() ) );
     connect( mDlg->pushButtonDelete, SIGNAL( clicked() ),
@@ -131,6 +132,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const char *name, const QStringList
              this, SLOT( aliasChanged( const QString& ) ) );
     connect( mDlg->comboBoxIconSet, SIGNAL( activated( int ) ),
              this, SLOT( iconSetChanged( int ) ) );
+    connect( mDlg->comboBoxBackends, SIGNAL( activated( int ) ),
+             this, SLOT( backendChanged( int ) ) );
     connect( mDlg->checkBoxNotConnected, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxNotConnectedToggled ( bool ) ) );
     connect( mDlg->checkBoxNotExisting, SIGNAL( toggled( bool ) ),
@@ -245,6 +248,27 @@ void ConfigDialog::load()
     mDlg->numInputSaveInterval->setValue( config->readNumEntry( "SaveInterval", 60 ) );
     mDlg->lineEditStatisticsDir->setText( config->readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) ) );
     mToolTipContent = config->readNumEntry( "ToolTipContent", 2 );
+
+    // select the backend from the config file
+    bool foundBackend = false;
+    QString backend = config->readEntry( "Backend", "Nettools" );
+    int i;
+    for ( i = 0; KCMRegistry[i].name != QString::null; i++ )
+    {
+        if ( KCMRegistry[i].name == backend )
+        {
+            foundBackend = true;
+            break;
+        }
+    }
+
+    if ( !foundBackend )
+    {
+        i = 0; // use the first backend (Nettools)
+    }
+    mDlg->comboBoxBackends->setCurrentItem( i );
+    mDlg->textLabelBackendDescription->setText( KCMRegistry[i].description );
+
     QStrList list;
     int numEntries = config->readListEntry( "Interfaces", list );
 
@@ -352,6 +376,7 @@ void ConfigDialog::save()
     config->writeEntry( "PollInterval", mDlg->numInputPollInterval->value() );
     config->writeEntry( "SaveInterval", mDlg->numInputSaveInterval->value() );
     config->writeEntry( "StatisticsDir",  mDlg->lineEditStatisticsDir->text() );
+    config->writeEntry( "Backend", mDlg->comboBoxBackends->text( mDlg->comboBoxBackends->currentItem() ) );
     config->writeEntry( "ToolTipContent", mToolTipContent );
     config->writeEntry( "Interfaces", list );
 
@@ -430,6 +455,8 @@ void ConfigDialog::defaults()
     mDlg->numInputPollInterval->setValue( 1 );
     mDlg->numInputSaveInterval->setValue( 60 );
     mDlg->lineEditStatisticsDir->setText( KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
+    mDlg->comboBoxBackends->setCurrentItem( 0 );
+    mDlg->textLabelBackendDescription->setText( KCMRegistry[0].description );
 
     // Default tool tips
     mToolTipContent = 2;
@@ -863,6 +890,12 @@ void ConfigDialog::iconSetChanged( int set )
     mDlg->pixmapIncoming->setPixmap( SmallIcon( ICON_INCOMING + suffix ) );
     mDlg->pixmapOutgoing->setPixmap( SmallIcon( ICON_OUTGOING + suffix ) );
     mDlg->pixmapTraffic->setPixmap( SmallIcon( ICON_TRAFFIC + suffix ) );
+    if (!mLock) changed( true );
+}
+
+void ConfigDialog::backendChanged( int backend )
+{
+    mDlg->textLabelBackendDescription->setText( KCMRegistry[backend].description );
     if (!mLock) changed( true );
 }
 
