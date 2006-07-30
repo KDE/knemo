@@ -47,6 +47,7 @@
 #include <kdirselectdialog.h>
 
 #include "configdlg.h"
+#include "kcmregistry.h"
 #include "configdialog.h"
 
 const QString ConfigDialog::ICON_DISCONNECTED = "network_disconnected";
@@ -99,6 +100,12 @@ ConfigDialog::ConfigDialog( QWidget *parent, const char *name, const QStringList
 
     mSettingsDict.setAutoDelete( true );
     setButtons( KCModule::Default | KCModule::Apply );
+
+    // fill the backends combobox
+    for ( int i = 0; KCMRegistry[i].name != QString::null; i++ )
+    {
+        mDlg->comboBoxBackends->insertItem( KCMRegistry[i].name );
+    }
 
     connect( mDlg->pushButtonNew, SIGNAL( clicked() ),
              this, SLOT( buttonNewSelected() ) );

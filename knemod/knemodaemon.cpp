@@ -31,8 +31,8 @@
 
 #include "knemodaemon.h"
 #include "interface.h"
-#include "registry.h"
 #include "backendbase.h"
+#include "daemonregistry.h"
 
 QString KNemoDaemon::sSelectedInterface = QString::null;
 
@@ -71,7 +71,7 @@ KNemoDaemon::KNemoDaemon( const QCString& name )
         readConfig();
 
     mInterfaceDict.setAutoDelete( true );
-    mBackend = ( *Registry[0].function )( mInterfaceDict );
+    mBackend = ( *DaemonRegistry[0].function )( mInterfaceDict );
 
     mPollTimer = new QTimer();
     connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );

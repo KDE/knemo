@@ -17,8 +17,8 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef REGISTRY_H
-#define REGISTRY_H
+#ifndef DAEMONREGISTRY_H
+#define DAEMONREGISTRY_H
 
 #include <qstring.h>
 
@@ -29,31 +29,18 @@
 
 /**
  * This registry tells KNemo what backends are available
- * and how they can be created. It also offers a short
- * description for every backend that is used in the
- * configuration dialog of KNemo. It should describe how
- * a backend gathers its information.
+ * and how they can be created. It is only used by the daemon
+ * to create the selected backend. Two registries were
+ * necessary to avoid linking the KCM module against all backends.
  *
  * @short Registry for all backends
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
-struct KCMRegistryEntry
-{
-    QString name;
-    QString description;
-};
-
 struct DaemonRegistryEntry
 {
     QString name;
     BackendBase* (*function) ( QDict<Interface>& );
-};
-
-KCMRegistryEntry KCMRegistry[] =
-{
-    { "Nettools", i18n( "None." ) },
-    { QString::null, QString::null }
 };
 
 DaemonRegistryEntry DaemonRegistry[] =
@@ -62,4 +49,4 @@ DaemonRegistryEntry DaemonRegistry[] =
     { QString::null, 0 }
 };
 
-#endif // REGISTRY_H
+#endif // DAEMONREGISTRY_H

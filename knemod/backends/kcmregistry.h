@@ -17,22 +17,18 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef REGISTRY_H
-#define REGISTRY_H
+#ifndef KCMREGISTRY_H
+#define KCMREGISTRY_H
 
 #include <qstring.h>
 
 #include <klocale.h>
 
-#include "backendbase.h"
-#include "nettoolsbackend.h"
-
 /**
- * This registry tells KNemo what backends are available
- * and how they can be created. It also offers a short
- * description for every backend that is used in the
- * configuration dialog of KNemo. It should describe how
- * a backend gathers its information.
+ * This registry tells the KCM module what backends are available
+ * and how they can be created. It also offers a short description
+ * for every backend that is used in the configuration dialog of KNemo.
+ * It should describe how a backend gathers its information.
  *
  * @short Registry for all backends
  * @author Percy Leonhardt <percy@eris23.de>
@@ -44,22 +40,15 @@ struct KCMRegistryEntry
     QString description;
 };
 
-struct DaemonRegistryEntry
-{
-    QString name;
-    BackendBase* (*function) ( QDict<Interface>& );
-};
-
 KCMRegistryEntry KCMRegistry[] =
 {
-    { "Nettools", i18n( "None." ) },
+    { "Nettools",
+      i18n( "Uses the tools from the nettool packge like ifconfig, "    \
+            "iwconfig and route to read the necessary information "     \
+            "from the ouput of these commands.\n"                       \
+            "This backend works rather stable but causes a relativly "  \
+            "high CPU load." ) },
     { QString::null, QString::null }
 };
 
-DaemonRegistryEntry DaemonRegistry[] =
-{
-    { "Nettools", NetToolsBackend::createInstance },
-    { QString::null, 0 }
-};
-
-#endif // REGISTRY_H
+#endif // KCMREGISTRY_H
