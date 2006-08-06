@@ -1,3 +1,7 @@
+Version 0.4.3:
+ * updated Russian translation
+ * support for different backends to gather information
+
 Version 0.4.2:
  * fixed crash when opening status dialog or tooltips
 
