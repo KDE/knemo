@@ -12,10 +12,10 @@ libknemo_backends_la_LDFLAGS = -module -avoid-version $(all_libraries)
 libknemo_backends_la_LIBADD = $(LIB_KIO) $(LIB_KUTILS)
 
 # which sources should be compiled as backends
-libknemo_backends_la_SOURCES = backendbase.cpp nettoolsbackend.cpp
+libknemo_backends_la_SOURCES = backendbase.cpp nettoolsbackend.cpp sysbackend.cpp
 
 # the headers of the backends
-noinst_HEADERS = nettoolsbackend.h
+noinst_HEADERS = backendbase.h nettoolsbackend.h sysbackend.h
 
 # let automoc handle all of the meta source files (moc)
 METASOURCES = AUTO

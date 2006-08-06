@@ -231,8 +231,8 @@ void NetToolsBackend::parseIfconfigOutput()
             interface->getData().available = true;
             updateInterfaceData( configs[key], interface->getData(), interface->getType() );
         }
-        updateComplete();
     }
+    updateComplete();
 }
 
 void NetToolsBackend::updateInterfaceData( QString& config, InterfaceData& data, int type )

@@ -112,6 +112,8 @@ private:
     GeneralData mGeneralData;
     // settings for the traffic plotter are stored here
     PlotterSettings mPlotterSettings;
+    // the name of backend we currently use
+    QString mBackendName;
     // the backend used to update the interface informations
     BackendBase* mBackend;
     // a list of all interfaces the user wants to monitor

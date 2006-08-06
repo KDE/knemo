@@ -48,6 +48,12 @@ KCMRegistryEntry KCMRegistry[] =
             "from the ouput of these commands.\n"                       \
             "This backend works rather stable but causes a relativly "  \
             "high CPU load." ) },
+    { "Sys",
+      i18n( "Uses the sys filesystem available in 2.6 kernels.\n"     \
+            "This backend is rather new, so expect minor problems. "  \
+            "It also does not collect as many information as the "    \
+            "Nettools backend because they are simply not available " \
+            "but as an advantage this backend should reduce the CPU load." ) },
     { QString::null, QString::null }
 };
 

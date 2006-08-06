@@ -25,6 +25,7 @@
 #include <klocale.h>
 
 #include "backendbase.h"
+#include "sysbackend.h"
 #include "nettoolsbackend.h"
 
 /**
@@ -46,6 +47,7 @@ struct DaemonRegistryEntry
 DaemonRegistryEntry DaemonRegistry[] =
 {
     { "Nettools", NetToolsBackend::createInstance },
+    { "Sys", SysBackend::createInstance },
     { QString::null, 0 }
 };
 

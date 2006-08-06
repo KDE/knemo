@@ -70,8 +70,26 @@ KNemoDaemon::KNemoDaemon( const QCString& name )
     else
         readConfig();
 
+    // select the backend from the config file
+    bool foundBackend = false;
+    mBackendName = config->readEntry( "Backend", "Nettools" );
+    int i;
+    for ( i = 0; DaemonRegistry[i].name != QString::null; i++ )
+    {
+        if ( DaemonRegistry[i].name == mBackendName )
+        {
+            foundBackend = true;
+            break;
+        }
+    }
+
+    if ( !foundBackend )
+    {
+        i = 0; // use the first backend (Nettools)
+    }
+    mBackend = ( *DaemonRegistry[i].function )( mInterfaceDict );
+
     mInterfaceDict.setAutoDelete( true );
-    mBackend = ( *DaemonRegistry[0].function )( mInterfaceDict );
 
     mPollTimer = new QTimer();
     connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );
@@ -182,6 +200,30 @@ void KNemoDaemon::reparseConfiguration()
 
     // restart the timer with the new interval
     mPollTimer->changeInterval( mGeneralData.pollInterval * 1000 );
+
+    // select the backend from the config file
+    QString backend = config->readEntry( "Backend", "Nettools" );
+
+    if ( mBackendName != backend )
+    {
+        bool foundBackend = false;
+        mBackendName = backend;
+        int i;
+        for ( i = 0; DaemonRegistry[i].name != QString::null; i++ )
+        {
+            if ( DaemonRegistry[i].name == backend )
+            {
+                foundBackend = true;
+                break;
+            }
+        }
+
+        if ( foundBackend )
+        {
+            delete mBackend;
+            mBackend = ( *DaemonRegistry[i].function )( mInterfaceDict );
+        }
+    }
 
     QStrList list;
     int numEntries = config->readListEntry( "Interfaces", list );
