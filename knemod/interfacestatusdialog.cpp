@@ -293,7 +293,6 @@ void InterfaceStatusDialog::statisticsChanged()
 
     if ( statistics == 0 )
     {
-        kdDebug() << "statisticsChanged: returning!!!" << endl;
         return;
     }
 

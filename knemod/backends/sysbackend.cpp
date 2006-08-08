@@ -168,7 +168,13 @@ void SysBackend::updateInterfaceData( const QString& ifName, InterfaceData& data
         if ( rxBytes < data.prevRxBytes )
         {
             // there was an overflow
-            data.rxBytes += 0x7FFFFFFF - data.prevRxBytes;
+            if ( type == Interface::ETHERNET )
+            {
+                // This makes data counting more accurate but will not work
+                // for interfaces that reset the transfered data to zero
+                // when deactivated like ppp does.
+                data.rxBytes += 0xFFFFFFFF - data.prevRxBytes;
+            }
             data.prevRxBytes = 0L;
         }
         if ( data.rxBytes == 0L )
@@ -196,7 +202,13 @@ void SysBackend::updateInterfaceData( const QString& ifName, InterfaceData& data
         if ( txBytes < data.prevTxBytes )
         {
             // there was an overflow
-            data.txBytes += 0x7FFFFFFF - data.prevTxBytes;
+            if ( type == Interface::ETHERNET )
+            {
+                // This makes data counting more accurate but will not work
+                // for interfaces that reset the transfered data to zero
+                // when deactivated like ppp does.
+                data.txBytes += 0xFFFFFFFF - data.prevTxBytes;
+            }
             data.prevTxBytes = 0L;
         }
         if ( data.txBytes == 0L )
