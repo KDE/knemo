@@ -223,7 +223,7 @@ void SysBackend::updateInterfaceData( const QString& ifName, InterfaceData& data
             // afterwards only add difference to previous number of bytes
             data.txBytes += txBytes - data.prevTxBytes;
 
-        data.incomingBytes = txBytes - data.prevTxBytes;
+        data.outgoingBytes = txBytes - data.prevTxBytes;
         data.prevTxBytes = txBytes;
         data.txString = KIO::convertSize( data.txBytes );
     }
