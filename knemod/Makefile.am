@@ -12,7 +12,7 @@ SUBDIRS = pics backends
 kde_module_LTLIBRARIES = kded_knemod.la
 
 # set the include path for X, qt and KDE
-INCLUDES = $(all_includes) -I$(srcdir)/../common -I$(srcdir)/backends
+INCLUDES = -I$(srcdir)/../common -I$(srcdir)/backends $(all_includes)
 
 # the library search path. 
 kded_knemod_la_LDFLAGS = -module -avoid-version $(all_libraries)

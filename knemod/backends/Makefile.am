@@ -3,7 +3,7 @@
 noinst_LTLIBRARIES = libknemo_backends.la
 
 # set the include path for X, qt and KDE
-INCLUDES = $(all_includes) -I$(srcdir)/.. -I$(srcdir)/../../common
+INCLUDES = -I$(srcdir)/.. -I$(srcdir)/../../common $(all_includes)
 
 # the library search path. 
 libknemo_backends_la_LDFLAGS = -module -avoid-version $(all_libraries)

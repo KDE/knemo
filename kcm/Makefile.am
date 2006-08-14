@@ -8,7 +8,7 @@ messages: rc.cpp
 kde_module_LTLIBRARIES = kcm_knemo.la
 
 # set the include path for X, qt and KDE
-INCLUDES = $(all_includes) -I$(srcdir)/../common -I$(srcdir)/../knemod/backends
+INCLUDES = -I$(srcdir)/../common -I$(srcdir)/../knemod/backends $(all_includes)
 
 # the library search path. 
 kcm_knemo_la_LDFLAGS = -module -avoid-version $(all_libraries)
