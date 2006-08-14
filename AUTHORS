@@ -5,14 +5,31 @@ Signal Plotter:
 	Taken from KSysGuard
 	Chris Schlaeger <cs@kde.org>
 
-Translation:
-	German: Bernd Zimmer (berndzimmer@gmx.de)
-	Spanish: Raúl Moratalla <raul.moratalla@ono.com>
-         	 Pedro Jurado Maqueda <melenas@kdehispano.org>
-	Bulgarian: Malin Malinov <lgmim@club-35.com>
-	Italien: Samuele Kaplun <kaplun@aliceposta.it>
-	Czech: Klara Cihlarova <cihlarov@suse.cz>
-	French: Julien Morot <julien@momonux.org>
-	Brazilian Portuguese: Rogerio Pereira <rogerio.araujo@gmail.com>
-	Dutch: Rinse de Vries <rinsedevries@kde.nl>
-	Russian: Alexander Shiyan <shc@milas.spb.ru>
+List of current translators:
+        Zlatko Popov <zlatkopopov@fsa-bg.org> (bg)
+        Thierry Vignaud <tvignaud@mandriva.com> (br)
+        Jakub Friedl <jfriedl@suse.cz>  Klara Cihlarova <koty@seznam.cz> (cs)
+        FULL NAME <EMAIL@ADDRESS> (cy)
+        Erik Kjær Pedersen <erik@binghamton.edu> (da)
+        Jannick Kuhr <jannick.kuhr@kdemail.net> (de)
+        Spiros Georgaras <sngeorgaras@otenet.gr> (el)
+        Malcolm Hunter <malcolm.hunter@gmx.co.uk> (en_GB)
+        Enrique Matias Sanchez (aka Quique) <cronopios@gmail.com> (es)
+        Marek Laane <bald@starman.ee> (et)
+        Julien Morot <julien@momonux.org> (fr)
+        Kevin Patrick Scannell <scannell@SLU.EDU> (ga)
+        Kroly Barcza (VectoR) <kbarcza@blackpanther.hu> (hu)
+        Samuele Kaplun <samuele.kaplun@collegiodimilano.it> (it)
+        Yukiko Bando <ybando@k6.dion.ne.jp> (ja)
+        Giasher <giasher@telenet.ge> (ka)
+        Donatas Glodenis <dgvirtual@akl.lt> (lt)
+        Bram Schoenmakers <bramschoenmakers@kde.nl>     Rinse de Vries <rinsedevries@kde.nl> (nl)
+        Marcin Zasada <emzeta76@gazeta.pl> (pl)
+        José Nuno Coelho Pires <jncp@netcabo.pt> (pt)
+        Lisiane Sztoltz Teixeira <lisiane@kdemail.net> (pt_BR)
+        Alexander Shiyan <shc@users.sourceforge.net> (ru)
+        Steve Murphy <murf@e-tools.com> (rw)
+        Slobodan Simic <simicsl@verat.net> (sr)
+        Slobodan Simic <simicsl@verat.net> (sr@Latn)
+        Stefan Asserhäll <stefan.asserhall@comhem.se> (sv)
+        Bulent SENER <bsener@inonu.edu.tr> (tr)
