@@ -388,9 +388,17 @@ void NetToolsBackend::parseIwconfigOutput()
 
 void NetToolsBackend::updateWirelessData( QString& config, WirelessData& data )
 {
-    QRegExp regExp( "ESSID:\"?([^\"]*)\"?" );
+    QRegExp regExp( "ESSID:([^\"][\\S]*)" );
     if ( regExp.search( config ) > -1 )
         data.essid = regExp.cap( 1 );
+    else
+    {
+        regExp.setPattern( "ESSID:\"([^\"]*)" );
+        if ( regExp.search( config ) > -1 )
+            data.essid = regExp.cap( 1 );
+        else
+            data.essid = QString::null;
+    }
 
     regExp.setPattern( "Mode:(\\w*)" );
     if ( regExp.search( config ) > -1 )
