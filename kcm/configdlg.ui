@@ -8,17 +8,25 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>484</width>
-            <height>484</height>
+            <width>447</width>
+            <height>465</height>
         </rect>
     </property>
-    <hbox>
+    <vbox>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>checkBoxStartKNemo</cstring>
+            </property>
+            <property name="text">
+                <string>Use KNemo to monitor your interfaces</string>
+            </property>
+        </widget>
         <widget class="QTabWidget">
             <property name="name">
-                <cstring>tabWidget</cstring>
+                <cstring>tabWidgetConfiguration</cstring>
             </property>
             <widget class="QWidget">
                 <property name="name">
@@ -1146,7 +1154,7 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                         <property name="title">
                             <string>Traffic</string>
                         </property>
-                        <vbox>
+                        <hbox>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
@@ -1157,6 +1165,9 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 <property name="text">
                                     <string>Sho&amp;w incoming traffic</string>
                                 </property>
+                                <property name="accel">
+                                    <string>Alt+W</string>
+                                </property>
                             </widget>
                             <widget class="QCheckBox">
                                 <property name="name">
@@ -1165,13 +1176,16 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 <property name="text">
                                     <string>Show &amp;outgoing traffic</string>
                                 </property>
+                                <property name="accel">
+                                    <string>Alt+O</string>
+                                </property>
                             </widget>
-                        </vbox>
+                        </hbox>
                     </widget>
                 </grid>
             </widget>
         </widget>
-    </hbox>
+    </vbox>
 </widget>
 <customwidgets>
 </customwidgets>
@@ -1254,9 +1268,15 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
         <receiver>pushButtonAddCommand</receiver>
         <slot>setEnabled(bool)</slot>
     </connection>
+    <connection>
+        <sender>checkBoxStartKNemo</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tabWidgetConfiguration</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
 </connections>
 <tabstops>
-    <tabstop>tabWidget</tabstop>
+    <tabstop>tabWidgetConfiguration</tabstop>
     <tabstop>listBoxInterfaces</tabstop>
     <tabstop>pushButtonNew</tabstop>
     <tabstop>pushButtonDelete</tabstop>

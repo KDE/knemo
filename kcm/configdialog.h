@@ -79,6 +79,7 @@ private slots:
     void checkBoxNotConnectedToggled( bool on );
     void checkBoxNotExistingToggled( bool on );
     void checkBoxStatisticsToggled( bool on );
+    void checkBoxStartKNemoToggled( bool on );
     void spinBoxTrafficValueChanged( int value );
     void checkBoxCustomToggled( bool on );
     void listViewCommandsSelectionChanged();

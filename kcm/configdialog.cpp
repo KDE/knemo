@@ -27,6 +27,7 @@
 #include <qlineedit.h>
 #include <qcombobox.h>
 #include <qwhatsthis.h>
+#include <qtabwidget.h>
 #include <qpushbutton.h>
 #include <qstringlist.h>
 #include <qdatastream.h>
@@ -38,6 +39,7 @@
 #include <dcopclient.h>
 #include <kiconloader.h>
 #include <kfiledialog.h>
+#include <kdesktopfile.h>
 #include <kcolorbutton.h>
 #include <kinputdialog.h>
 #include <kapplication.h>
@@ -140,6 +142,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const char *name, const QStringList
              this, SLOT( checkBoxNotExistingToggled ( bool ) ) );
     connect( mDlg->checkBoxStatistics, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxStatisticsToggled ( bool ) ) );
+    connect( mDlg->checkBoxStartKNemo, SIGNAL( toggled( bool ) ),
+             this, SLOT( checkBoxStartKNemoToggled( bool ) ) );
     connect( mDlg->spinBoxTrafficThreshold, SIGNAL( valueChanged( int ) ),
              this, SLOT( spinBoxTrafficValueChanged ( int ) ) );
     connect( mDlg->checkBoxCustom, SIGNAL( toggled( bool ) ),
@@ -195,39 +199,49 @@ ConfigDialog::ConfigDialog( QWidget *parent, const char *name, const QStringList
     connect( mDlg->kColorButtonBackground, SIGNAL( changed( const QColor& ) ),
              this, SLOT( kColorButtonChanged( const QColor& ) ) );
 
-    // In case the user opened the control center via the context menu
-    // this call to the daemon will deliver the interface the menu
-    // belongs to. This way we can preselect the appropriate entry in the list.
-    QCString replyType;
-    QByteArray replyData, arg;
-    QString selectedInterface = QString::null;
-    if ( kapp->dcopClient()->call( "kded", "knemod", "getSelectedInterface()", arg, replyType, replyData ) )
+    // No dcop call if KNemo is not activated by the user. Otherwise
+    // load-on-demand will start KNemo.
+    if ( mDlg->checkBoxStartKNemo->isChecked() )
     {
-        QDataStream reply( replyData,  IO_ReadOnly );
-        reply >> selectedInterface;
-    }
-
-    if ( selectedInterface != QString::null )
-    {
-        // Try to preselect the interface.
-        unsigned int i;
-        for ( i = 0; i < mDlg->listBoxInterfaces->count(); i++ )
+        // In case the user opened the control center via the context menu
+        // this call to the daemon will deliver the interface the menu
+        // belongs to. This way we can preselect the appropriate entry in the list.
+        QCString replyType;
+        QByteArray replyData, arg;
+        QString selectedInterface = QString::null;
+        if ( kapp->dcopClient()->call( "kded", "knemod", "getSelectedInterface()", arg, replyType, replyData ) )
         {
-            QListBoxItem* item = mDlg->listBoxInterfaces->item( i );
-            if ( item->text() == selectedInterface )
-            {
-                // Found it.
-                mDlg->listBoxInterfaces->setSelected( i, true );
-                break;
-            }
+            QDataStream reply( replyData,  IO_ReadOnly );
+            reply >> selectedInterface;
         }
-        if ( i == mDlg->listBoxInterfaces->count() )
-            // Not found. Select first entry in list.
+
+        if ( selectedInterface != QString::null )
+        {
+            // Try to preselect the interface.
+            unsigned int i;
+            for ( i = 0; i < mDlg->listBoxInterfaces->count(); i++ )
+            {
+                QListBoxItem* item = mDlg->listBoxInterfaces->item( i );
+                if ( item->text() == selectedInterface )
+                {
+                    // Found it.
+                    mDlg->listBoxInterfaces->setSelected( i, true );
+                    break;
+                }
+            }
+            if ( i == mDlg->listBoxInterfaces->count() )
+                // Not found. Select first entry in list.
+                mDlg->listBoxInterfaces->setSelected( 0, true );
+        }
+        else
+            // No interface from daemon. Select first entry in list.
             mDlg->listBoxInterfaces->setSelected( 0, true );
     }
     else
-        // No interface from daemon. Select first entry in list.
+    {
+        // Started from control center. Select first entry in list.
         mDlg->listBoxInterfaces->setSelected( 0, true );
+    }
 
     top->add( mDlg );
 }
@@ -244,6 +258,9 @@ void ConfigDialog::load()
     KConfig* config = new KConfig( "knemorc", true );
 
     config->setGroup( "General" );
+    bool startKNemo = config->readBoolEntry( "StartKNemo", false );
+    mDlg->checkBoxStartKNemo->setChecked( startKNemo );
+    mDlg->tabWidgetConfiguration->setEnabled( startKNemo );
     mDlg->numInputPollInterval->setValue( config->readNumEntry( "PollInterval", 1 ) );
     mDlg->numInputSaveInterval->setValue( config->readNumEntry( "SaveInterval", 60 ) );
     mDlg->lineEditStatisticsDir->setText( config->readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) ) );
@@ -373,6 +390,7 @@ void ConfigDialog::save()
     }
 
     config->setGroup( "General" );
+    config->writeEntry( "StartKNemo", mDlg->checkBoxStartKNemo->isChecked() );
     config->writeEntry( "PollInterval", mDlg->numInputPollInterval->value() );
     config->writeEntry( "SaveInterval", mDlg->numInputSaveInterval->value() );
     config->writeEntry( "StatisticsDir",  mDlg->lineEditStatisticsDir->text() );
@@ -403,7 +421,24 @@ void ConfigDialog::save()
 
     config->sync();
     delete config;
-    kapp->dcopClient()->send( "kded", "knemod", "reparseConfiguration()", "" );
+
+    KDesktopFile* desktop = new KDesktopFile( "kded/knemod.desktop", false, "services" );
+    if ( mDlg->checkBoxStartKNemo->isChecked() )
+    {
+        // This call will implicitly start KNemo if it is not yet running.
+        kapp->dcopClient()->send( "kded", "knemod", "reparseConfiguration()", "" );
+        desktop->writeEntry( "X-KDE-Kded-autoload", true );
+    }
+    else
+    {
+        QByteArray data;
+        QDataStream arg(data, IO_WriteOnly);
+        arg << "knemod";
+        kapp->dcopClient()->send("kded", "kded", "unloadModule(QCString)", data);
+        desktop->deleteEntry( "X-KDE-Kded-autoload" );
+    }
+    desktop->sync();
+    delete desktop;
 }
 
 void ConfigDialog::defaults()
@@ -933,6 +968,27 @@ void ConfigDialog::checkBoxStatisticsToggled( bool on )
 
     InterfaceSettings* settings = mSettingsDict[selected->text()];
     settings->activateStatistics = on;
+    if (!mLock) changed( true );
+}
+
+void ConfigDialog::checkBoxStartKNemoToggled( bool on )
+{
+    if ( on )
+    {
+        KConfig* config = new KConfig( "knemorc", false );
+        config->setGroup( "General" );
+        if ( config->readBoolEntry( "FirstStart", true ) )
+        {
+            config->writeEntry( "FirstStart", false );
+            config->sync();
+            delete config;
+
+            // Populate the dialog with some default values if the user starts
+            // KNemo for the very first time.
+            defaults();
+        }
+    }
+
     if (!mLock) changed( true );
 }
 
