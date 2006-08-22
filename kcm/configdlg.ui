@@ -1165,9 +1165,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 <property name="text">
                                     <string>Sho&amp;w incoming traffic</string>
                                 </property>
-                                <property name="accel">
-                                    <string>Alt+W</string>
-                                </property>
                             </widget>
                             <widget class="QCheckBox">
                                 <property name="name">
@@ -1175,9 +1172,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
                                 </property>
                                 <property name="text">
                                     <string>Show &amp;outgoing traffic</string>
-                                </property>
-                                <property name="accel">
-                                    <string>Alt+O</string>
                                 </property>
                             </widget>
                         </hbox>
