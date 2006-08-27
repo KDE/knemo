@@ -261,28 +261,31 @@ void Interface::updatePlotter()
 {
     if ( mPlotter )
     {
+        double outgoingBytes = mData.outgoingBytes / 1024.0 / (double) mGeneralData.pollInterval;
+        double incomingBytes = mData.incomingBytes / 1024.0 / (double) mGeneralData.pollInterval;
+
         QValueList<double> trafficList;
         switch ( mVisibleBeams )
         {
         case BOTH:
             if ( mIncomingPos == 1 )
             {
-                trafficList.append( (double) mData.outgoingBytes / 1024 );
-                trafficList.append( (double) mData.incomingBytes / 1024 );
+                trafficList.append( outgoingBytes );
+                trafficList.append( incomingBytes );
             }
             else
             {
-                trafficList.append( (double) mData.incomingBytes / 1024 );
-                trafficList.append( (double) mData.outgoingBytes / 1024 );
+                trafficList.append( incomingBytes );
+                trafficList.append( outgoingBytes );
             }
             mPlotter->addSample( trafficList );
             break;
         case INCOMING_TRAFFIC:
-            trafficList.append( (double) mData.incomingBytes / 1024 );
+            trafficList.append( incomingBytes );
             mPlotter->addSample( trafficList );
             break;
         case OUTGOING_TRAFFIC:
-            trafficList.append( (double) mData.outgoingBytes / 1024 );
+            trafficList.append( outgoingBytes );
             mPlotter->addSample( trafficList );
             break;
         case NONE:
