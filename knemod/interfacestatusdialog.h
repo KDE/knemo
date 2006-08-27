@@ -57,23 +57,19 @@ public:
     void show();
 
     /**
-     * Show the statistics tab when the user turned on statistics
+     * Enable or disable the statistics group when the user turned statistics on or off.
      */
-    void showStatisticsTab();
-    /**
-     * Hide the statistics tab when the user turned off statistics
-     */
-    void hideStatisticsTab();
+    void setStatisticsGroupEnabled( bool enabled );
 
 public slots:
     /**
-     * Enable the network tabs when the interface is connected
+     * Enable the network groups when the interface is connected
      */
-    void enableNetworkTabs( int );
+    void enableNetworkGroups( int );
     /**
-     * Disable the network tabs when the interface is not connected
+     * Disable the network groups when the interface is not connected
      */
-    void disableNetworkTabs( int );
+    void disableNetworkGroups( int );
     /**
      * Update the statistics tab when data changed
      */
@@ -88,11 +84,6 @@ private:
 
     QTimer* mTimer;
     Interface* mInterface;
-
-    // The position of the statistics tab depends on the wireless state
-    int statisticsTabPos;
-    // We remember the statistics tab to add it at a later time
-    QWidget* mStatisticsTab;
 };
 
 #endif // INTERFACESTATUSDIALOG_H

@@ -115,13 +115,9 @@ void Interface::configChanged()
         stopStatistics();
     }
 
-    if ( mSettings.activateStatistics && mStatusDialog )
+    if ( mStatusDialog )
     {
-        mStatusDialog->showStatisticsTab();
-    }
-    else if ( !mSettings.activateStatistics && mStatusDialog )
-    {
-        mStatusDialog->hideStatisticsTab();
+        mStatusDialog->setStatisticsGroupEnabled( mSettings.activateStatistics );
     }
 }
 
@@ -145,11 +141,11 @@ void Interface::showStatusDialog()
     {
         mStatusDialog = new InterfaceStatusDialog( this );
         connect( &mMonitor, SIGNAL( available( int ) ),
-                 mStatusDialog, SLOT( enableNetworkTabs( int ) ) );
+                 mStatusDialog, SLOT( enableNetworkGroups( int ) ) );
         connect( &mMonitor, SIGNAL( notAvailable( int ) ),
-                 mStatusDialog, SLOT( disableNetworkTabs( int ) ) );
+                 mStatusDialog, SLOT( disableNetworkGroups( int ) ) );
         connect( &mMonitor, SIGNAL( notExisting( int ) ),
-                 mStatusDialog, SLOT( disableNetworkTabs( int ) ) );
+                 mStatusDialog, SLOT( disableNetworkGroups( int ) ) );
         if ( mStatistics != 0 )
         {
             connect( mStatistics, SIGNAL( currentEntryChanged() ),

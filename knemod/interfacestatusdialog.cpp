@@ -20,6 +20,7 @@
 #include <qtimer.h>
 #include <qlabel.h>
 #include <qstring.h>
+#include <qgroupbox.h>
 #include <qdatetime.h>
 #include <qtabwidget.h>
 
@@ -39,35 +40,29 @@
 InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* parent, const char* name )
     : InterfaceStatusDlg( parent, name ),
       mPosInitialized( false ),
-      mInterface( interface ),
-      mStatisticsTab( 0 )
+      mInterface( interface )
 {
     setIcon( SmallIcon( "knemo" ) );
     setCaption( interface->getName() + " " + i18n( "Interface Status" ) );
     updateDialog();
     if ( interface->getData().available )
     {
-        enableNetworkTabs( 0 );
+        enableNetworkGroups( 0 );
     }
     else
     {
-        disableNetworkTabs( 0 );
+        disableNetworkGroups( 0 );
     }
     if ( !interface->getData().wirelessDevice )
     {
-        statisticsTabPos = 3;
-        QWidget* wirelessTab = tabWidget->page( 3 );
+        QWidget* wirelessTab = tabWidget->page( 2 );
         tabWidget->removePage( wirelessTab );
         delete wirelessTab;
-    }
-    else
-    {
-        statisticsTabPos = 4;
     }
 
     if ( !interface->getSettings().activateStatistics )
     {
-        hideStatisticsTab();
+        setStatisticsGroupEnabled( false );
     }
 
     // Restore window size and position.
@@ -98,13 +93,6 @@ InterfaceStatusDialog::~InterfaceStatusDialog()
 {
     mTimer->stop();
     delete mTimer;
-
-    if ( mStatisticsTab != 0 )
-    {
-        // The tab is not inserted in the tabwidget so we have
-        // to remove it ourselves.
-        delete mStatisticsTab;
-    }
 
     // Store window size and position.
     KConfig* config = new KConfig( "knemorc", false );
@@ -138,23 +126,9 @@ void InterfaceStatusDialog::show()
         move( mPos );
 }
 
-void InterfaceStatusDialog::showStatisticsTab()
+void InterfaceStatusDialog::setStatisticsGroupEnabled( bool enabled )
 {
-    if ( mStatisticsTab != 0 )
-    {
-        tabWidget->addTab( mStatisticsTab, i18n( "Statistics" ) );
-        mStatisticsTab = 0;
-    }
-}
-
-void InterfaceStatusDialog::hideStatisticsTab()
-{
-    if ( mStatisticsTab == 0 )
-    {
-        mStatisticsTab = tabWidget->page( statisticsTabPos );
-        tabWidget->setCurrentPage( 0 );
-        tabWidget->removePage( mStatisticsTab );
-    }
+    groupBoxStatistics->setEnabled( enabled );
 }
 
 void InterfaceStatusDialog::updateDialog()
@@ -235,10 +209,8 @@ void InterfaceStatusDialog::updateDialog()
         // traffic tab
         textLabelPacketsSend->setText( QString::number( data.txPackets ) );
         textLabelPacketsReceived->setText( QString::number( data.rxPackets ) );
-        textLabelBytesSend->setText( KGlobal::locale()->formatNumber( (double) data.txBytes, 0 ) +
-                                     "\n" + data.txString );
-        textLabelBytesReceived->setText( KGlobal::locale()->formatNumber( (double) data.rxBytes, 0 ) +
-                                         "\n" +data.rxString );
+        textLabelBytesSend->setText( data.txString );
+        textLabelBytesReceived->setText( data.rxString );
         unsigned long bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().pollInterval;
         textLabelSpeedSend->setText( KIO::convertSize( bytesPerSecond  ) + i18n( "/s" ) );
         bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().pollInterval;
@@ -268,23 +240,31 @@ void InterfaceStatusDialog::updateDialog()
     }
 }
 
-void InterfaceStatusDialog::enableNetworkTabs( int )
+void InterfaceStatusDialog::enableNetworkGroups( int )
 {
-    QWidget* ipTab = tabWidget->page( 1 );
-    QWidget* trafficTab = tabWidget->page( 2 );
-
-    tabWidget->setTabEnabled( ipTab, true );
-    tabWidget->setTabEnabled( trafficTab, true );
+    groupBoxIP->setEnabled( true );
+    groupBoxCurrentConnection->setEnabled( true );
 }
 
-void InterfaceStatusDialog::disableNetworkTabs( int )
+void InterfaceStatusDialog::disableNetworkGroups( int )
 {
-    QWidget* ipTab = tabWidget->page( 1 );
-    QWidget* trafficTab = tabWidget->page( 2 );
+    groupBoxIP->setEnabled( false );
+    groupBoxCurrentConnection->setEnabled( false );
 
-    tabWidget->setCurrentPage( 0 );
-    tabWidget->setTabEnabled( ipTab, false );
-    tabWidget->setTabEnabled( trafficTab, false );
+    // clear IP group
+    textLabelIP->setText( QString::null );
+    textLabelSubnet->setText( QString::null );
+    variableText1->setText( QString::null );
+    variableText2->setText( QString::null );
+    variableText3->setText( QString::null );
+
+    // clear current connection group
+    textLabelPacketsSend->setText( QString::null );
+    textLabelPacketsReceived->setText( QString::null );
+    textLabelBytesSend->setText( QString::null );
+    textLabelBytesReceived->setText( QString::null );
+    textLabelSpeedSend->setText( QString::null );
+    textLabelSpeedReceived->setText( QString::null );
 }
 
 void InterfaceStatusDialog::statisticsChanged()
