@@ -3,7 +3,12 @@ KNemo - the KDE Network Monitor
 KNemo offers a network monitor similar to the one found in Windows.
 For every network interface it displays an icon in the systray. 
  
-Features of version 0.4.3 include:
+IMPORTANT: KNemo has to be started using KDE Control Center/Internet & Network/
+Network Monitor. Please do no longer use the KDE Service Manager to start and
+stop KNemo. This change was necessary to keep KNemo from starting automatically 
+for every user in a multiuser environment.
+
+Features of version 0.4.5 include:
  * support for ethernet (including wireless) and ppp connections
  * the icon shows incoming/outgoing traffic
  * hiding of icon when the interface is not available
@@ -29,6 +34,3 @@ Features of version 0.4.3 include:
  * support for daily, monthly and yearly statistics
  * configurable update interval for interface informations
  * support for different backends to gather information
-
-IMPORTANT: KNemo is not an executable but an KDED service. Therefore
-it has to be started using Control Center/KDE Components/Service Manager. 

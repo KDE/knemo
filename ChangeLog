@@ -4,6 +4,8 @@ Version 0.4.5:
    KNemo must now be started using its control center module. This was
    necessary to keep KNemo from starting automatically for every user
    in a multiuser environment.
+ * fixed calculation of transfer speed
+ * redesigned the status dialog
 
 Version 0.4.4:
  * fixed counting of transfered data for ppp interfaces
