@@ -98,9 +98,6 @@ private:
     QColor mColorOutgoing;
     QColor mColorBackground;
 
-    // needed to calculate the number of
-    // seconds since the last update
-    QDateTime mLastUpdateTime;
     // every time this timer expires we will
     // gather new informations from the backend
     QTimer* mPollTimer;

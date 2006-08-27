@@ -129,12 +129,12 @@ void InterfaceToolTip::setupText( QString& text )
             text += "<tr><td>" + mToolTips[11].first + "</td><td>" + data.txString + "</td></tr>";
         if ( toolTipContent & DOWNLOAD_SPEED )
         {
-            unsigned long bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().secondsSinceLastUpdate;
+            unsigned long bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().pollInterval;
             text += "<tr><td>" + mToolTips[20].first + "</td><td>" + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + "</td></tr>";
         }
         if ( toolTipContent & UPLOAD_SPEED )
         {
-            unsigned long bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().secondsSinceLastUpdate;
+            unsigned long bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().pollInterval;
             text += "<tr><td>" + mToolTips[21].first + "</td><td>" + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + "</td></tr>";
         }
     }

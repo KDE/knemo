@@ -239,9 +239,9 @@ void InterfaceStatusDialog::updateDialog()
                                      "\n" + data.txString );
         textLabelBytesReceived->setText( KGlobal::locale()->formatNumber( (double) data.rxBytes, 0 ) +
                                          "\n" +data.rxString );
-        unsigned long bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().secondsSinceLastUpdate;
+        unsigned long bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().pollInterval;
         textLabelSpeedSend->setText( KIO::convertSize( bytesPerSecond  ) + i18n( "/s" ) );
-        bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().secondsSinceLastUpdate;
+        bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().pollInterval;
         textLabelSpeedReceived->setText( KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) );
     }
 

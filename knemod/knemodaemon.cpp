@@ -83,9 +83,6 @@ KNemoDaemon::KNemoDaemon( const QCString& name )
     mPollTimer = new QTimer();
     connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );
     mPollTimer->start( mGeneralData.pollInterval * 1000 );
-
-    mLastUpdateTime.setDate( QDate::currentDate() );
-    mLastUpdateTime.setTime( QTime::currentTime() );
 }
 
 KNemoDaemon::~KNemoDaemon()
@@ -335,16 +332,6 @@ QString KNemoDaemon::getSelectedInterface()
 void KNemoDaemon::updateInterfaces()
 {
     mBackend->update();
-
-    // needed to calculate the current speed
-    mGeneralData.secondsSinceLastUpdate = mLastUpdateTime.secsTo( QDateTime::currentDateTime() );
-    if ( mGeneralData.secondsSinceLastUpdate < 1 )
-    {
-        mGeneralData.secondsSinceLastUpdate = 1;
-    }
-    mLastUpdateTime.setDate( QDate::currentDate() );
-    mLastUpdateTime.setTime( QTime::currentTime() );
-
 }
 
 #include "knemodaemon.moc"
