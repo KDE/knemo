@@ -490,10 +490,10 @@ void SignalPlotter::paintEvent( QPaintEvent* )
     // - name of interface (original title)
     // - download speed (numerically, from the value shown by the bar on the right)
     // - upload speed (numerically, from the value shown by the bar on the right)
-    
+
     // title
     p.drawText(0, 0, x0/3, top - 2, Qt::AlignCenter, mTitle );
-    
+
     QValueList<QColor>::Iterator col_speeds;
     col_speeds           = mBeamColor.begin();
     QColor UploadColor   = *(col_speeds++);
@@ -504,13 +504,13 @@ void SignalPlotter::paintEvent( QPaintEvent* )
     DownloadSpeedText.sprintf("in: %0.2f KB/s", DownloadSpeed);
     p.setPen( DownloadColor );
     p.drawText(x0/3, 0, x0/3, top - 2, Qt::AlignCenter, DownloadSpeedText );
-    
+
     // upload speed
     QString UploadSpeedText;
     UploadSpeedText.sprintf("out: %0.2f KB/s", UploadSpeed);
     p.setPen( UploadColor );
     p.drawText(2*x0/3, 0, x0/3, top - 2, Qt::AlignCenter, UploadSpeedText );
-        
+
     // restore correct pen color for the separator lines
     p.setPen( mHorizontalLinesColor );
     // <--- JJ 2005-07-18
@@ -600,7 +600,7 @@ void SignalPlotter::paintEvent( QPaintEvent* )
     }
   } else if ( mGraphStyle == GRAPH_POLYGON ) {
     int *prevVals = new int[ mBeamData.count() ];
-    int hack[ 4 ];
+    int hack[ 4 ] = { 0, 0, 0, 0 };
     int x1 = w - ( ( mSamples + 1 ) * mHorizontalScale );
 
     for ( int i = 0; i < mSamples; i++ ) {
