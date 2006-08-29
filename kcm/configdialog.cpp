@@ -26,6 +26,7 @@
 #include <qcheckbox.h>
 #include <qlineedit.h>
 #include <qcombobox.h>
+#include <qgroupbox.h>
 #include <qwhatsthis.h>
 #include <qtabwidget.h>
 #include <qpushbutton.h>
@@ -325,6 +326,9 @@ void ConfigDialog::load()
         mSettingsDict.insert( interface, settings );
         mDlg->listBoxInterfaces->insertItem( interface );
     }
+
+    // enable or disable statistics entries
+    updateStatisticsEntries();
 
     // Set the plotter widgets
     config->setGroup( "PlotterSettings" );
@@ -969,6 +973,9 @@ void ConfigDialog::checkBoxStatisticsToggled( bool on )
     InterfaceSettings* settings = mSettingsDict[selected->text()];
     settings->activateStatistics = on;
     if (!mLock) changed( true );
+
+    // enable or disable statistics entries
+    updateStatisticsEntries();
 }
 
 void ConfigDialog::checkBoxStartKNemoToggled( bool on )
@@ -1081,6 +1088,23 @@ void ConfigDialog::setupToolTipArray()
     mToolTips[22] = QPair<QString, int>();
 }
 
+void ConfigDialog::updateStatisticsEntries( void )
+{
+    bool statisticsActive = false;
+    QDictIterator<InterfaceSettings> it( mSettingsDict );
+    for ( ; it.current(); ++it )
+    {
+        if ( it.current()->activateStatistics )
+        {
+            statisticsActive = true;
+            break;
+        }
+    }
+
+    mDlg->groupBoxStatistics->setEnabled( statisticsActive );
+    mDlg->groupBoxUpdateInterval->setEnabled( statisticsActive );
+}
+
 void ConfigDialog::checkBoxToggled( bool )
 {
     changed( true );
@@ -1169,6 +1193,5 @@ void ConfigDialog::listViewCommandsRenamed( QListViewItem* item, int col, const 
         if (!mLock) changed( true );
     }
 }
-
 
 #include "configdialog.moc"

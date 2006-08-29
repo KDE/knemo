@@ -98,6 +98,7 @@ private slots:
 private:
     void setupToolTipTab();
     void setupToolTipArray();
+    void updateStatisticsEntries( void );
 
     enum IconSet
     {
