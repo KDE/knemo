@@ -18,6 +18,12 @@
 */
 
 #include <stdio.h>
+#include <net/if.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 #include <qmap.h>
 #include <qdir.h>
@@ -234,6 +240,33 @@ void SysBackend::updateInterfaceData( const QString& ifName, InterfaceData& data
         if ( readStringFromFile( ifFolder + "address", hwAddress ) )
         {
             data.hwAddress = hwAddress;
+        }
+    }
+
+    // use ioctls for the rest
+    int fd;
+    struct ifreq ifr;
+    if ( ( fd = socket(AF_INET, SOCK_DGRAM, 0) ) > -1 )
+    {
+        strcpy( ifr.ifr_name, ifName.latin1() );
+        ifr.ifr_addr.sa_family = AF_INET;
+        if ( ioctl( fd, SIOCGIFADDR, &ifr ) > -1 )
+        {
+            data.ipAddress = inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr);
+        }
+        if ( ioctl( fd, SIOCGIFDSTADDR, &ifr) > -1 )
+        {
+            data.ptpAddress = inet_ntoa(((struct sockaddr_in*)&ifr.ifr_dstaddr)->sin_addr);
+        }
+
+        if ( ioctl( fd, SIOCGIFBRDADDR, &ifr ) > -1 )
+        {
+            data.broadcastAddress = inet_ntoa(((struct sockaddr_in*)&ifr.ifr_broadaddr)->sin_addr);
+        }
+
+        if ( ioctl( fd, SIOCGIFNETMASK, &ifr ) > -1 )
+        {
+            data.subnetMask = inet_ntoa(((struct sockaddr_in*)&ifr.ifr_netmask)->sin_addr);
         }
     }
 }
