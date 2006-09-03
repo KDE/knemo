@@ -39,6 +39,7 @@
 #include "config.h"
 
 #define SYSPATH "/sys/class/net/"
+#define PROCROUTE "/proc/net/route"
 
 SysBackend::SysBackend( QDict<Interface>& interfaces )
     : BackendBase( interfaces )
@@ -240,6 +241,21 @@ void SysBackend::updateInterfaceData( const QString& ifName, InterfaceData& data
         if ( readStringFromFile( ifFolder + "address", hwAddress ) )
         {
             data.hwAddress = hwAddress;
+        }
+    }
+
+    // for the default gateway we use the proc filesystem
+    QFile routeFile( PROCROUTE );
+    if ( routeFile.open( IO_ReadOnly ) )
+    {
+        QString routeData( routeFile.readAll().data() );
+        QRegExp regExp( ".*\\s+[\\w\\d]{8}\\s+([\\w\\d]{8})\\s+0+3" );
+        if ( regExp.search( routeData ) > -1 )
+        {
+            bool ok;
+            struct in_addr in;
+            in.s_addr = regExp.cap( 1 ).toULong( &ok, 16 );
+            data.defaultGateway = inet_ntoa( in );
         }
     }
 
