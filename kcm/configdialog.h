@@ -117,7 +117,7 @@ private:
     QColor mColorOutgoing;
     QColor mColorBackground;
     QDict<InterfaceSettings> mSettingsDict;
-    QPair<QString, int> mToolTips[23];
+    QPair<QString, int> mToolTips[25];
 
     static const QString ICON_DISCONNECTED;
     static const QString ICON_CONNECTED;

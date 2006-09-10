@@ -18,7 +18,8 @@
 */
 
 #include <stdio.h>
-#include <net/if.h>
+#include <iwlib.h>
+//#include <net/if.h>
 #include <string.h>
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
@@ -295,6 +296,116 @@ void SysBackend::updateWirelessData( const QString& ifName, WirelessData& data )
     if ( readNumberFromFile( wirelessFolder + "link", link ) )
     {
         data.linkQuality = QString::number( link );
+    }
+
+    // The following code was taken from iwconfig.c and iwlib.c.
+    int fd;
+    if ( ( fd = iw_sockets_open() ) > 0 )
+    {
+        struct iwreq wrq;
+        char buffer[128];
+        if ( iw_get_ext( fd, ifName.latin1(), SIOCGIWFREQ, &wrq ) >= 0 )
+        {
+            int channel = -1;
+            double freq = iw_freq2float( &( wrq.u.freq ) );
+            struct iw_range range;
+            if( iw_get_range_info( fd, ifName.latin1(), &range ) >= 0 )
+            {
+                if ( freq < KILO )
+                {
+                    channel = iw_channel_to_freq( (int) freq, &freq, &range );
+                }
+                else
+                {
+                    channel = iw_freq_to_channel( freq, &range );
+                }
+                iw_print_freq_value( buffer, sizeof( buffer ), freq );
+                data.frequency = buffer;
+                data.channel = QString::number( channel );
+            }
+        }
+
+        char essid[IW_ESSID_MAX_SIZE + 1];
+        memset( essid, 0, IW_ESSID_MAX_SIZE + 1 );
+        wrq.u.essid.pointer = (caddr_t) essid;
+        wrq.u.essid.length = IW_ESSID_MAX_SIZE + 1;
+        wrq.u.essid.flags = 0;
+        if ( iw_get_ext( fd, ifName.latin1(), SIOCGIWESSID, &wrq ) >= 0 )
+        {
+            if ( wrq.u.data.flags > 0 )
+            {
+                data.essid = essid;
+            }
+            else
+            {
+                data.essid = "any";
+            }
+        }
+
+        if ( iw_get_ext( fd, ifName.latin1(), SIOCGIWAP, &wrq ) >= 0 )
+        {
+            char ap_addr[128];
+            iw_ether_ntop( (const ether_addr*) wrq.u.ap_addr.sa_data, ap_addr);
+            data.accessPoint = ap_addr;
+        }
+
+        memset( essid, 0, IW_ESSID_MAX_SIZE + 1 );
+        wrq.u.essid.pointer = (caddr_t) essid;
+        wrq.u.essid.length = IW_ESSID_MAX_SIZE + 1;
+        wrq.u.essid.flags = 0;
+        if ( iw_get_ext( fd, ifName.latin1(), SIOCGIWNICKN, &wrq ) >= 0 )
+        {
+            if ( wrq.u.data.length > 1 )
+            {
+                data.nickName = essid;
+            }
+            else
+            {
+                data.nickName = QString::null;
+            }
+        }
+
+        if ( iw_get_ext( fd, ifName.latin1(), SIOCGIWRATE, &wrq ) >= 0 )
+        {
+            iwparam bitrate;
+            memcpy (&(bitrate), &(wrq.u.bitrate), sizeof (iwparam));
+            iw_print_bitrate( buffer, sizeof( buffer ), wrq.u.bitrate.value );
+            data.bitRate = buffer;
+        }
+
+        if ( iw_get_ext( fd, ifName.latin1(), SIOCGIWMODE, &wrq ) >= 0 )
+        {
+            int mode = wrq.u.mode;
+            if ( mode < IW_NUM_OPER_MODE && mode >= 0 )
+            {
+                data.mode = iw_operation_mode[mode];
+            }
+            else
+            {
+                data.mode = QString::null;
+            }
+        }
+
+        unsigned char key[IW_ENCODING_TOKEN_MAX];
+        wrq.u.data.pointer = (caddr_t) key;
+        wrq.u.data.length = IW_ENCODING_TOKEN_MAX;
+        wrq.u.data.flags = 0;
+        if ( iw_get_ext( fd, ifName.latin1(), SIOCGIWENCODE, &wrq ) >= 0 )
+        {
+            if ( ( wrq.u.data.flags & IW_ENCODE_DISABLED ) || ( wrq.u.data.length == 0 ) )
+            {
+                data.encryption = false;
+            }
+            else
+            {
+                data.encryption = true;
+            }
+        }
+        else
+        {
+            data.encryption = false;
+        }
+        close( fd );
     }
 }
 

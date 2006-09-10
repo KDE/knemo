@@ -1083,9 +1083,11 @@ void ConfigDialog::setupToolTipArray()
     mToolTips[17] = QPair<QString, int>( i18n( "Mode" ), MODE );
     mToolTips[18] = QPair<QString, int>( i18n( "Frequency" ), FREQUENCY );
     mToolTips[19] = QPair<QString, int>( i18n( "Bit Rate" ), BIT_RATE );
-    mToolTips[20] = QPair<QString, int>( i18n( "Signal/Noise" ), SIGNAL_NOISE );
+    mToolTips[20] = QPair<QString, int>( i18n( "Access Point" ), ACCESS_POINT );
     mToolTips[21] = QPair<QString, int>( i18n( "Link Quality" ), LINK_QUALITY );
-    mToolTips[22] = QPair<QString, int>();
+    mToolTips[22] = QPair<QString, int>( i18n( "Nickname" ), NICK_NAME );
+    mToolTips[23] = QPair<QString, int>( i18n( "Encryption" ), ENCRYPTION );
+    mToolTips[24] = QPair<QString, int>();
 }
 
 void ConfigDialog::updateStatisticsEntries( void )

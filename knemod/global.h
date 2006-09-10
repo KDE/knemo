@@ -81,9 +81,10 @@ struct WirelessData
     QString frequency;
     QString channel;
     QString bitRate;
-    QString signal;
-    QString noise;
     QString linkQuality;
+    QString accessPoint;
+    QString nickName;
+    bool encryption;
 };
 
 struct PlotterSettings

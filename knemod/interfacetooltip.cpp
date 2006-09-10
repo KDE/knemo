@@ -150,10 +150,23 @@ void InterfaceToolTip::setupText( QString& text )
             text += "<tr><td>" + mToolTips[14].first + "</td><td>" + wdata.frequency + "</td></tr>";
         if ( toolTipContent & BIT_RATE )
             text += "<tr><td>" + mToolTips[15].first + "</td><td>" + wdata.bitRate + "</td></tr>";
-        if ( toolTipContent & SIGNAL_NOISE )
-            text += "<tr><td>" + mToolTips[16].first + "</td><td>" + wdata.signal + "/" + wdata.noise + "</td></tr>";
+        if ( toolTipContent & ACCESS_POINT )
+            text += "<tr><td>" + mToolTips[16].first + "</td><td>" + wdata.accessPoint + "</td></tr>";
         if ( toolTipContent & LINK_QUALITY )
             text += "<tr><td>" + mToolTips[17].first + "</td><td>" + wdata.linkQuality + "</td></tr>";
+        if ( toolTipContent & NICK_NAME )
+            text += "<tr><td>" + mToolTips[22].first + "</td><td>" + wdata.nickName + "</td></tr>";
+        if ( toolTipContent & ENCRYPTION )
+        {
+            if ( wdata.encryption == true )
+            {
+                text += "<tr><td>" + mToolTips[23].first + "</td><td>" + i18n( "active" ) + "</td></tr>";
+            }
+            else
+            {
+                text += "<tr><td>" + mToolTips[23].first + "</td><td>" + i18n( "off" ) + "</td></tr>";
+            }
+        }
     }
     text += "</table>";
 }
@@ -178,12 +191,14 @@ void InterfaceToolTip::setupToolTipArray()
     mToolTips[13] = QPair<QString, int>( i18n( "Mode" ), MODE );
     mToolTips[14] = QPair<QString, int>( i18n( "Frequency" ), FREQUENCY );
     mToolTips[15] = QPair<QString, int>( i18n( "Bit Rate" ), BIT_RATE );
-    mToolTips[16] = QPair<QString, int>( i18n( "Signal/Noise" ), SIGNAL_NOISE );
+    mToolTips[16] = QPair<QString, int>( i18n( "Access Point" ), ACCESS_POINT );
     mToolTips[17] = QPair<QString, int>( i18n( "Link Quality" ), LINK_QUALITY );
     mToolTips[18] = QPair<QString, int>( i18n( "Broadcast Address" ), BCAST_ADDRESS );
     mToolTips[19] = QPair<QString, int>( i18n( "Default Gateway" ), LINK_QUALITY );
     mToolTips[20] = QPair<QString, int>( i18n( "Download Speed" ), DOWNLOAD_SPEED );
     mToolTips[21] = QPair<QString, int>( i18n( "Upload Speed" ), UPLOAD_SPEED );
-    mToolTips[22] = QPair<QString, int>();
+    mToolTips[22] = QPair<QString, int>( i18n( "Nickname" ), NICK_NAME );
+    mToolTips[23] = QPair<QString, int>( i18n( "Encryption" ), ENCRYPTION );
+    mToolTips[24] = QPair<QString, int>();
 }
 

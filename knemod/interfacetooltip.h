@@ -66,7 +66,7 @@ private:
     // the interface this tooltip belongs to
     Interface* mInterface;
     // the tooltip text for each information
-    QPair<QString, int> mToolTips[23];
+    QPair<QString, int> mToolTips[25];
 };
 
 #endif // INTERFACETOOLTIP_H

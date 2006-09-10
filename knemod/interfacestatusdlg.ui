@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>InterfaceStatusDlg</class>
 <widget class="QDialog">
     <property name="name">
@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>327</width>
+            <width>292</width>
             <height>328</height>
         </rect>
     </property>
@@ -527,69 +527,12 @@
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-                    <spacer row="6" column="1">
-                        <property name="name">
-                            <cstring>spacer4_4</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Vertical</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>81</width>
-                                <height>60</height>
-                            </size>
-                        </property>
-                    </spacer>
                     <widget class="QLabel" row="0" column="0">
                         <property name="name">
                             <cstring>textLabel3_2</cstring>
                         </property>
                         <property name="text">
-                            <string>ESSID:</string>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="1" column="0">
-                        <property name="name">
-                            <cstring>textLabel3_2_2</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Mode:</string>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="2" column="0">
-                        <property name="name">
-                            <cstring>textLabelFC</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Channel:</string>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="3" column="0">
-                        <property name="name">
-                            <cstring>textLabel3_2_4</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Bit Rate:</string>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="4" column="0">
-                        <property name="name">
-                            <cstring>textLabel3_2_5</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Signal/Noise:</string>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="5" column="0">
-                        <property name="name">
-                            <cstring>textLabel3_2_6</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Link Quality:</string>
+                            <string>Connected to:</string>
                         </property>
                     </widget>
                     <widget class="QLabel" row="0" column="1">
@@ -603,7 +546,66 @@
                             <set>AlignVCenter|AlignRight</set>
                         </property>
                     </widget>
+                    <widget class="QLabel" row="1" column="0">
+                        <property name="name">
+                            <cstring>textLabel3_2_2_2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Access point:</string>
+                        </property>
+                    </widget>
                     <widget class="QLabel" row="1" column="1">
+                        <property name="name">
+                            <cstring>textLabelAccessPoint</cstring>
+                        </property>
+                        <property name="text">
+                            <string></string>
+                        </property>
+                        <property name="alignment">
+                            <set>AlignVCenter|AlignRight</set>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="5" column="0">
+                        <property name="name">
+                            <cstring>textLabel3_2_4</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Bit Rate:</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="4" column="0">
+                        <property name="name">
+                            <cstring>textLabelFC</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Frequency [Channel]:</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="3" column="0">
+                        <property name="name">
+                            <cstring>textLabel3_2_2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Mode:</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="5" column="1">
+                        <property name="name">
+                            <cstring>textLabelBitRate</cstring>
+                        </property>
+                        <property name="alignment">
+                            <set>AlignVCenter|AlignRight</set>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="4" column="1">
+                        <property name="name">
+                            <cstring>textLabelFreqChannel</cstring>
+                        </property>
+                        <property name="alignment">
+                            <set>AlignVCenter|AlignRight</set>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="3" column="1">
                         <property name="name">
                             <cstring>textLabelMode</cstring>
                         </property>
@@ -616,31 +618,67 @@
                     </widget>
                     <widget class="QLabel" row="2" column="1">
                         <property name="name">
-                            <cstring>textLabelFreqChannel</cstring>
+                            <cstring>textLabelNickName</cstring>
                         </property>
                         <property name="alignment">
                             <set>AlignVCenter|AlignRight</set>
                         </property>
                     </widget>
-                    <widget class="QLabel" row="3" column="1">
+                    <widget class="QLabel" row="2" column="0">
                         <property name="name">
-                            <cstring>textLabelBitRate</cstring>
+                            <cstring>textLabel3_2_5</cstring>
                         </property>
-                        <property name="alignment">
-                            <set>AlignVCenter|AlignRight</set>
+                        <property name="text">
+                            <string>Nickname:</string>
                         </property>
                     </widget>
-                    <widget class="QLabel" row="4" column="1">
+                    <spacer row="8" column="0" rowspan="1" colspan="2">
                         <property name="name">
-                            <cstring>textLabelSignalNoise</cstring>
+                            <cstring>spacer4_4</cstring>
                         </property>
-                        <property name="alignment">
-                            <set>AlignVCenter|AlignRight</set>
+                        <property name="orientation">
+                            <enum>Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                            <enum>Expanding</enum>
+                        </property>
+                        <property name="sizeHint">
+                            <size>
+                                <width>81</width>
+                                <height>50</height>
+                            </size>
+                        </property>
+                    </spacer>
+                    <widget class="QLabel" row="6" column="0">
+                        <property name="name">
+                            <cstring>textLabel3_2_6</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Link Quality:</string>
                         </property>
                     </widget>
-                    <widget class="QLabel" row="5" column="1">
+                    <widget class="QLabel" row="7" column="0">
+                        <property name="name">
+                            <cstring>textLabel1</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Encryption:</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="6" column="1">
                         <property name="name">
                             <cstring>textLabelLinkQuality</cstring>
+                        </property>
+                        <property name="text">
+                            <string></string>
+                        </property>
+                        <property name="alignment">
+                            <set>AlignVCenter|AlignRight</set>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="7" column="1">
+                        <property name="name">
+                            <cstring>textLabelEncryption</cstring>
                         </property>
                         <property name="text">
                             <string></string>

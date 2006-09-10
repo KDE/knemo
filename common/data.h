@@ -81,12 +81,14 @@ enum ToolTipEnums
     MODE             = 0x00002000,
     FREQUENCY        = 0x00004000,
     BIT_RATE         = 0x00008000,
-    SIGNAL_NOISE     = 0x00010000,
+    ACCESS_POINT     = 0x00010000,
     LINK_QUALITY     = 0x00020000,
     BCAST_ADDRESS    = 0x00040000,
     GATEWAY          = 0x00080000,
     DOWNLOAD_SPEED   = 0x00100000,
-    UPLOAD_SPEED     = 0x00200000
+    UPLOAD_SPEED     = 0x00200000,
+    NICK_NAME        = 0x00400000,
+    ENCRYPTION       = 0x00800000
 };
 
 #endif // DATA_H

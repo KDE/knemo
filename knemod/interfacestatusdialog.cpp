@@ -215,28 +215,28 @@ void InterfaceStatusDialog::updateDialog()
         textLabelSpeedSend->setText( KIO::convertSize( bytesPerSecond  ) + i18n( "/s" ) );
         bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().pollInterval;
         textLabelSpeedReceived->setText( KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) );
-    }
 
-    if ( data.wirelessDevice )
-    {
-        WirelessData& wdata = mInterface->getWirelessData();
+        if ( data.wirelessDevice )
+        {
+            WirelessData& wdata = mInterface->getWirelessData();
 
-        // wireless tab
-        textLabelESSID->setText( wdata.essid );
-        textLabelMode->setText( wdata.mode );
-        if ( wdata.channel != QString::null )
-        {
-            textLabelFC->setText( i18n( "Channel:" ) );
-            textLabelFreqChannel->setText( wdata.channel );
+            // wireless tab
+            textLabelESSID->setText( wdata.essid );
+            textLabelAccessPoint->setText( wdata.accessPoint );
+            textLabelNickName->setText( wdata.nickName );
+            textLabelMode->setText( wdata.mode );
+            textLabelFreqChannel->setText( wdata.frequency + " [" + wdata.channel + "]" );
+            textLabelBitRate->setText( wdata.bitRate );
+            textLabelLinkQuality->setText( wdata.linkQuality + "%" );
+            if ( wdata.encryption == true )
+            {
+                textLabelEncryption->setText( i18n( "active" ) );
+            }
+            else
+            {
+                textLabelEncryption->setText( i18n( "off" ) );
+            }
         }
-        else
-        {
-            textLabelFC->setText( i18n( "Frequency:" ) );
-            textLabelFreqChannel->setText( wdata.frequency );
-        }
-        textLabelBitRate->setText( wdata.bitRate );
-        textLabelSignalNoise->setText( wdata.signal + "/" + wdata.noise );
-        textLabelLinkQuality->setText( wdata.linkQuality );
     }
 }
 
@@ -265,6 +265,16 @@ void InterfaceStatusDialog::disableNetworkGroups( int )
     textLabelBytesReceived->setText( QString::null );
     textLabelSpeedSend->setText( QString::null );
     textLabelSpeedReceived->setText( QString::null );
+
+    // clear wireless tab
+    textLabelESSID->setText( QString::null );
+    textLabelAccessPoint->setText( QString::null );
+    textLabelNickName->setText( QString::null );
+    textLabelMode->setText( QString::null );
+    textLabelFreqChannel->setText( QString::null );
+    textLabelBitRate->setText( QString::null );
+    textLabelLinkQuality->setText( QString::null );
+    textLabelEncryption->setText( QString::null );
 }
 
 void InterfaceStatusDialog::statisticsChanged()

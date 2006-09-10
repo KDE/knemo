@@ -404,31 +404,55 @@ void NetToolsBackend::updateWirelessData( QString& config, WirelessData& data )
     if ( regExp.search( config ) > -1 )
         data.mode = regExp.cap( 1 );
 
-    regExp.setPattern( "Frequency:([\\w|\\.]*)" );
+    regExp.setPattern( "Frequency:([\\w|\\.]*\\s*\\w*)" );
     if ( regExp.search( config ) > -1 )
+    {
         data.frequency = regExp.cap( 1 );
+        data.channel = "-";
+    }
     else
     {
+        data.frequency = "-";
         regExp.setPattern( "Channel:(\\d*)" );
         if ( regExp.search( config ) > -1 )
             data.channel = regExp.cap( 1 );
+        else
+            data.channel = "-";
     }
 
-    regExp.setPattern( "Bit Rate[=:]([\\w/]*)" );
+    regExp.setPattern( "Bit Rate[=:](\\d*\\s*[\\w/]*)" );
     if ( regExp.search( config ) > -1 )
         data.bitRate = regExp.cap( 1 );
 
-    regExp.setPattern( "Signal level.(-?\\d+\\s*\\w+)" );
+    regExp.setPattern( "(.{2}:.{2}:.{2}:.{2}:.{2}:.{2})" );
     if ( regExp.search( config ) > -1 )
-        data.signal = regExp.cap( 1 );
+        data.accessPoint = regExp.cap( 1 );
 
-    regExp.setPattern( "Noise level.(-?\\d+\\s*\\w+)" );
+    regExp.setPattern( "Nickname:\"(\\w*)\"" );
     if ( regExp.search( config ) > -1 )
-        data.noise = regExp.cap( 1 );
+        data.nickName = regExp.cap( 1 );
 
-    regExp.setPattern( "Link Quality[=:]([\\d/]*)" );
+    regExp.setPattern( "Link Quality[=:]([\\d]*)" );
     if ( regExp.search( config ) > -1 )
         data.linkQuality = regExp.cap( 1 );
+
+    regExp.setPattern( "Encryption key:" );
+    if ( regExp.search( config ) > -1 )
+    {
+        regExp.setPattern( "Encryption key:off" );
+        if ( regExp.search( config ) > -1 )
+        {
+            data.encryption = false;
+        }
+        else
+        {
+            data.encryption = true;
+        }
+    }
+    else
+    {
+        data.encryption = false;
+    }
 }
 
 void NetToolsBackend::parseRouteOutput()
