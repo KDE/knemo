@@ -153,7 +153,7 @@ void Interface::showStatusDialog()
                      mStatusDialog, SLOT( statisticsChanged() ) );
             mStatusDialog->statisticsChanged();
         }
-        mStatusDialog->show();
+        activateOrHide( mStatusDialog, true );
     }
     else
     {
@@ -172,7 +172,7 @@ void Interface::showSignalPlotter( bool wasMiddleButton )
         mPlotter->setCaption( mName + " " + i18n( "Traffic" ) );
         mPlotter->setTitle( mName );
         configurePlotter();
-        mPlotter->show();
+        activateOrHide( mPlotter, true );
 
         mPlotterTimer = new QTimer();
         connect( mPlotterTimer, SIGNAL( timeout() ),
