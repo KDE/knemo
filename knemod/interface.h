@@ -199,6 +199,13 @@ private:
      */
     void stopStatistics();
 
+    /**
+     * The following function is taken from ksystemtray.cpp for
+     * correct show, raise, focus and hide of status dialog and
+     * signal plotter.
+     */
+    void activateOrHide( QWidget* widget, bool onlyActivate = false );
+
     enum VisibleBeams
     {
         NONE = 0,

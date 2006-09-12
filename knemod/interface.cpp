@@ -20,8 +20,10 @@
 #include <qtimer.h>
 #include <qpixmap.h>
 
+#include <kwin.h>
 #include <kdebug.h>
 #include <klocale.h>
+#include <kwinmodule.h>
 #include <kiconloader.h>
 
 #include "interface.h"
@@ -134,9 +136,8 @@ void Interface::setStartTime( int )
 
 void Interface::showStatusDialog()
 {
-    /* Toggle the status dialog.
-     * First click will show the status dialog, second will hide it.
-     */
+    // Toggle the status dialog.
+    // First click will show the status dialog, second will hide it.
     if ( mStatusDialog == 0L )
     {
         mStatusDialog = new InterfaceStatusDialog( this );
@@ -157,18 +158,7 @@ void Interface::showStatusDialog()
     else
     {
         // Toggle the status dialog.
-        if ( mStatusDialog->isHidden() )
-            mStatusDialog->show();
-        else
-        {
-            if ( mStatusDialog->isActiveWindow() )
-                mStatusDialog->hide();
-            else
-            {
-                mStatusDialog->raise();
-                mStatusDialog->setActiveWindow();
-            }
-        }
+        activateOrHide( mStatusDialog );
     }
 }
 
@@ -194,29 +184,12 @@ void Interface::showSignalPlotter( bool wasMiddleButton )
         if ( wasMiddleButton )
         {
             // Toggle the signal plotter.
-            if ( mPlotter->isHidden() )
-                mPlotter->show();
-            else
-            {
-                if ( mPlotter->isActiveWindow() )
-                    mPlotter->hide();
-                else
-                {
-                    mPlotter->raise();
-                    mPlotter->setActiveWindow();
-                }
-            }
+            activateOrHide( mPlotter );
         }
         else
         {
             // Called from the context menu, show the dialog.
-            if ( mPlotter->isHidden() )
-                mPlotter->show();
-            else
-            {
-                mPlotter->raise();
-                mPlotter->setActiveWindow();
-            }
+            activateOrHide( mPlotter, true );
         }
     }
 }
@@ -439,6 +412,57 @@ void Interface::stopStatistics()
 
     delete mStatistics;
     mStatistics = 0;
+}
+
+// taken from ksystemtray.cpp
+void Interface::activateOrHide( QWidget* widget, bool onlyActivate )
+{
+    if ( !widget )
+	return;
+
+    KWin::WindowInfo info1 = KWin::windowInfo( widget->winId(), NET::XAWMState | NET::WMState );
+    // mapped = visible (but possibly obscured)
+    bool mapped = (info1.mappingState() == NET::Visible) && !info1.isMinimized();
+    //    - not mapped -> show, raise, focus
+    //    - mapped
+    //        - obscured -> raise, focus
+    //        - not obscured -> hide
+    if( !mapped )
+    {
+        KWin::setOnDesktop( widget->winId(), KWin::currentDesktop() );
+        widget->show();
+        widget->raise();
+	KWin::activateWindow( widget->winId() );
+    }
+    else
+    {
+        KWinModule module;
+        for( QValueList< WId >::ConstIterator it = module.stackingOrder().fromLast();
+             it != module.stackingOrder().end() && (*it) != widget->winId();
+             --it )
+        {
+            KWin::WindowInfo info2 = KWin::windowInfo( *it, (unsigned long)
+                NET::WMGeometry | NET::XAWMState | NET::WMState | NET::WMWindowType );
+            if( info2.mappingState() != NET::Visible )
+                continue; // not visible on current desktop -> ignore
+            if( !info2.geometry().intersects( widget->geometry()))
+                continue; // not obscuring the window -> ignore
+            if( !info1.hasState( NET::KeepAbove ) && info2.hasState( NET::KeepAbove ))
+                continue; // obscured by window kept above -> ignore
+            NET::WindowType type = info2.windowType( NET::NormalMask | NET::DesktopMask
+                | NET::DockMask | NET::ToolbarMask | NET::MenuMask | NET::DialogMask
+                | NET::OverrideMask | NET::TopMenuMask | NET::UtilityMask | NET::SplashMask );
+            if( type == NET::Dock || type == NET::TopMenu )
+                continue; // obscured by dock or topmenu -> ignore
+            widget->raise();
+            KWin::activateWindow( widget->winId());
+            return;
+        }
+        if ( !onlyActivate )
+        {
+            widget->hide();
+        }
+    }
 }
 
 #include "interface.moc"
