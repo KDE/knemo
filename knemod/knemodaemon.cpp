@@ -92,6 +92,13 @@ KNemoDaemon::~KNemoDaemon()
     delete mBackend;
     delete mNotifyInstance;
     delete mInstance;
+
+    QDictIterator<Interface> it( mInterfaceDict );
+    for ( ; it.current(); )
+    {
+        mInterfaceDict.remove( it.currentKey() );
+        // 'remove' already advanced the iterator to the next item
+    }
 }
 
 void KNemoDaemon::readConfig()
