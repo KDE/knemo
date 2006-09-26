@@ -35,7 +35,7 @@ void InterfaceMonitor::checkStatus( Interface* interface )
 {
     int currentState;
     int previousState = interface->getState();
-    const InterfaceData& data = interface->getData();
+    InterfaceData& data = interface->getData();
     int trafficThreshold = interface->getSettings().trafficThreshold;
 
     if ( !data.existing )
@@ -48,9 +48,9 @@ void InterfaceMonitor::checkStatus( Interface* interface )
     {
         // the interface is connected, look for traffic
         currentState = Interface::AVAILABLE;
-        if ( ( data.rxPackets - mData.rxPackets ) > (unsigned int) trafficThreshold )
+        if ( ( data.rxPackets - data.prevRxPackets ) > (unsigned int) trafficThreshold )
             currentState |= Interface::RX_TRAFFIC;
-        if ( ( data.txPackets - mData.txPackets ) > (unsigned int) trafficThreshold )
+        if ( ( data.txPackets - data.prevTxPackets ) > (unsigned int) trafficThreshold )
             currentState |= Interface::TX_TRAFFIC;
     }
 
@@ -64,7 +64,8 @@ void InterfaceMonitor::checkStatus( Interface* interface )
         emit outgoingData( data.outgoingBytes );
     }
 
-    mData = data; // backup current data
+    data.prevRxPackets = data.rxPackets;
+    data.prevTxPackets = data.txPackets;
 
     if ( ( previousState == Interface::NOT_EXISTING ||
            previousState == Interface::NOT_AVAILABLE ||

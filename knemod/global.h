@@ -45,6 +45,10 @@ struct InterfaceData
       : existing( false ),
         available( false ),
         wirelessDevice( false ),
+        prevRxPackets( 0L ),
+        prevTxPackets( 0L ),
+        rxPackets( 0L ),
+        txPackets( 0L ),
         prevRxBytes( 0L ),
         prevTxBytes( 0L ),
         incomingBytes( 0L ),
@@ -56,6 +60,8 @@ struct InterfaceData
     bool existing;
     bool available;
     bool wirelessDevice;
+    unsigned long prevRxPackets;
+    unsigned long prevTxPackets;
     unsigned long rxPackets;
     unsigned long txPackets;
     unsigned long prevRxBytes;

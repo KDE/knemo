@@ -67,10 +67,6 @@ signals:
     void incomingData( unsigned long );
     // the amount of outgoing traffic (for statistics)
     void outgoingData( unsigned long );
-
-private:
-    // store old interface data to compare new data against
-    InterfaceData mData;
 };
 
 #endif // INTERFACEMONITOR_H
