@@ -98,28 +98,6 @@ void InterfaceTray::showAboutDialog()
                     "percy@eris23.de" );
     data.addCredit( "Michael Olbrich", I18N_NOOP( "Threshold support" ),
                     "michael.olbrich@gmx.net" );
-    data.addAuthor( "Bernd Zimmer", I18N_NOOP( "German translation" ),
-                    "berndzimmer@gmx.de" );
-    data.addAuthor( "Raul Moratalla", I18N_NOOP( "Spanish translation" ),
-                    "raul.moratalla@ono.com" );
-    data.addAuthor( "Pedro Jurado Maqueda", I18N_NOOP( "Spanish translation" ),
-                    "melenas@kdehispano.org" );
-    data.addAuthor( "Malin Malinov", I18N_NOOP( "Bulgarian translation" ),
-                    "lgmim@club-35.com" );
-    data.addAuthor( "Samuele Kaplun", I18N_NOOP( "Italian translation" ),
-                    "kaplun@aliceposta.it" );
-    data.addAuthor( "Klara Cihlarova", I18N_NOOP( "Czech translation" ),
-                    "cihlarov@suse.cz" );
-    data.addAuthor( "Julien Morot", I18N_NOOP( "French translation" ),
-                    "julien@momonux.org" );
-    data.addAuthor( "Rogerio Pereira", I18N_NOOP( "Brazilian Portuguese translation" ),
-                    "rogerio.araujo@gmail.com" );
-    data.addAuthor( "Rinse de Vries", I18N_NOOP( "Dutch translation" ),
-                    "rinsedevries@kde.nl" );
-    data.addAuthor( "Alexander Shiyan", I18N_NOOP( "Russian translation" ),
-                    "shc@milas.spb.ru" );
-    data.addAuthor( "Charles Barcza", I18N_NOOP( "Hungarian translation" ),
-                    "kbarcza@blackpanther.hu" );
     data.addCredit( "Chris Schlaeger", I18N_NOOP( "Signal plotter" ),
                     "cs@kde.org" );
 
