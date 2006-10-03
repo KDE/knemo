@@ -1,9 +1,5 @@
- * redesign the status dialog
- * add MAC address of access point to WLAN infos
  * create the plotter (but keep it hidden) when an interface
    gets connected, so that we have sort of memory for the plotter
- * more usefull WLAN infos (remove signal/noise and display signal strength
-   as an absolut value in percent)
  * include an option: "show as line" - like the signal plotter in kppp
  * another option: "show up/down speed" in the bottom right (those numbers 
    shown in tooltip)

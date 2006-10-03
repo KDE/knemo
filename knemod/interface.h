@@ -172,6 +172,11 @@ public slots:
      */
     void showStatisticsDialog();
 
+    /*
+     * Reset data when PPP interface is disconnected
+     */
+    void resetData( int state );
+
 private slots:
     /**
      * Start the uptimer when the interface is connected

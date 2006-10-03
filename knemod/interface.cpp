@@ -61,6 +61,8 @@ Interface::Interface( QString ifname,
              &mIcon, SLOT( updateTrayStatus( int ) ) );
     connect( &mMonitor, SIGNAL( available( int ) ),
              this, SLOT( setStartTime( int ) ) );
+    connect( &mMonitor, SIGNAL( statusChanged( int ) ),
+             this, SLOT( resetData( int ) ) );
     connect( &mIcon, SIGNAL( statisticsSelected() ),
              this, SLOT( showStatisticsDialog() ) );
 }
@@ -224,6 +226,23 @@ void Interface::showStatisticsDialog()
         mStatisticsDialog->updateYears();
     }
     mStatisticsDialog->show();
+}
+
+void Interface::resetData( int state )
+{
+    // For PPP interfaces we will reset all data to zero when the
+    // interface gets disconnected. If the driver also resets its data
+    // (like PPP seems to do) we will start from zero for every new
+    // connection.
+    if ( mType == PPP &&
+         ( state == NOT_AVAILABLE ||
+           state == NOT_EXISTING ) )
+    {
+        mData.prevTxBytes = mData.txBytes = 0;
+        mData.prevRxBytes = mData.rxBytes = 0;
+        mData.prevTxPackets = mData.txPackets = 0;
+        mData.prevRxPackets = mData.rxPackets = 0;
+    }
 }
 
 void Interface::updatePlotter()

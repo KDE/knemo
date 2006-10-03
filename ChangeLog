@@ -1,3 +1,14 @@
+Version 0.4.6:
+ * disable statistics entries in configuration dialog if statistics are
+   not activated for at least one interface
+ * sys backend uses ioctls for network addresses
+ * sys backend uses proc filesystem for default gateway
+ * sys backend uses iwlib for wireless information
+ * wireless tab of status dialog was redesigned
+ * improved switching of status dialog and signal plotter
+ * if the PPP driver resets its data on disconnection KNemo should
+   also start to count the data from zero for every new connection
+
 Version 0.4.5:
  * fixed counting of transmitted data for sys backend
  * changed handling of KNemo as a service:
