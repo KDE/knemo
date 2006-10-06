@@ -18,8 +18,6 @@
 */
 
 #include <stdio.h>
-#include <iwlib.h>
-//#include <net/if.h>
 #include <string.h>
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
@@ -38,6 +36,12 @@
 #include "sysbackend.h"
 
 #include "config.h"
+
+#ifdef HAVE_IWLIB_H
+#include <iwlib.h>
+#else
+#include <net/if.h>
+#endif
 
 #define SYSPATH "/sys/class/net/"
 #define PROCROUTE "/proc/net/route"
@@ -298,6 +302,7 @@ void SysBackend::updateWirelessData( const QString& ifName, WirelessData& data )
         data.linkQuality = QString::number( link );
     }
 
+#ifdef HAVE_IWLIB_H
     // The following code was taken from iwconfig.c and iwlib.c.
     int fd;
     if ( ( fd = iw_sockets_open() ) > 0 )
@@ -407,5 +412,6 @@ void SysBackend::updateWirelessData( const QString& ifName, WirelessData& data )
         }
         close( fd );
     }
+#endif
 }
 
