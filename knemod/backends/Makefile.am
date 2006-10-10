@@ -9,7 +9,7 @@ INCLUDES = -I$(srcdir)/.. -I$(srcdir)/../../common $(all_includes)
 libknemo_backends_la_LDFLAGS = -module -avoid-version $(all_libraries)
 
 # the libraries to link against.
-libknemo_backends_la_LIBADD = $(LIB_KIO) $(LIB_KUTILS) -liw
+libknemo_backends_la_LIBADD = $(LIB_KIO) $(LIB_KUTILS)
 
 # which sources should be compiled as backends
 libknemo_backends_la_SOURCES = backendbase.cpp nettoolsbackend.cpp sysbackend.cpp
