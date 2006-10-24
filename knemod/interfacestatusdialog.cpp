@@ -267,14 +267,17 @@ void InterfaceStatusDialog::disableNetworkGroups( int )
     textLabelSpeedReceived->setText( QString::null );
 
     // clear wireless tab
-    textLabelESSID->setText( QString::null );
-    textLabelAccessPoint->setText( QString::null );
-    textLabelNickName->setText( QString::null );
-    textLabelMode->setText( QString::null );
-    textLabelFreqChannel->setText( QString::null );
-    textLabelBitRate->setText( QString::null );
-    textLabelLinkQuality->setText( QString::null );
-    textLabelEncryption->setText( QString::null );
+    if ( mInterface->getData().wirelessDevice )
+    {
+        textLabelESSID->setText( QString::null );
+        textLabelAccessPoint->setText( QString::null );
+        textLabelNickName->setText( QString::null );
+        textLabelMode->setText( QString::null );
+        textLabelFreqChannel->setText( QString::null );
+        textLabelBitRate->setText( QString::null );
+        textLabelLinkQuality->setText( QString::null );
+        textLabelEncryption->setText( QString::null );
+    }
 }
 
 void InterfaceStatusDialog::statisticsChanged()
