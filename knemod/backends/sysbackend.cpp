@@ -262,6 +262,7 @@ void SysBackend::updateInterfaceData( const QString& ifName, InterfaceData& data
             in.s_addr = regExp.cap( 1 ).toULong( &ok, 16 );
             data.defaultGateway = inet_ntoa( in );
         }
+        routeFile.close();
     }
 
     // use ioctls for the rest
@@ -289,6 +290,7 @@ void SysBackend::updateInterfaceData( const QString& ifName, InterfaceData& data
         {
             data.subnetMask = inet_ntoa(((struct sockaddr_in*)&ifr.ifr_netmask)->sin_addr);
         }
+        close( fd );
     }
 }
 
