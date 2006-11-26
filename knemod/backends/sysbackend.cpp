@@ -37,7 +37,7 @@
 
 #include "config.h"
 
-#ifdef HAVE_IWLIB_H
+#ifdef HAVE_LIBIW
 #include <iwlib.h>
 #else
 #include <net/if.h>
@@ -304,7 +304,7 @@ void SysBackend::updateWirelessData( const QString& ifName, WirelessData& data )
         data.linkQuality = QString::number( link );
     }
 
-#ifdef HAVE_IWLIB_H
+#ifdef HAVE_LIBIW
     // The following code was taken from iwconfig.c and iwlib.c.
     int fd;
     if ( ( fd = iw_sockets_open() ) > 0 )

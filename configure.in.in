@@ -12,7 +12,6 @@ AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h stdlib.h paths.h)
-AC_CHECK_HEADERS(iwlib.h,[],[],[[#define inline __inline__]])
 AC_CHECK_FUNCS(usleep)
 AC_CHECK_LIB(iw,iw_sockets_open)
 
