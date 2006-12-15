@@ -85,4 +85,4 @@ Keywords[uk]=knemo,network monitor,wlan monitor,wifi monitor,ethernet monitor,wi
 Keywords[xx]=xxknemo,network monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systrayxx
 Keywords[zh_CN]=knemo,network monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systray,网络监视器,无限局域网监视器,wifi 监视器以太网监视器,无线网络监视器,系统托盘
 
-Categories=Qt;KDE;X-KDE-settings-network
+Categories=Qt;KDE;X-KDE-settings-network;X-KDE-systemsettings-network
