@@ -8,3 +8,4 @@ X-KDE-FactoryName=knemod
 X-KDE-Kded-load-on-demand=true
 Name=KNemo
 Comment=KDE Network Monitor
+Comment[el]=Επίβλεψη δικτύου του KDE

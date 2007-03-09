@@ -1,21 +1,28 @@
 [!Global!]
 IconName=knemo
 Comment=KDE Network Monitor
+Comment[el]=Επίβλεψη δικτύου του KDE
 
 [knemo_connected]
 Name=Connected
+Name[el]=Συνδέθηκε
 Comment=Interface is connected
+Comment[el]=Η διασύνδεση είναι συνδεδεμένη
 default_sound=KDE_Dialog_Appear.wav
 default_presentation=17
 
 [knemo_disconnected]
 Name=Disconnected
+Name[el]=Αποσυνδέθηκε
 Comment=Interface is disconnected
+Comment[el]=Η διασύνδεση αποσυνδέθηκε
 default_sound=KDE_Dialog_Disappear.wav
 default_presentation=17
 
 [knemo_notexisting]
 Name=Not existing
+Name[el]=Δεν υπάρχει
 Comment=Interface does not exist
+Comment[el]=Η διασύνδεση δεν υπάρχει
 default_sound=KDE_Notify.wav
 default_presentation=0
