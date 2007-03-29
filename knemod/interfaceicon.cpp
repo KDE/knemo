@@ -260,8 +260,17 @@ void InterfaceIcon::updateTrayStatus( int previousState )
          * so that the winId of the tray is valid when used below.
          */
         usleep( 500000 );
-        KNotifyClient::event( mTray->winId(), "knemo_connected",
-                              title + ":\n" + i18n( "Connection established." ) );
+        if ( mInterface->getData().wirelessDevice )
+        {
+            KNotifyClient::event( mTray->winId(), "knemo_connected",
+                                  title + ":\n" + i18n( "Connection established to\n" ) +
+                                  mInterface->getWirelessData().essid );
+        }
+        else
+        {
+            KNotifyClient::event( mTray->winId(), "knemo_connected",
+                                  title + ":\n" + i18n( "Connection established." ) );
+        }
     }
 }
 

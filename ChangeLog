@@ -1,3 +1,8 @@
+Version 0.4.7:
+ * fixed missing tray icon caused by too many opened sockets
+ * fixed crash when non-wireless interfaces get disconnected
+ * make KNemo compilable on systems without iw lib
+
 Version 0.4.6:
  * disable statistics entries in configuration dialog if statistics are
    not activated for at least one interface
