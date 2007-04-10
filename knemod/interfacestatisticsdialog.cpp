@@ -61,7 +61,7 @@ void InterfaceStatisticsDialog::updateDays()
     while ( iterator )
     {
         QDate date( iterator->year, iterator->month,  iterator->day );
-        tableDaily->verticalHeader()->setLabel( row, KGlobal::locale()->formatDate( date, true ) );
+        tableDaily->verticalHeader()->setLabel( row, KGlobal::locale()->formatDate( date, KLocale::ShortDate ) );
         tableDaily->setText( row, 0, KIO::convertSize( iterator->txBytes ) );
         tableDaily->setText( row, 1, KIO::convertSize( iterator->rxBytes ) );
         tableDaily->setText( row, 2, KIO::convertSize( iterator->rxBytes + iterator->txBytes ) );
