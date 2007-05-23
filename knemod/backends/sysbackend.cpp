@@ -43,6 +43,7 @@
 #include <net/if.h>
 #endif
 
+#define RTF_GATEWAY 0x0002
 #define SYSPATH "/sys/class/net/"
 #define PROCROUTE "/proc/net/route"
 
@@ -247,22 +248,30 @@ void SysBackend::updateInterfaceData( const QString& ifName, InterfaceData& data
         {
             data.hwAddress = hwAddress;
         }
-    }
 
-    // for the default gateway we use the proc filesystem
-    QFile routeFile( PROCROUTE );
-    if ( routeFile.open( IO_ReadOnly ) )
-    {
-        QString routeData( routeFile.readAll().data() );
-        QRegExp regExp( ".*\\s+[\\w\\d]{8}\\s+([\\w\\d]{8})\\s+0+3" );
-        if ( regExp.search( routeData ) > -1 )
+        // for the default gateway we use the proc filesystem
+        QFile routeFile( PROCROUTE );
+        if ( routeFile.open( IO_ReadOnly ) )
         {
-            bool ok;
-            struct in_addr in;
-            in.s_addr = regExp.cap( 1 ).toULong( &ok, 16 );
-            data.defaultGateway = inet_ntoa( in );
+            QString routeData( routeFile.readAll().data() );
+            QStringList routeEntries = QStringList::split( "\n", routeData );
+            QStringList::Iterator it;
+            for ( it = routeEntries.begin(); it != routeEntries.end(); ++it )
+            {
+                QRegExp regExp( ".*\\s+[\\w\\d]{8}\\s+([\\w\\d]{8})\\s+(\\d{4})" );
+                if (   ( regExp.search( *it ) > -1 )
+                    && ( regExp.cap( 2 ).toUInt() & RTF_GATEWAY ) )
+                {
+                    bool ok;
+                    struct in_addr in;
+                    in.s_addr = regExp.cap( 1 ).toULong( &ok, 16 );
+                    data.defaultGateway = inet_ntoa( in );
+                    break;
+                }
+            }
+            routeFile.close();
         }
-        routeFile.close();
+
     }
 
     // use ioctls for the rest
