@@ -1,3 +1,6 @@
+Version 0.4.8:
+ * fixed high CPU load when the default gateway is missing (sysbackend)
+
 Version 0.4.7:
  * fixed missing tray icon caused by too many opened sockets
  * fixed crash when non-wireless interfaces get disconnected
