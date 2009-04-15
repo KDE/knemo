@@ -39,4 +39,3 @@ include_directories( ${CMAKE_BINARY_DIR} )
 link_directories( ${KDE4_LIB_DIR} )
 
 add_subdirectory( src )
-macro_optional_add_subdirectory( translations )
