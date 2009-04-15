@@ -1,0 +1,87 @@
+#!/bin/sh
+
+BUILD_DIR="build"
+INSTALL_PREFIX="/usr/local"
+
+usage ()
+{
+	cat << EOF
+\`configure' provides a very simple wrapper for a generic cmake configuration.
+Those needing more flexibility should run cmake directly.
+
+Usage: ./configure [OPTION]...
+
+Options:
+  -p, --prefix PREFIX             install files in PREFIX [/usr/local]
+  -b, --build-directory BUILDDIR  build the package in BUILDDIR [./build]
+  -h, --help                      display this help and exit
+EOF
+}
+
+GETOPTEST=`getopt --version`
+case "$GETOPTEST" in
+getopt*) # GNU getopt
+	ARGS=`getopt -n configure -l prefix:,build-directory:,help p:b:h "$@"`
+	;;
+*) # POSIX getopt ?
+	ARGS=`getopt p:b:h "$@"`
+	;;
+esac
+
+RET=$?
+if [ $RET -ne 0 ]; then
+	usage
+	exit 1
+fi
+
+eval set -- "$ARGS"
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+	-p|--prefix)
+		INSTALL_PREFIX="$2"
+		shift 2
+		;;
+	-b|--build-directory)
+		BUILD_DIR="$2"
+		shift 2
+		;;
+	-h|--help)
+		usage
+		exit 0
+		;;
+	--)
+		if [ $# -gt 1 ]; then
+			echo "Unknown parameter: $2"
+			echo ""
+			usage
+			exit 1
+		fi
+		break
+		;;
+	esac
+done
+
+SOURCE_DIR=`pwd`
+mkdir "$BUILD_DIR"
+cd "$BUILD_DIR"
+RET=$?
+if [ $RET -ne 0 ]; then
+	exit $RET
+fi
+
+cmake "$SOURCE_DIR" \
+	-DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
+	-DCMAKE_SKIP_RPATH=ON \
+	-DKDE4_USE_ALWAYS_FULL_RPATH=false \
+	-DCMAKE_BUILD_TYPE=Release
+
+RET=$?
+if [ $RET -ne 0 ]; then
+	echo "Error running cmake"
+	exit $RET
+else
+	echo ""
+	echo "Cmake configuration successful."
+	echo "Now run: 'cd \"$BUILD_DIR\"; make; make install'"
+fi

@@ -1,0 +1,641 @@
+# translation of kcm_knemo.po to Serbian
+# Slobodan Simic <simicsl@verat.net>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kcm_knemo\n"
+"POT-Creation-Date: 2006-09-11 08:34+0200\n"
+"PO-Revision-Date: 2005-08-03 11:49+0200\n"
+"Last-Translator: Slobodan Simic <simicsl@verat.net>\n"
+"Language-Team: Serbian <kde-yu@kde.org.yu>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.10\n"
+
+#: configdialog.cpp:100
+msgid ""
+"<p>In this area you can add the custom entries for your context menu: "
+"<ol>"
+"<li>check <b>Display custom entries in context menu</b>;</li>"
+"<li>push on the <b>Add</b> button to add a new entry in the list;</li>"
+"<li>edit the entry by double clicking in column <b>Menu text</b> and <b>"
+"Command</b>;</li>"
+"<li>start from step 2 for every new entry</li>.</ol>"
+"If you need to execute the command as root user check the corresponding <b>"
+"Root</b> CheckBox."
+msgstr ""
+"<p>Овде можете додати произвољне уносе у ваш контекстни мени: "
+"<ol>"
+"<li>провери <b>Приказује произвољне уносе у контекстном менију</b>;</li>"
+"<li>притисните <b>Додај</b> дугме да бисте додали нов унос на листу;</li>"
+"<li>унос можете мењати двоструким кликом на колону <b>Текст менија</b> и <b>"
+"Наредба</b>;</li>"
+"<li>крените од другог корака за сваки нови унос</li>.</ol>"
+"Ако је наредбу потребно покренути као root корисник означите одговарајућу "
+"кућицу <b>Root</b>."
+
+#: configdialog.cpp:531
+msgid "Add new interface"
+msgstr "Додај нови интерфејс"
+
+#: configdialog.cpp:532
+msgid ""
+"Please enter the name of the interface to be monitored.\n"
+"It should be something like 'eth1', 'wlan2' or 'ppp0'."
+msgstr ""
+"Унесите име интерфејса који ће бити надгледан.\n"
+"То би требало да буде нешто као „eth1“, „wlan2“ или „ppp0“."
+
+#: configdialog.cpp:1066
+msgid "Interface"
+msgstr "Интерфејс"
+
+#: configdialog.cpp:1067
+msgid "Alias"
+msgstr "Алијас"
+
+#: configdialog.cpp:1068
+msgid "Status"
+msgstr "Статус"
+
+#: configdialog.cpp:1069
+msgid "Uptime"
+msgstr "Време рада"
+
+#: configdialog.cpp:1070
+msgid "IP-Address"
+msgstr "IP-Адреса"
+
+#: configdialog.cpp:1071
+msgid "Subnet Mask"
+msgstr "Маска подмреже"
+
+#: configdialog.cpp:1072
+msgid "HW-Address"
+msgstr "HW-Адреса"
+
+#: configdialog.cpp:1073
+msgid "Broadcast Address"
+msgstr "Адреса трансмисије"
+
+#: configdialog.cpp:1074
+msgid "Default Gateway"
+msgstr "Подраз. мрежни излаз"
+
+#: configdialog.cpp:1075
+msgid "PtP-Address"
+msgstr "PtP-Адреса"
+
+#: configdialog.cpp:1076
+msgid "Packets Received"
+msgstr "Примљени пакети"
+
+#: configdialog.cpp:1077
+msgid "Packets Sent"
+msgstr "Послати пакети"
+
+#: configdialog.cpp:1078
+msgid "Bytes Received"
+msgstr "Примљено бајтова"
+
+#: configdialog.cpp:1079
+msgid "Bytes Sent"
+msgstr "Послато бајтова"
+
+#: configdialog.cpp:1080
+msgid "Download Speed"
+msgstr "Брзина преузимања"
+
+#: configdialog.cpp:1081
+msgid "Upload Speed"
+msgstr "Брзина слања"
+
+#: configdialog.cpp:1082
+msgid "ESSID"
+msgstr "ESSID"
+
+#: configdialog.cpp:1083
+msgid "Mode"
+msgstr "Режим"
+
+#: configdialog.cpp:1084
+msgid "Frequency"
+msgstr "Фреквенција"
+
+#: configdialog.cpp:1085
+msgid "Bit Rate"
+msgstr "Учестаност бита"
+
+#: configdialog.cpp:1086
+msgid "Access Point"
+msgstr ""
+
+#: configdialog.cpp:1087
+msgid "Link Quality"
+msgstr "Квалитет везе"
+
+#: configdialog.cpp:1088
+msgid "Nickname"
+msgstr ""
+
+#: configdialog.cpp:1089
+msgid "Encryption"
+msgstr ""
+
+#. i18n: file configdlg.ui line 24
+#: rc.cpp:3
+#, no-c-format
+msgid "Use KNemo to monitor your interfaces"
+msgstr ""
+
+#. i18n: file configdlg.ui line 36
+#: rc.cpp:6
+#, no-c-format
+msgid "&Interfaces"
+msgstr "&Интерфејси"
+
+#. i18n: file configdlg.ui line 58
+#: rc.cpp:10
+#, no-c-format
+msgid "Add a new interface"
+msgstr "Додај нови интерфејс"
+
+#. i18n: file configdlg.ui line 68
+#: rc.cpp:13
+#, no-c-format
+msgid ""
+"This is the list of icons you wish to monitor. Please\n"
+"use the names understood by the command 'ifconfig',\n"
+"for example 'eth0', 'wlan0' or 'ppp0'."
+msgstr ""
+"Ово је листа икона које желите да надгледате.\n"
+"Користите имена које наредба „ifconfig“ може да, \n"
+"на пример „eth0“, „wlan0“ или „ppp0“."
+
+#. i18n: file configdlg.ui line 79
+#: rc.cpp:19
+#, no-c-format
+msgid "Delete the selected interface"
+msgstr "Обриши означени интерфејс"
+
+#. i18n: file configdlg.ui line 89
+#: rc.cpp:22
+#, no-c-format
+msgid "&Context Menu"
+msgstr "&Контекстни мени"
+
+#. i18n: file configdlg.ui line 100
+#: rc.cpp:25
+#, no-c-format
+msgid "&Display custom entries in context menu"
+msgstr "&Прикажи произвољне уносе у контекстном менију"
+
+#. i18n: file configdlg.ui line 106
+#: rc.cpp:28
+#, no-c-format
+msgid "Root"
+msgstr "Root"
+
+#. i18n: file configdlg.ui line 117
+#: rc.cpp:31
+#, no-c-format
+msgid "Menu text"
+msgstr "Текст менија"
+
+#. i18n: file configdlg.ui line 128
+#: rc.cpp:34
+#, no-c-format
+msgid "Command"
+msgstr "Наредба"
+
+#. i18n: file configdlg.ui line 169
+#: rc.cpp:39
+#, no-c-format
+msgid "Add a new entry"
+msgstr "Додај нови унос"
+
+#. i18n: file configdlg.ui line 186
+#: rc.cpp:44
+#, no-c-format
+msgid "Remove the selected entry"
+msgstr "Уклони означени унос"
+
+#. i18n: file configdlg.ui line 214
+#: rc.cpp:48
+#, no-c-format
+msgid "Move the selected entry up"
+msgstr "Помери означени унос на горе"
+
+#. i18n: file configdlg.ui line 225
+#: rc.cpp:52
+#, no-c-format
+msgid "Move the selected entry down"
+msgstr "Помери означени унос на доле"
+
+#. i18n: file configdlg.ui line 237
+#: rc.cpp:55
+#, no-c-format
+msgid "Misce&llaneous"
+msgstr "&Разно"
+
+#. i18n: file configdlg.ui line 256
+#: rc.cpp:58
+#, no-c-format
+msgid "Alias:"
+msgstr "Алијас:"
+
+#. i18n: file configdlg.ui line 267
+#: rc.cpp:61
+#, no-c-format
+msgid ""
+"You can enter an alias for the interface.\n"
+"It will be used in the tooltip of the system\n"
+"tray icon for better differentiation of the\n"
+"icons."
+msgstr ""
+"Можете унети алијас за интерфејс.\n"
+"Он ће бити коришћен у облачићу за икону\n"
+"системске касете ради бољег разликовања\n"
+"икона."
+
+#. i18n: file configdlg.ui line 277
+#: rc.cpp:67
+#, no-c-format
+msgid "Hide icon when &not connected"
+msgstr "Сакриј икону када &није повезан"
+
+#. i18n: file configdlg.ui line 282
+#: rc.cpp:70
+#, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface is not connected. \n"
+"When reconnected the icon will be shown again."
+msgstr ""
+"Када је изабрано, икона за овај интерфејс\n"
+"ће бити скривена када интерфејс није повезан. \n"
+"Кад се поново повеже икона ће бити приказана."
+
+#. i18n: file configdlg.ui line 315
+#: rc.cpp:75
+#, no-c-format
+msgid "Hide icon &when not existing"
+msgstr "Сакриј икону &кад не постоји"
+
+#. i18n: file configdlg.ui line 322
+#: rc.cpp:78
+#, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface does not exist. \n"
+"This is useful for interfaces that are dynamically\n"
+"created and destroyed, for example interfaces\n"
+"of bluetooth adaptors."
+msgstr ""
+"Кад је изабрано, икона овог интерфејса ће бити\n"
+"скривена ако интерфејс не постоји. Ово је корисно\n"
+"за интерфејсе који се динамички праве и \n"
+"уклањају, на пример интерфејси\n"
+"bluetooth прикључака."
+
+#. i18n: file configdlg.ui line 332
+#: rc.cpp:85
+#, no-c-format
+msgid "Activate statistics"
+msgstr ""
+
+#. i18n: file configdlg.ui line 348
+#: rc.cpp:88
+#, no-c-format
+msgid "Traffic activity threshold:"
+msgstr "Праг активности саобраћаја:"
+
+#. i18n: file configdlg.ui line 351
+#: rc.cpp:91
+#, no-c-format
+msgid ""
+"Use this for networks with high noise i.e. many packets coming in and out all "
+"the time. Set this value high enough so that KNemo won't show incoming and "
+"outgoing traffic all the time."
+msgstr ""
+"Користите ово за мреже са високим шумом, тамо где много пакета излази и улази "
+"сваки час. Поставите ову вредност довољно високо да KNemo не би стално "
+"приказивао улазно-излазни саобраћај."
+
+#. i18n: file configdlg.ui line 367
+#: rc.cpp:94
+#, no-c-format
+msgid " packets/s"
+msgstr " пакета/s"
+
+#. i18n: file configdlg.ui line 393
+#: rc.cpp:97
+#, no-c-format
+msgid "Iconset:"
+msgstr "Скуп икона:"
+
+#. i18n: file configdlg.ui line 399
+#: rc.cpp:100
+#, no-c-format
+msgid "Monitor"
+msgstr "Монитор"
+
+#. i18n: file configdlg.ui line 404
+#: rc.cpp:103
+#, no-c-format
+msgid "Modem"
+msgstr "Модем"
+
+#. i18n: file configdlg.ui line 409
+#: rc.cpp:106
+#, no-c-format
+msgid "Network"
+msgstr "Мрежа"
+
+#. i18n: file configdlg.ui line 414
+#: rc.cpp:109
+#, no-c-format
+msgid "Wireless"
+msgstr "Бежично"
+
+#. i18n: file configdlg.ui line 457
+#: rc.cpp:112
+#, no-c-format
+msgid "&ToolTip"
+msgstr "&Облачић"
+
+#. i18n: file configdlg.ui line 469
+#: rc.cpp:115
+#, no-c-format
+msgid ""
+"<b>Note: Adding wireless specific information will only show up in the tooltips "
+"\n"
+"of wireless devices not in the tooltips of standard interfaces.</b>"
+msgstr ""
+"<b>Напомена: Додавање података својствених бежичним мрежама биће приказано \n"
+"у облачићима само за бежичне уређаје, не и за стандардне интерфејсе.</b>"
+
+#. i18n: file configdlg.ui line 497
+#: rc.cpp:120
+#, no-c-format
+msgid "Remove the selected entry from the list of displayed information"
+msgstr "Уклони изабрани унос са листе података за приказивање"
+
+#. i18n: file configdlg.ui line 525
+#: rc.cpp:124
+#, no-c-format
+msgid "Add the selected entry to the list of displayed information."
+msgstr "Додај изабрани унос са листе података за приказивање."
+
+#. i18n: file configdlg.ui line 557
+#: rc.cpp:127
+#, no-c-format
+msgid "Display:"
+msgstr "Прикажи:"
+
+#. i18n: file configdlg.ui line 573
+#: rc.cpp:130
+#, no-c-format
+msgid "Available:"
+msgstr "Доступни:"
+
+#. i18n: file configdlg.ui line 583
+#: rc.cpp:133
+#, no-c-format
+msgid "&Misc"
+msgstr "Раз&но"
+
+#. i18n: file configdlg.ui line 594
+#: rc.cpp:136
+#, no-c-format
+msgid "&Notifications"
+msgstr "&Обавештења"
+
+#. i18n: file configdlg.ui line 605
+#: rc.cpp:139
+#, no-c-format
+msgid "&Configure Sounds && Events..."
+msgstr "&Подеси звуке и догађаје..."
+
+#. i18n: file configdlg.ui line 615
+#: rc.cpp:142
+#, no-c-format
+msgid "Update interval"
+msgstr ""
+
+#. i18n: file configdlg.ui line 626
+#: rc.cpp:145
+#, no-c-format
+msgid "Update interface information every"
+msgstr ""
+
+#. i18n: file configdlg.ui line 654
+#: rc.cpp:148 rc.cpp:166
+#, no-c-format
+msgid "s"
+msgstr ""
+
+#. i18n: file configdlg.ui line 657
+#: rc.cpp:151
+#, no-c-format
+msgid ""
+"How often should KNemo poll for interface information. Lower number means more "
+"CPU load but faster reaction on changes. Larger number means less CPU load but "
+"slow reaction on changes."
+msgstr ""
+
+#. i18n: file configdlg.ui line 667
+#: rc.cpp:154
+#, fuzzy, no-c-format
+msgid "Statistics"
+msgstr "Статус"
+
+#. i18n: file configdlg.ui line 678
+#: rc.cpp:157
+#, no-c-format
+msgid "..."
+msgstr ""
+
+#. i18n: file configdlg.ui line 686
+#: rc.cpp:160
+#, no-c-format
+msgid "Statistics are stored in the following directory:"
+msgstr ""
+
+#. i18n: file configdlg.ui line 699
+#: rc.cpp:163
+#, no-c-format
+msgid "Save statistics every"
+msgstr ""
+
+#. i18n: file configdlg.ui line 737
+#: rc.cpp:169
+#, fuzzy, no-c-format
+msgid "Backend"
+msgstr "Позадина:"
+
+#. i18n: file configdlg.ui line 748
+#: rc.cpp:172
+#, no-c-format
+msgid "Use the following backend"
+msgstr ""
+
+#. i18n: file configdlg.ui line 764
+#: rc.cpp:175
+#, no-c-format
+msgid "Description:"
+msgstr ""
+
+#. i18n: file configdlg.ui line 829
+#: rc.cpp:179
+#, no-c-format
+msgid "Traffic &Plotter"
+msgstr "&Цртач саобраћаја"
+
+#. i18n: file configdlg.ui line 840
+#: rc.cpp:182
+#, no-c-format
+msgid "Scale"
+msgstr "Размера"
+
+#. i18n: file configdlg.ui line 862
+#: rc.cpp:185
+#, no-c-format
+msgid "Pixel per time period:"
+msgstr "Тачака по времену:"
+
+#. i18n: file configdlg.ui line 870
+#: rc.cpp:188
+#, no-c-format
+msgid "Ma&ximum value:"
+msgstr "Нај&већа вредност:"
+
+#. i18n: file configdlg.ui line 892
+#: rc.cpp:191
+#, no-c-format
+msgid "Automatic &range detection"
+msgstr "Аутоматско одређивање &опсега"
+
+#. i18n: file configdlg.ui line 908
+#: rc.cpp:194
+#, no-c-format
+msgid "&Minimum value:"
+msgstr "Нај&мања вредност:"
+
+#. i18n: file configdlg.ui line 921
+#: rc.cpp:197
+#, no-c-format
+msgid "Text"
+msgstr "Текст"
+
+#. i18n: file configdlg.ui line 932
+#: rc.cpp:200
+#, no-c-format
+msgid "&Labels"
+msgstr "&Ознаке"
+
+#. i18n: file configdlg.ui line 940
+#: rc.cpp:203
+#, no-c-format
+msgid "Top &bar"
+msgstr "Горња &трака"
+
+#. i18n: file configdlg.ui line 948
+#: rc.cpp:206
+#, no-c-format
+msgid "Fo&nt size:"
+msgstr "Величина фо&нта:"
+
+#. i18n: file configdlg.ui line 975
+#: rc.cpp:209
+#, no-c-format
+msgid "Lines"
+msgstr "Линије"
+
+#. i18n: file configdlg.ui line 1000
+#: rc.cpp:212
+#, no-c-format
+msgid "&Distance:"
+msgstr "&Растојање:"
+
+#. i18n: file configdlg.ui line 1011
+#: rc.cpp:215
+#, no-c-format
+msgid "Vertic&al lines"
+msgstr "Успр&авне линије"
+
+#. i18n: file configdlg.ui line 1019
+#: rc.cpp:218
+#, no-c-format
+msgid "V&ertical lines scroll"
+msgstr "Клизањ&е усправних линија"
+
+#. i18n: file configdlg.ui line 1041
+#: rc.cpp:221
+#, no-c-format
+msgid "Co&unt:"
+msgstr "Бр&ој:"
+
+#. i18n: file configdlg.ui line 1052
+#: rc.cpp:224
+#, no-c-format
+msgid "Hori&zontal lines"
+msgstr "Во&доравне линије"
+
+#. i18n: file configdlg.ui line 1062
+#: rc.cpp:227
+#, no-c-format
+msgid "&Colors"
+msgstr "&Боје"
+
+#. i18n: file configdlg.ui line 1073
+#: rc.cpp:230
+#, no-c-format
+msgid "Vertical lines:"
+msgstr "Усправне линије:"
+
+#. i18n: file configdlg.ui line 1105
+#: rc.cpp:236
+#, no-c-format
+msgid "Background:"
+msgstr "Позадина:"
+
+#. i18n: file configdlg.ui line 1121
+#: rc.cpp:240
+#, no-c-format
+msgid "Horizontal lines:"
+msgstr "Водоравне линије:"
+
+#. i18n: file configdlg.ui line 1129
+#: rc.cpp:243
+#, no-c-format
+msgid "Outgoing traffic:"
+msgstr "Одлазни саобраћај:"
+
+#. i18n: file configdlg.ui line 1137
+#: rc.cpp:246
+#, no-c-format
+msgid "Incoming traffic:"
+msgstr "Долазни саобраћај:"
+
+#. i18n: file configdlg.ui line 1155
+#: rc.cpp:250
+#, no-c-format
+msgid "Traffic"
+msgstr "Саобраћај"
+
+#. i18n: file configdlg.ui line 1166
+#: rc.cpp:253
+#, no-c-format
+msgid "Sho&w incoming traffic"
+msgstr "При&кажи долазни саобраћај"
+
+#. i18n: file configdlg.ui line 1174
+#: rc.cpp:256
+#, no-c-format
+msgid "Show &outgoing traffic"
+msgstr "Прикажи &одлазни саобраћај"
+
+#~ msgid "Signal/Noise"
+#~ msgstr "Сигнал/Шум"

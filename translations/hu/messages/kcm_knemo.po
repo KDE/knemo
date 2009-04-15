@@ -1,0 +1,670 @@
+# translation of kcm_knemo.po to Hungarian
+# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# Charles Barcza <kbarcza@blackpanther.hu>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kcm_knemo\n"
+"POT-Creation-Date: 2006-09-11 08:34+0200\n"
+"PO-Revision-Date: 2006-04-02 13:02+0100\n"
+"Last-Translator: Kroly Barcza (VectoR) <kbarcza@blackpanther.hu>\n"
+"Language-Team: Hungarian <translator@vgroup.hu>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.3.1\n"
+"X-Poedit-Language: Hungarian\n"
+"X-Poedit-Country: HUNGARY\n"
+
+#: configdialog.cpp:100
+msgid ""
+"<p>In this area you can add the custom entries for your context menu: "
+"<ol>"
+"<li>check <b>Display custom entries in context menu</b>;</li>"
+"<li>push on the <b>Add</b> button to add a new entry in the list;</li>"
+"<li>edit the entry by double clicking in column <b>Menu text</b> and <b>"
+"Command</b>;</li>"
+"<li>start from step 2 for every new entry</li>.</ol>"
+"If you need to execute the command as root user check the corresponding <b>"
+"Root</b> CheckBox."
+msgstr ""
+
+#: configdialog.cpp:531
+msgid "Add new interface"
+msgstr "Hálózati eszköz hozzáadása"
+
+#: configdialog.cpp:532
+msgid ""
+"Please enter the name of the interface to be monitored.\n"
+"It should be something like 'eth1', 'wlan2' or 'ppp0'."
+msgstr ""
+"Kérem adja meg a csatoló nevét a monitorozáshoz.\n"
+"Ezek lehetnek 'eth0','eth1',wlan0', ra0,wifi0, vagy akár 'ppp0', stb..."
+
+#: configdialog.cpp:1066
+msgid "Interface"
+msgstr "Csatoló"
+
+#: configdialog.cpp:1067
+msgid "Alias"
+msgstr "Álnév"
+
+#: configdialog.cpp:1068
+msgid "Status"
+msgstr "Állapot"
+
+#: configdialog.cpp:1069
+msgid "Uptime"
+msgstr "Aktivitási idő (uptime)"
+
+#: configdialog.cpp:1070
+msgid "IP-Address"
+msgstr "IP-cím"
+
+#: configdialog.cpp:1071
+msgid "Subnet Mask"
+msgstr "Alhálózati maszk"
+
+#: configdialog.cpp:1072
+msgid "HW-Address"
+msgstr "HW-cím"
+
+#: configdialog.cpp:1073
+msgid "Broadcast Address"
+msgstr "Broadcast-cím"
+
+#: configdialog.cpp:1074
+msgid "Default Gateway"
+msgstr "Alapértelmezett átjáró"
+
+#: configdialog.cpp:1075
+msgid "PtP-Address"
+msgstr "PtP-cím"
+
+#: configdialog.cpp:1076
+msgid "Packets Received"
+msgstr "Fogadott csomagok"
+
+#: configdialog.cpp:1077
+msgid "Packets Sent"
+msgstr "Elküldött csomagok"
+
+#: configdialog.cpp:1078
+msgid "Bytes Received"
+msgstr "Fogadott bájtok"
+
+#: configdialog.cpp:1079
+msgid "Bytes Sent"
+msgstr "Elküldött bájtok"
+
+#: configdialog.cpp:1080
+msgid "Download Speed"
+msgstr "Letöltési sebesség"
+
+#: configdialog.cpp:1081
+msgid "Upload Speed"
+msgstr "Feltöltési sebesség"
+
+#: configdialog.cpp:1082
+msgid "ESSID"
+msgstr "ESSID (hálózati eszköz):"
+
+#: configdialog.cpp:1083
+msgid "Mode"
+msgstr "Mód"
+
+#: configdialog.cpp:1084
+msgid "Frequency"
+msgstr "Frekvencia"
+
+#: configdialog.cpp:1085
+msgid "Bit Rate"
+msgstr "Bitráta"
+
+#: configdialog.cpp:1086
+msgid "Access Point"
+msgstr ""
+
+#: configdialog.cpp:1087
+msgid "Link Quality"
+msgstr "A kapcsolat minősége"
+
+#: configdialog.cpp:1088
+msgid "Nickname"
+msgstr ""
+
+#: configdialog.cpp:1089
+msgid "Encryption"
+msgstr ""
+
+#. i18n: file configdlg.ui line 24
+#: rc.cpp:3
+#, no-c-format
+msgid "Use KNemo to monitor your interfaces"
+msgstr ""
+
+#. i18n: file configdlg.ui line 36
+#: rc.cpp:6
+#, no-c-format
+msgid "&Interfaces"
+msgstr "&Csatlakozási felületek"
+
+#. i18n: file configdlg.ui line 58
+#: rc.cpp:10
+#, no-c-format
+msgid "Add a new interface"
+msgstr "Csatoló hozzáadása"
+
+#. i18n: file configdlg.ui line 68
+#: rc.cpp:13
+#, no-c-format
+msgid ""
+"This is the list of icons you wish to monitor. Please\n"
+"use the names understood by the command 'ifconfig',\n"
+"for example 'eth0', 'wlan0' or 'ppp0'."
+msgstr ""
+"Ez egy ikonlista a monitorhoz. Kérem\n"
+"use the names understood by the command 'ifconfig',\n"
+"for example 'eth0', 'wlan0' or 'ppp0'."
+
+#. i18n: file configdlg.ui line 79
+#: rc.cpp:19
+#, no-c-format
+msgid "Delete the selected interface"
+msgstr "A kijelölt csatoló törlése"
+
+#. i18n: file configdlg.ui line 89
+#: rc.cpp:22
+#, no-c-format
+msgid "&Context Menu"
+msgstr "&Felbukkanó menü"
+
+#. i18n: file configdlg.ui line 100
+#: rc.cpp:25
+#, no-c-format
+msgid "&Display custom entries in context menu"
+msgstr "&Megjelníti a kiválasztott elemet a menüben"
+
+#. i18n: file configdlg.ui line 106
+#: rc.cpp:28
+#, no-c-format
+msgid "Root"
+msgstr "Gyökér"
+
+#. i18n: file configdlg.ui line 117
+#: rc.cpp:31
+#, no-c-format
+msgid "Menu text"
+msgstr "Menüszöveg"
+
+#. i18n: file configdlg.ui line 128
+#: rc.cpp:34
+#, no-c-format
+msgid "Command"
+msgstr "Parancs"
+
+#. i18n: file configdlg.ui line 169
+#: rc.cpp:39
+#, no-c-format
+msgid "Add a new entry"
+msgstr "Tétel hozzáadása"
+
+#. i18n: file configdlg.ui line 186
+#: rc.cpp:44
+#, no-c-format
+msgid "Remove the selected entry"
+msgstr "Kijelölt elem eltávolítása"
+
+#. i18n: file configdlg.ui line 214
+#: rc.cpp:48
+#, no-c-format
+msgid "Move the selected entry up"
+msgstr "A kijelölt mozgatása felfelé"
+
+#. i18n: file configdlg.ui line 225
+#: rc.cpp:52
+#, no-c-format
+msgid "Move the selected entry down"
+msgstr "A kijelölt mozgatása lefelé"
+
+#. i18n: file configdlg.ui line 237
+#: rc.cpp:55
+#, no-c-format
+msgid "Misce&llaneous"
+msgstr "Ve&gyes"
+
+#. i18n: file configdlg.ui line 256
+#: rc.cpp:58
+#, no-c-format
+msgid "Alias:"
+msgstr "Alias:"
+
+#. i18n: file configdlg.ui line 267
+#: rc.cpp:61
+#, no-c-format
+msgid ""
+"You can enter an alias for the interface.\n"
+"It will be used in the tooltip of the system\n"
+"tray icon for better differentiation of the\n"
+"icons."
+msgstr ""
+"Adj meg egy aliast a csatolóhoz.\n"
+"Ezt fogja használni a tippekhez a tálca\n"
+"ikon. "
+
+#. i18n: file configdlg.ui line 277
+#: rc.cpp:67
+#, no-c-format
+msgid "Hide icon when &not connected"
+msgstr "Elrejti az ikont ha nincs &kapcsolódva"
+
+#. i18n: file configdlg.ui line 282
+#: rc.cpp:70
+#, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface is not connected. \n"
+"When reconnected the icon will be shown again."
+msgstr ""
+"Ez a kiválasztott ikon ehhez a csatolóhoz\n"
+"rejtett ha a csatoló nem csatlakoztatott. \n"
+"Ha kapcsolódik újra megjelenik a tálcán."
+
+#. i18n: file configdlg.ui line 315
+#: rc.cpp:75
+#, no-c-format
+msgid "Hide icon &when not existing"
+msgstr "Elrejti az ikont ha nem &létezik"
+
+#. i18n: file configdlg.ui line 322
+#: rc.cpp:78
+#, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface does not exist. \n"
+"This is useful for interfaces that are dynamically\n"
+"created and destroyed, for example interfaces\n"
+"of bluetooth adaptors."
+msgstr ""
+"Ez a kiválasztott ikon ehhez a csatolóhoz\n"
+"rejtett ha a csatoló nem csatlakoztatott. \n"
+"Ha kapcsolódik újra megjelenik a tálcán."
+
+#. i18n: file configdlg.ui line 332
+#: rc.cpp:85
+#, no-c-format
+msgid "Activate statistics"
+msgstr "Forgalmi st&atisztika"
+
+#. i18n: file configdlg.ui line 348
+#: rc.cpp:88
+#, no-c-format
+msgid "Traffic activity threshold:"
+msgstr "Traffic activity threshold:"
+
+#. i18n: file configdlg.ui line 351
+#: rc.cpp:91
+#, no-c-format
+msgid ""
+"Use this for networks with high noise i.e. many packets coming in and out all "
+"the time. Set this value high enough so that KNemo won't show incoming and "
+"outgoing traffic all the time."
+msgstr ""
+"Use this for networks with high noise i.e. many packets coming in and out all "
+"the time. Set this value high enough so that KNemo won't show incoming and "
+"outgoing traffic all the time."
+
+#. i18n: file configdlg.ui line 367
+#: rc.cpp:94
+#, no-c-format
+msgid " packets/s"
+msgstr " packets/s"
+
+#. i18n: file configdlg.ui line 393
+#: rc.cpp:97
+#, no-c-format
+msgid "Iconset:"
+msgstr "Ikonkészlet"
+
+#. i18n: file configdlg.ui line 399
+#: rc.cpp:100
+#, no-c-format
+msgid "Monitor"
+msgstr "Monitor"
+
+#. i18n: file configdlg.ui line 404
+#: rc.cpp:103
+#, no-c-format
+msgid "Modem"
+msgstr "Modem"
+
+#. i18n: file configdlg.ui line 409
+#: rc.cpp:106
+#, no-c-format
+msgid "Network"
+msgstr "Hálózat"
+
+#. i18n: file configdlg.ui line 414
+#: rc.cpp:109
+#, no-c-format
+msgid "Wireless"
+msgstr "Wireless"
+
+#. i18n: file configdlg.ui line 457
+#: rc.cpp:112
+#, no-c-format
+msgid "&ToolTip"
+msgstr "&Tippek"
+
+#. i18n: file configdlg.ui line 469
+#: rc.cpp:115
+#, no-c-format
+msgid ""
+"<b>Note: Adding wireless specific information will only show up in the tooltips "
+"\n"
+"of wireless devices not in the tooltips of standard interfaces.</b>"
+msgstr ""
+"<b>Megjegyzés: Adding wireless specific information will only show up in the "
+"tooltips \n"
+"of wireless devices not in the tooltips of standard interfaces.</b>"
+
+#. i18n: file configdlg.ui line 497
+#: rc.cpp:120
+#, no-c-format
+msgid "Remove the selected entry from the list of displayed information"
+msgstr "A kiválasztott elem eltávolítása a megjelenített információkból."
+
+#. i18n: file configdlg.ui line 525
+#: rc.cpp:124
+#, no-c-format
+msgid "Add the selected entry to the list of displayed information."
+msgstr "A kiválasztott elem hozzáadása a megjelenítendő információkhoz."
+
+#. i18n: file configdlg.ui line 557
+#: rc.cpp:127
+#, no-c-format
+msgid "Display:"
+msgstr "Megjelenítés:"
+
+#. i18n: file configdlg.ui line 573
+#: rc.cpp:130
+#, no-c-format
+msgid "Available:"
+msgstr "Elérhető:"
+
+#. i18n: file configdlg.ui line 583
+#: rc.cpp:133
+#, no-c-format
+msgid "&Misc"
+msgstr "&Egyéb"
+
+#. i18n: file configdlg.ui line 594
+#: rc.cpp:136
+#, no-c-format
+msgid "&Notifications"
+msgstr "É&rtesítések"
+
+#. i18n: file configdlg.ui line 605
+#: rc.cpp:139
+#, no-c-format
+msgid "&Configure Sounds && Events..."
+msgstr "&Hangok az eseményekhez"
+
+#. i18n: file configdlg.ui line 615
+#: rc.cpp:142
+#, no-c-format
+msgid "Update interval"
+msgstr ""
+
+#. i18n: file configdlg.ui line 626
+#: rc.cpp:145
+#, no-c-format
+msgid "Update interface information every"
+msgstr ""
+
+#. i18n: file configdlg.ui line 654
+#: rc.cpp:148 rc.cpp:166
+#, no-c-format
+msgid "s"
+msgstr ""
+
+#. i18n: file configdlg.ui line 657
+#: rc.cpp:151
+#, no-c-format
+msgid ""
+"How often should KNemo poll for interface information. Lower number means more "
+"CPU load but faster reaction on changes. Larger number means less CPU load but "
+"slow reaction on changes."
+msgstr ""
+
+#. i18n: file configdlg.ui line 667
+#: rc.cpp:154
+#, fuzzy, no-c-format
+msgid "Statistics"
+msgstr "Állapot"
+
+#. i18n: file configdlg.ui line 678
+#: rc.cpp:157
+#, no-c-format
+msgid "..."
+msgstr ""
+
+#. i18n: file configdlg.ui line 686
+#: rc.cpp:160
+#, no-c-format
+msgid "Statistics are stored in the following directory:"
+msgstr ""
+
+#. i18n: file configdlg.ui line 699
+#: rc.cpp:163
+#, fuzzy, no-c-format
+msgid "Save statistics every"
+msgstr "Forgalmi st&atisztika"
+
+#. i18n: file configdlg.ui line 737
+#: rc.cpp:169
+#, fuzzy, no-c-format
+msgid "Backend"
+msgstr "Háttér:"
+
+#. i18n: file configdlg.ui line 748
+#: rc.cpp:172
+#, no-c-format
+msgid "Use the following backend"
+msgstr ""
+
+#. i18n: file configdlg.ui line 764
+#: rc.cpp:175
+#, no-c-format
+msgid "Description:"
+msgstr ""
+
+#. i18n: file configdlg.ui line 829
+#: rc.cpp:179
+#, no-c-format
+msgid "Traffic &Plotter"
+msgstr "&Grafikus kijelzés"
+
+#. i18n: file configdlg.ui line 840
+#: rc.cpp:182
+#, no-c-format
+msgid "Scale"
+msgstr "Méret"
+
+#. i18n: file configdlg.ui line 862
+#: rc.cpp:185
+#, no-c-format
+msgid "Pixel per time period:"
+msgstr "Képpontok száma időintervallumonként:"
+
+#. i18n: file configdlg.ui line 870
+#: rc.cpp:188
+#, no-c-format
+msgid "Ma&ximum value:"
+msgstr "Ma&ximális érték:"
+
+#. i18n: file configdlg.ui line 892
+#: rc.cpp:191
+#, no-c-format
+msgid "Automatic &range detection"
+msgstr "Automatikus értéktartomány-kezelés"
+
+#. i18n: file configdlg.ui line 908
+#: rc.cpp:194
+#, no-c-format
+msgid "&Minimum value:"
+msgstr "M&inimális érték:"
+
+#. i18n: file configdlg.ui line 921
+#: rc.cpp:197
+#, no-c-format
+msgid "Text"
+msgstr "Szöveg"
+
+#. i18n: file configdlg.ui line 932
+#: rc.cpp:200
+#, no-c-format
+msgid "&Labels"
+msgstr "&Címkék"
+
+#. i18n: file configdlg.ui line 940
+#: rc.cpp:203
+#, no-c-format
+msgid "Top &bar"
+msgstr "Cí&msor"
+
+#. i18n: file configdlg.ui line 948
+#: rc.cpp:206
+#, no-c-format
+msgid "Fo&nt size:"
+msgstr "Fo&nt méret:"
+
+#. i18n: file configdlg.ui line 975
+#: rc.cpp:209
+#, no-c-format
+msgid "Lines"
+msgstr "Vonalak"
+
+#. i18n: file configdlg.ui line 1000
+#: rc.cpp:212
+#, no-c-format
+msgid "&Distance:"
+msgstr "&Távolság"
+
+#. i18n: file configdlg.ui line 1011
+#: rc.cpp:215
+#, no-c-format
+msgid "Vertic&al lines"
+msgstr "Függ&őleges vonalak"
+
+#. i18n: file configdlg.ui line 1019
+#: rc.cpp:218
+#, no-c-format
+msgid "V&ertical lines scroll"
+msgstr "A függőleges vonalak &görgetése"
+
+#. i18n: file configdlg.ui line 1041
+#: rc.cpp:221
+#, no-c-format
+msgid "Co&unt:"
+msgstr "&Számolás"
+
+#. i18n: file configdlg.ui line 1052
+#: rc.cpp:224
+#, no-c-format
+msgid "Hori&zontal lines"
+msgstr "Viszintes Vonalak"
+
+#. i18n: file configdlg.ui line 1062
+#: rc.cpp:227
+#, no-c-format
+msgid "&Colors"
+msgstr "&Színek"
+
+#. i18n: file configdlg.ui line 1073
+#: rc.cpp:230
+#, no-c-format
+msgid "Vertical lines:"
+msgstr "Függőleges vonalak:"
+
+#. i18n: file configdlg.ui line 1105
+#: rc.cpp:236
+#, no-c-format
+msgid "Background:"
+msgstr "Háttér:"
+
+#. i18n: file configdlg.ui line 1121
+#: rc.cpp:240
+#, no-c-format
+msgid "Horizontal lines:"
+msgstr "Vízszintes vonalak:"
+
+#. i18n: file configdlg.ui line 1129
+#: rc.cpp:243
+#, no-c-format
+msgid "Outgoing traffic:"
+msgstr " Kimenő forgalom:"
+
+#. i18n: file configdlg.ui line 1137
+#: rc.cpp:246
+#, no-c-format
+msgid "Incoming traffic:"
+msgstr "Bejövő forgalom"
+
+#. i18n: file configdlg.ui line 1155
+#: rc.cpp:250
+#, no-c-format
+msgid "Traffic"
+msgstr "Hálózatforgalom"
+
+#. i18n: file configdlg.ui line 1166
+#: rc.cpp:253
+#, no-c-format
+msgid "Sho&w incoming traffic"
+msgstr "Be&jövő forgalom megjelenítése"
+
+#. i18n: file configdlg.ui line 1174
+#: rc.cpp:256
+#, no-c-format
+msgid "Show &outgoing traffic"
+msgstr "Ki&menő forgalom megjelenítése"
+
+#~ msgid "Signal/Noise"
+#~ msgstr "Jel/Zaj"
+
+#~ msgid "Alt+W"
+#~ msgstr "Alt+W"
+
+#~ msgid "Alt+O"
+#~ msgstr "Alt+O"
+
+#~ msgid "Alt+N"
+#~ msgstr "Alt+N"
+
+#~ msgid "Form1"
+#~ msgstr "Űrlap1"
+
+#~ msgid "Alt+D"
+#~ msgstr "Alt+D"
+
+#~ msgid "Alt+C"
+#~ msgstr "Alt+C"
+
+#~ msgid "Alt+R"
+#~ msgstr "Alt+R"
+
+#~ msgid "Alt+L"
+#~ msgstr "Alt+L"
+
+#~ msgid "Alt+B"
+#~ msgstr "Alt+B"
+
+#~ msgid "Alt+A"
+#~ msgstr "Alt+A"
+
+#~ msgid "Alt+E"
+#~ msgstr "Alt+E"
+
+#~ msgid "Alt+Z"
+#~ msgstr "Alt+Z"

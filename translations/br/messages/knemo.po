@@ -1,0 +1,470 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: all2.po\n"
+"POT-Creation-Date: 2007-03-30 07:28+0200\n"
+"PO-Revision-Date: 2004-09-20 15:44+0200\n"
+"Last-Translator: Thierry Vignaud <tvignaud@mandriva.com>\n"
+"Language-Team: br <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: _translatorinfo.cpp:1
+msgid ""
+"_: NAME OF TRANSLATORS\n"
+"Your names"
+msgstr "Thierry Vignaud, Jañ-Mai Drapier"
+
+#: _translatorinfo.cpp:3
+msgid ""
+"_: EMAIL OF TRANSLATORS\n"
+"Your emails"
+msgstr "tvignaud@mandriva.com, jdrapier@club-internet.fr"
+
+#. i18n: file interfacestatusdlg.ui line 233
+#: interface.cpp:174 rc.cpp:94
+#, no-c-format
+msgid "Traffic"
+msgstr ""
+
+#: interfaceicon.cpp:139
+msgid "Open &Statistics"
+msgstr "Digeriñ ar &stadegoù"
+
+#: interfaceicon.cpp:174 interfacestatusdialog.cpp:166 interfacetooltip.cpp:94
+msgid "Not connected."
+msgstr "N'eo ket kevreet."
+
+#: interfaceicon.cpp:196 interfacestatusdialog.cpp:171 interfacetooltip.cpp:99
+msgid "Not existing."
+msgstr "N'eo ket endeo."
+
+#: interfaceicon.cpp:266
+#, fuzzy
+msgid ""
+"Connection established to\n"
+msgstr "Kevreadenn"
+
+#: interfaceicon.cpp:272 interfacestatusdialog.cpp:144 interfacetooltip.cpp:68
+msgid "Connection established."
+msgstr ""
+
+#. i18n: file interfacestatisticsdlg.ui line 16
+#: interfacestatisticsdialog.cpp:44 rc.cpp:3 rc.cpp:115
+#, no-c-format
+msgid "Statistics"
+msgstr "Stadegoù"
+
+#. i18n: file interfacestatusdlg.ui line 16
+#: interfacestatusdialog.cpp:46 rc.cpp:54
+#, no-c-format
+msgid "Interface Status"
+msgstr "Stad an etrefas"
+
+#. i18n: file interfacestatusdlg.ui line 129
+#: interfacestatusdialog.cpp:182 rc.cpp:69
+#, no-c-format
+msgid "Broadcast Address:"
+msgstr "Chomlec'h skignañ :"
+
+#. i18n: file interfacestatusdlg.ui line 137
+#: interfacestatusdialog.cpp:184 rc.cpp:72
+#, no-c-format
+msgid "Default Gateway:"
+msgstr "Treuzell dre ziouer :"
+
+#. i18n: file interfacestatusdlg.ui line 145
+#: interfacestatusdialog.cpp:186 rc.cpp:75
+#, no-c-format
+msgid "HW-Address:"
+msgstr "Chomlec'h HW :"
+
+#: interfacestatusdialog.cpp:191
+msgid "PtP-Address:"
+msgstr "Chomlec'h PtP :"
+
+#: interfacestatusdialog.cpp:215 interfacestatusdialog.cpp:217
+#: interfacetooltip.cpp:133 interfacetooltip.cpp:138
+msgid "/s"
+msgstr "/e"
+
+#: interfacestatusdialog.cpp:233 interfacetooltip.cpp:163
+msgid "active"
+msgstr "bev"
+
+#: interfacestatusdialog.cpp:237 interfacetooltip.cpp:167
+msgid "off"
+msgstr "marv"
+
+#: interfacetooltip.cpp:178
+msgid "Interface"
+msgstr "Etrefas"
+
+#: interfacetooltip.cpp:179
+msgid "Alias"
+msgstr "Lesanv"
+
+#: interfacetooltip.cpp:180
+msgid "Status"
+msgstr "Stad"
+
+#: interfacetooltip.cpp:181
+msgid "Uptime"
+msgstr ""
+
+#: interfacetooltip.cpp:182
+msgid "IP-Address"
+msgstr "Chomlec'h IP"
+
+#: interfacetooltip.cpp:183
+msgid "Subnet Mask"
+msgstr "Maskl ar rannrouedad"
+
+#: interfacetooltip.cpp:184
+msgid "HW-Address"
+msgstr "Chomlec'h HW"
+
+#: interfacetooltip.cpp:185
+msgid "PtP-Address"
+msgstr "Chomlec'h PtP"
+
+#: interfacetooltip.cpp:186
+msgid "Packets Received"
+msgstr ""
+
+#: interfacetooltip.cpp:187
+msgid "Packets Sent"
+msgstr ""
+
+#: interfacetooltip.cpp:188
+msgid "Bytes Received"
+msgstr "Oktedoù resevet"
+
+#: interfacetooltip.cpp:189
+msgid "Bytes Sent"
+msgstr "Oktedoù kaset"
+
+#: interfacetooltip.cpp:190
+msgid "ESSID"
+msgstr "ESSID"
+
+#: interfacetooltip.cpp:191
+msgid "Mode"
+msgstr "Mod"
+
+#: interfacetooltip.cpp:192
+msgid "Frequency"
+msgstr "Frekañs"
+
+#: interfacetooltip.cpp:193
+msgid "Bit Rate"
+msgstr "Feur (bit)"
+
+#: interfacetooltip.cpp:194
+msgid "Access Point"
+msgstr ""
+
+#: interfacetooltip.cpp:195
+msgid "Link Quality"
+msgstr "Perzh-mat al liamm"
+
+#: interfacetooltip.cpp:196
+msgid "Broadcast Address"
+msgstr "Chomlec'h skignañ"
+
+#: interfacetooltip.cpp:197
+msgid "Default Gateway"
+msgstr "Treuzell dre ziouer"
+
+#: interfacetooltip.cpp:198
+msgid "Download Speed"
+msgstr ""
+
+#: interfacetooltip.cpp:199
+msgid "Upload Speed"
+msgstr "Tizh ezkargañ"
+
+#: interfacetooltip.cpp:200
+msgid "Nickname"
+msgstr "Lesanv"
+
+#: interfacetooltip.cpp:201
+msgid "Encryption"
+msgstr "Enrinegadur"
+
+#: interfacetray.cpp:36
+msgid "KNemo - the KDE Network Monitor"
+msgstr ""
+
+#: interfacetray.cpp:51
+msgid "&About KNemo"
+msgstr "&Diwar-benn KNemo"
+
+#: interfacetray.cpp:53
+msgid "&Report Bug..."
+msgstr "&Reiñ da c'houzout ur gudenn ..."
+
+#: interfacetray.cpp:57
+msgid "&Configure KNemo..."
+msgstr "&Kefluniañ KNemo ..."
+
+#: interfacetray.cpp:60
+msgid "&Open Traffic Plotter"
+msgstr ""
+
+#: interfacetray.cpp:91 interfacetray.cpp:111
+msgid "KNemo"
+msgstr "KNemo"
+
+#: interfacetray.cpp:97
+msgid "Author"
+msgstr "Oberour"
+
+#: interfacetray.cpp:99
+msgid "Threshold support"
+msgstr ""
+
+#: interfacetray.cpp:101
+msgid "Signal plotter"
+msgstr ""
+
+#. i18n: file interfacestatisticsdlg.ui line 42
+#: rc.cpp:9
+#, no-c-format
+msgid "Daily"
+msgstr "Deizek"
+
+#. i18n: file interfacestatisticsdlg.ui line 51
+#: rc.cpp:12 rc.cpp:27 rc.cpp:42 rc.cpp:103 rc.cpp:133
+#, no-c-format
+msgid "Sent"
+msgstr "Kas"
+
+#. i18n: file interfacestatisticsdlg.ui line 56
+#: rc.cpp:15 rc.cpp:30 rc.cpp:45 rc.cpp:100 rc.cpp:124
+#, no-c-format
+msgid "Received"
+msgstr "Resev"
+
+#. i18n: file interfacestatisticsdlg.ui line 61
+#: rc.cpp:18 rc.cpp:33 rc.cpp:48 rc.cpp:127
+#, no-c-format
+msgid "Total"
+msgstr "Hollek"
+
+#. i18n: file interfacestatisticsdlg.ui line 82
+#: rc.cpp:21
+#, no-c-format
+msgid "Clear daily statistics"
+msgstr ""
+
+#. i18n: file interfacestatisticsdlg.ui line 92
+#: rc.cpp:24
+#, no-c-format
+msgid "Monthly"
+msgstr "Miziek"
+
+#. i18n: file interfacestatisticsdlg.ui line 129
+#: rc.cpp:36
+#, no-c-format
+msgid "Clear monthly statistics"
+msgstr ""
+
+#. i18n: file interfacestatisticsdlg.ui line 139
+#: rc.cpp:39
+#, no-c-format
+msgid "Yearly"
+msgstr "Bloazhiek"
+
+#. i18n: file interfacestatisticsdlg.ui line 179
+#: rc.cpp:51
+#, no-c-format
+msgid "Clear yearly statistics"
+msgstr ""
+
+#. i18n: file interfacestatusdlg.ui line 34
+#: rc.cpp:57
+#, no-c-format
+msgid "Connection"
+msgstr "Kevreadenn"
+
+#. i18n: file interfacestatusdlg.ui line 62
+#: rc.cpp:60
+#, no-c-format
+msgid "IP"
+msgstr "IP"
+
+#. i18n: file interfacestatusdlg.ui line 113
+#: rc.cpp:63
+#, no-c-format
+msgid "IP-Address:"
+msgstr "Chomlec'h IP :"
+
+#. i18n: file interfacestatusdlg.ui line 121
+#: rc.cpp:66
+#, no-c-format
+msgid "Subnet Mask:"
+msgstr "Maskl ar rannrouedad :"
+
+#. i18n: file interfacestatusdlg.ui line 199
+#: rc.cpp:82
+#, no-c-format
+msgid "Interface:"
+msgstr "Etrefas :"
+
+#. i18n: file interfacestatusdlg.ui line 207
+#: rc.cpp:85
+#, no-c-format
+msgid "Alias:"
+msgstr "Lesanv :"
+
+#. i18n: file interfacestatusdlg.ui line 215
+#: rc.cpp:88
+#, no-c-format
+msgid "Status:"
+msgstr "Stad :"
+
+#. i18n: file interfacestatusdlg.ui line 223
+#: rc.cpp:91
+#, no-c-format
+msgid "Uptime:"
+msgstr ""
+
+#. i18n: file interfacestatusdlg.ui line 244
+#: rc.cpp:97
+#, fuzzy, no-c-format
+msgid "Current connection"
+msgstr "Kevreadenn"
+
+#. i18n: file interfacestatusdlg.ui line 293
+#: rc.cpp:106
+#, no-c-format
+msgid "Packets:"
+msgstr "Pakadoù :"
+
+#. i18n: file interfacestatusdlg.ui line 301
+#: rc.cpp:109
+#, no-c-format
+msgid "Bytes:"
+msgstr "Oktedoù :"
+
+#. i18n: file interfacestatusdlg.ui line 312
+#: rc.cpp:112
+#, no-c-format
+msgid "Speed:"
+msgstr "Tizh :"
+
+#. i18n: file interfacestatusdlg.ui line 368
+#: rc.cpp:118
+#, no-c-format
+msgid "Today:"
+msgstr "Hiziv :"
+
+#. i18n: file interfacestatusdlg.ui line 376
+#: rc.cpp:121
+#, no-c-format
+msgid "This year:"
+msgstr "Ar bloaz-se :"
+
+#. i18n: file interfacestatusdlg.ui line 409
+#: rc.cpp:130
+#, no-c-format
+msgid "This month:"
+msgstr "Ar miz-se :"
+
+#. i18n: file interfacestatusdlg.ui line 524
+#: rc.cpp:136
+#, no-c-format
+msgid "Wireless"
+msgstr "Hep neud"
+
+#. i18n: file interfacestatusdlg.ui line 535
+#: rc.cpp:139
+#, fuzzy, no-c-format
+msgid "Connected to:"
+msgstr "Kevreadenn"
+
+#. i18n: file interfacestatusdlg.ui line 554
+#: rc.cpp:143
+#, no-c-format
+msgid "Access point:"
+msgstr ""
+
+#. i18n: file interfacestatusdlg.ui line 573
+#: rc.cpp:147
+#, no-c-format
+msgid "Bit Rate:"
+msgstr "Feur (bit) :"
+
+#. i18n: file interfacestatusdlg.ui line 581
+#: rc.cpp:150
+#, fuzzy, no-c-format
+msgid "Frequency [Channel]:"
+msgstr "Frekañs :"
+
+#. i18n: file interfacestatusdlg.ui line 589
+#: rc.cpp:153
+#, no-c-format
+msgid "Mode:"
+msgstr "Giz :"
+
+#. i18n: file interfacestatusdlg.ui line 632
+#: rc.cpp:157
+#, no-c-format
+msgid "Nickname:"
+msgstr "Lesanv :"
+
+#. i18n: file interfacestatusdlg.ui line 657
+#: rc.cpp:160
+#, no-c-format
+msgid "Link Quality:"
+msgstr "Perzh-mat al liamm :"
+
+#. i18n: file interfacestatusdlg.ui line 665
+#: rc.cpp:163
+#, no-c-format
+msgid "Encryption:"
+msgstr "Enrinegadur :"
+
+#~ msgid "German translation"
+#~ msgstr "Troidigezh en alamaneg"
+
+#~ msgid "Spanish translation"
+#~ msgstr "Troidigezh e spagnoleg"
+
+#~ msgid "Bulgarian translation"
+#~ msgstr "Troidigezh e bulgareg"
+
+#~ msgid "Italian translation"
+#~ msgstr "Troidigezh en italeg"
+
+#~ msgid "Czech translation"
+#~ msgstr "Troidigezh en tcheg"
+
+#~ msgid "French translation"
+#~ msgstr "Troidigezh e galleg"
+
+#~ msgid "Brazilian Portuguese translation"
+#~ msgstr "Troidigezh e portugaleg Brazil"
+
+#~ msgid "Dutch translation"
+#~ msgstr "Troidigezh e nederlandeg"
+
+#~ msgid "Russian translation"
+#~ msgstr "Troidigezh e rusianeg"
+
+#, fuzzy
+#~ msgid "Hungarian translation"
+#~ msgstr "Troidigezh e bulgareg"
+
+#~ msgid "Channel:"
+#~ msgstr "Kanol :"
+
+#~ msgid "ESSID:"
+#~ msgstr "ESSID :"
+
+#~ msgid "Setting up KNemo"
+#~ msgstr "O lakaat KNemo"
+
+#~ msgid "Alt+C"
+#~ msgstr "Alt+C"

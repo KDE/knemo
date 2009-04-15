@@ -1,0 +1,437 @@
+# translation of knemod.po to Bulgarian
+# translation of knemod.po to
+# Bulgarian translation of KDE.
+# This file is licensed under the GPL.
+#
+# $Id:$
+#
+# Златко Попов <zlatkopopov@fsa-bg.org>, 2005.
+# Zlatko Popov <zlatkopopov@fsa-bg.org>, 2006, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: knemod\n"
+"POT-Creation-Date: 2007-03-30 07:28+0200\n"
+"PO-Revision-Date: 2007-05-10 23:40+0000\n"
+"Last-Translator: Zlatko Popov <zlatkopopov@fsa-bg.org>\n"
+"Language-Team: Bulgarian <dict@linux.zonebg.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: _translatorinfo.cpp:1
+msgid ""
+"_: NAME OF TRANSLATORS\n"
+"Your names"
+msgstr "Красимира Минчева, Валентин Стойков"
+
+#: _translatorinfo.cpp:3
+msgid ""
+"_: EMAIL OF TRANSLATORS\n"
+"Your emails"
+msgstr "krasimira_m@yahoo.com, vstoykov@users.sourceforge.net"
+
+#. i18n: file interfacestatusdlg.ui line 233
+#: interface.cpp:174 rc.cpp:94
+#, no-c-format
+msgid "Traffic"
+msgstr "Трафик"
+
+#: interfaceicon.cpp:139
+msgid "Open &Statistics"
+msgstr "Отваряне на &статистика"
+
+#: interfaceicon.cpp:174 interfacestatusdialog.cpp:166 interfacetooltip.cpp:94
+msgid "Not connected."
+msgstr "Няма връзка."
+
+#: interfaceicon.cpp:196 interfacestatusdialog.cpp:171 interfacetooltip.cpp:99
+msgid "Not existing."
+msgstr "Не съществува."
+
+#: interfaceicon.cpp:266
+msgid ""
+"Connection established to\n"
+msgstr ""
+"Установена е връзка с\n"
+
+#: interfaceicon.cpp:272 interfacestatusdialog.cpp:144 interfacetooltip.cpp:68
+msgid "Connection established."
+msgstr "Установена е връзка."
+
+#. i18n: file interfacestatisticsdlg.ui line 16
+#: interfacestatisticsdialog.cpp:44 rc.cpp:3 rc.cpp:115
+#, no-c-format
+msgid "Statistics"
+msgstr "Статистика"
+
+#. i18n: file interfacestatusdlg.ui line 16
+#: interfacestatusdialog.cpp:46 rc.cpp:54
+#, no-c-format
+msgid "Interface Status"
+msgstr "Статус на интерфейса"
+
+#. i18n: file interfacestatusdlg.ui line 129
+#: interfacestatusdialog.cpp:182 rc.cpp:69
+#, no-c-format
+msgid "Broadcast Address:"
+msgstr "Излъчващ адрес:"
+
+#. i18n: file interfacestatusdlg.ui line 137
+#: interfacestatusdialog.cpp:184 rc.cpp:72
+#, no-c-format
+msgid "Default Gateway:"
+msgstr "Шлюз по подразбиране:"
+
+#. i18n: file interfacestatusdlg.ui line 145
+#: interfacestatusdialog.cpp:186 rc.cpp:75
+#, no-c-format
+msgid "HW-Address:"
+msgstr "Адрес MAC:"
+
+#: interfacestatusdialog.cpp:191
+msgid "PtP-Address:"
+msgstr "Адрес PtP:"
+
+#: interfacestatusdialog.cpp:215 interfacestatusdialog.cpp:217
+#: interfacetooltip.cpp:133 interfacetooltip.cpp:138
+msgid "/s"
+msgstr "/сек."
+
+#: interfacestatusdialog.cpp:233 interfacetooltip.cpp:163
+msgid "active"
+msgstr "активен"
+
+#: interfacestatusdialog.cpp:237 interfacetooltip.cpp:167
+msgid "off"
+msgstr "изкл."
+
+#: interfacetooltip.cpp:178
+msgid "Interface"
+msgstr "Интерфейс"
+
+#: interfacetooltip.cpp:179
+msgid "Alias"
+msgstr "Наименование"
+
+#: interfacetooltip.cpp:180
+msgid "Status"
+msgstr "Статус"
+
+#: interfacetooltip.cpp:181
+msgid "Uptime"
+msgstr "Продължителност"
+
+#: interfacetooltip.cpp:182
+msgid "IP-Address"
+msgstr "IP адрес"
+
+#: interfacetooltip.cpp:183
+msgid "Subnet Mask"
+msgstr "Мрежова маска"
+
+#: interfacetooltip.cpp:184
+msgid "HW-Address"
+msgstr "MAC адрес"
+
+#: interfacetooltip.cpp:185
+msgid "PtP-Address"
+msgstr "PtP адрес"
+
+#: interfacetooltip.cpp:186
+msgid "Packets Received"
+msgstr "Получени пакети"
+
+#: interfacetooltip.cpp:187
+msgid "Packets Sent"
+msgstr "Изпратени пакети"
+
+#: interfacetooltip.cpp:188
+msgid "Bytes Received"
+msgstr "Получени байтове"
+
+#: interfacetooltip.cpp:189
+msgid "Bytes Sent"
+msgstr "Изпратени байтове"
+
+#: interfacetooltip.cpp:190
+msgid "ESSID"
+msgstr "ESSID"
+
+#: interfacetooltip.cpp:191
+msgid "Mode"
+msgstr "Режим"
+
+#: interfacetooltip.cpp:192
+msgid "Frequency"
+msgstr "Честота"
+
+#: interfacetooltip.cpp:193
+msgid "Bit Rate"
+msgstr "Скорост"
+
+#: interfacetooltip.cpp:194
+msgid "Access Point"
+msgstr "Точка за достъп"
+
+#: interfacetooltip.cpp:195
+msgid "Link Quality"
+msgstr "Качество на връзката"
+
+#: interfacetooltip.cpp:196
+msgid "Broadcast Address"
+msgstr "Излъчващ адрес"
+
+#: interfacetooltip.cpp:197
+msgid "Default Gateway"
+msgstr "Шлюз по подразбиране"
+
+#: interfacetooltip.cpp:198
+msgid "Download Speed"
+msgstr "Скорост на сваляне"
+
+#: interfacetooltip.cpp:199
+msgid "Upload Speed"
+msgstr "Скорост на качване"
+
+#: interfacetooltip.cpp:200
+msgid "Nickname"
+msgstr "Псевдоним"
+
+#: interfacetooltip.cpp:201
+msgid "Encryption"
+msgstr "Шифроване"
+
+#: interfacetray.cpp:36
+msgid "KNemo - the KDE Network Monitor"
+msgstr "KNemo - Монитор на KDE мрежата"
+
+#: interfacetray.cpp:51
+msgid "&About KNemo"
+msgstr "&Относно KNemo"
+
+#: interfacetray.cpp:53
+msgid "&Report Bug..."
+msgstr "Съобщаване за &грешка..."
+
+#: interfacetray.cpp:57
+msgid "&Configure KNemo..."
+msgstr "&Настройване на KNemo..."
+
+#: interfacetray.cpp:60
+msgid "&Open Traffic Plotter"
+msgstr "&Отваряне на визуализатор на трафика"
+
+#: interfacetray.cpp:91 interfacetray.cpp:111
+msgid "KNemo"
+msgstr "KNemo"
+
+#: interfacetray.cpp:97
+msgid "Author"
+msgstr "Автор"
+
+#: interfacetray.cpp:99
+msgid "Threshold support"
+msgstr "Поддръжка"
+
+#: interfacetray.cpp:101
+msgid "Signal plotter"
+msgstr "Визуализатор на сигнала"
+
+#. i18n: file interfacestatisticsdlg.ui line 42
+#: rc.cpp:9
+#, no-c-format
+msgid "Daily"
+msgstr "Дневно"
+
+#. i18n: file interfacestatisticsdlg.ui line 51
+#: rc.cpp:12 rc.cpp:27 rc.cpp:42 rc.cpp:103 rc.cpp:133
+#, no-c-format
+msgid "Sent"
+msgstr "Изпратени"
+
+#. i18n: file interfacestatisticsdlg.ui line 56
+#: rc.cpp:15 rc.cpp:30 rc.cpp:45 rc.cpp:100 rc.cpp:124
+#, no-c-format
+msgid "Received"
+msgstr "Получени"
+
+#. i18n: file interfacestatisticsdlg.ui line 61
+#: rc.cpp:18 rc.cpp:33 rc.cpp:48 rc.cpp:127
+#, no-c-format
+msgid "Total"
+msgstr "Общо"
+
+#. i18n: file interfacestatisticsdlg.ui line 82
+#: rc.cpp:21
+#, no-c-format
+msgid "Clear daily statistics"
+msgstr "Изчистване на дневната статистика"
+
+#. i18n: file interfacestatisticsdlg.ui line 92
+#: rc.cpp:24
+#, no-c-format
+msgid "Monthly"
+msgstr "Месечно"
+
+#. i18n: file interfacestatisticsdlg.ui line 129
+#: rc.cpp:36
+#, no-c-format
+msgid "Clear monthly statistics"
+msgstr "Изчистване на месечната статистика"
+
+#. i18n: file interfacestatisticsdlg.ui line 139
+#: rc.cpp:39
+#, no-c-format
+msgid "Yearly"
+msgstr "Годишно"
+
+#. i18n: file interfacestatisticsdlg.ui line 179
+#: rc.cpp:51
+#, no-c-format
+msgid "Clear yearly statistics"
+msgstr "Изчистване на годишната статистика"
+
+#. i18n: file interfacestatusdlg.ui line 34
+#: rc.cpp:57
+#, no-c-format
+msgid "Connection"
+msgstr "Връзка"
+
+#. i18n: file interfacestatusdlg.ui line 62
+#: rc.cpp:60
+#, no-c-format
+msgid "IP"
+msgstr "IP"
+
+#. i18n: file interfacestatusdlg.ui line 113
+#: rc.cpp:63
+#, no-c-format
+msgid "IP-Address:"
+msgstr "IP адрес:"
+
+#. i18n: file interfacestatusdlg.ui line 121
+#: rc.cpp:66
+#, no-c-format
+msgid "Subnet Mask:"
+msgstr "Мрежова маска:"
+
+#. i18n: file interfacestatusdlg.ui line 199
+#: rc.cpp:82
+#, no-c-format
+msgid "Interface:"
+msgstr "Интерфейс:"
+
+#. i18n: file interfacestatusdlg.ui line 207
+#: rc.cpp:85
+#, no-c-format
+msgid "Alias:"
+msgstr "Псевдоним:"
+
+#. i18n: file interfacestatusdlg.ui line 215
+#: rc.cpp:88
+#, no-c-format
+msgid "Status:"
+msgstr "Статус:"
+
+#. i18n: file interfacestatusdlg.ui line 223
+#: rc.cpp:91
+#, no-c-format
+msgid "Uptime:"
+msgstr "Продължителност:"
+
+#. i18n: file interfacestatusdlg.ui line 244
+#: rc.cpp:97
+#, no-c-format
+msgid "Current connection"
+msgstr "Текуща връзка"
+
+#. i18n: file interfacestatusdlg.ui line 293
+#: rc.cpp:106
+#, no-c-format
+msgid "Packets:"
+msgstr "Пакети:"
+
+#. i18n: file interfacestatusdlg.ui line 301
+#: rc.cpp:109
+#, no-c-format
+msgid "Bytes:"
+msgstr "Байтове:"
+
+#. i18n: file interfacestatusdlg.ui line 312
+#: rc.cpp:112
+#, no-c-format
+msgid "Speed:"
+msgstr "Скорост:"
+
+#. i18n: file interfacestatusdlg.ui line 368
+#: rc.cpp:118
+#, no-c-format
+msgid "Today:"
+msgstr "Днес:"
+
+#. i18n: file interfacestatusdlg.ui line 376
+#: rc.cpp:121
+#, no-c-format
+msgid "This year:"
+msgstr "Тази година:"
+
+#. i18n: file interfacestatusdlg.ui line 409
+#: rc.cpp:130
+#, no-c-format
+msgid "This month:"
+msgstr "Този месец:"
+
+#. i18n: file interfacestatusdlg.ui line 524
+#: rc.cpp:136
+#, no-c-format
+msgid "Wireless"
+msgstr "Безжичен"
+
+#. i18n: file interfacestatusdlg.ui line 535
+#: rc.cpp:139
+#, no-c-format
+msgid "Connected to:"
+msgstr "Връзка с:"
+
+#. i18n: file interfacestatusdlg.ui line 554
+#: rc.cpp:143
+#, no-c-format
+msgid "Access point:"
+msgstr "Точка за достъп:"
+
+#. i18n: file interfacestatusdlg.ui line 573
+#: rc.cpp:147
+#, no-c-format
+msgid "Bit Rate:"
+msgstr "Скорост:"
+
+#. i18n: file interfacestatusdlg.ui line 581
+#: rc.cpp:150
+#, no-c-format
+msgid "Frequency [Channel]:"
+msgstr "Честота [канал]:"
+
+#. i18n: file interfacestatusdlg.ui line 589
+#: rc.cpp:153
+#, no-c-format
+msgid "Mode:"
+msgstr "Режим:"
+
+#. i18n: file interfacestatusdlg.ui line 632
+#: rc.cpp:157
+#, no-c-format
+msgid "Nickname:"
+msgstr "Псевдоним:"
+
+#. i18n: file interfacestatusdlg.ui line 657
+#: rc.cpp:160
+#, no-c-format
+msgid "Link Quality:"
+msgstr "Качество на връзката:"
+
+#. i18n: file interfacestatusdlg.ui line 665
+#: rc.cpp:163
+#, no-c-format
+msgid "Encryption:"
+msgstr "Шифроване:"

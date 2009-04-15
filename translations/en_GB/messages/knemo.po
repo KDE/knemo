@@ -1,0 +1,496 @@
+# translation of knemod.po to British English
+# Andrew Coles <andrew_coles@yahoo.co.uk>, 2005.
+# Malcolm Hunter <malcolm.hunter@gmx.co.uk>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: knemod\n"
+"POT-Creation-Date: 2007-03-30 07:28+0200\n"
+"PO-Revision-Date: 2006-01-02 01:53+0000\n"
+"Last-Translator: Malcolm Hunter <malcolm.hunter@gmx.co.uk>\n"
+"Language-Team: British English <kde-en-gb@kde.me.uk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.10.2\n"
+
+#: _translatorinfo.cpp:1
+msgid ""
+"_: NAME OF TRANSLATORS\n"
+"Your names"
+msgstr "Andrew Coles"
+
+#: _translatorinfo.cpp:3
+msgid ""
+"_: EMAIL OF TRANSLATORS\n"
+"Your emails"
+msgstr "andrew_coles@yahoo.co.uk"
+
+#. i18n: file interfacestatusdlg.ui line 233
+#: interface.cpp:174 rc.cpp:94
+#, no-c-format
+msgid "Traffic"
+msgstr "Traffic"
+
+#: interfaceicon.cpp:139
+msgid "Open &Statistics"
+msgstr ""
+
+#: interfaceicon.cpp:174 interfacestatusdialog.cpp:166 interfacetooltip.cpp:94
+msgid "Not connected."
+msgstr "Not connected."
+
+#: interfaceicon.cpp:196 interfacestatusdialog.cpp:171 interfacetooltip.cpp:99
+msgid "Not existing."
+msgstr "Not existing."
+
+#: interfaceicon.cpp:266
+#, fuzzy
+msgid ""
+"Connection established to\n"
+msgstr "Connection established."
+
+#: interfaceicon.cpp:272 interfacestatusdialog.cpp:144 interfacetooltip.cpp:68
+msgid "Connection established."
+msgstr "Connection established."
+
+#. i18n: file interfacestatisticsdlg.ui line 16
+#: interfacestatisticsdialog.cpp:44 rc.cpp:3 rc.cpp:115
+#, fuzzy, no-c-format
+msgid "Statistics"
+msgstr "Status"
+
+#. i18n: file interfacestatusdlg.ui line 16
+#: interfacestatusdialog.cpp:46 rc.cpp:54
+#, no-c-format
+msgid "Interface Status"
+msgstr "Interface Status"
+
+#. i18n: file interfacestatusdlg.ui line 129
+#: interfacestatusdialog.cpp:182 rc.cpp:69
+#, no-c-format
+msgid "Broadcast Address:"
+msgstr "Broadcast Address:"
+
+#. i18n: file interfacestatusdlg.ui line 137
+#: interfacestatusdialog.cpp:184 rc.cpp:72
+#, no-c-format
+msgid "Default Gateway:"
+msgstr "Default Gateway:"
+
+#. i18n: file interfacestatusdlg.ui line 145
+#: interfacestatusdialog.cpp:186 rc.cpp:75
+#, no-c-format
+msgid "HW-Address:"
+msgstr "HW-Address:"
+
+#: interfacestatusdialog.cpp:191
+msgid "PtP-Address:"
+msgstr "PtP-Address:"
+
+#: interfacestatusdialog.cpp:215 interfacestatusdialog.cpp:217
+#: interfacetooltip.cpp:133 interfacetooltip.cpp:138
+msgid "/s"
+msgstr "/s"
+
+#: interfacestatusdialog.cpp:233 interfacetooltip.cpp:163
+msgid "active"
+msgstr ""
+
+#: interfacestatusdialog.cpp:237 interfacetooltip.cpp:167
+msgid "off"
+msgstr ""
+
+#: interfacetooltip.cpp:178
+msgid "Interface"
+msgstr "Interface"
+
+#: interfacetooltip.cpp:179
+msgid "Alias"
+msgstr "Alias"
+
+#: interfacetooltip.cpp:180
+msgid "Status"
+msgstr "Status"
+
+#: interfacetooltip.cpp:181
+msgid "Uptime"
+msgstr "Uptime"
+
+#: interfacetooltip.cpp:182
+msgid "IP-Address"
+msgstr "IP-Address"
+
+#: interfacetooltip.cpp:183
+msgid "Subnet Mask"
+msgstr "Subnet Mask"
+
+#: interfacetooltip.cpp:184
+msgid "HW-Address"
+msgstr "HW-Address"
+
+#: interfacetooltip.cpp:185
+msgid "PtP-Address"
+msgstr "PtP-Address"
+
+#: interfacetooltip.cpp:186
+msgid "Packets Received"
+msgstr "Packets Received"
+
+#: interfacetooltip.cpp:187
+msgid "Packets Sent"
+msgstr "Packets Sent"
+
+#: interfacetooltip.cpp:188
+msgid "Bytes Received"
+msgstr "Bytes Received"
+
+#: interfacetooltip.cpp:189
+msgid "Bytes Sent"
+msgstr "Bytes Sent"
+
+#: interfacetooltip.cpp:190
+msgid "ESSID"
+msgstr "ESSID"
+
+#: interfacetooltip.cpp:191
+msgid "Mode"
+msgstr "Mode"
+
+#: interfacetooltip.cpp:192
+msgid "Frequency"
+msgstr "Frequency"
+
+#: interfacetooltip.cpp:193
+msgid "Bit Rate"
+msgstr "Bit Rate"
+
+#: interfacetooltip.cpp:194
+msgid "Access Point"
+msgstr ""
+
+#: interfacetooltip.cpp:195
+msgid "Link Quality"
+msgstr "Link Quality"
+
+#: interfacetooltip.cpp:196
+msgid "Broadcast Address"
+msgstr "Broadcast Address"
+
+#: interfacetooltip.cpp:197
+msgid "Default Gateway"
+msgstr "Default Gateway"
+
+#: interfacetooltip.cpp:198
+msgid "Download Speed"
+msgstr "Download Speed"
+
+#: interfacetooltip.cpp:199
+msgid "Upload Speed"
+msgstr "Upload Speed"
+
+#: interfacetooltip.cpp:200
+msgid "Nickname"
+msgstr ""
+
+#: interfacetooltip.cpp:201
+#, fuzzy
+msgid "Encryption"
+msgstr "Connection"
+
+#: interfacetray.cpp:36
+msgid "KNemo - the KDE Network Monitor"
+msgstr "KNemo - the KDE Network Monitor"
+
+#: interfacetray.cpp:51
+msgid "&About KNemo"
+msgstr "&About KNemo"
+
+#: interfacetray.cpp:53
+msgid "&Report Bug..."
+msgstr "&Report Bug..."
+
+#: interfacetray.cpp:57
+msgid "&Configure KNemo..."
+msgstr "&Configure KNemo..."
+
+#: interfacetray.cpp:60
+msgid "&Open Traffic Plotter"
+msgstr "&Open Traffic Plotter"
+
+#: interfacetray.cpp:91 interfacetray.cpp:111
+msgid "KNemo"
+msgstr "KNemo"
+
+#: interfacetray.cpp:97
+msgid "Author"
+msgstr "Author"
+
+#: interfacetray.cpp:99
+msgid "Threshold support"
+msgstr "Threshold support"
+
+#: interfacetray.cpp:101
+msgid "Signal plotter"
+msgstr "Signal plotter"
+
+#. i18n: file interfacestatisticsdlg.ui line 42
+#: rc.cpp:9
+#, no-c-format
+msgid "Daily"
+msgstr ""
+
+#. i18n: file interfacestatisticsdlg.ui line 51
+#: rc.cpp:12 rc.cpp:27 rc.cpp:42 rc.cpp:103 rc.cpp:133
+#, no-c-format
+msgid "Sent"
+msgstr "Sent"
+
+#. i18n: file interfacestatisticsdlg.ui line 56
+#: rc.cpp:15 rc.cpp:30 rc.cpp:45 rc.cpp:100 rc.cpp:124
+#, no-c-format
+msgid "Received"
+msgstr "Received"
+
+#. i18n: file interfacestatisticsdlg.ui line 61
+#: rc.cpp:18 rc.cpp:33 rc.cpp:48 rc.cpp:127
+#, no-c-format
+msgid "Total"
+msgstr ""
+
+#. i18n: file interfacestatisticsdlg.ui line 82
+#: rc.cpp:21
+#, no-c-format
+msgid "Clear daily statistics"
+msgstr ""
+
+#. i18n: file interfacestatisticsdlg.ui line 92
+#: rc.cpp:24
+#, no-c-format
+msgid "Monthly"
+msgstr ""
+
+#. i18n: file interfacestatisticsdlg.ui line 129
+#: rc.cpp:36
+#, no-c-format
+msgid "Clear monthly statistics"
+msgstr ""
+
+#. i18n: file interfacestatisticsdlg.ui line 139
+#: rc.cpp:39
+#, no-c-format
+msgid "Yearly"
+msgstr ""
+
+#. i18n: file interfacestatisticsdlg.ui line 179
+#: rc.cpp:51
+#, no-c-format
+msgid "Clear yearly statistics"
+msgstr ""
+
+#. i18n: file interfacestatusdlg.ui line 34
+#: rc.cpp:57
+#, no-c-format
+msgid "Connection"
+msgstr "Connection"
+
+#. i18n: file interfacestatusdlg.ui line 62
+#: rc.cpp:60
+#, no-c-format
+msgid "IP"
+msgstr "IP"
+
+#. i18n: file interfacestatusdlg.ui line 113
+#: rc.cpp:63
+#, no-c-format
+msgid "IP-Address:"
+msgstr "IP-Address:"
+
+#. i18n: file interfacestatusdlg.ui line 121
+#: rc.cpp:66
+#, no-c-format
+msgid "Subnet Mask:"
+msgstr "Subnet Mask:"
+
+#. i18n: file interfacestatusdlg.ui line 199
+#: rc.cpp:82
+#, no-c-format
+msgid "Interface:"
+msgstr "Interface:"
+
+#. i18n: file interfacestatusdlg.ui line 207
+#: rc.cpp:85
+#, no-c-format
+msgid "Alias:"
+msgstr "Alias:"
+
+#. i18n: file interfacestatusdlg.ui line 215
+#: rc.cpp:88
+#, no-c-format
+msgid "Status:"
+msgstr "Status:"
+
+#. i18n: file interfacestatusdlg.ui line 223
+#: rc.cpp:91
+#, no-c-format
+msgid "Uptime:"
+msgstr "Uptime:"
+
+#. i18n: file interfacestatusdlg.ui line 244
+#: rc.cpp:97
+#, fuzzy, no-c-format
+msgid "Current connection"
+msgstr "Connection"
+
+#. i18n: file interfacestatusdlg.ui line 293
+#: rc.cpp:106
+#, no-c-format
+msgid "Packets:"
+msgstr "Packets:"
+
+#. i18n: file interfacestatusdlg.ui line 301
+#: rc.cpp:109
+#, no-c-format
+msgid "Bytes:"
+msgstr "Bytes:"
+
+#. i18n: file interfacestatusdlg.ui line 312
+#: rc.cpp:112
+#, no-c-format
+msgid "Speed:"
+msgstr "Speed:"
+
+#. i18n: file interfacestatusdlg.ui line 368
+#: rc.cpp:118
+#, no-c-format
+msgid "Today:"
+msgstr ""
+
+#. i18n: file interfacestatusdlg.ui line 376
+#: rc.cpp:121
+#, no-c-format
+msgid "This year:"
+msgstr ""
+
+#. i18n: file interfacestatusdlg.ui line 409
+#: rc.cpp:130
+#, no-c-format
+msgid "This month:"
+msgstr ""
+
+#. i18n: file interfacestatusdlg.ui line 524
+#: rc.cpp:136
+#, no-c-format
+msgid "Wireless"
+msgstr "Wireless"
+
+#. i18n: file interfacestatusdlg.ui line 535
+#: rc.cpp:139
+#, fuzzy, no-c-format
+msgid "Connected to:"
+msgstr "Connection"
+
+#. i18n: file interfacestatusdlg.ui line 554
+#: rc.cpp:143
+#, no-c-format
+msgid "Access point:"
+msgstr ""
+
+#. i18n: file interfacestatusdlg.ui line 573
+#: rc.cpp:147
+#, no-c-format
+msgid "Bit Rate:"
+msgstr "Bit Rate:"
+
+#. i18n: file interfacestatusdlg.ui line 581
+#: rc.cpp:150
+#, fuzzy, no-c-format
+msgid "Frequency [Channel]:"
+msgstr "Frequency:"
+
+#. i18n: file interfacestatusdlg.ui line 589
+#: rc.cpp:153
+#, no-c-format
+msgid "Mode:"
+msgstr "Mode:"
+
+#. i18n: file interfacestatusdlg.ui line 632
+#: rc.cpp:157
+#, no-c-format
+msgid "Nickname:"
+msgstr ""
+
+#. i18n: file interfacestatusdlg.ui line 657
+#: rc.cpp:160
+#, no-c-format
+msgid "Link Quality:"
+msgstr "Link Quality:"
+
+#. i18n: file interfacestatusdlg.ui line 665
+#: rc.cpp:163
+#, no-c-format
+msgid "Encryption:"
+msgstr ""
+
+#~ msgid "German translation"
+#~ msgstr "German translation"
+
+#~ msgid "Spanish translation"
+#~ msgstr "Spanish translation"
+
+#~ msgid "Bulgarian translation"
+#~ msgstr "Bulgarian translation"
+
+#~ msgid "Italian translation"
+#~ msgstr "Italian translation"
+
+#~ msgid "Czech translation"
+#~ msgstr "Czech translation"
+
+#~ msgid "French translation"
+#~ msgstr "French translation"
+
+#~ msgid "Brazilian Portuguese translation"
+#~ msgstr "Brazilian Portuguese translation"
+
+#~ msgid "Dutch translation"
+#~ msgstr "Dutch translation"
+
+#~ msgid "Russian translation"
+#~ msgstr "Russian translation"
+
+#, fuzzy
+#~ msgid "Hungarian translation"
+#~ msgstr "Bulgarian translation"
+
+#~ msgid "Channel:"
+#~ msgstr "Channel:"
+
+#~ msgid "Signal/Noise"
+#~ msgstr "Signal/Noise"
+
+#~ msgid "ESSID:"
+#~ msgstr "ESSID:"
+
+#~ msgid "Signal/Noise:"
+#~ msgstr "Signal/Noise:"
+
+#, fuzzy
+#~ msgid ""
+#~ "It seems that you are running KNemo for the first time. In the following dialog please add all interfaces that you wish to monitor. Valid interfaces are e.g. 'eth2', 'wlan1' or 'ppp0'.\n"
+#~ "\n"
+#~ "Hint: Select the button 'Defaults' in the setup dialog and KNemo will automatically scan for available interfaces.\n"
+#~ "You can find the KNemo configuration dialog in the KDE Control Center -> Internet & Network -> Network Monitor. To start and stop KNemo use the entry under KDE Components -> Service Manager."
+#~ msgstr ""
+#~ "It seems that you are running KNemo for the first time. In the following dialogue please add all interfaces that you wish to monitor. Valid interfaces are e.g. 'eth2', 'wlan1' or 'ppp0'.\n"
+#~ "\n"
+#~ "Hint: Select the button 'Defaults' in the setup dialogue and KNemo will automatically scan for available interfaces."
+
+#~ msgid "Setting up KNemo"
+#~ msgstr "Setting up KNemo"
+
+#~ msgid "Alt+C"
+#~ msgstr "Alt+C"
+
+#~ msgid "Bug report for"
+#~ msgstr "Bug report for"

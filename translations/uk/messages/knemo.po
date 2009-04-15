@@ -1,0 +1,432 @@
+# translation of knemod.po to Ukrainian
+# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+#
+# Sergey Panasenko <admin@nitay.dp.ua>, 2008.
+msgid ""
+msgstr ""
+"Project-Id-Version: knemod\n"
+"PO-Revision-Date: 2008-08-26 07:01+0300\n"
+"Last-Translator: Sergey Panasenko <admin@nitay.dp.ua>\n"
+"Language-Team: Ukrainian <uk@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: _translatorinfo.cpp:1
+msgid ""
+"_: NAME OF TRANSLATORS\n"
+"Your names"
+msgstr "Sergey Panasenko"
+
+#: _translatorinfo.cpp:3
+msgid ""
+"_: EMAIL OF TRANSLATORS\n"
+"Your emails"
+msgstr "admin@nitay.dp.ua"
+
+#. i18n: file interfacestatusdlg.ui line 233
+#: interface.cpp:174 rc.cpp:94
+#, no-c-format
+msgid "Traffic"
+msgstr "Трафік"
+
+#: interfaceicon.cpp:139
+msgid "Open &Statistics"
+msgstr "Відкрити статистику"
+
+#: interfaceicon.cpp:174 interfacestatusdialog.cpp:166 interfacetooltip.cpp:94
+msgid "Not connected."
+msgstr "Не підключено."
+
+#: interfaceicon.cpp:196 interfacestatusdialog.cpp:171 interfacetooltip.cpp:99
+msgid "Not existing."
+msgstr "Відсутній."
+
+#: interfaceicon.cpp:266
+msgid "Connection established to\n"
+msgstr "Встановлено зв'язок з\n"
+
+#: interfaceicon.cpp:272 interfacestatusdialog.cpp:144 interfacetooltip.cpp:68
+msgid "Connection established."
+msgstr "Зв'язок встановлено."
+
+#. i18n: file interfacestatisticsdlg.ui line 16
+#: interfacestatisticsdialog.cpp:44 rc.cpp:3 rc.cpp:115
+#, no-c-format
+msgid "Statistics"
+msgstr "Статистика"
+
+#. i18n: file interfacestatusdlg.ui line 16
+#: interfacestatusdialog.cpp:46 rc.cpp:54
+#, no-c-format
+msgid "Interface Status"
+msgstr "Стан інтерфейсу"
+
+#. i18n: file interfacestatusdlg.ui line 129
+#: interfacestatusdialog.cpp:182 rc.cpp:69
+#, no-c-format
+msgid "Broadcast Address:"
+msgstr "Адреса загального доступу:"
+
+#. i18n: file interfacestatusdlg.ui line 137
+#: interfacestatusdialog.cpp:184 rc.cpp:72
+#, no-c-format
+msgid "Default Gateway:"
+msgstr "Шлюз за замовченням:"
+
+#. i18n: file interfacestatusdlg.ui line 145
+#: interfacestatusdialog.cpp:186 rc.cpp:75
+#, no-c-format
+msgid "HW-Address:"
+msgstr "HW-Адреса:"
+
+#: interfacestatusdialog.cpp:191
+msgid "PtP-Address:"
+msgstr "PtP-Адреса:"
+
+#: interfacestatusdialog.cpp:215 interfacestatusdialog.cpp:217
+#: interfacetooltip.cpp:133 interfacetooltip.cpp:138
+msgid "/s"
+msgstr "/с"
+
+#: interfacestatusdialog.cpp:233 interfacetooltip.cpp:163
+msgid "active"
+msgstr "активний"
+
+#: interfacestatusdialog.cpp:237 interfacetooltip.cpp:167
+msgid "off"
+msgstr "відкл."
+
+#: interfacetooltip.cpp:178
+msgid "Interface"
+msgstr "Інтерфейс"
+
+#: interfacetooltip.cpp:179
+msgid "Alias"
+msgstr "Назва"
+
+#: interfacetooltip.cpp:180
+msgid "Status"
+msgstr "Стан"
+
+#: interfacetooltip.cpp:181
+msgid "Uptime"
+msgstr "Тривалість роботи"
+
+#: interfacetooltip.cpp:182
+msgid "IP-Address"
+msgstr "IP-адреса"
+
+#: interfacetooltip.cpp:183
+msgid "Subnet Mask"
+msgstr "Маска підмережі"
+
+#: interfacetooltip.cpp:184
+msgid "HW-Address"
+msgstr "HW-Адреса"
+
+#: interfacetooltip.cpp:185
+msgid "PtP-Address"
+msgstr "PtP-Адреса"
+
+#: interfacetooltip.cpp:186
+msgid "Packets Received"
+msgstr "Прийнято пакетів"
+
+#: interfacetooltip.cpp:187
+msgid "Packets Sent"
+msgstr "Передано пакетів"
+
+#: interfacetooltip.cpp:188
+msgid "Bytes Received"
+msgstr "Прийнято"
+
+#: interfacetooltip.cpp:189
+msgid "Bytes Sent"
+msgstr "Відправлено"
+
+#: interfacetooltip.cpp:190
+msgid "ESSID"
+msgstr "ESSID"
+
+#: interfacetooltip.cpp:191
+msgid "Mode"
+msgstr "Режим"
+
+#: interfacetooltip.cpp:192
+msgid "Frequency"
+msgstr "Частота"
+
+#: interfacetooltip.cpp:193
+msgid "Bit Rate"
+msgstr "Швидкість передачі в бітах"
+
+#: interfacetooltip.cpp:194
+msgid "Access Point"
+msgstr "Точка доступу"
+
+#: interfacetooltip.cpp:195
+msgid "Link Quality"
+msgstr "Якість зв'язку"
+
+#: interfacetooltip.cpp:196
+msgid "Broadcast Address"
+msgstr "Адреса загального доступу"
+
+#: interfacetooltip.cpp:197
+msgid "Default Gateway"
+msgstr "Шлюз за замовченням"
+
+#: interfacetooltip.cpp:198
+msgid "Download Speed"
+msgstr "Швидкість завантаження"
+
+#: interfacetooltip.cpp:199
+msgid "Upload Speed"
+msgstr "Швідкість відправлення"
+
+#: interfacetooltip.cpp:200
+msgid "Nickname"
+msgstr "Прізвисько"
+
+#: interfacetooltip.cpp:201
+msgid "Encryption"
+msgstr "Шифрування"
+
+#: interfacetray.cpp:36
+msgid "KNemo - the KDE Network Monitor"
+msgstr "KNemo - Монітор мережі для KDE"
+
+#: interfacetray.cpp:51
+msgid "&About KNemo"
+msgstr "&Про програму KNemo"
+
+#: interfacetray.cpp:53
+msgid "&Report Bug..."
+msgstr "Повідомити про об п&омилку..."
+
+#: interfacetray.cpp:57
+msgid "&Configure KNemo..."
+msgstr "&Налаштувати KNemo..."
+
+#: interfacetray.cpp:60
+msgid "&Open Traffic Plotter"
+msgstr "Відкрити графік трафіку"
+
+#: interfacetray.cpp:91 interfacetray.cpp:111
+msgid "KNemo"
+msgstr "KNemo"
+
+#: interfacetray.cpp:97
+msgid "Author"
+msgstr "Автор"
+
+#: interfacetray.cpp:99
+msgid "Threshold support"
+msgstr "Підтримка порогу"
+
+#: interfacetray.cpp:101
+msgid "Signal plotter"
+msgstr "Графік сигналу"
+
+#. i18n: file interfacestatisticsdlg.ui line 42
+#: rc.cpp:9
+#, no-c-format
+msgid "Daily"
+msgstr "Щодня"
+
+#. i18n: file interfacestatisticsdlg.ui line 51
+#: rc.cpp:12 rc.cpp:27 rc.cpp:42 rc.cpp:103 rc.cpp:133
+#, no-c-format
+msgid "Sent"
+msgstr "Відправлено"
+
+#. i18n: file interfacestatisticsdlg.ui line 56
+#: rc.cpp:15 rc.cpp:30 rc.cpp:45 rc.cpp:100 rc.cpp:124
+#, no-c-format
+msgid "Received"
+msgstr "Прийнято"
+
+#. i18n: file interfacestatisticsdlg.ui line 61
+#: rc.cpp:18 rc.cpp:33 rc.cpp:48 rc.cpp:127
+#, no-c-format
+msgid "Total"
+msgstr "Всього"
+
+#. i18n: file interfacestatisticsdlg.ui line 82
+#: rc.cpp:21
+#, no-c-format
+msgid "Clear daily statistics"
+msgstr "Очистити щоденну статистику"
+
+#. i18n: file interfacestatisticsdlg.ui line 92
+#: rc.cpp:24
+#, no-c-format
+msgid "Monthly"
+msgstr "Щомісяця"
+
+#. i18n: file interfacestatisticsdlg.ui line 129
+#: rc.cpp:36
+#, no-c-format
+msgid "Clear monthly statistics"
+msgstr "Очистити щомісячну статистику"
+
+#. i18n: file interfacestatisticsdlg.ui line 139
+#: rc.cpp:39
+#, no-c-format
+msgid "Yearly"
+msgstr "Щороку"
+
+#. i18n: file interfacestatisticsdlg.ui line 179
+#: rc.cpp:51
+#, no-c-format
+msgid "Clear yearly statistics"
+msgstr "Очистити щорічну статистику"
+
+#. i18n: file interfacestatusdlg.ui line 34
+#: rc.cpp:57
+#, no-c-format
+msgid "Connection"
+msgstr "З'єднання"
+
+#. i18n: file interfacestatusdlg.ui line 62
+#: rc.cpp:60
+#, no-c-format
+msgid "IP"
+msgstr "IP"
+
+#. i18n: file interfacestatusdlg.ui line 113
+#: rc.cpp:63
+#, no-c-format
+msgid "IP-Address:"
+msgstr "IP-адреса:"
+
+#. i18n: file interfacestatusdlg.ui line 121
+#: rc.cpp:66
+#, no-c-format
+msgid "Subnet Mask:"
+msgstr "Маска підмережі:"
+
+#. i18n: file interfacestatusdlg.ui line 199
+#: rc.cpp:82
+#, no-c-format
+msgid "Interface:"
+msgstr "Інтерфейс:"
+
+#. i18n: file interfacestatusdlg.ui line 207
+#: rc.cpp:85
+#, no-c-format
+msgid "Alias:"
+msgstr "Назва:"
+
+#. i18n: file interfacestatusdlg.ui line 215
+#: rc.cpp:88
+#, no-c-format
+msgid "Status:"
+msgstr "Стан:"
+
+#. i18n: file interfacestatusdlg.ui line 223
+#: rc.cpp:91
+#, no-c-format
+msgid "Uptime:"
+msgstr "Тривалість роботи:"
+
+#. i18n: file interfacestatusdlg.ui line 244
+#: rc.cpp:97
+#, no-c-format
+msgid "Current connection"
+msgstr "Поточне з'єднання"
+
+#. i18n: file interfacestatusdlg.ui line 293
+#: rc.cpp:106
+#, no-c-format
+msgid "Packets:"
+msgstr "Пакети:"
+
+#. i18n: file interfacestatusdlg.ui line 301
+#: rc.cpp:109
+#, no-c-format
+msgid "Bytes:"
+msgstr "Байти:"
+
+#. i18n: file interfacestatusdlg.ui line 312
+#: rc.cpp:112
+#, no-c-format
+msgid "Speed:"
+msgstr "Швидкість:"
+
+#. i18n: file interfacestatusdlg.ui line 368
+#: rc.cpp:118
+#, no-c-format
+msgid "Today:"
+msgstr "Сьогодні:"
+
+#. i18n: file interfacestatusdlg.ui line 376
+#: rc.cpp:121
+#, no-c-format
+msgid "This year:"
+msgstr "За рік:"
+
+#. i18n: file interfacestatusdlg.ui line 409
+#: rc.cpp:130
+#, no-c-format
+msgid "This month:"
+msgstr "За місяць:"
+
+#. i18n: file interfacestatusdlg.ui line 524
+#: rc.cpp:136
+#, no-c-format
+msgid "Wireless"
+msgstr "Бездротова мережа"
+
+#. i18n: file interfacestatusdlg.ui line 535
+#: rc.cpp:139
+#, no-c-format
+msgid "Connected to:"
+msgstr "З'єднання:"
+
+#. i18n: file interfacestatusdlg.ui line 554
+#: rc.cpp:143
+#, no-c-format
+msgid "Access point:"
+msgstr "Точка доступу:"
+
+#. i18n: file interfacestatusdlg.ui line 573
+#: rc.cpp:147
+#, no-c-format
+msgid "Bit Rate:"
+msgstr "Швидкість передачі в бітах:"
+
+#. i18n: file interfacestatusdlg.ui line 581
+#: rc.cpp:150
+#, no-c-format
+msgid "Frequency [Channel]:"
+msgstr "Частота [канал]:"
+
+#. i18n: file interfacestatusdlg.ui line 589
+#: rc.cpp:153
+#, no-c-format
+msgid "Mode:"
+msgstr "Режим:"
+
+#. i18n: file interfacestatusdlg.ui line 632
+#: rc.cpp:157
+#, no-c-format
+msgid "Nickname:"
+msgstr "Прізвисько:"
+
+#. i18n: file interfacestatusdlg.ui line 657
+#: rc.cpp:160
+#, no-c-format
+msgid "Link Quality:"
+msgstr "Якість зв'язку:"
+
+#. i18n: file interfacestatusdlg.ui line 665
+#: rc.cpp:163
+#, no-c-format
+msgid "Encryption:"
+msgstr "Шифрування:"
+

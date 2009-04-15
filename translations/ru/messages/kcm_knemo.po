@@ -1,0 +1,646 @@
+# translation of kcm_knemo.po to
+# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+#
+# Alexander Shiyan <shc@users.sourceforge.net>, 2004 - 2006.
+# Leonid Morgun <morgunl@gmail.com>, 2007.
+# Nick Shaforostoff <shafff@ukr.net>, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: kcm_knemo\n"
+"POT-Creation-Date: 2006-09-11 08:34+0200\n"
+"PO-Revision-Date: 2007-01-31 08:52+0200\n"
+"Last-Translator: Nick Shaforostoff <shafff@ukr.net>\n"
+"Language-Team:  <ru@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>"
+"=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: configdialog.cpp:100
+msgid ""
+"<p>In this area you can add the custom entries for your context menu: "
+"<ol>"
+"<li>check <b>Display custom entries in context menu</b>;</li>"
+"<li>push on the <b>Add</b> button to add a new entry in the list;</li>"
+"<li>edit the entry by double clicking in column <b>Menu text</b> and <b>"
+"Command</b>;</li>"
+"<li>start from step 2 for every new entry</li>.</ol>"
+"If you need to execute the command as root user check the corresponding <b>"
+"Root</b> CheckBox."
+msgstr ""
+"<p>В этой области вы можете добавить свои пункты для всплывающего меню: "
+"<ol>"
+"<li>установите <b>Показывать свои пункты в контекстном меню</b>;</li>"
+"<li>нажмите <b>Добавить</b> для внесения новой записи в список;</li>"
+"<li>двойным щелчком по записи отредактируйте поля <b>Текст меню</b> и <b>"
+"Команда</b>;</li>"
+"<li>повторяйте с шага 2 для каждой новой записи меню</li>.</ol>"
+"Если необходимо выполнить команду с правами администратора, установите галочку "
+"<b>Администратор</b> для этого пункта меню."
+
+#: configdialog.cpp:531
+msgid "Add new interface"
+msgstr "Добавить новый интерфейс"
+
+msgid "Add all interfaces"
+msgstr "Добавить все интерфейсы"
+
+#: configdialog.cpp:532
+msgid ""
+"Please enter the name of the interface to be monitored.\n"
+"It should be something like 'eth1', 'wlan2' or 'ppp0'."
+msgstr ""
+"Введите названия контролируемых интерфейсов.\n"
+"Примеры: 'eth1', 'wlan2', 'ppp0' и.т.п."
+
+#: configdialog.cpp:1066
+msgid "Interface"
+msgstr "Интерфейс"
+
+#: configdialog.cpp:1067
+msgid "Alias"
+msgstr "Название"
+
+#: configdialog.cpp:1068
+msgid "Status"
+msgstr "Статус"
+
+#: configdialog.cpp:1069
+msgid "Uptime"
+msgstr "Время работы"
+
+#: configdialog.cpp:1070
+msgid "IP-Address"
+msgstr "IP-адрес"
+
+#: configdialog.cpp:1071
+msgid "Subnet Mask"
+msgstr "Маска подсети"
+
+#: configdialog.cpp:1072
+msgid "HW-Address"
+msgstr "HW-Адрес"
+
+#: configdialog.cpp:1073
+msgid "Broadcast Address"
+msgstr "ШВ Адрес"
+
+#: configdialog.cpp:1074
+msgid "Default Gateway"
+msgstr "Шлюз по умолчанию"
+
+#: configdialog.cpp:1075
+msgid "PtP-Address"
+msgstr "PtP-Адрес"
+
+#: configdialog.cpp:1076
+msgid "Packets Received"
+msgstr "Принято пакетов"
+
+#: configdialog.cpp:1077
+msgid "Packets Sent"
+msgstr "Передано пакетов"
+
+#: configdialog.cpp:1078
+msgid "Bytes Received"
+msgstr "Принято байт"
+
+#: configdialog.cpp:1079
+msgid "Bytes Sent"
+msgstr "Отправлено байт"
+
+#: configdialog.cpp:1080
+msgid "Download Speed"
+msgstr "Скорость скачивания"
+
+#: configdialog.cpp:1081
+msgid "Upload Speed"
+msgstr "Скорость закачивания"
+
+#: configdialog.cpp:1082
+msgid "ESSID"
+msgstr "ESSID"
+
+#: configdialog.cpp:1083
+msgid "Mode"
+msgstr "Режим"
+
+#: configdialog.cpp:1084
+msgid "Frequency"
+msgstr "Частота"
+
+#: configdialog.cpp:1085
+msgid "Bit Rate"
+msgstr "Скорость передачи"
+
+#: configdialog.cpp:1086
+msgid "Access Point"
+msgstr "Точка доступа"
+
+#: configdialog.cpp:1087
+msgid "Link Quality"
+msgstr "Качество связи"
+
+#: configdialog.cpp:1088
+msgid "Nickname"
+msgstr "Ник"
+
+#: configdialog.cpp:1089
+msgid "Encryption"
+msgstr "Шифрование"
+
+#. i18n: file configdlg.ui line 24
+#: rc.cpp:3
+#, no-c-format
+msgid "Use KNemo to monitor your interfaces"
+msgstr "Использовать KNemo для мониторинга интерфейсов"
+
+#. i18n: file configdlg.ui line 36
+#: rc.cpp:6
+#, no-c-format
+msgid "&Interfaces"
+msgstr "&Интерфейсы"
+
+#. i18n: file configdlg.ui line 58
+#: rc.cpp:10
+#, no-c-format
+msgid "Add a new interface"
+msgstr "Добавить новый интерфейс"
+
+#. i18n: file configdlg.ui line 68
+#: rc.cpp:13
+#, no-c-format
+msgid ""
+"This is the list of icons you wish to monitor. Please\n"
+"use the names understood by the command 'ifconfig',\n"
+"for example 'eth0', 'wlan0' or 'ppp0'."
+msgstr ""
+"Используйте имена, которые \"понимает\" команда ifconfig,\n"
+"к примеру 'eth0', 'wlan0' или 'ppp0'."
+
+#. i18n: file configdlg.ui line 79
+#: rc.cpp:19
+#, no-c-format
+msgid "Delete the selected interface"
+msgstr "Удалить выделенный интерфейс"
+
+#. i18n: file configdlg.ui line 89
+#: rc.cpp:22
+#, no-c-format
+msgid "&Context Menu"
+msgstr "Контекстное меню"
+
+#. i18n: file configdlg.ui line 100
+#: rc.cpp:25
+#, no-c-format
+msgid "&Display custom entries in context menu"
+msgstr "Показывать свои пункты в контекстном меню"
+
+#. i18n: file configdlg.ui line 106
+#: rc.cpp:28
+#, no-c-format
+msgid "Root"
+msgstr "Администратор"
+
+#. i18n: file configdlg.ui line 117
+#: rc.cpp:31
+#, no-c-format
+msgid "Menu text"
+msgstr "Текст меню"
+
+#. i18n: file configdlg.ui line 128
+#: rc.cpp:34
+#, no-c-format
+msgid "Command"
+msgstr "Команда"
+
+#. i18n: file configdlg.ui line 169
+#: rc.cpp:39
+#, no-c-format
+msgid "Add a new entry"
+msgstr "Добавить новую запись"
+
+#. i18n: file configdlg.ui line 186
+#: rc.cpp:44
+#, no-c-format
+msgid "Remove the selected entry"
+msgstr "Удалить выделенную запись"
+
+#. i18n: file configdlg.ui line 214
+#: rc.cpp:48
+#, no-c-format
+msgid "Move the selected entry up"
+msgstr "Переместить выделенную запись вверх"
+
+#. i18n: file configdlg.ui line 225
+#: rc.cpp:52
+#, no-c-format
+msgid "Move the selected entry down"
+msgstr "Переместить выделенную запись вниз"
+
+#. i18n: file configdlg.ui line 237
+#: rc.cpp:55
+#, no-c-format
+msgid "Misce&llaneous"
+msgstr "&Разное"
+
+#. i18n: file configdlg.ui line 256
+#: rc.cpp:58
+#, no-c-format
+msgid "Alias:"
+msgstr "Название:"
+
+#. i18n: file configdlg.ui line 267
+#: rc.cpp:61
+#, no-c-format
+msgid ""
+"You can enter an alias for the interface.\n"
+"It will be used in the tooltip of the system\n"
+"tray icon for better differentiation of the\n"
+"icons."
+msgstr ""
+"Вы можете ввести название интерфейса.\n"
+" Оно будет использоваться как всплывающая подсказка на иконке интерфейса в трее "
+"для обеспечения различия между иконками."
+
+#. i18n: file configdlg.ui line 277
+#: rc.cpp:67
+#, no-c-format
+msgid "Hide icon when &not connected"
+msgstr "Скрывать иконку когда не подключено"
+
+#. i18n: file configdlg.ui line 282
+#: rc.cpp:70
+#, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface is not connected. \n"
+"When reconnected the icon will be shown again."
+msgstr ""
+"При установленной опции, иконка интерфейса будет скрыта, когда интерфейс не "
+"подключен. При подключении интерфейса иконка будет показана."
+
+#. i18n: file configdlg.ui line 315
+#: rc.cpp:75
+#, no-c-format
+msgid "Hide icon &when not existing"
+msgstr "Скрывать иконку когда недоступно"
+
+#. i18n: file configdlg.ui line 322
+#: rc.cpp:78
+#, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface does not exist. \n"
+"This is useful for interfaces that are dynamically\n"
+"created and destroyed, for example interfaces\n"
+"of bluetooth adaptors."
+msgstr ""
+"При установленной опции, иконка интерфейса будет скрыта, когда интерфейс "
+"недоступен. При наличии интерфейса иконка будет показана. Опция хороша для "
+"динамически создаваемых интерфейсов, таких как модемное соединение или "
+"Bluetooth-адаптеры."
+
+#. i18n: file configdlg.ui line 332
+#: rc.cpp:85
+#, no-c-format
+msgid "Activate statistics"
+msgstr "Активировать статистику"
+
+#. i18n: file configdlg.ui line 348
+#: rc.cpp:88
+#, no-c-format
+msgid "Traffic activity threshold:"
+msgstr "Чувствительность индикатора:"
+
+#. i18n: file configdlg.ui line 351
+#: rc.cpp:91
+#, no-c-format
+msgid ""
+"Use this for networks with high noise i.e. many packets coming in and out all "
+"the time. Set this value high enough so that KNemo won't show incoming and "
+"outgoing traffic all the time."
+msgstr ""
+"Используйте это для 'шумных' сетей, т.е. с постоянно большим исходящим и "
+"входящим трафиком. Слишком высокая установка этого параметра может привести к "
+"тому, что KNemo не сможет показывать входящий и исходящий трафик одновременно."
+
+#. i18n: file configdlg.ui line 367
+#: rc.cpp:94
+#, no-c-format
+msgid " packets/s"
+msgstr " пакетов/с"
+
+#. i18n: file configdlg.ui line 393
+#: rc.cpp:97
+#, no-c-format
+msgid "Iconset:"
+msgstr "Картинки:"
+
+#. i18n: file configdlg.ui line 399
+#: rc.cpp:100
+#, no-c-format
+msgid "Monitor"
+msgstr "Монитор"
+
+#. i18n: file configdlg.ui line 404
+#: rc.cpp:103
+#, no-c-format
+msgid "Modem"
+msgstr "Модем"
+
+#. i18n: file configdlg.ui line 409
+#: rc.cpp:106
+#, no-c-format
+msgid "Network"
+msgstr "Сеть"
+
+#. i18n: file configdlg.ui line 414
+#: rc.cpp:109
+#, no-c-format
+msgid "Wireless"
+msgstr "Беспроводная сеть"
+
+#. i18n: file configdlg.ui line 457
+#: rc.cpp:112
+#, no-c-format
+msgid "&ToolTip"
+msgstr "&Всплывающая подсказка"
+
+#. i18n: file configdlg.ui line 469
+#: rc.cpp:115
+#, no-c-format
+msgid ""
+"<b>Note: Adding wireless specific information will only show up in the tooltips "
+"\n"
+"of wireless devices not in the tooltips of standard interfaces.</b>"
+msgstr ""
+"<b>Замечание: Добавление специфичной информации для беспроводных сетей будет "
+"отображаться в подсказке только для устройств беспроводной связи.</b>"
+
+#. i18n: file configdlg.ui line 497
+#: rc.cpp:120
+#, no-c-format
+msgid "Remove the selected entry from the list of displayed information"
+msgstr "Удалить выделенный пункт из списка отображаемой информации."
+
+#. i18n: file configdlg.ui line 525
+#: rc.cpp:124
+#, no-c-format
+msgid "Add the selected entry to the list of displayed information."
+msgstr "Добавить выделенный пункт в список отображаемой информации."
+
+#. i18n: file configdlg.ui line 557
+#: rc.cpp:127
+#, no-c-format
+msgid "Display:"
+msgstr "Отображение:"
+
+#. i18n: file configdlg.ui line 573
+#: rc.cpp:130
+#, no-c-format
+msgid "Available:"
+msgstr "Доступность:"
+
+#. i18n: file configdlg.ui line 583
+#: rc.cpp:133
+#, no-c-format
+msgid "&Misc"
+msgstr "&Разное"
+
+#. i18n: file configdlg.ui line 594
+#: rc.cpp:136
+#, no-c-format
+msgid "&Notifications"
+msgstr "&Уведомления"
+
+#. i18n: file configdlg.ui line 605
+#: rc.cpp:139
+#, no-c-format
+msgid "&Configure Sounds && Events..."
+msgstr "&Настроить звуки и события..."
+
+#. i18n: file configdlg.ui line 615
+#: rc.cpp:142
+#, no-c-format
+msgid "Update interval"
+msgstr "Интервал обновления"
+
+#. i18n: file configdlg.ui line 626
+#: rc.cpp:145
+#, no-c-format
+msgid "Update interface information every"
+msgstr "Обновлять информацию интерфейса каждые"
+
+#. i18n: file configdlg.ui line 654
+#: rc.cpp:148 rc.cpp:166
+#, no-c-format
+msgid "s"
+msgstr "с"
+
+#. i18n: file configdlg.ui line 657
+#: rc.cpp:151
+#, no-c-format
+msgid ""
+"How often should KNemo poll for interface information. Lower number means more "
+"CPU load but faster reaction on changes. Larger number means less CPU load but "
+"slow reaction on changes."
+msgstr ""
+"Порядок обновления информации интерфейса. Маленькие значения требуют большей "
+"загрузки процессора, но обеспечивают более быструю реакцию. Большие значения "
+"уменьшают загрузку процессора, но реакция на изменения более медленная."
+
+#. i18n: file configdlg.ui line 667
+#: rc.cpp:154
+#, no-c-format
+msgid "Statistics"
+msgstr "Статистика"
+
+#. i18n: file configdlg.ui line 678
+#: rc.cpp:157
+#, no-c-format
+msgid "..."
+msgstr "..."
+
+#. i18n: file configdlg.ui line 686
+#: rc.cpp:160
+#, no-c-format
+msgid "Statistics are stored in the following directory:"
+msgstr "Статистика сохраняется в следующем каталоге:"
+
+#. i18n: file configdlg.ui line 699
+#: rc.cpp:163
+#, no-c-format
+msgid "Save statistics every"
+msgstr "Сохранять статистику каждые"
+
+#. i18n: file configdlg.ui line 737
+#: rc.cpp:169
+#, no-c-format
+msgid "Backend"
+msgstr "Выходной буфер"
+
+#. i18n: file configdlg.ui line 748
+#: rc.cpp:172
+#, no-c-format
+msgid "Use the following backend"
+msgstr "Использовать следующий выходной буфер"
+
+#. i18n: file configdlg.ui line 764
+#: rc.cpp:175
+#, no-c-format
+msgid "Description:"
+msgstr "Описание:"
+
+#. i18n: file configdlg.ui line 829
+#: rc.cpp:179
+#, no-c-format
+msgid "Traffic &Plotter"
+msgstr "График сигнала"
+
+#. i18n: file configdlg.ui line 840
+#: rc.cpp:182
+#, no-c-format
+msgid "Scale"
+msgstr "Масштабировать"
+
+#. i18n: file configdlg.ui line 862
+#: rc.cpp:185
+#, no-c-format
+msgid "Pixel per time period:"
+msgstr "Период обновления:"
+
+#. i18n: file configdlg.ui line 870
+#: rc.cpp:188
+#, no-c-format
+msgid "Ma&ximum value:"
+msgstr "Максимальное значение:"
+
+#. i18n: file configdlg.ui line 892
+#: rc.cpp:191
+#, no-c-format
+msgid "Automatic &range detection"
+msgstr "Автоопределение пределов"
+
+#. i18n: file configdlg.ui line 908
+#: rc.cpp:194
+#, no-c-format
+msgid "&Minimum value:"
+msgstr "Минимальное значение:"
+
+#. i18n: file configdlg.ui line 921
+#: rc.cpp:197
+#, no-c-format
+msgid "Text"
+msgstr "Текст"
+
+#. i18n: file configdlg.ui line 932
+#: rc.cpp:200
+#, no-c-format
+msgid "&Labels"
+msgstr "&Метки"
+
+#. i18n: file configdlg.ui line 940
+#: rc.cpp:203
+#, no-c-format
+msgid "Top &bar"
+msgstr "Верхнее меню"
+
+#. i18n: file configdlg.ui line 948
+#: rc.cpp:206
+#, no-c-format
+msgid "Fo&nt size:"
+msgstr "Размер &шрифта:"
+
+#. i18n: file configdlg.ui line 975
+#: rc.cpp:209
+#, no-c-format
+msgid "Lines"
+msgstr "Строки"
+
+#. i18n: file configdlg.ui line 1000
+#: rc.cpp:212
+#, no-c-format
+msgid "&Distance:"
+msgstr "Расстояние:"
+
+#. i18n: file configdlg.ui line 1011
+#: rc.cpp:215
+#, no-c-format
+msgid "Vertic&al lines"
+msgstr "Вертикальные линии"
+
+#. i18n: file configdlg.ui line 1019
+#: rc.cpp:218
+#, no-c-format
+msgid "V&ertical lines scroll"
+msgstr "Сдвиг вертикальных линий"
+
+#. i18n: file configdlg.ui line 1041
+#: rc.cpp:221
+#, no-c-format
+msgid "Co&unt:"
+msgstr "&Количество:"
+
+#. i18n: file configdlg.ui line 1052
+#: rc.cpp:224
+#, no-c-format
+msgid "Hori&zontal lines"
+msgstr "Горизонтальные линии"
+
+#. i18n: file configdlg.ui line 1062
+#: rc.cpp:227
+#, no-c-format
+msgid "&Colors"
+msgstr "&Цвета"
+
+#. i18n: file configdlg.ui line 1073
+#: rc.cpp:230
+#, no-c-format
+msgid "Vertical lines:"
+msgstr "Вертикальные линии:"
+
+#. i18n: file configdlg.ui line 1105
+#: rc.cpp:236
+#, no-c-format
+msgid "Background:"
+msgstr "Фон:"
+
+#. i18n: file configdlg.ui line 1121
+#: rc.cpp:240
+#, no-c-format
+msgid "Horizontal lines:"
+msgstr "Горизонтальные линии:"
+
+#. i18n: file configdlg.ui line 1129
+#: rc.cpp:243
+#, no-c-format
+msgid "Outgoing traffic:"
+msgstr "Исходящий трафик:"
+
+#. i18n: file configdlg.ui line 1137
+#: rc.cpp:246
+#, no-c-format
+msgid "Incoming traffic:"
+msgstr "Входящий трафик:"
+
+#. i18n: file configdlg.ui line 1155
+#: rc.cpp:250
+#, no-c-format
+msgid "Traffic"
+msgstr "Трафик"
+
+#. i18n: file configdlg.ui line 1166
+#: rc.cpp:253
+#, no-c-format
+msgid "Sho&w incoming traffic"
+msgstr "Показать &входящий трафик"
+
+#. i18n: file configdlg.ui line 1174
+#: rc.cpp:256
+#, no-c-format
+msgid "Show &outgoing traffic"
+msgstr "Показать &исходящий трафик"

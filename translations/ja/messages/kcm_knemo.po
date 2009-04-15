@@ -1,0 +1,628 @@
+# translation of kcm_knemo.po to Japanese.
+# Yukiko Bando <ybando@k6.dion.ne.jp>, 2006.
+msgid ""
+msgstr ""
+"Project-Id-Version: kcm_knemo\n"
+"POT-Creation-Date: 2006-09-11 08:34+0200\n"
+"PO-Revision-Date: 2006-10-20 23:00+0900\n"
+"Last-Translator: Yukiko Bando <ybando@k6.dion.ne.jp>\n"
+"Language-Team: Japanese <Kdeveloper@kde.gr.jp>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: configdialog.cpp:100
+msgid ""
+"<p>In this area you can add the custom entries for your context menu: "
+"<ol>"
+"<li>check <b>Display custom entries in context menu</b>;</li>"
+"<li>push on the <b>Add</b> button to add a new entry in the list;</li>"
+"<li>edit the entry by double clicking in column <b>Menu text</b> and <b>"
+"Command</b>;</li>"
+"<li>start from step 2 for every new entry</li>.</ol>"
+"If you need to execute the command as root user check the corresponding <b>"
+"Root</b> CheckBox."
+msgstr ""
+"<p>ここには、コンテキストメニューに表示させるカスタムエントリを以下の手順で追加します: "
+"<ol>"
+"<li>「コンテキストメニューにカスタムエントリを表示」をチェック</li>"
+"<li>「追加」ボタンを押して、リストに新しいエントリを追加</li>"
+"<li>「メニューテキスト」と「コマンド」のカラムをダブルクリックしてエントリを編集</li>"
+"<li>追加する各エントリについて、ステップ 2 と 3 を繰り返す</li></ol>コマンドを root "
+"ユーザで実行する必要がある場合は、対応する「root」チェックボックスをチェックしてください。"
+
+#: configdialog.cpp:531
+msgid "Add new interface"
+msgstr "新しいインターフェースを追加"
+
+#: configdialog.cpp:532
+msgid ""
+"Please enter the name of the interface to be monitored.\n"
+"It should be something like 'eth1', 'wlan2' or 'ppp0'."
+msgstr ""
+"監視するインターフェースの名前を入力してください。\n"
+"例: eth1, wlan2, ppp0"
+
+#: configdialog.cpp:1066
+msgid "Interface"
+msgstr "インターフェース"
+
+#: configdialog.cpp:1067
+msgid "Alias"
+msgstr "エイリアス"
+
+#: configdialog.cpp:1068
+msgid "Status"
+msgstr "状態"
+
+#: configdialog.cpp:1069
+msgid "Uptime"
+msgstr "アップタイム"
+
+#: configdialog.cpp:1070
+msgid "IP-Address"
+msgstr "IP アドレス"
+
+#: configdialog.cpp:1071
+msgid "Subnet Mask"
+msgstr "サブネットマスク"
+
+#: configdialog.cpp:1072
+msgid "HW-Address"
+msgstr "HW アドレス"
+
+#: configdialog.cpp:1073
+msgid "Broadcast Address"
+msgstr "ブロードキャストアドレス"
+
+#: configdialog.cpp:1074
+msgid "Default Gateway"
+msgstr "デフォルトゲートウェイ"
+
+#: configdialog.cpp:1075
+msgid "PtP-Address"
+msgstr "PtP アドレス"
+
+#: configdialog.cpp:1076
+msgid "Packets Received"
+msgstr "受信したパケット数"
+
+#: configdialog.cpp:1077
+msgid "Packets Sent"
+msgstr "送信したパケット数"
+
+#: configdialog.cpp:1078
+msgid "Bytes Received"
+msgstr "受信したバイト数"
+
+#: configdialog.cpp:1079
+msgid "Bytes Sent"
+msgstr "送信したバイト数"
+
+#: configdialog.cpp:1080
+msgid "Download Speed"
+msgstr "ダウンロード速度"
+
+#: configdialog.cpp:1081
+msgid "Upload Speed"
+msgstr "アップロード速度"
+
+#: configdialog.cpp:1082
+msgid "ESSID"
+msgstr "ESSID"
+
+#: configdialog.cpp:1083
+msgid "Mode"
+msgstr "モード"
+
+#: configdialog.cpp:1084
+msgid "Frequency"
+msgstr "周波数"
+
+#: configdialog.cpp:1085
+msgid "Bit Rate"
+msgstr "ビットレート"
+
+#: configdialog.cpp:1086
+msgid "Access Point"
+msgstr "アクセスポイント"
+
+#: configdialog.cpp:1087
+msgid "Link Quality"
+msgstr "リンクの品質"
+
+#: configdialog.cpp:1088
+msgid "Nickname"
+msgstr "ニックネーム"
+
+#: configdialog.cpp:1089
+msgid "Encryption"
+msgstr "暗号化"
+
+#. i18n: file configdlg.ui line 24
+#: rc.cpp:3
+#, no-c-format
+msgid "Use KNemo to monitor your interfaces"
+msgstr "インターフェースの監視に KNemo を使う"
+
+#. i18n: file configdlg.ui line 36
+#: rc.cpp:6
+#, no-c-format
+msgid "&Interfaces"
+msgstr "インターフェース(&I)"
+
+#. i18n: file configdlg.ui line 58
+#: rc.cpp:10
+#, no-c-format
+msgid "Add a new interface"
+msgstr "新しいインターフェースを追加"
+
+#. i18n: file configdlg.ui line 68
+#: rc.cpp:13
+#, no-c-format
+msgid ""
+"This is the list of icons you wish to monitor. Please\n"
+"use the names understood by the command 'ifconfig',\n"
+"for example 'eth0', 'wlan0' or 'ppp0'."
+msgstr ""
+"これは監視するインターフェースのリストです。\n"
+"'ifconfig' コマンドが認識する名前 (例 eth0, wlan0, ppp0) を使用してください。"
+
+#. i18n: file configdlg.ui line 79
+#: rc.cpp:19
+#, no-c-format
+msgid "Delete the selected interface"
+msgstr "選択したインターフェースを削除"
+
+#. i18n: file configdlg.ui line 89
+#: rc.cpp:22
+#, no-c-format
+msgid "&Context Menu"
+msgstr "コンテキストメニュー(&C)"
+
+#. i18n: file configdlg.ui line 100
+#: rc.cpp:25
+#, no-c-format
+msgid "&Display custom entries in context menu"
+msgstr "コンテキストメニューにカスタムエントリを表示(&D)"
+
+#. i18n: file configdlg.ui line 106
+#: rc.cpp:28
+#, no-c-format
+msgid "Root"
+msgstr "root"
+
+#. i18n: file configdlg.ui line 117
+#: rc.cpp:31
+#, no-c-format
+msgid "Menu text"
+msgstr "メニューテキスト"
+
+#. i18n: file configdlg.ui line 128
+#: rc.cpp:34
+#, no-c-format
+msgid "Command"
+msgstr "コマンド"
+
+#. i18n: file configdlg.ui line 169
+#: rc.cpp:39
+#, no-c-format
+msgid "Add a new entry"
+msgstr "新規エントリを追加"
+
+#. i18n: file configdlg.ui line 186
+#: rc.cpp:44
+#, no-c-format
+msgid "Remove the selected entry"
+msgstr "選択したエントリを削除"
+
+#. i18n: file configdlg.ui line 214
+#: rc.cpp:48
+#, no-c-format
+msgid "Move the selected entry up"
+msgstr "選択したエントリを上に移動"
+
+#. i18n: file configdlg.ui line 225
+#: rc.cpp:52
+#, no-c-format
+msgid "Move the selected entry down"
+msgstr "選択したエントリを下に移動"
+
+#. i18n: file configdlg.ui line 237
+#: rc.cpp:55
+#, no-c-format
+msgid "Misce&llaneous"
+msgstr "その他(&L)"
+
+#. i18n: file configdlg.ui line 256
+#: rc.cpp:58
+#, no-c-format
+msgid "Alias:"
+msgstr "エイリアス:"
+
+#. i18n: file configdlg.ui line 267
+#: rc.cpp:61
+#, no-c-format
+msgid ""
+"You can enter an alias for the interface.\n"
+"It will be used in the tooltip of the system\n"
+"tray icon for better differentiation of the\n"
+"icons."
+msgstr ""
+"インターフェースのエイリアスを入力してください。複数のアイコンを区別しやすくするために、この名前をシステムトレイアイコンのツールチップに表示します。"
+
+#. i18n: file configdlg.ui line 277
+#: rc.cpp:67
+#, no-c-format
+msgid "Hide icon when &not connected"
+msgstr "接続していないときはアイコンを表示しない(&N)"
+
+#. i18n: file configdlg.ui line 282
+#: rc.cpp:70
+#, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface is not connected. \n"
+"When reconnected the icon will be shown again."
+msgstr ""
+"このオプションを選択すると、このインターフェースが接続していないときは、対応するアイコンが非表示になります。接続すると、アイコンが再び表示されます。"
+
+#. i18n: file configdlg.ui line 315
+#: rc.cpp:75
+#, no-c-format
+msgid "Hide icon &when not existing"
+msgstr "存在しないときはアイコンを表示しない(&W)"
+
+#. i18n: file configdlg.ui line 322
+#: rc.cpp:78
+#, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface does not exist. \n"
+"This is useful for interfaces that are dynamically\n"
+"created and destroyed, for example interfaces\n"
+"of bluetooth adaptors."
+msgstr ""
+"このオプションを選択すると、このインターフェースが存在しないときは、対応するアイコンが非表示になります。これは、例えば Bluetooth "
+"アダプタのインターフェースのように、動的に作成されたり消滅するインターフェースに適しています。"
+
+#. i18n: file configdlg.ui line 332
+#: rc.cpp:85
+#, no-c-format
+msgid "Activate statistics"
+msgstr "統計を有効にする"
+
+#. i18n: file configdlg.ui line 348
+#: rc.cpp:88
+#, no-c-format
+msgid "Traffic activity threshold:"
+msgstr "トラフィック活動のしきい値:"
+
+#. i18n: file configdlg.ui line 351
+#: rc.cpp:91
+#, no-c-format
+msgid ""
+"Use this for networks with high noise i.e. many packets coming in and out all "
+"the time. Set this value high enough so that KNemo won't show incoming and "
+"outgoing traffic all the time."
+msgstr ""
+"このオプションは、パケットが絶えず送受信されるノイズの多いネットワークで使用します。KNemo "
+"が常に受信/送信トラフィックを表示しないように、値を高く設定してください。"
+
+#. i18n: file configdlg.ui line 367
+#: rc.cpp:94
+#, no-c-format
+msgid " packets/s"
+msgstr " パケット/秒"
+
+#. i18n: file configdlg.ui line 393
+#: rc.cpp:97
+#, no-c-format
+msgid "Iconset:"
+msgstr "アイコンセット:"
+
+#. i18n: file configdlg.ui line 399
+#: rc.cpp:100
+#, no-c-format
+msgid "Monitor"
+msgstr "モニタ"
+
+#. i18n: file configdlg.ui line 404
+#: rc.cpp:103
+#, no-c-format
+msgid "Modem"
+msgstr "モデム"
+
+#. i18n: file configdlg.ui line 409
+#: rc.cpp:106
+#, no-c-format
+msgid "Network"
+msgstr "ネットワーク"
+
+#. i18n: file configdlg.ui line 414
+#: rc.cpp:109
+#, no-c-format
+msgid "Wireless"
+msgstr "ワイヤレス"
+
+#. i18n: file configdlg.ui line 457
+#: rc.cpp:112
+#, no-c-format
+msgid "&ToolTip"
+msgstr "ツールチップ(&T)"
+
+#. i18n: file configdlg.ui line 469
+#: rc.cpp:115
+#, no-c-format
+msgid ""
+"<b>Note: Adding wireless specific information will only show up in the tooltips "
+"\n"
+"of wireless devices not in the tooltips of standard interfaces.</b>"
+msgstr ""
+"注意: ワイヤレス特有の情報は、ワイヤレスデバイスのツールチップにのみ表示されます。\n"
+"標準的なインターフェースのツールチップには表示されません。"
+
+#. i18n: file configdlg.ui line 497
+#: rc.cpp:120
+#, no-c-format
+msgid "Remove the selected entry from the list of displayed information"
+msgstr "選択した項目を表示する情報のリストから削除します。"
+
+#. i18n: file configdlg.ui line 525
+#: rc.cpp:124
+#, no-c-format
+msgid "Add the selected entry to the list of displayed information."
+msgstr "選択した項目を表示する情報のリストに追加します。"
+
+#. i18n: file configdlg.ui line 557
+#: rc.cpp:127
+#, no-c-format
+msgid "Display:"
+msgstr "表示する情報:"
+
+#. i18n: file configdlg.ui line 573
+#: rc.cpp:130
+#, no-c-format
+msgid "Available:"
+msgstr "利用可能:"
+
+#. i18n: file configdlg.ui line 583
+#: rc.cpp:133
+#, no-c-format
+msgid "&Misc"
+msgstr "その他(&M)"
+
+#. i18n: file configdlg.ui line 594
+#: rc.cpp:136
+#, no-c-format
+msgid "&Notifications"
+msgstr "通知(&N)"
+
+#. i18n: file configdlg.ui line 605
+#: rc.cpp:139
+#, no-c-format
+msgid "&Configure Sounds && Events..."
+msgstr "サウンドとイベントを設定(&C)..."
+
+#. i18n: file configdlg.ui line 615
+#: rc.cpp:142
+#, no-c-format
+msgid "Update interval"
+msgstr "更新間隔"
+
+#. i18n: file configdlg.ui line 626
+#: rc.cpp:145
+#, no-c-format
+msgid "Update interface information every"
+msgstr "インターフェースの情報を更新する間隔"
+
+#. i18n: file configdlg.ui line 654
+#: rc.cpp:148 rc.cpp:166
+#, no-c-format
+msgid "s"
+msgstr "秒"
+
+#. i18n: file configdlg.ui line 657
+#: rc.cpp:151
+#, no-c-format
+msgid ""
+"How often should KNemo poll for interface information. Lower number means more "
+"CPU load but faster reaction on changes. Larger number means less CPU load but "
+"slow reaction on changes."
+msgstr ""
+"KNemo がインターフェースの情報をチェックする間隔。値を小さくすると、CPU 負荷が大きくなりますが、変化が素早く反映されます。値を大きくすると、CPU "
+"負荷は小さくなりますが、変化に対する反応が遅くなります。"
+
+#. i18n: file configdlg.ui line 667
+#: rc.cpp:154
+#, no-c-format
+msgid "Statistics"
+msgstr "統計"
+
+#. i18n: file configdlg.ui line 678
+#: rc.cpp:157
+#, no-c-format
+msgid "..."
+msgstr "..."
+
+#. i18n: file configdlg.ui line 686
+#: rc.cpp:160
+#, no-c-format
+msgid "Statistics are stored in the following directory:"
+msgstr "統計を保存するディレクトリ:"
+
+#. i18n: file configdlg.ui line 699
+#: rc.cpp:163
+#, no-c-format
+msgid "Save statistics every"
+msgstr "統計を保存する間隔"
+
+#. i18n: file configdlg.ui line 737
+#: rc.cpp:169
+#, no-c-format
+msgid "Backend"
+msgstr "バックエンド"
+
+#. i18n: file configdlg.ui line 748
+#: rc.cpp:172
+#, no-c-format
+msgid "Use the following backend"
+msgstr "以下のバックエンドを使う"
+
+#. i18n: file configdlg.ui line 764
+#: rc.cpp:175
+#, no-c-format
+msgid "Description:"
+msgstr "説明:"
+
+#. i18n: file configdlg.ui line 829
+#: rc.cpp:179
+#, no-c-format
+msgid "Traffic &Plotter"
+msgstr "トラフィックプロッタ(&P)"
+
+#. i18n: file configdlg.ui line 840
+#: rc.cpp:182
+#, no-c-format
+msgid "Scale"
+msgstr "目盛"
+
+#. i18n: file configdlg.ui line 862
+#: rc.cpp:185
+#, no-c-format
+msgid "Pixel per time period:"
+msgstr "時間当たりのピクセル数:"
+
+#. i18n: file configdlg.ui line 870
+#: rc.cpp:188
+#, no-c-format
+msgid "Ma&ximum value:"
+msgstr "最大値(&X):"
+
+#. i18n: file configdlg.ui line 892
+#: rc.cpp:191
+#, no-c-format
+msgid "Automatic &range detection"
+msgstr "自動レンジ検出(&R)"
+
+# ACCELERATOR changed by translator
+#. i18n: file configdlg.ui line 908
+#: rc.cpp:194
+#, no-c-format
+msgid "&Minimum value:"
+msgstr "最小値(&Y):"
+
+#. i18n: file configdlg.ui line 921
+#: rc.cpp:197
+#, no-c-format
+msgid "Text"
+msgstr "テキスト"
+
+#. i18n: file configdlg.ui line 932
+#: rc.cpp:200
+#, no-c-format
+msgid "&Labels"
+msgstr "ラベル(&L)"
+
+#. i18n: file configdlg.ui line 940
+#: rc.cpp:203
+#, no-c-format
+msgid "Top &bar"
+msgstr "トップバー(&B)"
+
+#. i18n: file configdlg.ui line 948
+#: rc.cpp:206
+#, no-c-format
+msgid "Fo&nt size:"
+msgstr "フォントサイズ(&N):"
+
+#. i18n: file configdlg.ui line 975
+#: rc.cpp:209
+#, no-c-format
+msgid "Lines"
+msgstr "線"
+
+#. i18n: file configdlg.ui line 1000
+#: rc.cpp:212
+#, no-c-format
+msgid "&Distance:"
+msgstr "間隔(&D):"
+
+#. i18n: file configdlg.ui line 1011
+#: rc.cpp:215
+#, no-c-format
+msgid "Vertic&al lines"
+msgstr "縦線(&A)"
+
+#. i18n: file configdlg.ui line 1019
+#: rc.cpp:218
+#, no-c-format
+msgid "V&ertical lines scroll"
+msgstr "縦線のスクロールを有効にする(&E)"
+
+#. i18n: file configdlg.ui line 1041
+#: rc.cpp:221
+#, no-c-format
+msgid "Co&unt:"
+msgstr "本数(&U):"
+
+#. i18n: file configdlg.ui line 1052
+#: rc.cpp:224
+#, no-c-format
+msgid "Hori&zontal lines"
+msgstr "横線(&Z)"
+
+#. i18n: file configdlg.ui line 1062
+#: rc.cpp:227
+#, no-c-format
+msgid "&Colors"
+msgstr "色(&C)"
+
+#. i18n: file configdlg.ui line 1073
+#: rc.cpp:230
+#, no-c-format
+msgid "Vertical lines:"
+msgstr "縦線:"
+
+#. i18n: file configdlg.ui line 1105
+#: rc.cpp:236
+#, no-c-format
+msgid "Background:"
+msgstr "背景:"
+
+#. i18n: file configdlg.ui line 1121
+#: rc.cpp:240
+#, no-c-format
+msgid "Horizontal lines:"
+msgstr "横線:"
+
+#. i18n: file configdlg.ui line 1129
+#: rc.cpp:243
+#, no-c-format
+msgid "Outgoing traffic:"
+msgstr "送信トラフィック:"
+
+#. i18n: file configdlg.ui line 1137
+#: rc.cpp:246
+#, no-c-format
+msgid "Incoming traffic:"
+msgstr "受信トラフィック:"
+
+#. i18n: file configdlg.ui line 1155
+#: rc.cpp:250
+#, no-c-format
+msgid "Traffic"
+msgstr "トラフィック"
+
+#. i18n: file configdlg.ui line 1166
+#: rc.cpp:253
+#, no-c-format
+msgid "Sho&w incoming traffic"
+msgstr "受信トラフィックを表示(&W)"
+
+#. i18n: file configdlg.ui line 1174
+#: rc.cpp:256
+#, no-c-format
+msgid "Show &outgoing traffic"
+msgstr "送信トラフィックを表示(&O)"

@@ -1,0 +1,654 @@
+# translation of kcm_knemo.po to Deutsch
+# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+#
+# Percy Leonhardt <percy@eris23.de>, 2004.
+# Bernd Zimmer <berndzimmer@gmx.de>, 2004.
+# Bernd Zimmer <bernd@dennis-zimmer.de>, 2004.
+# Thomas Reitelbach <tr@erdfunkstelle.de>, 2006.
+# Jannick Kuhr <jannick.kuhr@kdemail.net>, 2006.
+msgid ""
+msgstr ""
+"Project-Id-Version: kcm_knemo\n"
+"POT-Creation-Date: 2006-09-11 08:34+0200\n"
+"PO-Revision-Date: 2006-09-24 22:49+0200\n"
+"Last-Translator: Jannick Kuhr <jannick.kuhr@kdemail.net>\n"
+"Language-Team: Deutsch <kde-i18n-de@kde.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#: configdialog.cpp:100
+msgid ""
+"<p>In this area you can add the custom entries for your context menu: "
+"<ol>"
+"<li>check <b>Display custom entries in context menu</b>;</li>"
+"<li>push on the <b>Add</b> button to add a new entry in the list;</li>"
+"<li>edit the entry by double clicking in column <b>Menu text</b> and <b>"
+"Command</b>;</li>"
+"<li>start from step 2 for every new entry</li>.</ol>"
+"If you need to execute the command as root user check the corresponding <b>"
+"Root</b> CheckBox."
+msgstr ""
+"<p>In diesem Bereich können Sie dem Kontextmenü eigene Einträge hinzufügen: "
+"<ol>"
+"<li>Aktivieren Sie <b>Zeige eigene Menüeinträge im Kontextmenü an</b>;</li>"
+"<li>Klicken Sie auf den Knopf<b> Neuen Eintrag hinzufügen</b>"
+", um einen neuen Eintrag in die Liste aufzunehmen;</li>"
+"<li>Sie können einen Eintrag verändern, in dem Sie auf die Zeile <b>Menütext</b> "
+"bzw. <b>Befehl</b> doppelklicken;</li>"
+"<li>Beginnen Sie mit Schritt 2 für jeden weiteren Eintrag</li>.</ol>"
+"Wenn Sie einen Befehl als Root ausführen möchten, aktivieren Sie die Box <b>"
+"Root</b> am jeweiligen Zeilenanfang."
+
+#: configdialog.cpp:531
+msgid "Add new interface"
+msgstr "Neue Schnittstelle hinzufügen"
+
+#: configdialog.cpp:532
+msgid ""
+"Please enter the name of the interface to be monitored.\n"
+"It should be something like 'eth1', 'wlan2' or 'ppp0'."
+msgstr ""
+"Bitte geben Sie den Namen der Schnittstelle ein, die Sie\n"
+"überwachen möchten z.B. 'eth1','wlan0' oder 'ppp0'."
+
+#: configdialog.cpp:1066
+msgid "Interface"
+msgstr "Schnittstelle"
+
+#: configdialog.cpp:1067
+msgid "Alias"
+msgstr "Alias"
+
+#: configdialog.cpp:1068
+msgid "Status"
+msgstr "Status"
+
+#: configdialog.cpp:1069
+msgid "Uptime"
+msgstr "Uptime"
+
+#: configdialog.cpp:1070
+msgid "IP-Address"
+msgstr "IP-Adresse"
+
+#: configdialog.cpp:1071
+msgid "Subnet Mask"
+msgstr "Subnetz-Maske"
+
+#: configdialog.cpp:1072
+msgid "HW-Address"
+msgstr "HW-Adresse"
+
+#: configdialog.cpp:1073
+msgid "Broadcast Address"
+msgstr "Broadcast-Adresse"
+
+#: configdialog.cpp:1074
+msgid "Default Gateway"
+msgstr "Default-Gateway"
+
+#: configdialog.cpp:1075
+msgid "PtP-Address"
+msgstr "PtP-Adresse"
+
+#: configdialog.cpp:1076
+msgid "Packets Received"
+msgstr "Empfangene Pakete"
+
+#: configdialog.cpp:1077
+msgid "Packets Sent"
+msgstr "Gesendete Pakete"
+
+#: configdialog.cpp:1078
+msgid "Bytes Received"
+msgstr "Empfangene Bytes"
+
+#: configdialog.cpp:1079
+msgid "Bytes Sent"
+msgstr "Gesendete Bytes"
+
+#: configdialog.cpp:1080
+msgid "Download Speed"
+msgstr "Download-Geschwindigkeit"
+
+#: configdialog.cpp:1081
+msgid "Upload Speed"
+msgstr "Upload-Geschwindigkeit"
+
+#: configdialog.cpp:1082
+msgid "ESSID"
+msgstr "ESSID"
+
+#: configdialog.cpp:1083
+msgid "Mode"
+msgstr "Modus"
+
+#: configdialog.cpp:1084
+msgid "Frequency"
+msgstr "Frequenz"
+
+#: configdialog.cpp:1085
+msgid "Bit Rate"
+msgstr "Bit-Rate"
+
+#: configdialog.cpp:1086
+msgid "Access Point"
+msgstr "Zugangspunkt"
+
+#: configdialog.cpp:1087
+msgid "Link Quality"
+msgstr "Verbindungsqualität"
+
+#: configdialog.cpp:1088
+msgid "Nickname"
+msgstr "Nickname"
+
+#: configdialog.cpp:1089
+msgid "Encryption"
+msgstr "Verschlüsselung"
+
+#. i18n: file configdlg.ui line 24
+#: rc.cpp:3
+#, no-c-format
+msgid "Use KNemo to monitor your interfaces"
+msgstr "KNemo verwenden, um Ihre Schnittstellen zu überwachen"
+
+#. i18n: file configdlg.ui line 36
+#: rc.cpp:6
+#, no-c-format
+msgid "&Interfaces"
+msgstr "Schn&ittstellen"
+
+#. i18n: file configdlg.ui line 58
+#: rc.cpp:10
+#, no-c-format
+msgid "Add a new interface"
+msgstr "Neue Schnittstelle hinzufügen"
+
+#. i18n: file configdlg.ui line 68
+#: rc.cpp:13
+#, no-c-format
+msgid ""
+"This is the list of icons you wish to monitor. Please\n"
+"use the names understood by the command 'ifconfig',\n"
+"for example 'eth0', 'wlan0' or 'ppp0'."
+msgstr ""
+"Dies ist die Liste der Symbole, die Sie überwachen möchten. Bitte benutzen Sie "
+"Namen, die vom Befehl\n"
+"'ifconfig' verstanden werden z.B 'eth0', 'wlan0' oder 'ppp0'."
+
+#. i18n: file configdlg.ui line 79
+#: rc.cpp:19
+#, no-c-format
+msgid "Delete the selected interface"
+msgstr "Ausgewählte Schnittstelle löschen"
+
+#. i18n: file configdlg.ui line 89
+#: rc.cpp:22
+#, no-c-format
+msgid "&Context Menu"
+msgstr "&Kontextmenü"
+
+#. i18n: file configdlg.ui line 100
+#: rc.cpp:25
+#, no-c-format
+msgid "&Display custom entries in context menu"
+msgstr "&Zeige eigene Menüeinträge im Kontextmenü an"
+
+#. i18n: file configdlg.ui line 106
+#: rc.cpp:28
+#, no-c-format
+msgid "Root"
+msgstr "Root"
+
+#. i18n: file configdlg.ui line 117
+#: rc.cpp:31
+#, no-c-format
+msgid "Menu text"
+msgstr "Menütext"
+
+#. i18n: file configdlg.ui line 128
+#: rc.cpp:34
+#, no-c-format
+msgid "Command"
+msgstr "Befehl"
+
+#. i18n: file configdlg.ui line 169
+#: rc.cpp:39
+#, no-c-format
+msgid "Add a new entry"
+msgstr "Neuen Eintrag hinzufügen"
+
+#. i18n: file configdlg.ui line 186
+#: rc.cpp:44
+#, no-c-format
+msgid "Remove the selected entry"
+msgstr "Ausgewählten Eintrag entfernen"
+
+#. i18n: file configdlg.ui line 214
+#: rc.cpp:48
+#, no-c-format
+msgid "Move the selected entry up"
+msgstr "Ausgewählten Eintrag nach oben verschieben"
+
+#. i18n: file configdlg.ui line 225
+#: rc.cpp:52
+#, no-c-format
+msgid "Move the selected entry down"
+msgstr "Ausgewählten Eintrag nach unten verschieben"
+
+#. i18n: file configdlg.ui line 237
+#: rc.cpp:55
+#, no-c-format
+msgid "Misce&llaneous"
+msgstr "Verschiedenes"
+
+#. i18n: file configdlg.ui line 256
+#: rc.cpp:58
+#, no-c-format
+msgid "Alias:"
+msgstr "Alias:"
+
+#. i18n: file configdlg.ui line 267
+#: rc.cpp:61
+#, no-c-format
+msgid ""
+"You can enter an alias for the interface.\n"
+"It will be used in the tooltip of the system\n"
+"tray icon for better differentiation of the\n"
+"icons."
+msgstr ""
+"Sie können einen Alias für die Schnittstelle eingeben.\n"
+"Dieser Alias wird im ToolTip des Symbols angezeigt, um\n"
+"die Schnittstellen besser unterscheiden zu können."
+
+#. i18n: file configdlg.ui line 277
+#: rc.cpp:67
+#, no-c-format
+msgid "Hide icon when &not connected"
+msgstr "Symbol verstecke&n wenn nicht verbunden"
+
+#. i18n: file configdlg.ui line 282
+#: rc.cpp:70
+#, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface is not connected. \n"
+"When reconnected the icon will be shown again."
+msgstr ""
+"Wenn die Box aktiviert ist, wird das Symbol nicht angezeigt,\n"
+"wenn die Schnittstelle nicht verfügbar oder nicht \n"
+"verbunden ist. Wenn die Schnittstelle wieder verfügbar \n"
+"ist, wird das Symbol wieder angezeigt."
+
+#. i18n: file configdlg.ui line 315
+#: rc.cpp:75
+#, no-c-format
+msgid "Hide icon &when not existing"
+msgstr "Symbol verstecken, &wenn Schnittstelle nicht existiert"
+
+#. i18n: file configdlg.ui line 322
+#: rc.cpp:78
+#, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface does not exist. \n"
+"This is useful for interfaces that are dynamically\n"
+"created and destroyed, for example interfaces\n"
+"of bluetooth adaptors."
+msgstr ""
+"Wenn dies aktiviert ist, wird das Symbol für dieses\n"
+"Netzwerkgerät ausgeblendet, falls es \n"
+"nicht vorhanden ist.\n"
+"Dies ist nützlich bei Geräten, die dynamisch erzeugt\n"
+"und entfernt werden, wie zum Beispiel die Schnittstellen\n"
+"von Bluetooth-Adaptern."
+
+#. i18n: file configdlg.ui line 332
+#: rc.cpp:85
+#, no-c-format
+msgid "Activate statistics"
+msgstr "Statistiken aktivieren"
+
+#. i18n: file configdlg.ui line 348
+#: rc.cpp:88
+#, no-c-format
+msgid "Traffic activity threshold:"
+msgstr "Schwellwert für aktiven Datenverkehr:"
+
+#. i18n: file configdlg.ui line 351
+#: rc.cpp:91
+#, no-c-format
+msgid ""
+"Use this for networks with high noise i.e. many packets coming in and out all "
+"the time. Set this value high enough so that KNemo won't show incoming and "
+"outgoing traffic all the time."
+msgstr ""
+"Verwenden Sie dies für Netzwerke mit viel Datenverkehr, also andauernd vielen "
+"ein- und ausgehenden Paketen. Setzen Sie den Schwellwert so hoch an, dass KNemo "
+"nicht andauern Aktivität anzeigt."
+
+#. i18n: file configdlg.ui line 367
+#: rc.cpp:94
+#, no-c-format
+msgid " packets/s"
+msgstr " Pakete/s"
+
+#. i18n: file configdlg.ui line 393
+#: rc.cpp:97
+#, no-c-format
+msgid "Iconset:"
+msgstr "Symbol-Design:"
+
+#. i18n: file configdlg.ui line 399
+#: rc.cpp:100
+#, no-c-format
+msgid "Monitor"
+msgstr "Monitor"
+
+#. i18n: file configdlg.ui line 404
+#: rc.cpp:103
+#, no-c-format
+msgid "Modem"
+msgstr "Modem"
+
+#. i18n: file configdlg.ui line 409
+#: rc.cpp:106
+#, no-c-format
+msgid "Network"
+msgstr "Netzwerk"
+
+#. i18n: file configdlg.ui line 414
+#: rc.cpp:109
+#, no-c-format
+msgid "Wireless"
+msgstr "Drahtlose Verbindung"
+
+#. i18n: file configdlg.ui line 457
+#: rc.cpp:112
+#, no-c-format
+msgid "&ToolTip"
+msgstr "&ToolTip"
+
+#. i18n: file configdlg.ui line 469
+#: rc.cpp:115
+#, no-c-format
+msgid ""
+"<b>Note: Adding wireless specific information will only show up in the tooltips "
+"\n"
+"of wireless devices not in the tooltips of standard interfaces.</b>"
+msgstr ""
+"<b>Achtung: Wenn Sie Informationen hinzufügen, die sich auf drahtlose "
+"Verbindungen beziehen, werden diese nur in den ToolTips für diese Geräte "
+"angezeigt, nicht in den ToolTips der Standard-Geräte.</b>"
+
+#. i18n: file configdlg.ui line 497
+#: rc.cpp:120
+#, no-c-format
+msgid "Remove the selected entry from the list of displayed information"
+msgstr ""
+"Ausgewählten Eintrag aus der Liste der angezeigten Informationen entfernen"
+
+#. i18n: file configdlg.ui line 525
+#: rc.cpp:124
+#, no-c-format
+msgid "Add the selected entry to the list of displayed information."
+msgstr ""
+"Ausgewählten Eintrag der Liste der angezeigten Informationen hinzufügen"
+
+#. i18n: file configdlg.ui line 557
+#: rc.cpp:127
+#, no-c-format
+msgid "Display:"
+msgstr "Angezeigte Informationen:"
+
+#. i18n: file configdlg.ui line 573
+#: rc.cpp:130
+#, no-c-format
+msgid "Available:"
+msgstr "Verfügbare Informationen:"
+
+#. i18n: file configdlg.ui line 583
+#: rc.cpp:133
+#, no-c-format
+msgid "&Misc"
+msgstr "&Verschiedenes"
+
+#. i18n: file configdlg.ui line 594
+#: rc.cpp:136
+#, no-c-format
+msgid "&Notifications"
+msgstr "Be&nachrichtigungen"
+
+#. i18n: file configdlg.ui line 605
+#: rc.cpp:139
+#, no-c-format
+msgid "&Configure Sounds && Events..."
+msgstr "Einrichten der &Klänge && Ereignisse ..."
+
+#. i18n: file configdlg.ui line 615
+#: rc.cpp:142
+#, no-c-format
+msgid "Update interval"
+msgstr "Aktualisierungsintervall"
+
+#. i18n: file configdlg.ui line 626
+#: rc.cpp:145
+#, no-c-format
+msgid "Update interface information every"
+msgstr "Schnittstelleninformationen aktualisieren alle"
+
+#. i18n: file configdlg.ui line 654
+#: rc.cpp:148 rc.cpp:166
+#, no-c-format
+msgid "s"
+msgstr "s"
+
+#. i18n: file configdlg.ui line 657
+#: rc.cpp:151
+#, no-c-format
+msgid ""
+"How often should KNemo poll for interface information. Lower number means more "
+"CPU load but faster reaction on changes. Larger number means less CPU load but "
+"slow reaction on changes."
+msgstr ""
+"Diese Einstellung legt fest, wie oft KNemo die Schnittstelleninformationen "
+"abfragen soll. Niedrige Zahlen bedeuten höhere CPU-Last, führen aber zu "
+"schnellerer Reaktion auf Änderungen. Höhere Zahlen bedeuten niedrigere "
+"CPU-Last, führen aber auch zu langsamerer Reaktion auf Änderungen."
+
+#. i18n: file configdlg.ui line 667
+#: rc.cpp:154
+#, no-c-format
+msgid "Statistics"
+msgstr "Statistiken"
+
+#. i18n: file configdlg.ui line 678
+#: rc.cpp:157
+#, no-c-format
+msgid "..."
+msgstr "..."
+
+#. i18n: file configdlg.ui line 686
+#: rc.cpp:160
+#, no-c-format
+msgid "Statistics are stored in the following directory:"
+msgstr "Statistiken werden in folgendem Ordner gespeichert:"
+
+#. i18n: file configdlg.ui line 699
+#: rc.cpp:163
+#, no-c-format
+msgid "Save statistics every"
+msgstr "Statistiken speichern alle"
+
+#. i18n: file configdlg.ui line 737
+#: rc.cpp:169
+#, no-c-format
+msgid "Backend"
+msgstr "Ausgabegerät"
+
+#. i18n: file configdlg.ui line 748
+#: rc.cpp:172
+#, no-c-format
+msgid "Use the following backend"
+msgstr "Folgendes Ausgabegerät verwenden"
+
+#. i18n: file configdlg.ui line 764
+#: rc.cpp:175
+#, no-c-format
+msgid "Description:"
+msgstr "Beschreibung:"
+
+#. i18n: file configdlg.ui line 829
+#: rc.cpp:179
+#, no-c-format
+msgid "Traffic &Plotter"
+msgstr "Daten&plotter"
+
+#. i18n: file configdlg.ui line 840
+#: rc.cpp:182
+#, no-c-format
+msgid "Scale"
+msgstr "Skalierung"
+
+#. i18n: file configdlg.ui line 862
+#: rc.cpp:185
+#, no-c-format
+msgid "Pixel per time period:"
+msgstr "Pixel pro Zeiteinheit:"
+
+#. i18n: file configdlg.ui line 870
+#: rc.cpp:188
+#, no-c-format
+msgid "Ma&ximum value:"
+msgstr "Ma&ximalwert:"
+
+#. i18n: file configdlg.ui line 892
+#: rc.cpp:191
+#, no-c-format
+msgid "Automatic &range detection"
+msgstr "Signalbereich automatisch erkennen"
+
+#. i18n: file configdlg.ui line 908
+#: rc.cpp:194
+#, no-c-format
+msgid "&Minimum value:"
+msgstr "&Minimalwert:"
+
+#. i18n: file configdlg.ui line 921
+#: rc.cpp:197
+#, no-c-format
+msgid "Text"
+msgstr "Text"
+
+#. i18n: file configdlg.ui line 932
+#: rc.cpp:200
+#, no-c-format
+msgid "&Labels"
+msgstr "Beschriftung"
+
+#. i18n: file configdlg.ui line 940
+#: rc.cpp:203
+#, no-c-format
+msgid "Top &bar"
+msgstr "O&bere Anzeige"
+
+#. i18n: file configdlg.ui line 948
+#: rc.cpp:206
+#, no-c-format
+msgid "Fo&nt size:"
+msgstr "Schri&ftgröße:"
+
+#. i18n: file configdlg.ui line 975
+#: rc.cpp:209
+#, no-c-format
+msgid "Lines"
+msgstr "Linien"
+
+#. i18n: file configdlg.ui line 1000
+#: rc.cpp:212
+#, no-c-format
+msgid "&Distance:"
+msgstr "Abstan&d:"
+
+#. i18n: file configdlg.ui line 1011
+#: rc.cpp:215
+#, no-c-format
+msgid "Vertic&al lines"
+msgstr "Senkrechte Linien"
+
+#. i18n: file configdlg.ui line 1019
+#: rc.cpp:218
+#, no-c-format
+msgid "V&ertical lines scroll"
+msgstr "B&ewegliche senkrechte Linien"
+
+#. i18n: file configdlg.ui line 1041
+#: rc.cpp:221
+#, no-c-format
+msgid "Co&unt:"
+msgstr "An&zahl:"
+
+#. i18n: file configdlg.ui line 1052
+#: rc.cpp:224
+#, no-c-format
+msgid "Hori&zontal lines"
+msgstr "Waagerec&hte Linien"
+
+#. i18n: file configdlg.ui line 1062
+#: rc.cpp:227
+#, no-c-format
+msgid "&Colors"
+msgstr "Farben"
+
+#. i18n: file configdlg.ui line 1073
+#: rc.cpp:230
+#, no-c-format
+msgid "Vertical lines:"
+msgstr "Senkrechte Linien:"
+
+#. i18n: file configdlg.ui line 1105
+#: rc.cpp:236
+#, no-c-format
+msgid "Background:"
+msgstr "Hintergrund:"
+
+#. i18n: file configdlg.ui line 1121
+#: rc.cpp:240
+#, no-c-format
+msgid "Horizontal lines:"
+msgstr "Waagerechte Linien:"
+
+#. i18n: file configdlg.ui line 1129
+#: rc.cpp:243
+#, no-c-format
+msgid "Outgoing traffic:"
+msgstr "Ausgehende Daten:"
+
+#. i18n: file configdlg.ui line 1137
+#: rc.cpp:246
+#, no-c-format
+msgid "Incoming traffic:"
+msgstr "Eingehende Daten:"
+
+#. i18n: file configdlg.ui line 1155
+#: rc.cpp:250
+#, no-c-format
+msgid "Traffic"
+msgstr "Datenverkehr"
+
+#. i18n: file configdlg.ui line 1166
+#: rc.cpp:253
+#, no-c-format
+msgid "Sho&w incoming traffic"
+msgstr "Eingehende Daten an&zeigen"
+
+#. i18n: file configdlg.ui line 1174
+#: rc.cpp:256
+#, no-c-format
+msgid "Show &outgoing traffic"
+msgstr "Aus&gehende Daten anzeigen"

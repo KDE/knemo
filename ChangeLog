@@ -1,3 +1,38 @@
+Version 0.5.2:
+ * fix config dialog so it preserves new position and size settings
+ * events work again
+ * sys backend uses iwlib instead of deprecated /sys/class/net/*/wireless
+ * backends check the wireless access point for the encryption status
+ * each monitored interface creates a plotter on startup but keeps it hidden;
+   this way the plotter already has a history before it's made visible for the
+   first time
+ * don't inadvertently force libiw as a dependency
+ * take range (or lack of it) into account when showing wireless link quality
+ * if there is no config file, KNemo will monitor the default route interface;
+   this should reduce confusion for first time users while remaining discreet
+ * sys backend is now the default
+
+Version 0.5.1:
+ * added Ukranian translation, thanks to Sergey Panasenko
+ * fix build on Gentoo
+ * lots of little fixes to the traffic plotter dialog
+ * fix sorting statistics for months/years
+ * statistics dialog scrolls to the most recent item again
+ * improve how dialog size/position is saved and restored
+ * Set reasonable limits on numeric values in the config dialog
+ * remove horizontal line count setting in config dialog; no longer relevant
+ * change some behavior of the config dialog
+   - The first time it is run it does not create a default list of devices;
+     manually clicking "Defaults" will still create a default list though
+   - tweak how various sections of the dialog become enabled/disabled
+     depending on the settings
+ * tooltip stats are now dynamically updated
+ * config dialog now searches for icon sets on startup.  This lets users
+   install their own custom sets.  See README for more details.
+
+Version 0.5.0:
+ * ported to KDE 4
+
 Version 0.4.8:
  * fixed high CPU load when the default gateway is missing (sysbackend)
 

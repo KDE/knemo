@@ -1,0 +1,431 @@
+# Danish translation of knemod
+#
+# Erik Kjær Pedersen <erik@binghamton.edu>, 2005, 2006.
+msgid ""
+msgstr ""
+"Project-Id-Version: knemod\n"
+"POT-Creation-Date: 2007-03-30 07:28+0200\n"
+"PO-Revision-Date: 2006-09-11 21:16-0400\n"
+"Last-Translator: Erik Kjær Pedersen <erik@binghamton.edu>\n"
+"Language-Team: Danish <dansk@klid.dk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.2\n"
+
+#: _translatorinfo.cpp:1
+msgid ""
+"_: NAME OF TRANSLATORS\n"
+"Your names"
+msgstr "Erik Kjær Pedersen"
+
+#: _translatorinfo.cpp:3
+msgid ""
+"_: EMAIL OF TRANSLATORS\n"
+"Your emails"
+msgstr "erik@binghamton.edu"
+
+#. i18n: file interfacestatusdlg.ui line 233
+#: interface.cpp:174 rc.cpp:94
+#, no-c-format
+msgid "Traffic"
+msgstr "Trafik"
+
+#: interfaceicon.cpp:139
+msgid "Open &Statistics"
+msgstr "Åbn &statistik"
+
+#: interfaceicon.cpp:174 interfacestatusdialog.cpp:166 interfacetooltip.cpp:94
+msgid "Not connected."
+msgstr "Ikke forbundet."
+
+#: interfaceicon.cpp:196 interfacestatusdialog.cpp:171 interfacetooltip.cpp:99
+msgid "Not existing."
+msgstr "Ikke eksisterende."
+
+#: interfaceicon.cpp:266
+#, fuzzy
+msgid ""
+"Connection established to\n"
+msgstr "Forbindelse etaberet."
+
+#: interfaceicon.cpp:272 interfacestatusdialog.cpp:144 interfacetooltip.cpp:68
+msgid "Connection established."
+msgstr "Forbindelse etaberet."
+
+#. i18n: file interfacestatisticsdlg.ui line 16
+#: interfacestatisticsdialog.cpp:44 rc.cpp:3 rc.cpp:115
+#, no-c-format
+msgid "Statistics"
+msgstr "Statistik"
+
+#. i18n: file interfacestatusdlg.ui line 16
+#: interfacestatusdialog.cpp:46 rc.cpp:54
+#, no-c-format
+msgid "Interface Status"
+msgstr "Grænsefladestatus:"
+
+#. i18n: file interfacestatusdlg.ui line 129
+#: interfacestatusdialog.cpp:182 rc.cpp:69
+#, no-c-format
+msgid "Broadcast Address:"
+msgstr "Broadcast-adresse:"
+
+#. i18n: file interfacestatusdlg.ui line 137
+#: interfacestatusdialog.cpp:184 rc.cpp:72
+#, no-c-format
+msgid "Default Gateway:"
+msgstr "Standard-gateway:"
+
+#. i18n: file interfacestatusdlg.ui line 145
+#: interfacestatusdialog.cpp:186 rc.cpp:75
+#, no-c-format
+msgid "HW-Address:"
+msgstr "HW-adresse:"
+
+#: interfacestatusdialog.cpp:191
+msgid "PtP-Address:"
+msgstr "PtP-adresse:"
+
+#: interfacestatusdialog.cpp:215 interfacestatusdialog.cpp:217
+#: interfacetooltip.cpp:133 interfacetooltip.cpp:138
+msgid "/s"
+msgstr "/s"
+
+#: interfacestatusdialog.cpp:233 interfacetooltip.cpp:163
+msgid "active"
+msgstr "aktiv"
+
+#: interfacestatusdialog.cpp:237 interfacetooltip.cpp:167
+msgid "off"
+msgstr "fra"
+
+#: interfacetooltip.cpp:178
+msgid "Interface"
+msgstr "Grænseflade"
+
+#: interfacetooltip.cpp:179
+msgid "Alias"
+msgstr "Alias"
+
+#: interfacetooltip.cpp:180
+msgid "Status"
+msgstr "Status"
+
+#: interfacetooltip.cpp:181
+msgid "Uptime"
+msgstr "Oppetid"
+
+#: interfacetooltip.cpp:182
+msgid "IP-Address"
+msgstr "IP-Adresse"
+
+#: interfacetooltip.cpp:183
+msgid "Subnet Mask"
+msgstr "Subnetmaske"
+
+#: interfacetooltip.cpp:184
+msgid "HW-Address"
+msgstr "HW-Adresse"
+
+#: interfacetooltip.cpp:185
+msgid "PtP-Address"
+msgstr "PtP-Adresse"
+
+#: interfacetooltip.cpp:186
+msgid "Packets Received"
+msgstr "Pakker modtaget"
+
+#: interfacetooltip.cpp:187
+msgid "Packets Sent"
+msgstr "Pakker sendt"
+
+#: interfacetooltip.cpp:188
+msgid "Bytes Received"
+msgstr "Byte modtaget"
+
+#: interfacetooltip.cpp:189
+msgid "Bytes Sent"
+msgstr "Byte sendt"
+
+#: interfacetooltip.cpp:190
+msgid "ESSID"
+msgstr "ESSID"
+
+#: interfacetooltip.cpp:191
+msgid "Mode"
+msgstr "Tilstand"
+
+#: interfacetooltip.cpp:192
+msgid "Frequency"
+msgstr "Frekvens"
+
+#: interfacetooltip.cpp:193
+msgid "Bit Rate"
+msgstr "Bitrate"
+
+#: interfacetooltip.cpp:194
+msgid "Access Point"
+msgstr "Adgangspunkt"
+
+#: interfacetooltip.cpp:195
+msgid "Link Quality"
+msgstr "Linkkvalitet"
+
+#: interfacetooltip.cpp:196
+msgid "Broadcast Address"
+msgstr "Broadcast-adresse"
+
+#: interfacetooltip.cpp:197
+msgid "Default Gateway"
+msgstr "Standard-gateway"
+
+#: interfacetooltip.cpp:198
+msgid "Download Speed"
+msgstr "Download-hastighed"
+
+#: interfacetooltip.cpp:199
+msgid "Upload Speed"
+msgstr "Upload-hastighed"
+
+#: interfacetooltip.cpp:200
+msgid "Nickname"
+msgstr "Alias"
+
+#: interfacetooltip.cpp:201
+msgid "Encryption"
+msgstr "Kryptering"
+
+#: interfacetray.cpp:36
+msgid "KNemo - the KDE Network Monitor"
+msgstr "Knemo - KDE's netværksovervågere"
+
+#: interfacetray.cpp:51
+msgid "&About KNemo"
+msgstr "&Om Knemo"
+
+#: interfacetray.cpp:53
+msgid "&Report Bug..."
+msgstr "&Rapportér programfejl..."
+
+#: interfacetray.cpp:57
+msgid "&Configure KNemo..."
+msgstr "&Indstil Knemo..."
+
+#: interfacetray.cpp:60
+msgid "&Open Traffic Plotter"
+msgstr "Å&bn trafikplotter"
+
+#: interfacetray.cpp:91 interfacetray.cpp:111
+msgid "KNemo"
+msgstr "Knemo"
+
+#: interfacetray.cpp:97
+msgid "Author"
+msgstr "Forfatter"
+
+#: interfacetray.cpp:99
+msgid "Threshold support"
+msgstr "Tærskelunderstøttelse"
+
+#: interfacetray.cpp:101
+msgid "Signal plotter"
+msgstr "Signalplotter"
+
+#. i18n: file interfacestatisticsdlg.ui line 42
+#: rc.cpp:9
+#, no-c-format
+msgid "Daily"
+msgstr "Daglig"
+
+#. i18n: file interfacestatisticsdlg.ui line 51
+#: rc.cpp:12 rc.cpp:27 rc.cpp:42 rc.cpp:103 rc.cpp:133
+#, no-c-format
+msgid "Sent"
+msgstr "Sendt"
+
+#. i18n: file interfacestatisticsdlg.ui line 56
+#: rc.cpp:15 rc.cpp:30 rc.cpp:45 rc.cpp:100 rc.cpp:124
+#, no-c-format
+msgid "Received"
+msgstr "Modtaget"
+
+#. i18n: file interfacestatisticsdlg.ui line 61
+#: rc.cpp:18 rc.cpp:33 rc.cpp:48 rc.cpp:127
+#, no-c-format
+msgid "Total"
+msgstr "I alt"
+
+#. i18n: file interfacestatisticsdlg.ui line 82
+#: rc.cpp:21
+#, no-c-format
+msgid "Clear daily statistics"
+msgstr "Ryd daglig statistik"
+
+#. i18n: file interfacestatisticsdlg.ui line 92
+#: rc.cpp:24
+#, no-c-format
+msgid "Monthly"
+msgstr "Månedlig"
+
+#. i18n: file interfacestatisticsdlg.ui line 129
+#: rc.cpp:36
+#, no-c-format
+msgid "Clear monthly statistics"
+msgstr "Ryd månedlig statistik"
+
+#. i18n: file interfacestatisticsdlg.ui line 139
+#: rc.cpp:39
+#, no-c-format
+msgid "Yearly"
+msgstr "Årlig"
+
+#. i18n: file interfacestatisticsdlg.ui line 179
+#: rc.cpp:51
+#, no-c-format
+msgid "Clear yearly statistics"
+msgstr "Ryd årlig statistik"
+
+#. i18n: file interfacestatusdlg.ui line 34
+#: rc.cpp:57
+#, no-c-format
+msgid "Connection"
+msgstr "Forbindelse"
+
+#. i18n: file interfacestatusdlg.ui line 62
+#: rc.cpp:60
+#, no-c-format
+msgid "IP"
+msgstr "IP"
+
+#. i18n: file interfacestatusdlg.ui line 113
+#: rc.cpp:63
+#, no-c-format
+msgid "IP-Address:"
+msgstr "IP-adresse:"
+
+#. i18n: file interfacestatusdlg.ui line 121
+#: rc.cpp:66
+#, no-c-format
+msgid "Subnet Mask:"
+msgstr "Delnetsmaske:"
+
+#. i18n: file interfacestatusdlg.ui line 199
+#: rc.cpp:82
+#, no-c-format
+msgid "Interface:"
+msgstr "Grænseflade:"
+
+#. i18n: file interfacestatusdlg.ui line 207
+#: rc.cpp:85
+#, no-c-format
+msgid "Alias:"
+msgstr "Script:"
+
+#. i18n: file interfacestatusdlg.ui line 215
+#: rc.cpp:88
+#, no-c-format
+msgid "Status:"
+msgstr "Status:"
+
+#. i18n: file interfacestatusdlg.ui line 223
+#: rc.cpp:91
+#, no-c-format
+msgid "Uptime:"
+msgstr "Oppetid:"
+
+#. i18n: file interfacestatusdlg.ui line 244
+#: rc.cpp:97
+#, no-c-format
+msgid "Current connection"
+msgstr "Nuværende forbindelse"
+
+#. i18n: file interfacestatusdlg.ui line 293
+#: rc.cpp:106
+#, no-c-format
+msgid "Packets:"
+msgstr "Pakker:"
+
+#. i18n: file interfacestatusdlg.ui line 301
+#: rc.cpp:109
+#, no-c-format
+msgid "Bytes:"
+msgstr "Byte:"
+
+#. i18n: file interfacestatusdlg.ui line 312
+#: rc.cpp:112
+#, no-c-format
+msgid "Speed:"
+msgstr "Hastighed:"
+
+#. i18n: file interfacestatusdlg.ui line 368
+#: rc.cpp:118
+#, no-c-format
+msgid "Today:"
+msgstr "I dag:"
+
+#. i18n: file interfacestatusdlg.ui line 376
+#: rc.cpp:121
+#, no-c-format
+msgid "This year:"
+msgstr "I år:"
+
+#. i18n: file interfacestatusdlg.ui line 409
+#: rc.cpp:130
+#, no-c-format
+msgid "This month:"
+msgstr "Denne måned:"
+
+#. i18n: file interfacestatusdlg.ui line 524
+#: rc.cpp:136
+#, no-c-format
+msgid "Wireless"
+msgstr "Trådløs"
+
+#. i18n: file interfacestatusdlg.ui line 535
+#: rc.cpp:139
+#, no-c-format
+msgid "Connected to:"
+msgstr "Forbundet til:"
+
+#. i18n: file interfacestatusdlg.ui line 554
+#: rc.cpp:143
+#, no-c-format
+msgid "Access point:"
+msgstr "Adgangspunkt:"
+
+#. i18n: file interfacestatusdlg.ui line 573
+#: rc.cpp:147
+#, no-c-format
+msgid "Bit Rate:"
+msgstr "Bithastighed:"
+
+#. i18n: file interfacestatusdlg.ui line 581
+#: rc.cpp:150
+#, no-c-format
+msgid "Frequency [Channel]:"
+msgstr "Frekvens [Kanal]:"
+
+#. i18n: file interfacestatusdlg.ui line 589
+#: rc.cpp:153
+#, no-c-format
+msgid "Mode:"
+msgstr "Tilstand:"
+
+#. i18n: file interfacestatusdlg.ui line 632
+#: rc.cpp:157
+#, no-c-format
+msgid "Nickname:"
+msgstr "Alias:"
+
+#. i18n: file interfacestatusdlg.ui line 657
+#: rc.cpp:160
+#, no-c-format
+msgid "Link Quality:"
+msgstr "Linkkvalitet:"
+
+#. i18n: file interfacestatusdlg.ui line 665
+#: rc.cpp:163
+#, no-c-format
+msgid "Encryption:"
+msgstr "Kryptering:"

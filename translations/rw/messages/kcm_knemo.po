@@ -1,0 +1,662 @@
+# translation of kcm_knemo to Kinyarwanda.
+# Copyright (C) 2005 Rwanda
+# This file is distributed under the same license as the kcm_knemo package.
+# Steve Murphy <murf@e-tools.com>, 2005.
+# Steve performed initial rough translation from compendium built from translations provided by the following translators:
+# Philibert Ndandali  <ndandali@yahoo.fr>, 2005.
+# Viateur MUGENZI <muvia1@yahoo.fr>, 2005.
+# Noëlla Mupole <s24211045@tuks.co.za>, 2005.
+# Carole Karema <karemacarole@hotmail.com>, 2005.
+# JEAN BAPTISTE NGENDAHAYO <ngenda_denis@yahoo.co.uk>, 2005.
+# Augustin KIBERWA  <akiberwa@yahoo.co.uk>, 2005.
+# Donatien NSENGIYUMVA <ndonatienuk@yahoo.co.uk>, 2005.
+# Antoine Bigirimana <antoine@e-tools.com>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kcm_knemo 3.4\n"
+"POT-Creation-Date: 2006-09-11 08:34+0200\n"
+"PO-Revision-Date: 2005-08-30 18:37-0600\n"
+"Last-Translator: Steve Murphy <murf@e-tools.com>\n"
+"Language-Team: Kinyarwanda <translation-team-rw@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: configdialog.cpp:100
+#, fuzzy
+msgid ""
+"<p>In this area you can add the custom entries for your context menu: "
+"<ol>"
+"<li>check <b>Display custom entries in context menu</b>;</li>"
+"<li>push on the <b>Add</b> button to add a new entry in the list;</li>"
+"<li>edit the entry by double clicking in column <b>Menu text</b> and <b>"
+"Command</b>;</li>"
+"<li>start from step 2 for every new entry</li>.</ol>"
+"If you need to execute the command as root user check the corresponding <b>"
+"Root</b> CheckBox."
+msgstr ""
+"<p> iyi Umwanya &Ongera i Guhanga Ibyinjijwe ya:  Imvugiro Ibikubiyemo : < > "
+"<li> Kugenzura <b> Guhanga Ibyinjijwe in Imvugiro Ibikubiyemo </b> ; </li> "
+"<li> ku i <b> </b> Akabuto Kuri &Ongera A Gishya Icyinjijwe in i Urutonde ; "
+"</li> "
+"<li> Kwandika i Icyinjijwe ku MAHARAKUBIRI in Inkingi <b> Umwandiko </b> na <b> "
+"</b> ; </li> "
+"<li> Tangira &vendorShortName; Kuva: Intera 2 ya:  buri Gishya Icyinjijwe </li> "
+". < /> Kuri Gukora i command Nka Imizi Umukoresha Kugenzura i <b> </b> . "
+
+#: configdialog.cpp:531
+#, fuzzy
+msgid "Add new interface"
+msgstr "Gishya Imigaragarire "
+
+#: configdialog.cpp:532
+#, fuzzy
+msgid ""
+"Please enter the name of the interface to be monitored.\n"
+"It should be something like 'eth1', 'wlan2' or 'ppp0'."
+msgstr ""
+"Injiza i Izina: Bya i Imigaragarire Kuri . \n"
+"nka ' , ' Cyangwa ' . "
+
+#: configdialog.cpp:1066
+msgid "Interface"
+msgstr "Imigaragarire"
+
+#: configdialog.cpp:1067
+msgid "Alias"
+msgstr "Irihimbano"
+
+#: configdialog.cpp:1068
+msgid "Status"
+msgstr "Imimerere"
+
+#: configdialog.cpp:1069
+#, fuzzy
+msgid "Uptime"
+msgstr "Kugeza ku ndunduro"
+
+#: configdialog.cpp:1070
+#, fuzzy
+msgid "IP-Address"
+msgstr "Aderesi IP:"
+
+#: configdialog.cpp:1071
+#, fuzzy
+msgid "Subnet Mask"
+msgstr "Urusobemuyoboro rwungirije:%1"
+
+#: configdialog.cpp:1072
+#, fuzzy
+msgid "HW-Address"
+msgstr "Aderesi"
+
+#: configdialog.cpp:1073
+#, fuzzy
+msgid "Broadcast Address"
+msgstr "Kubuganya aderesi"
+
+#: configdialog.cpp:1074
+#, fuzzy
+msgid "Default Gateway"
+msgstr "Itariki mburabuzi"
+
+#: configdialog.cpp:1075
+#, fuzzy
+msgid "PtP-Address"
+msgstr "Aderesi"
+
+#: configdialog.cpp:1076
+#, fuzzy
+msgid "Packets Received"
+msgstr "uburyo byaje bikurikiranye"
+
+#: configdialog.cpp:1077
+#, fuzzy
+msgid "Packets Sent"
+msgstr "Amapaki"
+
+#: configdialog.cpp:1078
+#, fuzzy
+msgid "Bytes Received"
+msgstr "Cyakiriwe"
+
+#: configdialog.cpp:1079
+#, fuzzy
+msgid "Bytes Sent"
+msgstr "Bayite"
+
+#: configdialog.cpp:1080
+#, fuzzy
+msgid "Download Speed"
+msgstr "Yimuwe"
+
+#: configdialog.cpp:1081
+#, fuzzy
+msgid "Upload Speed"
+msgstr "Hohereza idosiye"
+
+#: configdialog.cpp:1082
+#, fuzzy
+msgid "ESSID"
+msgstr "BESSELI"
+
+#: configdialog.cpp:1083
+msgid "Mode"
+msgstr "Ubwoko"
+
+#: configdialog.cpp:1084
+msgid "Frequency"
+msgstr "Ubwisubire"
+
+#: configdialog.cpp:1085
+#, fuzzy
+msgid "Bit Rate"
+msgstr "Itariki y'amavuko"
+
+#: configdialog.cpp:1086
+msgid "Access Point"
+msgstr ""
+
+#: configdialog.cpp:1087
+#, fuzzy
+msgid "Link Quality"
+msgstr "Ubwiza bw'Icapa"
+
+#: configdialog.cpp:1088
+msgid "Nickname"
+msgstr ""
+
+#: configdialog.cpp:1089
+msgid "Encryption"
+msgstr ""
+
+#. i18n: file configdlg.ui line 24
+#: rc.cpp:3
+#, no-c-format
+msgid "Use KNemo to monitor your interfaces"
+msgstr ""
+
+#. i18n: file configdlg.ui line 36
+#: rc.cpp:6
+#, fuzzy, no-c-format
+msgid "&Interfaces"
+msgstr "Imigaragarire"
+
+#. i18n: file configdlg.ui line 58
+#: rc.cpp:10
+#, fuzzy, no-c-format
+msgid "Add a new interface"
+msgstr "A Gishya Imigaragarire "
+
+#. i18n: file configdlg.ui line 68
+#: rc.cpp:13
+#, fuzzy, no-c-format
+msgid ""
+"This is the list of icons you wish to monitor. Please\n"
+"use the names understood by the command 'ifconfig',\n"
+"for example 'eth0', 'wlan0' or 'ppp0'."
+msgstr ""
+"ni i Urutonde Bya Udushushondanga Kuri . i Amazina ku i command ' , \n"
+"ya:  Urugero: ' , ' Cyangwa ' . "
+
+#. i18n: file configdlg.ui line 79
+#: rc.cpp:19
+#, fuzzy, no-c-format
+msgid "Delete the selected interface"
+msgstr "i Byahiswemo Imigaragarire "
+
+#. i18n: file configdlg.ui line 89
+#: rc.cpp:22
+#, fuzzy, no-c-format
+msgid "&Context Menu"
+msgstr "Ifashayobora bijyanye"
+
+#. i18n: file configdlg.ui line 100
+#: rc.cpp:25
+#, fuzzy, no-c-format
+msgid "&Display custom entries in context menu"
+msgstr "Guhanga Ibyinjijwe in Imvugiro Ibikubiyemo "
+
+#. i18n: file configdlg.ui line 106
+#: rc.cpp:28
+#, no-c-format
+msgid "Root"
+msgstr "Imizi"
+
+#. i18n: file configdlg.ui line 117
+#: rc.cpp:31
+#, fuzzy, no-c-format
+msgid "Menu text"
+msgstr "Umwandiko "
+
+#. i18n: file configdlg.ui line 128
+#: rc.cpp:34
+#, no-c-format
+msgid "Command"
+msgstr "Icyo wifuza"
+
+#. i18n: file configdlg.ui line 169
+#: rc.cpp:39
+#, fuzzy, no-c-format
+msgid "Add a new entry"
+msgstr "A Gishya Icyinjijwe "
+
+#. i18n: file configdlg.ui line 186
+#: rc.cpp:44
+#, fuzzy, no-c-format
+msgid "Remove the selected entry"
+msgstr "i Byahiswemo Icyinjijwe "
+
+#. i18n: file configdlg.ui line 214
+#: rc.cpp:48
+#, fuzzy, no-c-format
+msgid "Move the selected entry up"
+msgstr "i Byahiswemo Icyinjijwe Hejuru "
+
+#. i18n: file configdlg.ui line 225
+#: rc.cpp:52
+#, fuzzy, no-c-format
+msgid "Move the selected entry down"
+msgstr "i Byahiswemo Icyinjijwe Hasi "
+
+#. i18n: file configdlg.ui line 237
+#: rc.cpp:55
+#, fuzzy, no-c-format
+msgid "Misce&llaneous"
+msgstr "Binyuranye"
+
+#. i18n: file configdlg.ui line 256
+#: rc.cpp:58
+#, fuzzy, no-c-format
+msgid "Alias:"
+msgstr "Irihimbano"
+
+#. i18n: file configdlg.ui line 267
+#: rc.cpp:61
+#, fuzzy, no-c-format
+msgid ""
+"You can enter an alias for the interface.\n"
+"It will be used in the tooltip of the system\n"
+"tray icon for better differentiation of the\n"
+"icons."
+msgstr ""
+"Injiza Irihimbano ya:  i Imigaragarire . \n"
+"Byakoreshejwe in i Umwanyanyobora: Bya i Agashushondanga ya:  Bya . "
+
+#. i18n: file configdlg.ui line 277
+#: rc.cpp:67
+#, fuzzy, no-c-format
+msgid "Hide icon when &not connected"
+msgstr "Agashushondanga Ryari: OYA "
+
+#. i18n: file configdlg.ui line 282
+#: rc.cpp:70
+#, fuzzy, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface is not connected. \n"
+"When reconnected the icon will be shown again."
+msgstr ""
+"Byahiswemo i Agashushondanga ya:  iyi Imigaragarire Ryari: i Imigaragarire ni "
+"OYA . \n"
+"i Agashushondanga Nanone . "
+
+#. i18n: file configdlg.ui line 315
+#: rc.cpp:75
+#, fuzzy, no-c-format
+msgid "Hide icon &when not existing"
+msgstr "Agashushondanga Ryari: OYA "
+
+#. i18n: file configdlg.ui line 322
+#: rc.cpp:78
+#, fuzzy, no-c-format
+msgid ""
+"When selected the icon for this interface will be\n"
+"hidden when the interface does not exist. \n"
+"This is useful for interfaces that are dynamically\n"
+"created and destroyed, for example interfaces\n"
+"of bluetooth adaptors."
+msgstr ""
+"Byahiswemo i Agashushondanga ya:  iyi Imigaragarire Ryari: i Imigaragarire OYA "
+". \n"
+"ni ya:  Imigaragarire na , ya:  Urugero: . "
+
+#. i18n: file configdlg.ui line 332
+#: rc.cpp:85
+#, no-c-format
+msgid "Activate statistics"
+msgstr ""
+
+#. i18n: file configdlg.ui line 348
+#: rc.cpp:88
+#, fuzzy, no-c-format
+msgid "Traffic activity threshold:"
+msgstr "Umurimo : "
+
+#. i18n: file configdlg.ui line 351
+#: rc.cpp:91
+#, fuzzy, no-c-format
+msgid ""
+"Use this for networks with high noise i.e. many packets coming in and out all "
+"the time. Set this value high enough so that KNemo won't show incoming and "
+"outgoing traffic all the time."
+msgstr "e."
+
+#. i18n: file configdlg.ui line 367
+#: rc.cpp:94
+#, fuzzy, no-c-format
+msgid " packets/s"
+msgstr "Amapaki /S "
+
+#. i18n: file configdlg.ui line 393
+#: rc.cpp:97
+#, fuzzy, no-c-format
+msgid "Iconset:"
+msgstr "Itsinda ry'udushushondanga:"
+
+#. i18n: file configdlg.ui line 399
+#: rc.cpp:100
+#, fuzzy, no-c-format
+msgid "Monitor"
+msgstr "Mugaragazayohereza"
+
+#. i18n: file configdlg.ui line 404
+#: rc.cpp:103
+#, no-c-format
+msgid "Modem"
+msgstr "Modemu"
+
+#. i18n: file configdlg.ui line 409
+#: rc.cpp:106
+#, no-c-format
+msgid "Network"
+msgstr "urusobe"
+
+#. i18n: file configdlg.ui line 414
+#: rc.cpp:109
+#, fuzzy, no-c-format
+msgid "Wireless"
+msgstr "Inziga"
+
+#. i18n: file configdlg.ui line 457
+#: rc.cpp:112
+#, fuzzy, no-c-format
+msgid "&ToolTip"
+msgstr "Umwanyanyobora:"
+
+#. i18n: file configdlg.ui line 469
+#: rc.cpp:115
+#, fuzzy, no-c-format
+msgid ""
+"<b>Note: Adding wireless specific information will only show up in the tooltips "
+"\n"
+"of wireless devices not in the tooltips of standard interfaces.</b>"
+msgstr ""
+"<b> icyitonderwa : Ibisobanuro: Herekana %S Hejuru in i \n"
+"Bya Amapareye OYA in i Bya Bisanzwe Imigaragarire . </b> "
+
+#. i18n: file configdlg.ui line 497
+#: rc.cpp:120
+#, fuzzy, no-c-format
+msgid "Remove the selected entry from the list of displayed information"
+msgstr "i Byahiswemo Icyinjijwe Kuva: i Urutonde Bya Ibisobanuro: "
+
+#. i18n: file configdlg.ui line 525
+#: rc.cpp:124
+#, fuzzy, no-c-format
+msgid "Add the selected entry to the list of displayed information."
+msgstr "i Byahiswemo Icyinjijwe Kuri i Urutonde Bya Ibisobanuro: . "
+
+#. i18n: file configdlg.ui line 557
+#: rc.cpp:127
+#, fuzzy, no-c-format
+msgid "Display:"
+msgstr "Kugaragaza:"
+
+#. i18n: file configdlg.ui line 573
+#: rc.cpp:130
+#, fuzzy, no-c-format
+msgid "Available:"
+msgstr "Bihari:"
+
+#. i18n: file configdlg.ui line 583
+#: rc.cpp:133
+#, fuzzy, no-c-format
+msgid "&Misc"
+msgstr "Misc"
+
+#. i18n: file configdlg.ui line 594
+#: rc.cpp:136
+#, fuzzy, no-c-format
+msgid "&Notifications"
+msgstr "Ibimenyetso"
+
+#. i18n: file configdlg.ui line 605
+#: rc.cpp:139
+#, fuzzy, no-c-format
+msgid "&Configure Sounds && Events..."
+msgstr "Kuboneza Imyandikire..."
+
+#. i18n: file configdlg.ui line 615
+#: rc.cpp:142
+#, no-c-format
+msgid "Update interval"
+msgstr ""
+
+#. i18n: file configdlg.ui line 626
+#: rc.cpp:145
+#, no-c-format
+msgid "Update interface information every"
+msgstr ""
+
+#. i18n: file configdlg.ui line 654
+#: rc.cpp:148 rc.cpp:166
+#, no-c-format
+msgid "s"
+msgstr ""
+
+#. i18n: file configdlg.ui line 657
+#: rc.cpp:151
+#, no-c-format
+msgid ""
+"How often should KNemo poll for interface information. Lower number means more "
+"CPU load but faster reaction on changes. Larger number means less CPU load but "
+"slow reaction on changes."
+msgstr ""
+
+#. i18n: file configdlg.ui line 667
+#: rc.cpp:154
+#, fuzzy, no-c-format
+msgid "Statistics"
+msgstr "Imimerere"
+
+#. i18n: file configdlg.ui line 678
+#: rc.cpp:157
+#, no-c-format
+msgid "..."
+msgstr ""
+
+#. i18n: file configdlg.ui line 686
+#: rc.cpp:160
+#, no-c-format
+msgid "Statistics are stored in the following directory:"
+msgstr ""
+
+#. i18n: file configdlg.ui line 699
+#: rc.cpp:163
+#, no-c-format
+msgid "Save statistics every"
+msgstr ""
+
+#. i18n: file configdlg.ui line 737
+#: rc.cpp:169
+#, fuzzy, no-c-format
+msgid "Backend"
+msgstr "Mbuganyuma:"
+
+#. i18n: file configdlg.ui line 748
+#: rc.cpp:172
+#, no-c-format
+msgid "Use the following backend"
+msgstr ""
+
+#. i18n: file configdlg.ui line 764
+#: rc.cpp:175
+#, no-c-format
+msgid "Description:"
+msgstr ""
+
+#. i18n: file configdlg.ui line 829
+#: rc.cpp:179
+#, no-c-format
+msgid "Traffic &Plotter"
+msgstr ""
+
+#. i18n: file configdlg.ui line 840
+#: rc.cpp:182
+#, no-c-format
+msgid "Scale"
+msgstr "Gupima"
+
+#. i18n: file configdlg.ui line 862
+#: rc.cpp:185
+#, fuzzy, no-c-format
+msgid "Pixel per time period:"
+msgstr "Igihe Igihe : "
+
+#. i18n: file configdlg.ui line 870
+#: rc.cpp:188
+#, no-c-format
+msgid "Ma&ximum value:"
+msgstr "Kanini gashoboka"
+
+#. i18n: file configdlg.ui line 892
+#: rc.cpp:191
+#, fuzzy, no-c-format
+msgid "Automatic &range detection"
+msgstr "Igenzura ry'igice ryikora"
+
+#. i18n: file configdlg.ui line 908
+#: rc.cpp:194
+#, fuzzy, no-c-format
+msgid "&Minimum value:"
+msgstr "Gato gashoboka"
+
+#. i18n: file configdlg.ui line 921
+#: rc.cpp:197
+#, no-c-format
+msgid "Text"
+msgstr "Umwandiko"
+
+#. i18n: file configdlg.ui line 932
+#: rc.cpp:200
+#, fuzzy, no-c-format
+msgid "&Labels"
+msgstr "Uturango"
+
+#. i18n: file configdlg.ui line 940
+#: rc.cpp:203
+#, fuzzy, no-c-format
+msgid "Top &bar"
+msgstr "Umurongo Utangira"
+
+#. i18n: file configdlg.ui line 948
+#: rc.cpp:206
+#, fuzzy, no-c-format
+msgid "Fo&nt size:"
+msgstr "Ingano y'Imyandikire"
+
+#. i18n: file configdlg.ui line 975
+#: rc.cpp:209
+#, no-c-format
+msgid "Lines"
+msgstr "Imirongo"
+
+#. i18n: file configdlg.ui line 1000
+#: rc.cpp:212
+#, fuzzy, no-c-format
+msgid "&Distance:"
+msgstr "Intera:"
+
+#. i18n: file configdlg.ui line 1011
+#: rc.cpp:215
+#, fuzzy, no-c-format
+msgid "Vertic&al lines"
+msgstr "Imirongo Ihagaze"
+
+#. i18n: file configdlg.ui line 1019
+#: rc.cpp:218
+#, fuzzy, no-c-format
+msgid "V&ertical lines scroll"
+msgstr "Kunyereza imirongo ihagaze"
+
+#. i18n: file configdlg.ui line 1041
+#: rc.cpp:221
+#, fuzzy, no-c-format
+msgid "Co&unt:"
+msgstr "Ibara-"
+
+#. i18n: file configdlg.ui line 1052
+#: rc.cpp:224
+#, fuzzy, no-c-format
+msgid "Hori&zontal lines"
+msgstr "Imirongo Itambitse"
+
+#. i18n: file configdlg.ui line 1062
+#: rc.cpp:227
+#, no-c-format
+msgid "&Colors"
+msgstr "Amabara"
+
+#. i18n: file configdlg.ui line 1073
+#: rc.cpp:230
+#, no-c-format
+msgid "Vertical lines:"
+msgstr "Imirongo ihagaze:"
+
+#. i18n: file configdlg.ui line 1105
+#: rc.cpp:236
+#, no-c-format
+msgid "Background:"
+msgstr "Mbuganyuma:"
+
+#. i18n: file configdlg.ui line 1121
+#: rc.cpp:240
+#, no-c-format
+msgid "Horizontal lines:"
+msgstr "Imirongo itambitse:"
+
+#. i18n: file configdlg.ui line 1129
+#: rc.cpp:243
+#, fuzzy, no-c-format
+msgid "Outgoing traffic:"
+msgstr "ubutumwa bwagiye"
+
+#. i18n: file configdlg.ui line 1137
+#: rc.cpp:246
+#, fuzzy, no-c-format
+msgid "Incoming traffic:"
+msgstr "Izina koresha y'ubutumwa bwinjira:"
+
+#. i18n: file configdlg.ui line 1155
+#: rc.cpp:250
+#, fuzzy, no-c-format
+msgid "Traffic"
+msgstr "Icyarabu"
+
+#. i18n: file configdlg.ui line 1166
+#: rc.cpp:253
+#, no-c-format
+msgid "Sho&w incoming traffic"
+msgstr ""
+
+#. i18n: file configdlg.ui line 1174
+#: rc.cpp:256
+#, no-c-format
+msgid "Show &outgoing traffic"
+msgstr ""
+
+#, fuzzy
+#~ msgid "Signal/Noise"
+#~ msgstr "Ikinyasinali"

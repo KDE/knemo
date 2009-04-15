@@ -3,12 +3,7 @@ KNemo - the KDE Network Monitor
 KNemo offers a network monitor similar to the one found in Windows.
 For every network interface it displays an icon in the systray. 
  
-IMPORTANT: KNemo has to be started using KDE Control Center/Internet & Network/
-Network Monitor. Please do no longer use the KDE Service Manager to start and
-stop KNemo. This change was necessary to keep KNemo from starting automatically 
-for every user in a multiuser environment.
-
-Features of version 0.4.5 include:
+Features of version 0.5.1 include:
  * support for ethernet (including wireless) and ppp connections
  * the icon shows incoming/outgoing traffic
  * hiding of icon when the interface is not available
@@ -21,7 +16,7 @@ Features of version 0.4.5 include:
    KSysGuard (2nd click hides dialog)
  * configuration via context menu or control center module (Internet & Network/
    Network Monitor)
- * customizable tooltip for quick access to often needed information
+ * customizable dynamic tooltip for quick access to often needed information
  * custom entries in the context menu. Useful to start/stop/restart interfaces 
    or to configure them using external tools.
  * automatic detection of available interfaces (click on 'Default' in the 
@@ -32,5 +27,14 @@ Features of version 0.4.5 include:
    even display a hugh amount of traffic while 'ifconfig' has an overflow at 4GB.
  * support for different iconsets for every interface
  * support for daily, monthly and yearly statistics
- * configurable update interval for interface informations
+ * configurable update interval for interface information
  * support for different backends to gather information
+ * support for user-supplied icon sets
+   You can drop your own custom icon sets in $KDEHOME/share/apps/knemo and they
+   will magically appear in the config dialog the next time you run it. A
+   complete icon set contains the following 22x22 png files:
+     [iconset name]_connected.png
+     [iconset name]_disconnected.png
+     [iconset name]_incoming.png
+     [iconset name]_outgoing.png
+     [iconset name]_traffic.png
