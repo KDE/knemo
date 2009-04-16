@@ -30,12 +30,10 @@ configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config-knemo.h.cmake
                 ${CMAKE_CURRENT_BINARY_DIR}/config-knemo.h
 )
 
-set( CMAKE_VERBOSE_MAKEFILE TRUE )
 set( CMAKE_INCLUDE_CURRENT_DIR TRUE )
 
 add_definitions( ${QT_DEFINITIONS} ${KDE4_DEFINITIONS} )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-link_directories( ${KDE4_LIB_DIR} )
 
 add_subdirectory( src )
