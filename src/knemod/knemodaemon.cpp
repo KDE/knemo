@@ -271,7 +271,7 @@ void KNemoDaemon::createAboutData()
     mAboutData = new KAboutData( "knemo", 0, ki18n( "KNemo" ), KNEMO_VERSION,
                       ki18n( description ),
                       KAboutData::License_GPL_V2,
-                      ki18n( "" ),
+                      KLocalizedString(),
                       ki18n( "Copyright (C) 2004, 2005, 2006 Percy Leonhardt\nCopyright (C) 2009 John Stamp\n\nSignal plotter taken from KSysGuard\nCopyright (C) 1999 - 2002, Chris Schlaeger\nCopyright (C) 2006 John Tapsell" ),
                       "http://extragear.kde.org/apps/knemo/",
                       "jstamp@users.sourceforge.net");
