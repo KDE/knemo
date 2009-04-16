@@ -35,7 +35,7 @@ set( CMAKE_INCLUDE_CURRENT_DIR TRUE )
 
 add_definitions( ${QT_DEFINITIONS} ${KDE4_DEFINITIONS} )
 
-include_directories( ${CMAKE_BINARY_DIR} )
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 link_directories( ${KDE4_LIB_DIR} )
 
 add_subdirectory( src )
