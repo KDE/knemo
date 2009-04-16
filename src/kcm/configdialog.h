@@ -27,8 +27,6 @@
 #include "ui_configdlg.h"
 
 class QStandardItem;
-class QStandardItemModel;
-class QTimer;
 class QTreeWidgetItem;
 
 /**
