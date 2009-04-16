@@ -74,8 +74,7 @@ KNemoDaemon::~KNemoDaemon()
 {
     mPollTimer->stop();
     delete mPollTimer;
-    if ( mBackend )
-        delete mBackend;
+    delete mBackend;
 
     foreach ( QString key, mInterfaceHash.keys() )
     {
