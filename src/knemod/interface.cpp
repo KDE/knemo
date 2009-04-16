@@ -69,14 +69,8 @@ Interface::Interface( QString ifname,
 
 Interface::~Interface()
 {
-    if ( mStatusDialog != 0 )
-    {
-        delete mStatusDialog;
-    }
-    if ( mPlotterDialog != 0 )
-    {
-        delete mPlotterDialog;
-    }
+    delete mStatusDialog;
+    delete mPlotterDialog;
     if ( mPlotterTimer != 0 )
     {
         mPlotterTimer->stop();
@@ -296,12 +290,9 @@ void Interface::startStatistics()
 
 void Interface::stopStatistics()
 {
-    if ( mStatisticsDialog != 0 )
-    {
-        // this will close an open statistics dialog
-        delete mStatisticsDialog;
-        mStatisticsDialog = 0;
-    }
+    // this will close an open statistics dialog
+    delete mStatisticsDialog;
+    mStatisticsDialog = 0;
 
     mStatistics->saveStatistics();
 
