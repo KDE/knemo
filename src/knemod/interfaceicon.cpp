@@ -30,6 +30,7 @@
 #include <KIconLoader>
 #include <KProcess>
 #include <KNotification>
+#include <KStandardDirs>
 
 #include "data.h"
 #include "interface.h"
@@ -292,7 +293,7 @@ void InterfaceIcon::menuTriggered( QAction *action )
     KProcess process;
     if ( command.runAsRoot )
     {
-        process << "kdesu";
+        process << KStandardDirs::findExe("kdesu");
         process << command.command;
     }
     else
