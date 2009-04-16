@@ -26,8 +26,8 @@ else ( LIBIW_LIBRARY )
     set ( LIBIW_LIBRARY "" )
 endif ( LIBIW_LIBRARY )
 
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake
-                ${CMAKE_CURRENT_BINARY_DIR}/config.h
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config-knemo.h.cmake
+                ${CMAKE_CURRENT_BINARY_DIR}/config-knemo.h
 )
 
 set( CMAKE_VERBOSE_MAKEFILE TRUE )

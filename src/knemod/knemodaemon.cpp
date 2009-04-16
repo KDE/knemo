@@ -26,7 +26,7 @@
 #include <KLocale>
 #include <KStandardDirs>
 
-#include "config.h"
+#include "config-knemo.h"
 #include "knemodaemon.h"
 #include "interface.h"
 #include "backends/backendbase.h"

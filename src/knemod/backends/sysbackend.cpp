@@ -26,7 +26,7 @@
 
 #include <kio/global.h>
 
-#include "config.h"
+#include "config-knemo.h"
 #include "sysbackend.h"
 
 #ifndef HAVE_LIBIW

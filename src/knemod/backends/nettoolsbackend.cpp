@@ -21,7 +21,7 @@
 #include <KProcess>
 #include <kio/global.h>
 
-#include "config.h"
+#include "config-knemo.h"
 #include "nettoolsbackend.h"
 
 NetToolsBackend::NetToolsBackend( QHash<QString, Interface *>& interfaces )
