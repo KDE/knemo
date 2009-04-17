@@ -856,7 +856,7 @@ void ConfigDialog::buttonAddToolTipSelected()
 void ConfigDialog::buttonRemoveToolTipSelected()
 {
     // Support extended selection
-    if ( mDlg->listBoxAvailable->count() == 0 )
+    if ( mDlg->listBoxDisplay->count() == 0 )
         return;
 
     QList<QListWidgetItem *> selectedItems = mDlg->listBoxDisplay->selectedItems();
