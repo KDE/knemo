@@ -91,7 +91,7 @@ QString InterfaceTray::toolTipData()
     }
 
     if ( toolTipContent & UPTIME )
-        tipData = "<tr><td style='padding-right:1em'>" + mToolTips.value( UPTIME ) + "</td><td>" + mInterface->getUptimeString() + "</td></tr>" ;
+        tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( UPTIME ) + "</td><td>" + mInterface->getUptimeString() + "</td></tr>" ;
 
     if ( data.available )
     {
