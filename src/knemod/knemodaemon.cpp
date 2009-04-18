@@ -133,7 +133,7 @@ void KNemoDaemon::readConfig()
     mPlotterSettings.minimumValue = clamp<int>(plotterGroup.readEntry( "MinimumValue", 0 ), 0, 49999 );
     mPlotterSettings.maximumValue = clamp<int>(plotterGroup.readEntry( "MaximumValue", 1 ), 1, 50000 );
     mPlotterSettings.labels = plotterGroup.readEntry( "Labels", true );
-    mPlotterSettings.bottomBar = plotterGroup.readEntry( "BottomBar", false );
+    mPlotterSettings.bottomBar = plotterGroup.readEntry( "BottomBar", true );
     mPlotterSettings.showIncoming = plotterGroup.readEntry( "ShowIncoming", true );
     mPlotterSettings.showOutgoing = plotterGroup.readEntry( "ShowOutgoing", true );
     mPlotterSettings.verticalLines = plotterGroup.readEntry( "VerticalLines", true );
