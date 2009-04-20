@@ -49,7 +49,7 @@ public:
     /**
      * Default Constructor
      */
-    Interface(QString ifname,
+    Interface(const QString& ifname,
               const GeneralData& generalData,
               const PlotterSettings& plotterSettings );
 

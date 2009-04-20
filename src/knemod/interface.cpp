@@ -28,7 +28,7 @@
 #include "interfacestatusdialog.h"
 #include "interfacestatisticsdialog.h"
 
-Interface::Interface( QString ifname,
+Interface::Interface( const QString &ifname,
                       const GeneralData& generalData,
                       const PlotterSettings& plotterSettings )
     : QObject(),
