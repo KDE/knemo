@@ -123,11 +123,7 @@ void InterfaceStatusDialog::updateDialog()
         time_t upsecs = mInterface->getUptime();
         time_t updays = upsecs / 86400;
 
-        QString uptime;
-        if ( updays == 1 )
-            uptime = "1 day, ";
-        else if ( updays > 1 )
-            uptime = QString( "%1 days, " ).arg( updays );
+        QString uptime = i18np("1 day, ","%1 days, ",updays);
 
         upsecs -= 86400 * updays; // we only want the seconds of today
         int hrs = upsecs / 3600;
