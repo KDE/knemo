@@ -241,10 +241,7 @@ void Interface::updateDetails()
         time_t upsecs = mUptime;
         time_t updays = upsecs / 86400;
 
-        if ( updays == 1 )
-            uptime = "1 day, ";
-        else if ( updays > 1 )
-            uptime = QString( "%1 days, " ).arg( updays );
+        uptime = i18np("1 day, ","%1 days, ",updays);
 
         upsecs -= 86400 * updays; // we only want the seconds of today
         int hrs = upsecs / 3600;
