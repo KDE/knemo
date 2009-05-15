@@ -49,6 +49,9 @@ private:
 
     QString toolTipData();
     void setupToolTipArray();
+
+private Q_SLOTS:
+    void slotQuit();
 };
 
 #endif // INTERFACETRAY_H

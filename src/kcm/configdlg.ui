@@ -13,7 +13,7 @@
    <item>
     <widget class="QCheckBox" name="checkBoxStartKNemo" >
      <property name="text" >
-      <string>Use KNemo to monitor your interfaces</string>
+      <string>Start KNemo automatically when you login</string>
      </property>
     </widget>
    </item>

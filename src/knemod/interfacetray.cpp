@@ -22,6 +22,11 @@
 
 #include <kio/global.h>
 #include <KLocale>
+#include <KActionCollection>
+#include <KApplication>
+#include <KConfigGroup>
+#include <KMessageBox>
+#include <KStandardAction>
 
 #include <QToolTip>
 #include <QHelpEvent>
@@ -30,6 +35,9 @@ InterfaceTray::InterfaceTray( Interface* interface, const QString& icon, QWidget
 {
     mInterface = interface;
     setupToolTipArray();
+    // remove quit action added by KSystemTrayIcon
+    actionCollection()->removeAction( actionCollection()->action( KStandardAction::name( KStandardAction::Quit ) ) );
+    KStandardAction::quit( this, SLOT( slotQuit() ), actionCollection() );
 }
 
 InterfaceTray::~InterfaceTray()
@@ -47,6 +55,25 @@ void InterfaceTray::updateToolTip()
         setToolTip( toolTipData() );
         QToolTip::showText( pos, toolTip() );
     }
+}
+
+void InterfaceTray::slotQuit()
+{
+    int autoStart = KMessageBox::questionYesNoCancel(0, i18n("Should KNemo start automatically when you login?"),
+                                                     i18n("Automatically Start KNemo?"), KGuiItem(i18n("Start")),
+                                                     KGuiItem(i18n("Do Not Start")), KStandardGuiItem::cancel(), "StartAutomatically");
+
+    KConfig *config = KGlobal::config().data();
+    KConfigGroup generalGroup( config, "General");
+    if ( autoStart == KMessageBox::Yes ) {
+        generalGroup.writeEntry("AutoStart", true);
+    } else if ( autoStart == KMessageBox::No) {
+        generalGroup.writeEntry("AutoStart", false);
+    } else  // cancel chosen; don't quit
+        return;
+    config->sync();
+
+    kapp->quit();
 }
 
 bool InterfaceTray::event( QEvent *e )

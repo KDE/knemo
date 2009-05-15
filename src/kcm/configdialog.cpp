@@ -464,17 +464,7 @@ void ConfigDialog::save()
     plotterGroup.writeEntry( "ColorBackground", mDlg->kColorButtonBackground->color() );
 
     config->sync();
-
-    if ( mDlg->checkBoxStartKNemo->isChecked() )
-    {
-        QDBusMessage reply = QDBusInterface("org.kde.knemo", "/knemo", "org.kde.knemo").call("reparseConfiguration");
-
-        // Assume an error means that KNemo isn't running.  Try to start it.
-        if ( reply.type() == QDBusMessage::ErrorMessage )
-            KToolInvocation::kdeinitExec( "knemo" );
-    }
-    else
-        QDBusInterface("org.kde.knemo", "/MainApplication", "org.kde.KApplication").call("quit");
+    QDBusMessage reply = QDBusInterface("org.kde.knemo", "/knemo", "org.kde.knemo").call("reparseConfiguration");
 }
 
 void ConfigDialog::defaults()
