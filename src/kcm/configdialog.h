@@ -81,15 +81,6 @@ private slots:
     void listViewCommandsSelectionChanged( QTreeWidgetItem *current, QTreeWidgetItem *previous );
     void listViewCommandsChanged( QTreeWidgetItem* item, int column );
 
-    /**
-     * These three are generic.
-     * They are used for all plotter settings to activate the
-     * 'Apply' button when something was changed by the user.
-     */
-    void checkBoxToggled( bool );
-    void spinBoxValueChanged( int );
-    void kColorButtonChanged( const QColor& );
-
 private:
     void setupToolTipTab();
     void setupToolTipArray();

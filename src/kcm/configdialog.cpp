@@ -176,47 +176,47 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
 
     // connect the plotter widgets
     connect( mDlg->checkBoxBottomBar, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxToggled( bool ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->checkBoxLabels, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxToggled( bool ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->checkBoxVLines, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxToggled( bool ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->checkBoxHLines, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxToggled( bool ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->checkBoxIncoming, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxToggled( bool ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->checkBoxOutgoing, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxToggled( bool ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->checkBoxVLinesScroll, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxToggled( bool ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->checkBoxAutoDetection, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxToggled( bool ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->spinBoxPixel, SIGNAL( valueChanged( int ) ),
-             this, SLOT( spinBoxValueChanged( int ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->spinBoxDistance, SIGNAL( valueChanged( int ) ),
-             this, SLOT( spinBoxValueChanged( int ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->spinBoxFontSize, SIGNAL( valueChanged( int ) ),
-             this, SLOT( spinBoxValueChanged( int ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->spinBoxMinValue, SIGNAL( valueChanged( int ) ),
-             this, SLOT( spinBoxValueChanged( int ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->spinBoxMaxValue, SIGNAL( valueChanged( int ) ),
-             this, SLOT( spinBoxValueChanged( int ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->numInputPollInterval, SIGNAL( valueChanged( int ) ),
-             this, SLOT( spinBoxValueChanged( int ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->numInputSaveInterval, SIGNAL( valueChanged( int ) ),
-             this, SLOT( spinBoxValueChanged( int ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->kColorButtonVLines, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( kColorButtonChanged( const QColor& ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->kColorButtonHLines, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( kColorButtonChanged( const QColor& ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->kColorButtonIncoming, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( kColorButtonChanged( const QColor& ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->kColorButtonOutgoing, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( kColorButtonChanged( const QColor& ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->kColorButtonBackground, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( kColorButtonChanged( const QColor& ) ) );
+             this, SLOT( changed() ) );
     connect( mDlg->spinBoxOpacity, SIGNAL( valueChanged( const int ) ),
-             this, SLOT( spinBoxValueChanged( int ) ) );
+             this, SLOT( changed() ) );
 }
 
 ConfigDialog::~ConfigDialog()
@@ -1134,21 +1134,6 @@ void ConfigDialog::updateStatisticsEntries( void )
     }
 
     mDlg->groupBoxStatistics->setEnabled( statisticsActive );
-}
-
-void ConfigDialog::checkBoxToggled( bool )
-{
-    changed( true );
-}
-
-void ConfigDialog::spinBoxValueChanged( int )
-{
-    changed( true );
-}
-
-void ConfigDialog::kColorButtonChanged( const QColor& )
-{
-    changed( true );
 }
 
 void ConfigDialog::listViewCommandsSelectionChanged( QTreeWidgetItem* item, QTreeWidgetItem* )
