@@ -145,6 +145,7 @@ void KNemoDaemon::readConfig()
     mPlotterSettings.colorIncoming = plotterGroup.readEntry( "ColorIncoming", mColorIncoming );
     mPlotterSettings.colorOutgoing = plotterGroup.readEntry( "ColorOutgoing", mColorOutgoing );
     mPlotterSettings.colorBackground = plotterGroup.readEntry( "ColorBackground", mColorBackground );
+    mPlotterSettings.opacity = clamp<int>(plotterGroup.readEntry( "Opacity", 20 ), 0, 100 );
 
     // Interfaces
     QHash< QString, InterfaceSettings *> settingsHash;

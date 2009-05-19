@@ -231,6 +231,7 @@ void InterfacePlotterDialog::configChanged()
     mPlotter->setVerticalLinesColor( mPlotterSettings.colorVLines );
     mPlotter->setHorizontalLinesColor( mPlotterSettings.colorHLines );
     mPlotter->setBackgroundColor( mPlotterSettings.colorBackground );
+    mPlotter->setFillOpacity( mPlotterSettings.opacity * 255 / 100.0 + 0.5 );
 
     // add or remove beams according to user settings
     VisibleBeams nextVisibleBeams = NONE;

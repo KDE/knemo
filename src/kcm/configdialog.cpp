@@ -215,6 +215,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( kColorButtonChanged( const QColor& ) ) );
     connect( mDlg->kColorButtonBackground, SIGNAL( changed( const QColor& ) ),
              this, SLOT( kColorButtonChanged( const QColor& ) ) );
+    connect( mDlg->spinBoxOpacity, SIGNAL( valueChanged( const int ) ),
+             this, SLOT( spinBoxValueChanged( int ) ) );
 }
 
 ConfigDialog::~ConfigDialog()
@@ -318,6 +320,7 @@ void ConfigDialog::load()
     mDlg->kColorButtonIncoming->setColor( plotterGroup.readEntry( "ColorIncoming", mColorIncoming ) );
     mDlg->kColorButtonOutgoing->setColor( plotterGroup.readEntry( "ColorOutgoing", mColorOutgoing ) );
     mDlg->kColorButtonBackground->setColor( plotterGroup.readEntry( "ColorBackground", mColorBackground ) );
+    mDlg->spinBoxOpacity->setValue( clamp<int>(plotterGroup.readEntry( "Opacity", 20 ), 0, 100 ) );
 
     // These things need to be here so that 'Reset' from the control
     // center is handled correctly.
@@ -462,6 +465,7 @@ void ConfigDialog::save()
     plotterGroup.writeEntry( "ColorIncoming", mDlg->kColorButtonIncoming->color() );
     plotterGroup.writeEntry( "ColorOutgoing", mDlg->kColorButtonOutgoing->color() );
     plotterGroup.writeEntry( "ColorBackground", mDlg->kColorButtonBackground->color() );
+    plotterGroup.writeEntry( "Opacity", mDlg->spinBoxOpacity->value() );
 
     config->sync();
     QDBusMessage reply = QDBusInterface("org.kde.knemo", "/knemo", "org.kde.knemo").call("reparseConfiguration");
@@ -559,6 +563,7 @@ void ConfigDialog::defaults()
     mDlg->kColorButtonIncoming->setColor( mColorIncoming );
     mDlg->kColorButtonOutgoing->setColor( mColorOutgoing );
     mDlg->kColorButtonBackground->setColor( mColorBackground );
+    mDlg->spinBoxOpacity->setValue( 20 );
 
     changed( true );
 }

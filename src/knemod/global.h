@@ -116,6 +116,7 @@ struct PlotterSettings
     QColor colorIncoming;
     QColor colorOutgoing;
     QColor colorBackground;
+    int opacity;
 };
 
 struct StatisticEntry
