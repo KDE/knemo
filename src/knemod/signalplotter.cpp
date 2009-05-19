@@ -851,9 +851,12 @@ void KSignalPlotter::drawBeam(QPainter *p, const QRect &boundingBox, int horizon
         path.lineTo(x0,boundingBox.bottom());
         path.lineTo(x1,boundingBox.bottom());
         path.lineTo(x1,y1);
-	QColor fillColor = mBeamColors[j];
-	fillColor.setAlpha(mFillOpacity);
-        p->fillPath(path, fillColor);
+        QColor fillColor = mBeamColors[j];
+        fillColor.setAlpha(mFillOpacity);
+        QBrush brush = QBrush(fillColor);
+        p->setBrush(brush);
+        p->setPen(Qt::NoPen);
+        p->drawPath(path);
     }
   }
 }
