@@ -54,7 +54,7 @@ KCMRegistryEntry KCMRegistry[] =
       i18n( "Uses the tools from the nettool packge like ifconfig, "    \
             "iwconfig and route to read the necessary information "     \
             "from the ouput of these commands.\n"                       \
-            "This backend works rather stable but causes a relativly "  \
+            "This backend works rather stable but causes a relatively "  \
             "high CPU load." ) },
     { QString::null, QString::null }
 };
