@@ -49,7 +49,6 @@
 
 #include "ui_configdlg.h"
 #include "configdialog.h"
-#include "../knemod/backends/kcmregistry.h"
 
 const QString ConfigDialog::ICON_DISCONNECTED = "_disconnected";
 const QString ConfigDialog::ICON_CONNECTED = "_connected";
@@ -73,7 +72,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
       mColorBackground( 0x313031 )
 {
     mConfig = KSharedConfig::openConfig( "knemorc" );
-    setupToolTipArray();
+    setupToolTipMap();
+    setupBackendInfo();
 
     QWidget *main = new QWidget( this );
     QVBoxLayout* top = new QVBoxLayout( this );
@@ -99,9 +99,9 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
 
     // fill the backends combobox
     QStringList items;
-    for ( int i = 0; KCMRegistry[i].name != QString::null; i++ )
+    for ( int i = 0; i < mBackends.count(); i++ )
     {
-        items << KCMRegistry[i].name;
+        items << mBackends.at( i ).name;
     }
     mDlg->comboBoxBackends->addItems( items );
 
@@ -243,9 +243,9 @@ void ConfigDialog::load()
     bool foundBackend = false;
     QString backend = generalGroup.readEntry( "Backend", "Sys" );
     int i;
-    for ( i = 0; KCMRegistry[i].name != QString::null; i++ )
+    for ( i = 0; i < mBackends.count(); i++ )
     {
-        if ( KCMRegistry[i].name == backend )
+        if ( mBackends.at( i ).configName == backend )
         {
             foundBackend = true;
             break;
@@ -257,7 +257,7 @@ void ConfigDialog::load()
         i = 0; // use the first backend (Sys)
     }
     mDlg->comboBoxBackends->setCurrentIndex( i );
-    mDlg->textLabelBackendDescription->setText( KCMRegistry[i].description );
+    mDlg->textLabelBackendDescription->setText( mBackends.at( i ).description );
 
     QStringList list = generalGroup.readEntry( "Interfaces", QStringList() );
 
@@ -442,7 +442,7 @@ void ConfigDialog::save()
     generalGroup.writeEntry( "PollInterval", mDlg->numInputPollInterval->value() );
     generalGroup.writeEntry( "SaveInterval", mDlg->numInputSaveInterval->value() );
     generalGroup.writeEntry( "StatisticsDir",  mDlg->lineEditStatisticsDir->url().url() );
-    generalGroup.writeEntry( "Backend", mDlg->comboBoxBackends->currentText() );
+    generalGroup.writeEntry( "Backend", mBackends.at( mDlg->comboBoxBackends->currentIndex() ).configName );
     generalGroup.writeEntry( "ToolTipContent", mToolTipContent );
     generalGroup.writeEntry( "Interfaces", list );
 
@@ -538,7 +538,7 @@ void ConfigDialog::defaults()
     mDlg->numInputSaveInterval->setValue( 60 );
     mDlg->lineEditStatisticsDir->setUrl( KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
     mDlg->comboBoxBackends->setCurrentIndex( 0 );
-    mDlg->textLabelBackendDescription->setText( KCMRegistry[0].description );
+    mDlg->textLabelBackendDescription->setText( mBackends.at( 0 ).description );
 
     // Default tool tips
     mToolTipContent = 2;
@@ -968,7 +968,7 @@ void ConfigDialog::iconSetChanged( int set )
 
 void ConfigDialog::backendChanged( int backend )
 {
-    mDlg->textLabelBackendDescription->setText( KCMRegistry[backend].description );
+    mDlg->textLabelBackendDescription->setText( mBackends.at( backend ).description );
     if (!mLock) changed( true );
 }
 
@@ -1091,7 +1091,7 @@ void ConfigDialog::setupToolTipTab()
         mDlg->pushButtonAddToolTip->setEnabled( false );
 }
 
-void ConfigDialog::setupToolTipArray()
+void ConfigDialog::setupToolTipMap()
 {
     // Cannot make this data static as the i18n macro doesn't seem
     // to work when called to early i.e. before setting the catalogue.
@@ -1119,6 +1119,27 @@ void ConfigDialog::setupToolTipArray()
     mToolTips.insert( LINK_QUALITY, i18n( "Link Quality" ) );
     mToolTips.insert( NICK_NAME, i18n( "Nickname" ) );
     mToolTips.insert( ENCRYPTION, i18n( "Encryption" ) );
+}
+
+void ConfigDialog::setupBackendInfo()
+{
+    BackendEntry reg;
+    reg.name = i18n( "Sys" );
+    reg.configName = "Sys";
+    reg.description = i18n( "Reads network information from the sysfs file " \
+            "system and direct system calls.\n" \
+            "This backend should have a low CPU load and does not access " \
+            "the hard disk." );
+    mBackends.append( reg );
+
+    reg.name = i18n( "Nettools" );
+    reg.configName = "Nettools";
+    reg.description = i18n( "Reads network information from ifconfig, " \
+            "iwconfig, iwlist, and route.\n" \
+            "This backend may cause a relatively high CPU load, so it is " \
+            "recommended only if you are having trouble with the \"Sys\" " \
+            "backend." );
+    mBackends.append( reg );
 }
 
 void ConfigDialog::updateStatisticsEntries( void )

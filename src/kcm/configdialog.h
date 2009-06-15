@@ -83,7 +83,8 @@ private slots:
 
 private:
     void setupToolTipTab();
-    void setupToolTipArray();
+    void setupToolTipMap();
+    void setupBackendInfo();
     void updateStatisticsEntries( void );
 
     enum IconSet
@@ -92,6 +93,13 @@ private:
         MODEM,
         NETWORK,
         WIRELESS
+    };
+
+    struct BackendEntry
+    {
+        QString name;
+        QString configName;
+        QString description;
     };
 
     int mToolTipContent;
@@ -106,6 +114,7 @@ private:
     QMap<QString, InterfaceSettings *> mSettingsMap;
     QMap<quint32, QString> mToolTips;
     QList<QString> mDeletedIfaces;
+    QList<BackendEntry> mBackends;
     QStringList mIconSets;
 
     static const QString ICON_DISCONNECTED;
