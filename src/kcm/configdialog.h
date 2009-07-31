@@ -26,7 +26,6 @@
 #include "data.h"
 #include "ui_configdlg.h"
 
-class QStandardItem;
 class QTreeWidgetItem;
 
 /**
