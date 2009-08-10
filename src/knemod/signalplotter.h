@@ -26,7 +26,6 @@
 #include <QWidget>
 #include <QResizeEvent>
 #include <QPaintEvent>
-#include <QLinkedList>
 #include <QImage>
 
 #define USE_QIMAGE

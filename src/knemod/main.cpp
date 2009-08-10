@@ -22,9 +22,7 @@
 #include <stdlib.h>
 
 #include "knemodaemon.h"
-#include <KAboutData>
 #include <KCmdLineArgs>
-#include <KLocale>
 #include <KUniqueApplication>
 
 extern "C" int main(int argc, char *argv[] )

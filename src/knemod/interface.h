@@ -21,7 +21,6 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-#include <QDate>
 
 #include "data.h"
 #include "global.h"

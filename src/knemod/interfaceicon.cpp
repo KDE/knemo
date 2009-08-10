@@ -24,10 +24,8 @@
 #include <KIcon>
 #include <KAction>
 #include <KActionCollection>
-#include <KApplication>
 #include <KLocale>
 #include <KMenu>
-#include <KIconLoader>
 #include <KProcess>
 #include <KNotification>
 #include <KStandardDirs>
