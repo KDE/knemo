@@ -45,7 +45,6 @@
 #include <kstandarddirs.h>
 #include <kgenericfactory.h>
 #include <kdirselectdialog.h>
-#include <KToolInvocation>
 
 #include "ui_configdlg.h"
 #include "configdialog.h"
