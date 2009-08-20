@@ -2,7 +2,7 @@ project( knemo )
 
 set( KNEMO_VERSION 0.5.2 )
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
 find_package( KDE4 REQUIRED )
 include( CheckLibraryExists )
