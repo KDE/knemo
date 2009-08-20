@@ -119,7 +119,7 @@ void InterfaceStatusDialog::updateDialog()
     ui.textLabelAlias->setText( settings.alias );
     if ( data.available )
     {
-        ui.textLabelStatus->setText( i18n( "Connection established." ) );
+        ui.textLabelStatus->setText( i18n( "Connected" ) );
         time_t upsecs = mInterface->getUptime();
         time_t updays = upsecs / 86400;
 
@@ -136,12 +136,12 @@ void InterfaceStatusDialog::updateDialog()
     }
     else if ( data.existing )
     {
-        ui.textLabelStatus->setText( i18n( "Not connected." ) );
+        ui.textLabelStatus->setText( i18n( "Disconnected" ) );
         ui.textLabelUptime->setText( "00:00:00" );
     }
     else
     {
-        ui.textLabelStatus->setText( i18n( "Not existing." ) );
+        ui.textLabelStatus->setText( i18n( "Nonexistent" ) );
         ui.textLabelUptime->setText( "00:00:00" );
     }
 

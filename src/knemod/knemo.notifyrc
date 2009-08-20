@@ -171,8 +171,8 @@ Comment[zh_TW]=介面已斷線
 Sound=KDE_Sys-App-Negative.ogg
 Action=Popup
 
-[Event/notexisting]
-Name=Not existing
+[Event/nonexistent]
+Name=Nonexistent
 Name[be]=Не існуе
 Name[bg]=Несъществуващ
 Name[cs]=Neexistuje
@@ -201,7 +201,7 @@ Name[sv]=Existerar inte
 Name[th]=ไม่พบ
 Name[tr]=Yok
 Name[uk]=Не існує
-Name[x-test]=xxNot existingxx
+Name[x-test]=xxNonexistentxx
 Name[zh_CN]=当前不存在
 Name[zh_TW]=不存在
 Comment=Interface does not exist

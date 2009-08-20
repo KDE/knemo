@@ -164,18 +164,18 @@ void InterfaceIcon::updateTrayStatus( int previousState )
          * status as this would be annoying when KDE starts.
          */
         KNotification::event( "disconnected",
-                       title + ":\n" + i18n( "Not connected." ) );
+                       title + ": " + i18n( "Disconnected" ) );
     }
 
-    // notification 'interface not existing'
+    // notification 'interface nonexistent'
     if ( !interfaceExists && mTray != 0L &&
          previousState != Interface::UNKNOWN_STATE )
     {
         /* When KNemo is starting we don't show the change in connection
          * status as this would be annoying when KDE starts.
          */
-        KNotification::event( "notexisting",
-                              title + ":\n" + i18n( "Not existing." ) );
+        KNotification::event( "nonexistent",
+                              title + ": " + i18n( "Nonexistent" ) );
     }
 
     /* Remove the icon if
@@ -239,13 +239,13 @@ void InterfaceIcon::updateTrayStatus( int previousState )
         if ( mInterface->getData().wirelessDevice )
         {
             KNotification::event( "connected",
-                                  title + ":\n" + i18n( "Connection established to\n" ) +
-                                  mInterface->getWirelessData().essid );
+                                  title + ": " +
+                                  i18n( "Connected to %1", mInterface->getWirelessData().essid ) );
         }
         else
         {
             KNotification::event( "connected",
-                                  title + ":\n" + i18n( "Connection established." ) );
+                                  title + ": " + i18n( "Connected" ) );
         }
     }
 }
