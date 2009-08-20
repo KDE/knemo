@@ -141,72 +141,79 @@ QString InterfaceTray::toolTipData()
     QString tipData;
     int toolTipContent = mInterface->getGeneralData().toolTipContent;
     InterfaceData& data = mInterface->getData();
+    QString leftTags = "<tr><td style='padding-right:1em; white-space:nowrap;'>";
+    QString centerTags = "</td><td style='white-space:nowrap;'>";
+    QString rightTags = "</td></tr>";
 
     tipData = "<table cellspacing='2'>";
 
 #ifndef USE_KNOTIFICATIONITEM
     if ( ( toolTipContent & ALIAS ) &&
          !mInterface->getSettings().alias.isEmpty() )
-        tipData += "<tr><th colspan='2' align='center'>" + mInterface->getSettings().alias + "</th></tr>";
+        tipData += "<tr><th colspan='2' style='text-align:center;'>" + mInterface->getSettings().alias + "</th></tr>";
 #endif
     if ( toolTipContent & INTERFACE )
-        tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( INTERFACE ) + "</td><td>" + mInterface->getName() + "</td></tr>";
+        tipData += leftTags + mToolTips.value( INTERFACE ) + centerTags + mInterface->getName() + rightTags;
     if ( data.available )
     {
         if ( toolTipContent & STATUS )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( STATUS ) + "</td><td>" + i18n( "Connection established." ) + "</td></tr>";
+            tipData += leftTags + mToolTips.value( STATUS ) + centerTags + i18n( "Connected" ) + rightTags;
     }
     else if ( data.existing )
     {
         if ( toolTipContent & STATUS )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( STATUS ) + "</td><td>" + i18n( "Not connected." ) + "</td></tr>";
+            tipData += leftTags + mToolTips.value( STATUS ) + centerTags + i18n( "Disconnected" ) + rightTags;
     }
     else
     {
         if ( toolTipContent & STATUS )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( STATUS ) + "</td><td>" + i18n( "Not existing." ) + "</td></tr>";
+            tipData += leftTags + mToolTips.value( STATUS ) + centerTags + i18n( "Nonexistent" ) + rightTags;
     }
 
-    if ( toolTipContent & UPTIME )
-        tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( UPTIME ) + "</td><td>" + mInterface->getUptimeString() + "</td></tr>" ;
+    if ( ! mInterface->getData().existing )
+        tipData += leftTags + i18n( "Nonexistent" ) + centerTags + rightTags;
+    else if ( ! mInterface->getData().available )
+        tipData += leftTags + i18n( "Disconnected" ) + centerTags + rightTags;
 
     if ( data.available )
     {
+        if ( toolTipContent & UPTIME )
+            tipData += leftTags + mToolTips.value( UPTIME ) + centerTags + mInterface->getUptimeString() + rightTags ;
         if ( toolTipContent & IP_ADDRESS )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( IP_ADDRESS ) + "</td><td>" + data.ipAddress + "</td></tr>";
+            tipData += leftTags + mToolTips.value( IP_ADDRESS ) + centerTags + data.ipAddress + rightTags;
         if ( toolTipContent & SUBNET_MASK )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( SUBNET_MASK ) + "</td><td>" + data.subnetMask + "</td></tr>";
+            tipData += leftTags + mToolTips.value( SUBNET_MASK ) + centerTags + data.subnetMask + rightTags;
         if ( mInterface->getType() == Interface::ETHERNET )
         {
             if ( toolTipContent & BCAST_ADDRESS )
-                tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( BCAST_ADDRESS ) + "</td><td>" + data.broadcastAddress + "</td></tr>";
+                tipData += leftTags + mToolTips.value( BCAST_ADDRESS ) + centerTags + data.broadcastAddress + rightTags;
             if ( toolTipContent & GATEWAY )
-                tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( GATEWAY ) + "</td><td>" + data.defaultGateway + "</td></tr>";
+                tipData += leftTags + mToolTips.value( GATEWAY ) + centerTags + data.defaultGateway + rightTags;
             if ( toolTipContent & HW_ADDRESS )
-                tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( HW_ADDRESS ) + "</td><td>" + data.hwAddress + "</td></tr>";
+                tipData += leftTags + mToolTips.value( HW_ADDRESS ) + centerTags + data.hwAddress + rightTags;
         }
         if ( mInterface->getType() == Interface::PPP )
         {
             if ( toolTipContent & PTP_ADDRESS )
-                tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( PTP_ADDRESS ) + "</td><td>" + data.ptpAddress + "</td></tr>";
+                tipData += leftTags + mToolTips.value( PTP_ADDRESS ) + centerTags + data.ptpAddress + rightTags;
         }
         if ( toolTipContent & RX_PACKETS )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( RX_PACKETS ) + "</td><td>" + QString::number( data.rxPackets ) + "</td></tr>";
+            tipData += leftTags + mToolTips.value( RX_PACKETS ) + centerTags + QString::number( data.rxPackets ) + rightTags;
         if ( toolTipContent & TX_PACKETS )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( TX_PACKETS ) + "</td><td>" + QString::number( data.txPackets ) + "</td></tr>";
+            tipData += leftTags + mToolTips.value( TX_PACKETS ) + centerTags + QString::number( data.txPackets ) + rightTags;
         if ( toolTipContent & RX_BYTES )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( RX_BYTES ) + "</td><td>" + data.rxString + "</td></tr>";
+            tipData += leftTags + mToolTips.value( RX_BYTES ) + centerTags + data.rxString + rightTags;
         if ( toolTipContent & TX_BYTES )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( TX_BYTES ) + "</td><td>" + data.txString + "</td></tr>";
+            tipData += leftTags + mToolTips.value( TX_BYTES ) + centerTags + data.txString + rightTags;
         if ( toolTipContent & DOWNLOAD_SPEED )
         {
             unsigned long bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().pollInterval;
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( DOWNLOAD_SPEED ) + "</td><td>" + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + "</td></tr>";
+            tipData += leftTags + mToolTips.value( DOWNLOAD_SPEED ) + centerTags + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + rightTags;
         }
         if ( toolTipContent & UPLOAD_SPEED )
         {
             unsigned long bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().pollInterval;
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( UPLOAD_SPEED ) + "</td><td>" + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + "</td></tr>";
+            tipData += leftTags + mToolTips.value( UPLOAD_SPEED ) + centerTags + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + rightTags;
         }
     }
 
@@ -214,28 +221,28 @@ QString InterfaceTray::toolTipData()
     {
         WirelessData& wdata = mInterface->getWirelessData();
         if ( toolTipContent & ESSID )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( ESSID ) + "</td><td>" + wdata.essid + "</td></tr>";
+            tipData += leftTags + mToolTips.value( ESSID ) + centerTags + wdata.essid + rightTags;
         if ( toolTipContent & MODE )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( MODE ) + "</td><td>" + wdata.mode + "</td></tr>";
+            tipData += leftTags + mToolTips.value( MODE ) + centerTags + wdata.mode + rightTags;
         if ( toolTipContent & FREQUENCY )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( FREQUENCY ) + "</td><td>" + wdata.frequency + "</td></tr>";
+            tipData += leftTags + mToolTips.value( FREQUENCY ) + centerTags + wdata.frequency + rightTags;
         if ( toolTipContent & BIT_RATE )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( BIT_RATE ) + "</td><td>" + wdata.bitRate + "</td></tr>";
+            tipData += leftTags + mToolTips.value( BIT_RATE ) + centerTags + wdata.bitRate + rightTags;
         if ( toolTipContent & ACCESS_POINT )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( ACCESS_POINT ) + "</td><td>" + wdata.accessPoint + "</td></tr>";
+            tipData += leftTags + mToolTips.value( ACCESS_POINT ) + centerTags + wdata.accessPoint + rightTags;
         if ( toolTipContent & LINK_QUALITY )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( LINK_QUALITY ) + "</td><td>" + wdata.linkQuality + "</td></tr>";
+            tipData += leftTags + mToolTips.value( LINK_QUALITY ) + centerTags + wdata.linkQuality + rightTags;
         if ( toolTipContent & NICK_NAME )
-            tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( NICK_NAME ) + "</td><td>" + wdata.nickName + "</td></tr>";
+            tipData += leftTags + mToolTips.value( NICK_NAME ) + centerTags + wdata.nickName + rightTags;
         if ( toolTipContent & ENCRYPTION )
         {
             if ( wdata.encryption == true )
             {
-                tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( ENCRYPTION ) + "</td><td>" + i18n( "active" ) + "</td></tr>";
+                tipData += leftTags + mToolTips.value( ENCRYPTION ) + centerTags + i18n( "active" ) + rightTags;
             }
             else
             {
-                tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( ENCRYPTION ) + "</td><td>" + i18n( "off" ) + "</td></tr>";
+                tipData += leftTags + mToolTips.value( ENCRYPTION ) + centerTags + i18n( "off" ) + rightTags;
             }
         }
     }
