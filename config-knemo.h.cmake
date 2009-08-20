@@ -6,3 +6,4 @@
 #cmakedefine PATH_IWLIST   "${PATH_IWLIST}"
 #cmakedefine PATH_ROUTE    "${PATH_ROUTE}"
 #cmakedefine HAVE_LIBIW 1
+#cmakedefine USE_KNOTIFICATIONITEM 1

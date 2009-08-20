@@ -157,7 +157,7 @@ void KNemoDaemon::readConfig()
         if ( config->hasGroup( group ) )
         {
             KConfigGroup interfaceGroup( config, group );
-            settings->alias = interfaceGroup.readEntry( "Alias" );
+            settings->alias = interfaceGroup.readEntry( "Alias" ).trimmed();
             settings->iconSet = interfaceGroup.readEntry( "IconSet", "monitor" );
             settings->customCommands = interfaceGroup.readEntry( "CustomCommands", false );
             settings->hideWhenNotAvailable = interfaceGroup.readEntry( "HideWhenNotAvailable",false );

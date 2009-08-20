@@ -73,28 +73,34 @@ void InterfaceIcon::updateStatus( int status )
     QString iconSet = mInterface->getSettings().iconSet;
 
     // Now set the correct icon depending on the status of the interface.
+    QString iconName = iconSet;
     if ( status == Interface::NOT_AVAILABLE ||
          status == Interface::NOT_EXISTING )
     {
-        mTray->setIcon( UserIcon( iconSet + ICON_DISCONNECTED ) );
+        iconName += ICON_DISCONNECTED;
     }
     else if ( ( status & Interface::RX_TRAFFIC ) &&
               ( status & Interface::TX_TRAFFIC ) )
     {
-        mTray->setIcon( UserIcon( iconSet + ICON_TRAFFIC ) );
+        iconName += ICON_TRAFFIC;
     }
     else if ( status & Interface::RX_TRAFFIC )
     {
-        mTray->setIcon( UserIcon( iconSet + ICON_INCOMING ) );
+        iconName += ICON_INCOMING;
     }
     else if ( status & Interface::TX_TRAFFIC )
     {
-        mTray->setIcon( UserIcon( iconSet + ICON_OUTGOING ) );
+        iconName += ICON_OUTGOING;
     }
     else
     {
-        mTray->setIcon( UserIcon( iconSet + ICON_CONNECTED ) );
+        iconName += ICON_CONNECTED;
     }
+#ifdef USE_KNOTIFICATIONITEM
+    mTray->setIconByPixmap( UserIcon( iconName ) );
+#else
+    mTray->setIcon( UserIcon( iconName ) );
+#endif
 }
 
 void InterfaceIcon::updateToolTip()
@@ -146,6 +152,10 @@ void InterfaceIcon::updateTrayStatus( int previousState )
     bool hideWhenNotExisting = mInterface->getSettings().hideWhenNotExisting;
     bool hideWhenNotAvailable = mInterface->getSettings().hideWhenNotAvailable;
 
+    QString title = mInterface->getSettings().alias;
+    if ( title.isEmpty() )
+        title = mInterface->getName();
+
     // notification 'interface not available'
     if ( !interfaceAvailable && mTray != 0L &&
          previousState == Interface::AVAILABLE )
@@ -153,12 +163,6 @@ void InterfaceIcon::updateTrayStatus( int previousState )
         /* When KNemo is starting we don't show the change in connection
          * status as this would be annoying when KDE starts.
          */
-        QString title;
-        if ( mInterface->getSettings().alias != QString::null )
-            title = mInterface->getSettings().alias;
-        else
-            title = mInterface->getName();
-
         KNotification::event( "disconnected",
                        title + ":\n" + i18n( "Not connected." ) );
     }
@@ -170,12 +174,6 @@ void InterfaceIcon::updateTrayStatus( int previousState )
         /* When KNemo is starting we don't show the change in connection
          * status as this would be annoying when KDE starts.
          */
-        QString title;
-        if ( mInterface->getSettings().alias != QString::null )
-            title = mInterface->getSettings().alias;
-        else
-            title = mInterface->getName();
-
         KNotification::event( "notexisting",
                               title + ":\n" + i18n( "Not existing." ) );
     }
@@ -208,7 +206,7 @@ void InterfaceIcon::updateTrayStatus( int previousState )
         KMenu* menu = (KMenu *)mTray->contextMenu();
 
         menu->removeAction( menu->actions().at( 0 ) );
-        menu->addTitle( KIcon( "knemo" ), "KNemo - " + mInterface->getName() );
+        menu->addTitle( KIcon( "knemo" ), i18n( "KNemo - " ) + title );
         menu->addAction( plotterAction );
         menu->addAction( statisticsAction );
         menu->addAction( configAction );
@@ -217,8 +215,6 @@ void InterfaceIcon::updateTrayStatus( int previousState )
 
         connect( menu, SIGNAL( triggered( QAction * ) ),
                  this, SLOT( menuTriggered( QAction * ) ) );
-        connect( mTray, SIGNAL( activated( QSystemTrayIcon::ActivationReason ) ),
-                 this, SLOT( iconActivated( QSystemTrayIcon::ActivationReason ) ) );
         connect( plotterAction, SIGNAL( triggered() ),
                  this, SLOT( showGraph() ) );
         connect( statisticsAction, SIGNAL( triggered() ),
@@ -228,7 +224,9 @@ void InterfaceIcon::updateTrayStatus( int previousState )
 
         updateStatus( mInterface->getState() );
         updateMenu();
+#ifndef USE_KNOTIFICATIONITEM
         mTray->show();
+#endif
     }
 
     // notification 'interface available'
@@ -236,14 +234,8 @@ void InterfaceIcon::updateTrayStatus( int previousState )
          previousState != Interface::UNKNOWN_STATE )
     {
         /* When KNemo is starting we don't show the change in connection
-         * status as this would be annoying when KDE starts.
+         * status as this would be annoying.
          */
-        QString title;
-        if ( mInterface->getSettings().alias != QString::null )
-            title = mInterface->getSettings().alias;
-        else
-            title = mInterface->getName();
-
         if ( mInterface->getData().wirelessDevice )
         {
             KNotification::event( "connected",
@@ -265,21 +257,6 @@ void InterfaceIcon::showConfigDialog()
     KProcess process;
     process << "kcmshell4" << "kcm_knemo";
     process.startDetached();
-}
-
-void InterfaceIcon::iconActivated( QSystemTrayIcon::ActivationReason reason )
-{
-    switch (reason)
-    {
-     case QSystemTrayIcon::Trigger:
-         mInterface->showStatusDialog();
-         break;
-     case QSystemTrayIcon::MiddleClick:
-         mInterface->showSignalPlotter( true );
-         break;
-     default:
-         ;
-     }
 }
 
 void InterfaceIcon::menuTriggered( QAction *action )

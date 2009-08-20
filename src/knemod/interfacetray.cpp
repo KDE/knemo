@@ -31,9 +31,22 @@
 #include <QToolTip>
 #include <QHelpEvent>
 
-InterfaceTray::InterfaceTray( Interface* interface, const QString& icon, QWidget* parent ) : KSystemTrayIcon( icon, parent )
+#ifdef USE_KNOTIFICATIONITEM
+InterfaceTray::InterfaceTray( Interface* interface, const QString &id, QWidget* parent ) : KNotificationItem( id, parent )
+#else
+InterfaceTray::InterfaceTray( Interface* interface, const QString &, QWidget* parent ) : KSystemTrayIcon( parent )
+#endif
 {
     mInterface = interface;
+#ifdef USE_KNOTIFICATIONITEM
+    setToolTipIconByName( "knemo" );
+    setCategory(Hardware);
+    setStatus(Active);
+    connect(this, SIGNAL(secondaryActivateRequested(QPoint)), this, SLOT(togglePlotter()));
+#else
+    connect( this, SIGNAL( activated( QSystemTrayIcon::ActivationReason ) ),
+             this, SLOT( iconActivated( QSystemTrayIcon::ActivationReason ) ) );
+#endif
     setupToolTipArray();
     // remove quit action added by KSystemTrayIcon
     actionCollection()->removeAction( actionCollection()->action( KStandardAction::name( KStandardAction::Quit ) ) );
@@ -46,6 +59,13 @@ InterfaceTray::~InterfaceTray()
 
 void InterfaceTray::updateToolTip()
 {
+#ifdef USE_KNOTIFICATIONITEM
+    QString title = mInterface->getSettings().alias;
+    if ( title.isEmpty() )
+        title = mInterface->getName();
+    setToolTipTitle( i18n( "KNemo - " ) + title );
+    setToolTipSubTitle( toolTipData() );
+#else
     QPoint pos = QCursor::pos();
     /* If a tooltip is already visible and the global cursor position is in
      * our rect then it must be our tooltip, right? */
@@ -55,6 +75,7 @@ void InterfaceTray::updateToolTip()
         setToolTip( toolTipData() );
         QToolTip::showText( pos, toolTip() );
     }
+#endif
 }
 
 void InterfaceTray::slotQuit()
@@ -76,6 +97,32 @@ void InterfaceTray::slotQuit()
     kapp->quit();
 }
 
+#ifdef USE_KNOTIFICATIONITEM
+void InterfaceTray::activate(const QPoint&)
+{
+    mInterface->showStatusDialog();
+}
+
+void InterfaceTray::togglePlotter()
+{
+     mInterface->showSignalPlotter( true );
+}
+#else
+void InterfaceTray::iconActivated( QSystemTrayIcon::ActivationReason reason )
+{
+    switch (reason)
+    {
+     case QSystemTrayIcon::Trigger:
+         mInterface->showStatusDialog();
+         break;
+     case QSystemTrayIcon::MiddleClick:
+         mInterface->showSignalPlotter( true );
+         break;
+     default:
+         ;
+     }
+}
+
 bool InterfaceTray::event( QEvent *e )
 {
     if (e->type() == QEvent::ToolTip) {
@@ -87,6 +134,7 @@ bool InterfaceTray::event( QEvent *e )
     else
         return KSystemTrayIcon::event(e);
 }
+#endif
 
 QString InterfaceTray::toolTipData()
 {
@@ -96,9 +144,11 @@ QString InterfaceTray::toolTipData()
 
     tipData = "<table cellspacing='2'>";
 
+#ifndef USE_KNOTIFICATIONITEM
     if ( ( toolTipContent & ALIAS ) &&
-         mInterface->getSettings().alias != QString::null )
+         !mInterface->getSettings().alias.isEmpty() )
         tipData += "<tr><th colspan='2' align='center'>" + mInterface->getSettings().alias + "</th></tr>";
+#endif
     if ( toolTipContent & INTERFACE )
         tipData += "<tr><td style='padding-right:1em'>" + mToolTips.value( INTERFACE ) + "</td><td>" + mInterface->getName() + "</td></tr>";
     if ( data.available )
@@ -198,7 +248,9 @@ void InterfaceTray::setupToolTipArray()
     // Cannot make this data static as the i18n macro doesn't seem
     // to work when called to early i.e. before setting the catalogue.
     mToolTips.insert( INTERFACE, i18n( "Interface" ) );
+#ifndef USE_KNOTIFICATIONITEM
     mToolTips.insert( ALIAS, i18n( "Alias" ) );
+#endif
     mToolTips.insert( STATUS, i18n( "Status" ) );
     mToolTips.insert( UPTIME, i18n( "Uptime" ) );
     mToolTips.insert( IP_ADDRESS, i18n( "IP-Address" ) );

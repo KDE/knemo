@@ -89,8 +89,6 @@ private slots:
      */
     void menuTriggered( QAction * );
 
-    void iconActivated( QSystemTrayIcon::ActivationReason reason );
-
     void showGraph();
     void showStatistics();
 

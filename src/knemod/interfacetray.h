@@ -20,18 +20,30 @@
 #ifndef INTERFACETRAY_H
 #define INTERFACETRAY_H
 
-#include <KSystemTrayIcon>
+#include "config-knemo.h"
+
+#ifdef USE_KNOTIFICATIONITEM
+  #include <knotificationitem-1/knotificationitem.h>
+#else
+  #include <KSystemTrayIcon>
+#endif
 
 #include "interface.h"
 
+#ifdef USE_KNOTIFICATIONITEM
+using namespace Experimental;
+
+class InterfaceTray : public KNotificationItem
+#else
 class InterfaceTray : public KSystemTrayIcon
+#endif
 {
     Q_OBJECT
 public:
     /**
      * Default Constructor
      */
-    InterfaceTray( Interface* interface, const QString& icon, QWidget* parent = 0 );
+    InterfaceTray( Interface* interface, const QString &id, QWidget* parent = 0 );
 
     /**
      * Default Destructor
@@ -40,8 +52,13 @@ public:
 
     void updateToolTip();
 
+#ifdef USE_KNOTIFICATIONITEM
+public Q_SLOTS:
+    void activate(const QPoint &pos);
+#else
 protected:
     bool event( QEvent * );
+#endif
 
 private:
     Interface* mInterface;
@@ -51,6 +68,11 @@ private:
     void setupToolTipArray();
 
 private Q_SLOTS:
+#ifdef USE_KNOTIFICATIONITEM
+    void togglePlotter();
+#else
+    void iconActivated( QSystemTrayIcon::ActivationReason );
+#endif
     void slotQuit();
 };
 

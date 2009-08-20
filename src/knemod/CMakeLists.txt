@@ -20,7 +20,7 @@ set( knemo_SRCS
 kde4_add_ui_files( knemo_SRCS interfacestatisticsdlg.ui interfacestatusdlg.ui )
 kde4_add_executable( knemo ${knemo_SRCS} )
 
-target_link_libraries( knemo ${KDE4_KIO_LIBS} ${LIBIW_LIBRARY} )
+target_link_libraries( knemo ${LIBKNOTIFICATIONITEM-1_LIBRARIES} ${KDE4_KIO_LIBS} ${LIBIW_LIBRARY} )
 
 install( TARGETS knemo ${INSTALL_TARGETS_DEFAULT_ARGS} )
 

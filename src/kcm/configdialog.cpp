@@ -47,6 +47,7 @@
 #include <kdirselectdialog.h>
 
 #include "ui_configdlg.h"
+#include "config-knemo.h"
 #include "configdialog.h"
 
 const QString ConfigDialog::ICON_DISCONNECTED = "_disconnected";
@@ -268,7 +269,7 @@ void ConfigDialog::load()
         if ( config->hasGroup( group ) )
         {
             KConfigGroup interfaceGroup( config, group );
-            settings->alias = interfaceGroup.readEntry( "Alias" );
+            settings->alias = interfaceGroup.readEntry( "Alias" ).trimmed();
             settings->iconSet = interfaceGroup.readEntry( "IconSet", "monitor" );
             settings->customCommands = interfaceGroup.readEntry( "CustomCommands", false );
             settings->hideWhenNotAvailable = interfaceGroup.readEntry( "HideWhenNotAvailable", false );
@@ -413,7 +414,7 @@ void ConfigDialog::save()
             interfaceGroup.writeEntry( "StatusPos", statusPos );
         if ( !statusSize.isEmpty() )
             interfaceGroup.writeEntry( "StatusSize", statusSize );
-        if ( !settings->alias.isEmpty() )
+        if ( !settings->alias.trimmed().isEmpty() )
             interfaceGroup.writeEntry( "Alias", settings->alias );
 
         interfaceGroup.writeEntry( "IconSet", settings->iconSet );
@@ -1095,7 +1096,9 @@ void ConfigDialog::setupToolTipMap()
     // Cannot make this data static as the i18n macro doesn't seem
     // to work when called to early i.e. before setting the catalogue.
     mToolTips.insert( INTERFACE, i18n( "Interface" ) );
+#ifndef USE_KNOTIFICATIONITEM
     mToolTips.insert( ALIAS, i18n( "Alias" ) );
+#endif
     mToolTips.insert( STATUS, i18n( "Status" ) );
     mToolTips.insert( UPTIME, i18n( "Uptime" ) );
     mToolTips.insert( IP_ADDRESS, i18n( "IP-Address" ) );
