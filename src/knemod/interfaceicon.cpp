@@ -295,7 +295,7 @@ void InterfaceIcon::menuTriggered( QAction *action )
         process << command.command;
     }
     else
-        process << command.command.split( " " );
+        process << "/bin/sh" << "-c" << command.command;
 
     process.startDetached();
 }
