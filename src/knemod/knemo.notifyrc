@@ -173,6 +173,11 @@ Action=Popup
 
 [Event/nonexistent]
 Name=Nonexistent
+Name[pt]=Inexistente
+Name[pt_BR]=Inexistente
+Name[sv]=Existerar inte
+Name[tr]=Yok
+Name[uk]=Не існує
 Comment=Interface does not exist
 Comment[be]=Інтэрфейс не існуе
 Comment[bg]=Интерфейсът не съществува
