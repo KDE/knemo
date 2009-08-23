@@ -173,8 +173,9 @@ Action=Popup
 
 [Event/nonexistent]
 Name=Nonexistent
+Name[bg]=Несъществуващ
 Name[pt]=Inexistente
-Name[pt_BR]=Inexistente
+Name[pt_BR]=Não existente
 Name[sv]=Existerar inte
 Name[tr]=Yok
 Name[uk]=Не існує
