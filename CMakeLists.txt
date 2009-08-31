@@ -17,7 +17,7 @@ find_program( PATH_IWLIST iwlist )
 find_program( PATH_ROUTE route )
 find_library( LIBIW_LIBRARY iw )
 
-option (USE_KNOTIFICATIONITEM "If building against KDE 4.3, use the experimental KNotificationItem for the tray icon.  This is the default.  Set to false to compile the tray icon as a KSystemTrayIcon." TRUE )
+option (USE_KNOTIFICATIONITEM "If building against KDE 4.3, use the experimental KNotificationItem for the tray icon." FALSE )
 if ( ${KDE_VERSION} VERSION_GREATER "4.2.84" AND USE_KNOTIFICATIONITEM )
     find_package(LibKNotificationItem-1 REQUIRED)
     macro_log_feature(LIBKNOTIFICATIONITEM-1_FOUND "LibKNotificationItem-1" "An experimental library" "svn://anonsvn.kde.org/home/kde/trunk/KDE/kdelibs/experimental" TRUE "" "LibKNotificationItem-1 is an unfinished library which is required by knemo.")
