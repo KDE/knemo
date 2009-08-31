@@ -28,11 +28,14 @@
 #include <qgroupbox.h>
 #include <qwhatsthis.h>
 #include <qtabwidget.h>
+#include <QPainter>
 #include <qpushbutton.h>
 #include <qstringlist.h>
 #include <qdatastream.h>
 
+#include <KColorScheme>
 #include <kglobal.h>
+#include <KGlobalSettings>
 #include <kconfig.h>
 #include <klocale.h>
 #include <knuminput.h>
@@ -93,6 +96,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
                 mIconSets << rx.cap( 1 );
     }
     mIconSets.sort();
+    // We want "Text" at the bottom of the list
+    mIconSets << i18n( "Text" );
     mDlg->comboBoxIconSet->addItems( mIconSets );
     if ( mIconSets.contains( "monitor" ) )
         mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( "monitor" ) );
@@ -210,9 +215,9 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     connect( mDlg->kColorButtonHLines, SIGNAL( changed( const QColor& ) ),
              this, SLOT( changed() ) );
     connect( mDlg->kColorButtonIncoming, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
+             this, SLOT( colorButtonChanged() ) );
     connect( mDlg->kColorButtonOutgoing, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
+             this, SLOT( colorButtonChanged() ) );
     connect( mDlg->kColorButtonBackground, SIGNAL( changed( const QColor& ) ),
              this, SLOT( changed() ) );
     connect( mDlg->spinBoxOpacity, SIGNAL( valueChanged( const int ) ),
@@ -901,6 +906,8 @@ void ConfigDialog::interfaceSelected( int row )
     mDlg->lineEditAlias->setText( settings->alias );
     if ( mIconSets.contains( settings->iconSet ) )
         mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( settings->iconSet ) );
+    else if ( settings->iconSet.isEmpty() )
+        mDlg->comboBoxIconSet->setCurrentIndex( mDlg->comboBoxIconSet->count() - 1 );
     else
         mDlg->comboBoxIconSet->setCurrentIndex( 0 );
     mDlg->checkBoxCustom->setChecked( settings->customCommands );
@@ -945,6 +952,58 @@ void ConfigDialog::aliasChanged( const QString& text )
     if (!mLock) changed( true );
 }
 
+void ConfigDialog::colorButtonChanged()
+{
+    if ( mDlg->comboBoxIconSet->count() - 1 == mDlg->comboBoxIconSet->currentIndex() )
+        iconSetChanged( mDlg->comboBoxIconSet->currentIndex() );
+    changed( true );
+}
+
+QFont ConfigDialog::setIconFont( QString text )
+{
+    QFont f = KGlobalSettings::generalFont();
+    float pointSize = f.pointSizeF();
+    QFontMetrics fm( f );
+    int w = fm.width( text );
+    if ( w > 22 )
+    {
+        pointSize *= float( 22 ) / float( w );
+        f.setPointSizeF( pointSize );
+    }
+
+    fm = QFontMetrics( f );
+    // Don't want decender()...space too tight
+    // +1 for base line +1 for space between lines
+    int h = fm.ascent() + 2;
+    if ( h > 11 )
+    {
+        pointSize *= float( 11 ) / float( h );
+        f.setPointSizeF( pointSize );
+    }
+    return f;
+}
+
+QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, bool active )
+{
+    KColorScheme scheme(QPalette::Active, KColorScheme::View);
+    QPixmap sampleIcon( 22, 22 );
+    sampleIcon.fill( Qt::transparent );
+    QPainter p( &sampleIcon );
+    p.setBrush( Qt::NoBrush );
+    p.setOpacity( 1.0 );
+    p.setFont( setIconFont( incomingText ) );
+    if ( active )
+        p.setPen( mDlg->kColorButtonIncoming->color() );
+    else
+        p.setPen( scheme.foreground( KColorScheme::InactiveText ).color() );
+    p.drawText( sampleIcon.rect(), Qt::AlignTop | Qt::AlignRight, incomingText );
+    p.setFont( setIconFont( outgoingText ) );
+    if ( active )
+        p.setPen( mDlg->kColorButtonOutgoing->color() );
+    p.drawText( sampleIcon.rect(), Qt::AlignBottom | Qt::AlignRight, outgoingText );
+    return sampleIcon;
+}
+
 void ConfigDialog::iconSetChanged( int set )
 {
     if ( !mDlg->listBoxInterfaces->currentItem() )
@@ -953,15 +1012,28 @@ void ConfigDialog::iconSetChanged( int set )
     QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
 
     InterfaceSettings* settings = mSettingsMap[selected->text()];
-    settings->iconSet = mDlg->comboBoxIconSet->itemText( set );
-
-    // Update the preview of the iconset.
-    KIconLoader::global()->addAppDir( "knemo" );
-    mDlg->pixmapDisconnected->setPixmap( UserIcon( settings->iconSet + ICON_DISCONNECTED ) );
-    mDlg->pixmapConnected->setPixmap( UserIcon( settings->iconSet + ICON_CONNECTED ) );
-    mDlg->pixmapIncoming->setPixmap( UserIcon( settings->iconSet + ICON_INCOMING ) );
-    mDlg->pixmapOutgoing->setPixmap( UserIcon( settings->iconSet + ICON_OUTGOING ) );
-    mDlg->pixmapTraffic->setPixmap( UserIcon( settings->iconSet + ICON_TRAFFIC ) );
+    if ( mDlg->comboBoxIconSet->count() - 1 == mDlg->comboBoxIconSet->currentIndex() )
+    {
+        // empty iconSet = Text icon
+        settings->iconSet.clear();
+        // Update the preview of the iconset.
+        mDlg->pixmapDisconnected->setPixmap( textIcon( "0B", "0B", false ) );
+        mDlg->pixmapConnected->setPixmap( textIcon( "0B", "0B", true ) );
+        mDlg->pixmapIncoming->setPixmap( textIcon( "123K", "0B", true ) );
+        mDlg->pixmapOutgoing->setPixmap( textIcon( "0B", "12K", true ) );
+        mDlg->pixmapTraffic->setPixmap( textIcon( "123K", "12K", true ) );
+    }
+    else
+    {
+        settings->iconSet = mDlg->comboBoxIconSet->itemText( set );
+        // Update the preview of the iconset.
+        KIconLoader::global()->addAppDir( "knemo" );
+        mDlg->pixmapDisconnected->setPixmap( UserIcon( settings->iconSet + ICON_DISCONNECTED ) );
+        mDlg->pixmapConnected->setPixmap( UserIcon( settings->iconSet + ICON_CONNECTED ) );
+        mDlg->pixmapIncoming->setPixmap( UserIcon( settings->iconSet + ICON_INCOMING ) );
+        mDlg->pixmapOutgoing->setPixmap( UserIcon( settings->iconSet + ICON_OUTGOING ) );
+        mDlg->pixmapTraffic->setPixmap( UserIcon( settings->iconSet + ICON_TRAFFIC ) );
+    }
     if (!mLock) changed( true );
 }
 

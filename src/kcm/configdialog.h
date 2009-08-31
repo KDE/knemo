@@ -77,6 +77,7 @@ private slots:
     void checkBoxStartKNemoToggled( bool on );
     void spinBoxTrafficValueChanged( int value );
     void checkBoxCustomToggled( bool on );
+    void colorButtonChanged();
     void listViewCommandsSelectionChanged( QTreeWidgetItem *current, QTreeWidgetItem *previous );
     void listViewCommandsChanged( QTreeWidgetItem* item, int column );
 
@@ -85,6 +86,8 @@ private:
     void setupToolTipMap();
     void setupBackendInfo();
     void updateStatisticsEntries( void );
+    QPixmap textIcon( QString incomingText, QString outgoingText, bool active );
+    QFont setIconFont( QString );
 
     enum IconSet
     {

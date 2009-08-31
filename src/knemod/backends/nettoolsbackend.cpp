@@ -209,6 +209,8 @@ void NetToolsBackend::parseIfconfigOutput()
             // isn't loaded and/or the interface has not been created.
             interface->getData().existing = false;
             interface->getData().available = false;
+            interface->getData().incomingBytes = 0;
+            interface->getData().outgoingBytes = 0;
         }
         // JJ 2005-07-18: use RUNNING instead of UP to detect whether interface is connected
         else if ( !configs[key].contains( "inet " ) ||
@@ -217,6 +219,8 @@ void NetToolsBackend::parseIfconfigOutput()
             // The interface is up or has an IP assigned but not both
             interface->getData().existing = true;
             interface->getData().available = false;
+            interface->getData().incomingBytes = 0;
+            interface->getData().outgoingBytes = 0;
         }
         else
         {

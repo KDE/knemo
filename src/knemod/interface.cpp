@@ -50,7 +50,7 @@ Interface::Interface( const QString &ifname,
     connect( mPlotterTimer, SIGNAL( timeout() ),
              this, SLOT( updatePlotter() ) );
     connect( &mMonitor, SIGNAL( statusChanged( int ) ),
-             &mIcon, SLOT( updateStatus( int ) ) );
+             &mIcon, SLOT( updateIconImage( int ) ) );
     connect( &mMonitor, SIGNAL( available( int ) ),
              &mIcon, SLOT( updateTrayStatus( int ) ) );
     connect( &mMonitor, SIGNAL( notAvailable( int ) ),
@@ -85,11 +85,7 @@ Interface::~Interface()
 
 void Interface::configChanged()
 {
-    // UNKNOWN_STATE to avoid notification
-    mIcon.updateTrayStatus( UNKNOWN_STATE );
-    // handle changed iconset by user
-    mIcon.updateStatus( mState );
-    mIcon.updateMenu();
+    mIcon.configChanged( mPlotterSettings.colorIncoming, mPlotterSettings.colorOutgoing, mState );
 
     if ( mPlotterDialog != 0L )
     {

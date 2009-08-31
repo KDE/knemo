@@ -20,6 +20,10 @@
 
 #include <unistd.h>
 
+#include <QPainter>
+#include <KColorScheme>
+#include <KConfigGroup>
+#include <KGlobalSettings>
 #include <KHelpMenu>
 #include <KIcon>
 #include <KAction>
@@ -64,13 +68,35 @@ InterfaceIcon::~InterfaceIcon()
         delete mTray;
 }
 
-void InterfaceIcon::updateStatus( int status )
+void InterfaceIcon::configChanged( QColor incoming, QColor outgoing, int status )
 {
-    if ( mTray == 0L )
-        return;
+    KConfigGroup cg( KGlobal::mainComponent().config(), "System Tray" );
+    iconWidth = cg.readEntry( "systrayIconWidth", 22 );
 
+    colorIncoming = incoming;
+    colorOutgoing = outgoing;
+
+    // UNKNOWN_STATE to avoid notification
+    updateTrayStatus( Interface::UNKNOWN_STATE );
+
+    // handle changed iconset by user
+    if ( mTray != 0L )
+    {
+        if ( mInterface->getSettings().iconSet.isEmpty() )
+            updateIconText( true );
+        else
+            updateIconImage( status );
+        updateMenu();
+    }
+}
+
+void InterfaceIcon::updateIconImage( int status )
+{
     // We need the iconset name in all cases.
     QString iconSet = mInterface->getSettings().iconSet;
+
+    if ( mTray == 0L || iconSet.isEmpty() )
+        return;
 
     // Now set the correct icon depending on the status of the interface.
     QString iconName = iconSet;
@@ -103,18 +129,111 @@ void InterfaceIcon::updateStatus( int status )
 #endif
 }
 
+QFont InterfaceIcon::setIconFont( QString text )
+{
+    QFont f = KGlobalSettings::generalFont();
+    float pointSize = f.pointSizeF();
+    QFontMetrics fm( f );
+    int w = fm.width( text );
+    if ( w > iconWidth )
+    {
+        pointSize *= float( iconWidth ) / float( w );
+        f.setPointSizeF( pointSize );
+    }
+
+    fm = QFontMetrics( f );
+    // Don't want decender()...space too tight
+    // +1 for base line +1 for space between lines
+    int h = fm.ascent() + 2;
+    if ( h > iconWidth/2 )
+    {
+        pointSize *= float( iconWidth/2 ) / float( h );
+        f.setPointSizeF( pointSize );
+    }
+    return f;
+}
+
+QString InterfaceIcon::compactTrayText(unsigned long bytes )
+{
+    QString byteString;
+    // Space is tight, so no space between number and units, and the complete
+    // string should be no more than 4 chars.
+    if ( bytes < 922 ) // 922B = 0.9K
+        byteString = i18n( "%1B" ).arg( bytes );
+    else if ( bytes < 10189 ) // < 9.95K
+        byteString = i18n( "%1K" ).arg( QString::number( bytes/1024.0, 'f', 1 ) );
+    else if ( bytes < 1023488 ) // < 999.5
+        byteString = i18n( "%1K" ).arg( QString::number( bytes/1024.0, 'f', 0 ) );
+    else if ( bytes < 10433331 ) // < 9.95M
+        byteString = i18n( "%1M" ).arg( QString::number( bytes/1048576.0, 'f', 1 ) );
+    else if ( bytes < 1048051712 ) // < 999.5G
+        byteString = i18n( "%1M" ).arg( QString::number( bytes/1048576.0, 'f', 0 ) );
+    else if ( bytes < 10683731148.0 ) // < 9.95G
+        byteString = i18n( "%1G" ).arg( QString::number( bytes/1073741824.0, 'f', 1 ) );
+    else
+        byteString = i18n( "%1G" ).arg( QString::number( bytes/1073741824.0, 'f', 0) );
+    return byteString;
+}
+
+void InterfaceIcon::updateIconText( bool proceed )
+{
+    InterfaceData& data = mInterface->getData();
+
+    unsigned long bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().pollInterval;
+    QString byteText = compactTrayText( bytesPerSecond );
+    if ( byteText != textIncoming )
+    {
+        proceed = true;
+        textIncoming = byteText;
+    }
+    bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().pollInterval;
+    byteText = compactTrayText( bytesPerSecond );
+    if ( byteText != textOutgoing )
+    {
+        proceed = true;
+        textOutgoing = byteText;
+    }
+
+    // Do we even need to repaint?
+    if ( !proceed )
+        return;
+
+    QPixmap textIcon(iconWidth, iconWidth);
+    textIcon.fill( Qt::transparent );
+    QPainter p( &textIcon );
+    p.setBrush( Qt::NoBrush );
+    p.setOpacity( 1.0 );
+
+    KColorScheme scheme(QPalette::Active, KColorScheme::View);
+    p.setFont( setIconFont( byteText ) );
+    if ( data.available )
+        p.setPen( colorIncoming );
+    else
+        p.setPen( scheme.foreground( KColorScheme::InactiveText ).color() );
+    p.drawText( textIcon.rect(), Qt::AlignTop | Qt::AlignRight, textIncoming );
+
+    p.setFont( setIconFont( byteText ) );
+    if ( data.available )
+        p.setPen( colorOutgoing );
+    p.drawText( textIcon.rect(), Qt::AlignBottom | Qt::AlignRight, textOutgoing );
+#ifdef USE_KNOTIFICATIONITEM
+    mTray->setIconByPixmap( textIcon );
+#else
+    mTray->setIcon( textIcon );
+#endif
+}
+
 void InterfaceIcon::updateToolTip()
 {
     if ( mTray == 0L )
         return;
+    if ( mInterface->getSettings().iconSet.isEmpty() )
+        updateIconText();
     mTray->updateToolTip();
 }
 
 void InterfaceIcon::updateMenu()
 {
-    if ( mTray == 0L )
-        return;
-
     // Remove all old entries.
     KMenu* menu = (KMenu*)mTray->contextMenu();
     QList<QAction *> actions = menu->actions();
@@ -156,26 +275,27 @@ void InterfaceIcon::updateTrayStatus( int previousState )
     if ( title.isEmpty() )
         title = mInterface->getName();
 
-    // notification 'interface not available'
-    if ( !interfaceAvailable && mTray != 0L &&
-         previousState == Interface::AVAILABLE )
+    if ( mTray != 0L )
     {
-        /* When KNemo is starting we don't show the change in connection
-         * status as this would be annoying when KDE starts.
-         */
-        KNotification::event( "disconnected",
-                       title + ": " + i18n( "Disconnected" ) );
-    }
+        // notification 'interface not available'
+        if ( !interfaceAvailable && previousState == Interface::AVAILABLE )
+        {
+            /* When KNemo is starting we don't show the change in connection
+             * status as this would be annoying when KDE starts.
+             */
+            KNotification::event( "disconnected",
+                           title + ": " + i18n( "Disconnected" ) );
+        }
 
-    // notification 'interface nonexistent'
-    if ( !interfaceExists && mTray != 0L &&
-         previousState != Interface::UNKNOWN_STATE )
-    {
-        /* When KNemo is starting we don't show the change in connection
-         * status as this would be annoying when KDE starts.
-         */
-        KNotification::event( "nonexistent",
-                              title + ": " + i18n( "Nonexistent" ) );
+        // notification 'interface nonexistent'
+        if ( !interfaceExists && previousState != Interface::UNKNOWN_STATE )
+        {
+            /* When KNemo is starting we don't show the change in connection
+             * status as this would be annoying when KDE starts.
+             */
+            KNotification::event( "nonexistent",
+                                  title + ": " + i18n( "Nonexistent" ) );
+        }
     }
 
     /* Remove the icon if
@@ -222,31 +342,39 @@ void InterfaceIcon::updateTrayStatus( int previousState )
         connect( configAction, SIGNAL( triggered() ),
                  this, SLOT( showConfigDialog() ) );
 
-        updateStatus( mInterface->getState() );
+        if ( !mInterface->getSettings().iconSet.isEmpty() )
+            updateIconImage( mInterface->getState() );
         updateMenu();
 #ifndef USE_KNOTIFICATIONITEM
         mTray->show();
 #endif
     }
 
-    // notification 'interface available'
-    if ( interfaceAvailable && mTray != 0L &&
-         previousState != Interface::UNKNOWN_STATE )
+    if ( mTray != 0L )
     {
-        /* When KNemo is starting we don't show the change in connection
-         * status as this would be annoying.
-         */
-        if ( mInterface->getData().wirelessDevice )
+        // notification 'interface available'
+        if ( interfaceAvailable && previousState != Interface::UNKNOWN_STATE )
         {
-            KNotification::event( "connected",
-                                  title + ": " +
-                                  i18n( "Connected to %1", mInterface->getWirelessData().essid ) );
+            /* When KNemo is starting we don't show the change in connection
+             * status as this would be annoying.
+             */
+            if ( mInterface->getData().wirelessDevice )
+            {
+                KNotification::event( "connected",
+                                      title + ": " +
+                                      i18n( "Connected to %1", mInterface->getWirelessData().essid ) );
+            }
+            else
+            {
+                KNotification::event( "connected",
+                                      title + ": " + i18n( "Connected" ) );
+            }
         }
-        else
-        {
-            KNotification::event( "connected",
-                                  title + ": " + i18n( "Connected" ) );
-        }
+
+        // Tray text may need to appear active/inactive
+        // Force an update
+        if ( mInterface->getSettings().iconSet.isEmpty() )
+             updateIconText( true );
     }
 }
 

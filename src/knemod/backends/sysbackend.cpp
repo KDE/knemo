@@ -65,6 +65,8 @@ void SysBackend::update()
             // isn't loaded and/or the interface has not been created.
             interface->getData().existing = false;
             interface->getData().available = false;
+            interface->getData().incomingBytes = 0;
+            interface->getData().outgoingBytes = 0;
         }
         else
         {
@@ -85,6 +87,8 @@ void SysBackend::update()
                 // The interface is there but not useable.
                 interface->getData().existing = true;
                 interface->getData().available = false;
+                interface->getData().incomingBytes = 0;
+                interface->getData().outgoingBytes = 0;
             }
             else
             {

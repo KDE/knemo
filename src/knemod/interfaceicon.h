@@ -52,20 +52,14 @@ public:
      */
     virtual ~InterfaceIcon();
 
-    /*
-     * Fill the context menu with entries if the user configured
-     * start and stop command
-     */
-    void updateMenu();
-
 signals:
     void statisticsSelected();
 
 public slots:
     /*
-     * Changes the icon image displayed in the tray
+     * Changes the icon displayed in the tray
      */
-    void updateStatus( int status );
+    void updateIconImage( int status );
 
     /*
      * Creates or deletes the tray icon
@@ -76,6 +70,17 @@ public slots:
      * Change the tooltip according to the alias of the interface
      */
     void updateToolTip();
+
+    /*
+     * Fill the context menu with entries if the user configured
+     * start and stop command
+     */
+    void updateMenu();
+
+    /*
+     * Set colors for text in the tray
+     */
+    void configChanged( QColor colorIncoming, QColor colorOutgoing, int status );
 
 private slots:
     /*
@@ -89,10 +94,23 @@ private slots:
      */
     void menuTriggered( QAction * );
 
+    /*
+     * Given a string, return a general font with a point size that fits the
+     * tray icon
+     */
+    QFont setIconFont( QString );
+
+    /*
+     * Returns a string with a compact transfer rate
+     * This should not be more than 4 chars, including the units
+     */
+    QString compactTrayText( unsigned long );
+
     void showGraph();
     void showStatistics();
 
 private:
+    void updateIconText( bool proceed = false );
     // the interface this icon belongs to
     Interface* mInterface;
     // the real tray icon
@@ -101,6 +119,11 @@ private:
     KAction* plotterAction;
     KAction* statisticsAction;
     KAction* configAction;
+    QColor colorIncoming;
+    QColor colorOutgoing;
+    QString textIncoming;
+    QString textOutgoing;
+    int iconWidth;
 
     static const QString ICON_DISCONNECTED;
     static const QString ICON_CONNECTED;
