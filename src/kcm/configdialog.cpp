@@ -233,7 +233,6 @@ void ConfigDialog::load()
     KConfigGroup generalGroup( config, "General" );
     bool startKNemo = generalGroup.readEntry( "AutoStart", true );
     mDlg->checkBoxStartKNemo->setChecked( startKNemo );
-    mDlg->tabWidgetConfiguration->setEnabled( startKNemo );
     mDlg->numInputPollInterval->setValue( clamp<int>(generalGroup.readEntry( "PollInterval", 1 ), 1, 60 ) );
     mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( "SaveInterval", 60 ), 1, 300 ) );
     mDlg->lineEditStatisticsDir->setUrl( generalGroup.readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) ) );

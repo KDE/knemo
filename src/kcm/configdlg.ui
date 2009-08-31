@@ -1311,21 +1311,5 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b></string>
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>checkBoxStartKNemo</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>tabWidgetConfiguration</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
 </ui>
