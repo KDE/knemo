@@ -169,8 +169,10 @@ QString InterfaceIcon::compactTrayText(unsigned long bytes )
     else if ( bytes < 1048051712 ) // < 999.5G
         byteString = i18n( "%1M" ).arg( QString::number( bytes/1048576.0, 'f', 0 ) );
     else if ( bytes < 10683731148.0 ) // < 9.95G
+        // xgettext: no-c-format
         byteString = i18n( "%1G" ).arg( QString::number( bytes/1073741824.0, 'f', 1 ) );
     else
+        // xgettext: no-c-format
         byteString = i18n( "%1G" ).arg( QString::number( bytes/1073741824.0, 'f', 0) );
     return byteString;
 }
