@@ -37,7 +37,7 @@
 
 #ifdef USE_KNOTIFICATIONITEM
 
-#if KDE_VERSION < 4.3.66
+#if KDE_VERSION < 4366
 using namespace Experimental;
 #endif
 
