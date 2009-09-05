@@ -24,11 +24,12 @@
 
 #include <kdeversion.h>
 
-#if KDE_MAKE_VERSION(4,4,0)
-  #include <knotificationitem.h>
-#endif
 #ifdef USE_KNOTIFICATIONITEM
-  #include <knotificationitem-1/knotificationitem.h>
+  #if KDE_VERSION >= KDE_MAKE_VERSION(4, 3, 66)
+    #include <knotificationitem.h>
+  #else
+    #include <knotificationitem-1/knotificationitem.h>
+  #endif
 #else
   #include <KSystemTrayIcon>
 #endif
