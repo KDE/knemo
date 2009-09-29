@@ -57,16 +57,6 @@ public:
      */
     virtual ~Interface();
 
-    void setType( int type )
-    {
-        mType = type;
-    }
-
-    int getType()
-    {
-        return mType;
-    }
-
     void setState( int state )
     {
         mState = state;

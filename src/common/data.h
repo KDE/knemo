@@ -71,6 +71,17 @@ struct InterfaceSettings
     QList<InterfaceCommand> commands;
 };
 
+#ifndef __linux__
+enum rt_scope_t
+{
+    RT_SCOPE_UNIVERSE=0,
+    RT_SCOPE_SITE=200,
+    RT_SCOPE_LINK=253,
+    RT_SCOPE_HOST=254,
+    RT_SCOPE_NOWHERE=255
+};
+#endif
+
 enum ToolTipEnums
 {
     INTERFACE        = 0x00000001,
@@ -78,7 +89,7 @@ enum ToolTipEnums
     STATUS           = 0x00000004,
     UPTIME           = 0x00000008,
     IP_ADDRESS       = 0x00000010,
-    SUBNET_MASK      = 0x00000020,
+    SCOPE            = 0x00000020,
     HW_ADDRESS       = 0x00000040,
     PTP_ADDRESS      = 0x00000080,
     RX_PACKETS       = 0x00000100,

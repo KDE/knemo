@@ -44,20 +44,10 @@
          </property>
          <layout class="QGridLayout" name="_2">
           <item row="0" column="1">
-           <widget class="QLabel" name="textLabelIP">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-            <property name="textInteractionFlags">
-             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-            </property>
-           </widget>
+           <widget class="QComboBox" name="comboBoxIP" />
           </item>
           <item row="1" column="1">
-           <widget class="QLabel" name="textLabelSubnet">
+           <widget class="QLabel" name="textLabelAddrLabel">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
@@ -70,7 +60,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLabel" name="variableText1">
+           <widget class="QLabel" name="textLabelScope">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
@@ -83,7 +73,7 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLabel" name="variableText2">
+           <widget class="QLabel" name="variableText1">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
@@ -96,6 +86,19 @@
            </widget>
           </item>
           <item row="4" column="1">
+           <widget class="QLabel" name="variableText2">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
            <widget class="QLabel" name="variableText3">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -111,7 +114,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="textLabel4_2">
             <property name="text">
-             <string>IP-Address:</string>
+             <string>IP Address/prefix:</string>
             </property>
             <property name="wordWrap">
              <bool>false</bool>
@@ -119,9 +122,9 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="textLabel5_2">
+           <widget class="QLabel" name="addrLabel">
             <property name="text">
-             <string>Subnet Mask:</string>
+             <string>Address Label:</string>
             </property>
             <property name="wordWrap">
              <bool>false</bool>
@@ -129,6 +132,16 @@
            </widget>
           </item>
           <item row="2" column="0">
+           <widget class="QLabel" name="scopeLabel">
+            <property name="text">
+             <string>Scope &amp; Flags:</string>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
            <widget class="QLabel" name="variableLabel1">
             <property name="text">
              <string>Broadcast Address:</string>
@@ -138,7 +151,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="variableLabel2">
             <property name="text">
              <string>Default Gateway:</string>
@@ -148,10 +161,10 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="variableLabel3">
             <property name="text">
-             <string>HW-Address:</string>
+             <string>MAC Address:</string>
             </property>
             <property name="wordWrap">
              <bool>false</bool>

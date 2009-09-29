@@ -1,6 +1,6 @@
 /* This file is part of KNemo
-   Copyright (C) 2006 Percy Leonhardt <percy@eris23.de>
    Copyright (C) 2009 John Stamp <jstamp@users.sourceforge.net>
+
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -18,39 +18,12 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef DAEMONREGISTRY_H
-#define DAEMONREGISTRY_H
+#include <QString>
 
-#ifdef __linux__
-  #include "netlinkbackend.h"
-#else
-  #include "bsdbackend.h"
-#endif
-
-/**
- * This registry tells KNemo what backends are available
- * and how they can be created. It is only used by the daemon
- * to create the selected backend. Two registries were
- * necessary to avoid linking the KCM module against all backends.
- *
- * @short Registry for all backends
- * @author Percy Leonhardt <percy@eris23.de>
+/*
+ * Finds the default gateway for AF_INET or AF_INET6
+ * It fills defaultGateway with the address and returns the interface name
+ * If one isn't found, both are empty.
+ * data is by the netlink backend to pass nl_cache data
  */
-
-struct DaemonRegistryEntry
-{
-    QString name;
-    BackendBase* (*function) ( QHash<QString, Interface *>& );
-};
-
-DaemonRegistryEntry DaemonRegistry[] =
-{
-#ifdef __linux__
-    { "Sys", NetlinkBackend::createInstance },
-#else
-    { "Sys", BSDBackend::createInstance },
-#endif
-    { QString::null, 0 }
-};
-
-#endif // DAEMONREGISTRY_H
+QString getDefaultRoute( int afType, QString * defaultGateway = NULL, void * data = NULL );

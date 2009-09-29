@@ -18,8 +18,11 @@
    Boston, MA 02110-1301, USA.
 */
 
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <ifaddrs.h>
+#include <netdb.h>
 #include <QDBusInterface>
-#include <qfile.h>
 #include <qlabel.h>
 #include <qlayout.h>
 #include <qcheckbox.h>
@@ -52,6 +55,13 @@
 #include "ui_configdlg.h"
 #include "config-knemo.h"
 #include "configdialog.h"
+#include "utils.h"
+
+#ifdef __linux__
+  #include <netlink/route/rtnl.h>
+  #include <netlink/route/link.h>
+  #include <netlink/route/route.h>
+#endif
 
 const QString ConfigDialog::ICON_DISCONNECTED = "_disconnected";
 const QString ConfigDialog::ICON_CONNECTED = "_connected";
@@ -76,7 +86,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
 {
     mConfig = KSharedConfig::openConfig( "knemorc" );
     setupToolTipMap();
-    setupBackendInfo();
 
     QWidget *main = new QWidget( this );
     QVBoxLayout* top = new QVBoxLayout( this );
@@ -101,14 +110,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     mDlg->comboBoxIconSet->addItems( mIconSets );
     if ( mIconSets.contains( "monitor" ) )
         mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( "monitor" ) );
-
-    // fill the backends combobox
-    QStringList items;
-    for ( int i = 0; i < mBackends.count(); i++ )
-    {
-        items << mBackends.at( i ).name;
-    }
-    mDlg->comboBoxBackends->addItems( items );
 
     mDlg->pushButtonNew->setIcon( SmallIcon( "list-add" ) );
     mDlg->pushButtonAll->setIcon( SmallIcon( "document-new" ) );
@@ -158,8 +159,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( aliasChanged( const QString& ) ) );
     connect( mDlg->comboBoxIconSet, SIGNAL( activated( int ) ),
              this, SLOT( iconSetChanged( int ) ) );
-    connect( mDlg->comboBoxBackends, SIGNAL( activated( int ) ),
-             this, SLOT( backendChanged( int ) ) );
     connect( mDlg->checkBoxNotConnected, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxNotConnectedToggled ( bool ) ) );
     connect( mDlg->checkBoxNotExisting, SIGNAL( toggled( bool ) ),
@@ -242,26 +241,6 @@ void ConfigDialog::load()
     mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( "SaveInterval", 60 ), 1, 300 ) );
     mDlg->lineEditStatisticsDir->setUrl( generalGroup.readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) ) );
     mToolTipContent = generalGroup.readEntry( "ToolTipContent", 2 );
-
-    // select the backend from the config file
-    bool foundBackend = false;
-    QString backend = generalGroup.readEntry( "Backend", "Sys" );
-    int i;
-    for ( i = 0; i < mBackends.count(); i++ )
-    {
-        if ( mBackends.at( i ).configName == backend )
-        {
-            foundBackend = true;
-            break;
-        }
-    }
-
-    if ( !foundBackend )
-    {
-        i = 0; // use the first backend (Sys)
-    }
-    mDlg->comboBoxBackends->setCurrentIndex( i );
-    mDlg->textLabelBackendDescription->setText( mBackends.at( i ).description );
 
     QStringList list = generalGroup.readEntry( "Interfaces", QStringList() );
 
@@ -446,7 +425,6 @@ void ConfigDialog::save()
     generalGroup.writeEntry( "PollInterval", mDlg->numInputPollInterval->value() );
     generalGroup.writeEntry( "SaveInterval", mDlg->numInputSaveInterval->value() );
     generalGroup.writeEntry( "StatisticsDir",  mDlg->lineEditStatisticsDir->url().url() );
-    generalGroup.writeEntry( "Backend", mBackends.at( mDlg->comboBoxBackends->currentIndex() ).configName );
     generalGroup.writeEntry( "ToolTipContent", mToolTipContent );
     generalGroup.writeEntry( "Interfaces", list );
 
@@ -499,50 +477,49 @@ void ConfigDialog::defaults()
     mDlg->pixmapTraffic->clear();
 
     // Default interface
-    QFile proc( "/proc/net/route" );
-    if ( proc.open( QIODevice::ReadOnly ) )
+    void *cache = NULL;
+
+#ifdef __linux__
+	nl_handle *rtsock = nl_handle_alloc();
+	int c = nl_connect(rtsock, NETLINK_ROUTE);
+    if ( c >= 0 )
     {
-        QString file =  proc.readAll();
-        QStringList content = file.split( "\n" );
-        QStringListIterator it( content );
-        while ( it.hasNext() )
-        {
-            QStringList routeParameter = it.next().split( QRegExp("\\s"), QString::SkipEmptyParts );
-            if ( routeParameter.count() < 2 )
-                continue;
-            if ( routeParameter[1] != "00000000" ) // no default route
-                continue;
-            if ( routeParameter[0] == "lo" )
-                continue;
-            QString interface = routeParameter[0]; // default route interface
-            InterfaceSettings* settings = new InterfaceSettings();
-            settings->customCommands = false;
-            settings->hideWhenNotAvailable = false;
-            settings->hideWhenNotExisting = false;
-            settings->activateStatistics = false;
-            settings->iconSet = "monitor";
-            settings->alias = interface;
-            mSettingsMap.insert( interface, settings );
-            mDlg->listBoxInterfaces->addItem( interface );
-            mDlg->lineEditAlias->setText( interface );
-            break;
-        }
-        if ( mDlg->listBoxInterfaces->count() > 0 )
-        {
-            mDlg->listBoxInterfaces->setCurrentRow( 0 );
-            mDlg->pushButtonDelete->setDisabled( false );
-            mDlg->groupBoxIfaceMisc->setDisabled( false );
-            mDlg->groupBoxIfaceMenu->setDisabled( false );
-        }
-        proc.close();
+	    cache = rtnl_route_alloc_cache( rtsock );
+    }
+#endif
+
+    QString interface = getDefaultRoute( AF_INET, NULL, cache );
+    if ( interface.isEmpty() )
+        interface = getDefaultRoute( AF_INET6, NULL, cache );
+
+#ifdef __linux__
+    nl_cache_free( static_cast<nl_cache*>(cache) );
+    nl_close( rtsock );
+    nl_handle_destroy( rtsock );
+#endif
+
+    if ( !interface.isEmpty() )
+    {
+        InterfaceSettings* settings = new InterfaceSettings();
+        settings->customCommands = false;
+        settings->hideWhenNotAvailable = false;
+        settings->hideWhenNotExisting = false;
+        settings->activateStatistics = false;
+        settings->iconSet = "monitor";
+        settings->alias = interface;
+        mSettingsMap.insert( interface, settings );
+        mDlg->listBoxInterfaces->addItem( interface );
+        mDlg->lineEditAlias->setText( interface );
+        mDlg->listBoxInterfaces->setCurrentRow( 0 );
+        mDlg->pushButtonDelete->setDisabled( false );
+        mDlg->groupBoxIfaceMisc->setDisabled( false );
+        mDlg->groupBoxIfaceMenu->setDisabled( false );
     }
 
     // Default misc settings
     mDlg->numInputPollInterval->setValue( 1 );
     mDlg->numInputSaveInterval->setValue( 60 );
     mDlg->lineEditStatisticsDir->setUrl( KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
-    mDlg->comboBoxBackends->setCurrentIndex( 0 );
-    mDlg->textLabelBackendDescription->setText( mBackends.at( 0 ).description );
 
     // Default tool tips
     mToolTipContent = 2;
@@ -596,49 +573,70 @@ void ConfigDialog::buttonNewSelected()
 
 void ConfigDialog::buttonAllSelected()
 {
-    QFile proc( "/proc/net/dev" );
-    if ( proc.open( QIODevice::ReadOnly ) )
-    {
-        QString file =  proc.readAll();
-        QStringList content = file.split( "\n", QString::SkipEmptyParts );
-        if ( content.count() > 2 )
-        {
-            for ( int i = 2; i < content.count(); i++ )
-            {
-                QString interface = content[i].simplified();
-                int index = interface.indexOf( ':' );
-                if ( index > -1 )
-                {
-                    interface = interface.left( index );
-                    if ( interface == "lo" || mSettingsMap.contains( interface ) )
-                        continue;
-                }
+    QStringList ifaces;
 
-                InterfaceSettings* settings = new InterfaceSettings();
-                settings->customCommands = false;
-                settings->hideWhenNotAvailable = false;
-                settings->hideWhenNotExisting = false;
-                settings->activateStatistics = false;
-                settings->iconSet = "monitor";
-                settings->alias = interface;
-                mSettingsMap.insert( interface, settings );
-                mDlg->listBoxInterfaces->addItem( interface );
-            }
-            if ( mDlg->listBoxInterfaces->count() > 0 )
-            {
-                mDlg->listBoxInterfaces->setCurrentRow( 0 );
-                mDlg->pushButtonDelete->setDisabled( false );
-                mDlg->groupBoxIfaceMisc->setDisabled( false );
-                mDlg->groupBoxIfaceMenu->setDisabled( false );
-                QString iface = mDlg->listBoxInterfaces->item( 0 )->text();
-                mDlg->lineEditAlias->blockSignals( true );
-                mDlg->lineEditAlias->setText( mSettingsMap[iface]->alias );
-                mDlg->lineEditAlias->blockSignals( false );
-            }
+#ifdef __linux__
+    nl_cache * linkCache = NULL;
+    nl_handle *rtsock = nl_handle_alloc();
+    int c = nl_connect(rtsock, NETLINK_ROUTE);
+    if ( c >= 0 )
+    {
+        linkCache = rtnl_link_alloc_cache( rtsock );
+
+        struct rtnl_link * rtlink;
+        for ( rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_first( linkCache ));
+              rtlink != NULL;
+              rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_next( reinterpret_cast<struct nl_object *>(rtlink) ))
+            )
+        {
+            QString ifname( rtnl_link_get_name( rtlink ) );
+            if ( "lo" == ifname || mSettingsMap.contains( ifname ) )
+                continue;
+            ifaces << ifname;
         }
-        proc.close();
-        changed( true );
     }
+    nl_cache_free( linkCache );
+    nl_close( rtsock );
+    nl_handle_destroy( rtsock );
+#else
+    struct ifaddrs *ifaddr;
+    struct ifaddrs *ifa;
+    getifaddrs( &ifaddr );
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        QString ifname( ifa->ifa_name );
+        if ( "lo" == ifname || "lo0" == ifname || ifaces.contains( ifname ) || mSettingsMap.contains( ifname ) )
+            continue;
+        ifaces << ifname;
+    }
+    freeifaddrs( ifaddr );
+#endif
+
+    foreach ( QString ifname, ifaces )
+    {
+        InterfaceSettings* settings = new InterfaceSettings();
+        settings->customCommands = false;
+        settings->hideWhenNotAvailable = false;
+        settings->hideWhenNotExisting = false;
+        settings->activateStatistics = false;
+        settings->iconSet = "monitor";
+        settings->alias = ifname;
+        mSettingsMap.insert( ifname, settings );
+        mDlg->listBoxInterfaces->addItem( ifname );
+    }
+
+    if ( mDlg->listBoxInterfaces->count() > 0 )
+    {
+        mDlg->listBoxInterfaces->setCurrentRow( 0 );
+        mDlg->pushButtonDelete->setDisabled( false );
+        mDlg->groupBoxIfaceMisc->setDisabled( false );
+        mDlg->groupBoxIfaceMenu->setDisabled( false );
+        QString iface = mDlg->listBoxInterfaces->item( 0 )->text();
+        mDlg->lineEditAlias->blockSignals( true );
+        mDlg->lineEditAlias->setText( mSettingsMap[iface]->alias );
+        mDlg->lineEditAlias->blockSignals( false );
+    }
+    changed( true );
 }
 
 void ConfigDialog::buttonDeleteSelected()
@@ -1037,12 +1035,6 @@ void ConfigDialog::iconSetChanged( int set )
     if (!mLock) changed( true );
 }
 
-void ConfigDialog::backendChanged( int backend )
-{
-    mDlg->textLabelBackendDescription->setText( mBackends.at( backend ).description );
-    if (!mLock) changed( true );
-}
-
 void ConfigDialog::checkBoxNotConnectedToggled( bool on )
 {
     if ( !mDlg->listBoxInterfaces->currentItem() )
@@ -1172,12 +1164,12 @@ void ConfigDialog::setupToolTipMap()
 #endif
     mToolTips.insert( STATUS, i18n( "Status" ) );
     mToolTips.insert( UPTIME, i18n( "Uptime" ) );
-    mToolTips.insert( IP_ADDRESS, i18n( "IP-Address" ) );
-    mToolTips.insert( SUBNET_MASK, i18n( "Subnet Mask" ) );
-    mToolTips.insert( HW_ADDRESS, i18n( "HW-Address" ) );
+    mToolTips.insert( IP_ADDRESS, i18n( "IP Address" ) );
+    mToolTips.insert( SCOPE, i18n( "Scope & Flags" ) );
+    mToolTips.insert( HW_ADDRESS, i18n( "MAC Address" ) );
     mToolTips.insert( BCAST_ADDRESS, i18n( "Broadcast Address" ) );
     mToolTips.insert( GATEWAY, i18n( "Default Gateway" ) );
-    mToolTips.insert( PTP_ADDRESS, i18n( "PtP-Address" ) );
+    mToolTips.insert( PTP_ADDRESS, i18n( "PtP Address" ) );
     mToolTips.insert( RX_PACKETS, i18n( "Packets Received" ) );
     mToolTips.insert( TX_PACKETS, i18n( "Packets Sent" ) );
     mToolTips.insert( RX_BYTES, i18n( "Bytes Received" ) );
@@ -1192,27 +1184,6 @@ void ConfigDialog::setupToolTipMap()
     mToolTips.insert( LINK_QUALITY, i18n( "Link Quality" ) );
     mToolTips.insert( NICK_NAME, i18n( "Nickname" ) );
     mToolTips.insert( ENCRYPTION, i18n( "Encryption" ) );
-}
-
-void ConfigDialog::setupBackendInfo()
-{
-    BackendEntry reg;
-    reg.name = i18n( "Sys" );
-    reg.configName = "Sys";
-    reg.description = i18n( "Reads network information from the sysfs file " \
-            "system and direct system calls.\n" \
-            "This backend should have a low CPU load and does not access " \
-            "the hard disk." );
-    mBackends.append( reg );
-
-    reg.name = i18n( "Nettools" );
-    reg.configName = "Nettools";
-    reg.description = i18n( "Reads network information from ifconfig, " \
-            "iwconfig, iwlist, and route.\n" \
-            "This backend may cause a relatively high CPU load, so it is " \
-            "recommended only if you are having trouble with the \"Sys\" " \
-            "backend." );
-    mBackends.append( reg );
 }
 
 void ConfigDialog::updateStatisticsEntries( void )

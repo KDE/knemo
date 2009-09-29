@@ -50,7 +50,7 @@ public:
      * interfaces in the QHash.
      */
     virtual void update() = 0;
-    virtual QString getDefaultRouteIface() = 0;
+    virtual QString getDefaultRouteIface( int afInet ) = 0;
 
 protected:
     /**
@@ -58,9 +58,13 @@ protected:
      * update. It will trigger the interfaces to check
      * if there state has changed.
      */
-    void updateComplete();
+    virtual void updateComplete();
 
     const QHash<QString, Interface *>& mInterfaces;
+    QString ip4DefGw;
+    QString ip6DefGw;
+    void incBytes( int type, unsigned long bytes, unsigned long &changed, unsigned long &prevDataBytes, quint64 &curDataBytes );
+    virtual void updateInterfaceData( const QString&, InterfaceData& ) = 0;
 };
 
 #endif // BACKENDBASE_H

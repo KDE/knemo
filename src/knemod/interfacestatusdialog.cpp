@@ -19,6 +19,13 @@
 */
 
 #include <kio/global.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <QAbstractItemView>
+
+#ifdef __linux__
+  #include <netlink/netlink.h>
+#endif
 
 #include "data.h"
 #include "interface.h"
@@ -35,6 +42,14 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     setButtons( Close );
 
     ui.setupUi( mainWidget() );
+
+    // FreeBSD doesn't have address labels, so hide by default
+#ifndef __linux__
+    ui.addrLabel->hide();
+    ui.textLabelAddrLabel->hide();
+#endif
+
+    connect( ui.comboBoxIP, SIGNAL( activated(int) ), this, SLOT( updateDialog() ) );
 
     updateDialog();
     if ( interface->getData().available )
@@ -100,6 +115,8 @@ bool InterfaceStatusDialog::event( QEvent *e )
             move( pos() );
         }
     }
+    else if ( e->type() == QEvent::Show )
+        updateDialog();
 
     return KDialog::event( e );
 }
@@ -111,6 +128,9 @@ void InterfaceStatusDialog::setStatisticsGroupEnabled( bool enabled )
 
 void InterfaceStatusDialog::updateDialog()
 {
+    if ( isHidden() )
+        return;
+
     InterfaceData& data = mInterface->getData();
     InterfaceSettings& settings = mInterface->getSettings();
 
@@ -145,38 +165,102 @@ void InterfaceStatusDialog::updateDialog()
         ui.textLabelUptime->setText( "00:00:00" );
     }
 
+    if ( data.interfaceType == Interface::ETHERNET )
+    {
+        ui.variableLabel3->setText( i18n( "MAC Address:" ) );
+        ui.variableText3->setText( data.hwAddress );
+    }
+    else
+    {
+        ui.variableLabel3->setText( QString::null );
+        ui.variableText3->setText( QString::null );
+    }
+
     if ( data.available )
     {
         // ip tab
-        ui.textLabelIP->setText( data.ipAddress );
-        ui.textLabelSubnet->setText( data.subnetMask );
-        if ( mInterface->getType() == Interface::ETHERNET )
+
+        // Simpler to just clear and re-insert items in the combo box.
+        // But then if we're selecting, the highlighted item would get
+        // cleared each poll period.
+        int i = 0;
+        QStringList keys = data.addrData.keys();
+        while ( i < ui.comboBoxIP->count() )
         {
-            ui.variableLabel1->setText( i18n( "Broadcast Address:" ) );
-            ui.variableText1->setText( data.broadcastAddress );
-            ui.variableLabel2->setText( i18n( "Default Gateway:" ) );
-            ui.variableText2->setText( data.defaultGateway );
-            ui.variableLabel3->setText( i18n( "HW-Address:" ) );
-            ui.variableText3->setText( data.hwAddress );
+            if ( keys.contains( ui.comboBoxIP->itemText( i ) ) )
+                i++;
+            else
+                ui.comboBoxIP->removeItem( i );
         }
-        else if ( mInterface->getType() == Interface::PPP )
+        int keyCounter = 0;
+        foreach( QString key, keys )
         {
-            ui.variableLabel1->setText( i18n( "PtP-Address:" ) );
-            ui.variableText1->setText( data.ptpAddress );
+            // Combo box preserves order in map
+            if ( ui.comboBoxIP->findText( key ) < 0 )
+                ui.comboBoxIP->insertItem( keyCounter, key );
+            keyCounter++;
+        }
+        ui.comboBoxIP->setMinimumWidth( ui.comboBoxIP->view()->sizeHint().width() );
+
+        AddrData addrData = data.addrData.value( ui.comboBoxIP->currentText() );
+
+#ifdef __linux__
+        if ( addrData.label.isEmpty() )
+            ui.textLabelAddrLabel->clear();
+        else
+            ui.textLabelAddrLabel->setText( addrData.label );
+#endif
+
+        QString scope;
+        switch ( addrData.scope )
+        {
+            case RT_SCOPE_UNIVERSE:
+                scope = i18n( "global" );
+                break;
+            case RT_SCOPE_SITE:
+                scope = i18n( "site" );
+                break;
+            case RT_SCOPE_LINK:
+                scope = i18n( "link" );
+                break;
+            case RT_SCOPE_HOST:
+                scope = i18n( "host" );
+                break;
+            case RT_SCOPE_NOWHERE:
+                scope = i18n( "none" );
+                break;
+        }
+        scope += addrData.ipv6Flags;
+        ui.textLabelScope->setText( scope );
+
+        if ( data.interfaceType == Interface::PPP )
+        {
             ui.variableLabel2->setText( QString::null );
             ui.variableText2->setText( QString::null );
-            ui.variableLabel3->setText( QString::null );
-            ui.variableText3->setText( QString::null );
         }
         else
         {
-            // shouldn't happen
-            ui.variableLabel1->setText( QString::null );
-            ui.variableText1->setText( QString::null );
-            ui.variableLabel2->setText( QString::null );
-            ui.variableText2->setText( QString::null );
-            ui.variableLabel3->setText( QString::null );
-            ui.variableText3->setText( QString::null );
+            if ( addrData.scope != RT_SCOPE_HOST )
+            {
+                if ( addrData.afType == AF_INET )
+                    ui.variableText2->setText( data.ip4DefaultGateway );
+                else
+                    ui.variableText2->setText( data.ip6DefaultGateway );
+            }
+        }
+
+        if ( addrData.scope != RT_SCOPE_HOST )
+        {
+            if ( addrData.hasPeer )
+            {
+                ui.variableLabel1->setText( i18n( "PtP Address:" ) );
+                ui.variableText1->setText( addrData.broadcastAddress );
+            }
+            else
+            {
+                ui.variableLabel1->setText( i18n( "Broadcast Address:" ) );
+                ui.variableText1->setText( addrData.broadcastAddress );
+            }
         }
 
         // traffic tab
@@ -225,8 +309,8 @@ void InterfaceStatusDialog::disableNetworkGroups( int )
     ui.groupBoxCurrentConnection->setEnabled( false );
 
     // clear IP group
-    ui.textLabelIP->setText( QString::null );
-    ui.textLabelSubnet->setText( QString::null );
+    ui.comboBoxIP->clear();
+    //ui.textLabelSubnet->setText( QString::null );
     ui.variableText1->setText( QString::null );
     ui.variableText2->setText( QString::null );
     ui.variableText3->setText( QString::null );

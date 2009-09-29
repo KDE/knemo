@@ -20,6 +20,12 @@
 
 #include "interfacetray.h"
 
+#ifdef __linux__
+#include <netlink/netlink.h>
+#endif
+
+#include <sys/socket.h>
+#include <netdb.h>
 #include <kio/global.h>
 #include <KLocale>
 #include <KActionCollection>
@@ -179,23 +185,47 @@ QString InterfaceTray::toolTipData()
     {
         if ( toolTipContent & UPTIME )
             tipData += leftTags + mToolTips.value( UPTIME ) + centerTags + mInterface->getUptimeString() + rightTags ;
-        if ( toolTipContent & IP_ADDRESS )
-            tipData += leftTags + mToolTips.value( IP_ADDRESS ) + centerTags + data.ipAddress + rightTags;
-        if ( toolTipContent & SUBNET_MASK )
-            tipData += leftTags + mToolTips.value( SUBNET_MASK ) + centerTags + data.subnetMask + rightTags;
-        if ( mInterface->getType() == Interface::ETHERNET )
+        QStringList keys = data.addrData.keys();
+        QString ip4Tip;
+        QString ip6Tip;
+        foreach ( QString key, keys )
         {
-            if ( toolTipContent & BCAST_ADDRESS )
-                tipData += leftTags + mToolTips.value( BCAST_ADDRESS ) + centerTags + data.broadcastAddress + rightTags;
+            AddrData addrData = data.addrData.value( key );
+
+            if ( addrData.afType == AF_INET )
+            {
+                if ( toolTipContent & IP_ADDRESS )
+                    ip4Tip += leftTags + i18n( "IPv4 Address" ) + centerTags + key + rightTags;
+                if ( toolTipContent & SCOPE )
+                    ip4Tip += leftTags + mToolTips.value( SCOPE ) + centerTags + mScope.value( addrData.scope ) + addrData.ipv6Flags + rightTags;
+                if ( toolTipContent & BCAST_ADDRESS && !addrData.hasPeer )
+                    ip4Tip += leftTags + mToolTips.value( BCAST_ADDRESS ) + centerTags + addrData.broadcastAddress + rightTags;
+                else if ( toolTipContent & PTP_ADDRESS && addrData.hasPeer )
+                    ip4Tip += leftTags + mToolTips.value( PTP_ADDRESS ) + centerTags + addrData.broadcastAddress + rightTags;
+            }
+            else
+            {
+                if ( toolTipContent & IP_ADDRESS )
+                    ip6Tip += leftTags + i18n( "IPv6 Address" ) + centerTags + key + rightTags;
+                if ( toolTipContent & SCOPE )
+                    ip6Tip += leftTags + mToolTips.value( SCOPE ) + centerTags + mScope.value( addrData.scope ) + rightTags;
+                if ( toolTipContent & PTP_ADDRESS && addrData.hasPeer )
+                    ip6Tip += leftTags + mToolTips.value( PTP_ADDRESS ) + centerTags + addrData.broadcastAddress + rightTags;
+            }
+        }
+        tipData += ip4Tip + ip6Tip;
+
+        if ( Interface::ETHERNET == data.interfaceType )
+        {
             if ( toolTipContent & GATEWAY )
-                tipData += leftTags + mToolTips.value( GATEWAY ) + centerTags + data.defaultGateway + rightTags;
+            {
+                if ( !data.ip4DefaultGateway.isEmpty() )
+                    tipData += leftTags + i18n( "IPv4 Default Gateway" ) + centerTags + data.ip4DefaultGateway + rightTags;
+                if ( !data.ip6DefaultGateway.isEmpty() )
+                    tipData += leftTags + i18n( "IPv6 Default Gateway" ) + centerTags + data.ip6DefaultGateway + rightTags;
+            }
             if ( toolTipContent & HW_ADDRESS )
                 tipData += leftTags + mToolTips.value( HW_ADDRESS ) + centerTags + data.hwAddress + rightTags;
-        }
-        if ( mInterface->getType() == Interface::PPP )
-        {
-            if ( toolTipContent & PTP_ADDRESS )
-                tipData += leftTags + mToolTips.value( PTP_ADDRESS ) + centerTags + data.ptpAddress + rightTags;
         }
         if ( toolTipContent & RX_PACKETS )
             tipData += leftTags + mToolTips.value( RX_PACKETS ) + centerTags + QString::number( data.rxPackets ) + rightTags;
@@ -254,16 +284,21 @@ void InterfaceTray::setupToolTipArray()
 {
     // Cannot make this data static as the i18n macro doesn't seem
     // to work when called to early i.e. before setting the catalogue.
+    mScope.insert( RT_SCOPE_NOWHERE, i18n( "none" ) );
+    mScope.insert( RT_SCOPE_HOST, i18n( "host" ) );
+    mScope.insert( RT_SCOPE_LINK, i18n( "link" ) );
+    mScope.insert( RT_SCOPE_SITE, i18n( "site" ) );
+    mScope.insert( RT_SCOPE_UNIVERSE, i18n( "global" ) );
+
     mToolTips.insert( INTERFACE, i18n( "Interface" ) );
 #ifndef USE_KNOTIFICATIONITEM
     mToolTips.insert( ALIAS, i18n( "Alias" ) );
 #endif
     mToolTips.insert( STATUS, i18n( "Status" ) );
     mToolTips.insert( UPTIME, i18n( "Uptime" ) );
-    mToolTips.insert( IP_ADDRESS, i18n( "IP-Address" ) );
-    mToolTips.insert( SUBNET_MASK, i18n( "Subnet Mask" ) );
-    mToolTips.insert( HW_ADDRESS, i18n( "HW-Address" ) );
-    mToolTips.insert( PTP_ADDRESS, i18n( "PtP-Address" ) );
+    mToolTips.insert( SCOPE, i18n( "Scope & Flags" ) );
+    mToolTips.insert( HW_ADDRESS, i18n( "MAC Address" ) );
+    mToolTips.insert( PTP_ADDRESS, i18n( "PtP Address" ) );
     mToolTips.insert( RX_PACKETS, i18n( "Packets Received" ) );
     mToolTips.insert( TX_PACKETS, i18n( "Packets Sent" ) );
     mToolTips.insert( RX_BYTES, i18n( "Bytes Received" ) );
@@ -275,7 +310,6 @@ void InterfaceTray::setupToolTipArray()
     mToolTips.insert( ACCESS_POINT, i18n( "Access Point" ) );
     mToolTips.insert( LINK_QUALITY, i18n( "Link Quality" ) );
     mToolTips.insert( BCAST_ADDRESS, i18n( "Broadcast Address" ) );
-    mToolTips.insert( GATEWAY, i18n( "Default Gateway" ) );
     mToolTips.insert( DOWNLOAD_SPEED, i18n( "Download Speed" ) );
     mToolTips.insert( UPLOAD_SPEED, i18n( "Upload Speed" ) );
     mToolTips.insert( NICK_NAME, i18n( "Nickname" ) );

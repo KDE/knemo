@@ -19,6 +19,7 @@
 */
 
 #include "backendbase.h"
+#include "utils.h"
 
 BackendBase::BackendBase( QHash<QString, Interface *>& interfaces )
     : mInterfaces( interfaces )
@@ -36,3 +37,41 @@ void BackendBase::updateComplete()
         mInterfaces.value( key )->activateMonitor();
     }
 }
+
+void BackendBase::incBytes( int type, unsigned long bytes, unsigned long &changed, unsigned long &prevDataBytes, quint64 &curDataBytes )
+{
+    // We count the traffic on ourself to avoid an overflow after
+    // 4GB of traffic.
+    if ( bytes < prevDataBytes )
+    {
+        // there was an overflow
+        if ( type == Interface::ETHERNET )
+        {
+            // This makes data counting more accurate but will not work
+            // for interfaces that reset the transfered data to zero
+            // when deactivated like ppp does.
+            // BSD uses uint32_t for byte counters, so no need to test
+            // size
+#ifdef __linux__
+            if ( 4 == sizeof(long) )
+#endif
+                curDataBytes += 0xFFFFFFFF - prevDataBytes;
+        }
+        prevDataBytes = 0L;
+    }
+    if ( curDataBytes == 0L )
+    {
+        // on startup set to currently received bytes
+        curDataBytes = bytes;
+        // this is new: KNemo only counts the traffic transfered
+        // while it is running. Important to not falsify statistics!
+        prevDataBytes = bytes;
+    }
+    else
+        // afterwards only add difference to previous number of bytes
+        curDataBytes += bytes - prevDataBytes;
+
+    changed = bytes - prevDataBytes;
+    prevDataBytes = bytes;
+}
+

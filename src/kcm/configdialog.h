@@ -70,7 +70,6 @@ private slots:
     void interfaceSelected( int row );
     void aliasChanged( const QString& text );
     void iconSetChanged( int set );
-    void backendChanged( int set );
     void checkBoxNotConnectedToggled( bool on );
     void checkBoxNotExistingToggled( bool on );
     void checkBoxStatisticsToggled( bool on );
@@ -84,7 +83,6 @@ private slots:
 private:
     void setupToolTipTab();
     void setupToolTipMap();
-    void setupBackendInfo();
     void updateStatisticsEntries( void );
     QPixmap textIcon( QString incomingText, QString outgoingText, bool active );
     QFont setIconFont( QString );
@@ -95,13 +93,6 @@ private:
         MODEM,
         NETWORK,
         WIRELESS
-    };
-
-    struct BackendEntry
-    {
-        QString name;
-        QString configName;
-        QString description;
     };
 
     int mToolTipContent;
@@ -116,7 +107,6 @@ private:
     QMap<QString, InterfaceSettings *> mSettingsMap;
     QMap<quint32, QString> mToolTips;
     QList<QString> mDeletedIfaces;
-    QList<BackendEntry> mBackends;
     QStringList mIconSets;
 
     static const QString ICON_DISCONNECTED;

@@ -41,11 +41,23 @@ struct GeneralData
     KUrl statisticsDir;
 };
 
+struct AddrData
+{
+    int afType;
+    QString broadcastAddress;
+    int scope;
+    QString ipv6Flags;
+    QString label;
+    bool hasPeer;
+};
+
 struct InterfaceData
 {
     InterfaceData()
       : existing( false ),
         available( false ),
+        index( -1 ),
+        interfaceType( 0 ),
         wirelessDevice( false ),
         prevRxPackets( 0L ),
         prevTxPackets( 0L ),
@@ -61,6 +73,8 @@ struct InterfaceData
 
     bool existing;
     bool available;
+    int index;
+    int interfaceType;
     bool wirelessDevice;
     unsigned long prevRxPackets;
     unsigned long prevTxPackets;
@@ -70,12 +84,10 @@ struct InterfaceData
     unsigned long prevTxBytes;
     unsigned long incomingBytes;
     unsigned long outgoingBytes;
-    QString ipAddress;
-    QString subnetMask;
+    QMap<QString, AddrData> addrData;
     QString hwAddress;
-    QString ptpAddress;
-    QString broadcastAddress;
-    QString defaultGateway;
+    QString ip4DefaultGateway;
+    QString ip6DefaultGateway;
     QString rxString;
     QString txString;
     quint64 rxBytes;

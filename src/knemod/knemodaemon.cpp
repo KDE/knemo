@@ -48,7 +48,7 @@ KNemoDaemon::KNemoDaemon()
     readConfig();
     QDBusConnection::sessionBus().registerObject("/knemo", this, QDBusConnection::ExportScriptableSlots);
 
-    bool foundBackend = false;
+    /*bool foundBackend = false;
     int i;
     for ( i = 0; DaemonRegistry[i].name != QString::null; i++ )
     {
@@ -62,8 +62,8 @@ KNemoDaemon::KNemoDaemon()
     if ( !foundBackend )
     {
         i = 0; // use the first backend (Sys)
-    }
-    mBackend = ( *DaemonRegistry[i].function )( mInterfaceHash );
+    }*/
+    mBackend = ( *DaemonRegistry[0].function )( mInterfaceHash );
 
     mPollTimer = new QTimer();
     connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );
@@ -101,7 +101,7 @@ void KNemoDaemon::readConfig()
     if ( generalGroup.hasKey( "Interfaces" ) )
         mHaveInterfaces = true;
     QStringList interfaceList = generalGroup.readEntry( "Interfaces", QStringList() );
-    QString backend = generalGroup.readEntry( "Backend", "Sys" );
+    /*QString backend = generalGroup.readEntry( "Backend", "Sys" );
 
     if ( mBackendName != backend )
     {
@@ -123,7 +123,7 @@ void KNemoDaemon::readConfig()
                 delete mBackend;
             mBackend = ( *DaemonRegistry[i].function )( mInterfaceHash );
         }
-    }
+    }*/
 
     // Plotter
     KConfigGroup plotterGroup( config, "PlotterSettings" );
@@ -247,7 +247,9 @@ void KNemoDaemon::updateInterfaces()
     {
         // If there's an interface for the default route, let's make that the
         // one to watch
-        QString ifaceName = mBackend->getDefaultRouteIface();
+        QString ifaceName = mBackend->getDefaultRouteIface( AF_INET );
+        if ( ifaceName.isEmpty() )
+            ifaceName = mBackend->getDefaultRouteIface( AF_INET6 );
         if ( !ifaceName.isEmpty() )
         {
             Interface *iface = new Interface( ifaceName, mGeneralData, mPlotterSettings );

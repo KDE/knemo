@@ -1,5 +1,4 @@
 /* This file is part of KNemo
-   Copyright (C) 2006 Percy Leonhardt <percy@eris23.de>
    Copyright (C) 2009 John Stamp <jstamp@users.sourceforge.net>
 
    KNemo is free software; you can redistribute it and/or modify
@@ -18,45 +17,48 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef SYSBACKEND_H
-#define SYSBACKEND_H
+#ifndef NETLINKBACKEND_H
+#define NETLINKBACKEND_H
 
 #include "backendbase.h"
+#include <netlink/route/link.h>
+
 #ifdef HAVE_LIBIW
 #include <iwlib.h>
 #endif
 
 /**
- * The sys backend uses the sys filesystem available in 2.6
- * kernels. It reads all necessary information from the files
- * and folders located at /sys and parses their output.
+ * This uses libnl and libiw to get information.
  * It then triggers the interface monitor to look for changes
  * in the state of the interface.
  *
- * @short Update the information of the interfaces via sys filesystem
- * @author Percy Leonhardt <percy@eris23.de>
+ * @short Update the information of the interfaces via netlink
+ * @author John Stamp <jstamp@users.sourceforge.net>
  */
 
-class SysBackend : public BackendBase
+class NetlinkBackend : public BackendBase
 {
 public:
-    SysBackend(QHash<QString, Interface *>& interfaces );
-    virtual ~SysBackend();
+    NetlinkBackend(QHash<QString, Interface *>& interfaces );
+    virtual ~NetlinkBackend();
 
     static BackendBase* createInstance( QHash<QString, Interface *>& interfaces );
 
-    void update();
-    QString getDefaultRouteIface();
+    virtual void update();
+    virtual QString getDefaultRouteIface( int afInet );
+
+protected:
+    virtual void updateInterfaceData( const QString& ifName, InterfaceData& data );
 
 private:
-    bool readNumberFromFile( const QString& fileName, unsigned int& value );
-    bool readStringFromFile( const QString& fileName, QString& string );
     void updateWirelessData( int fd, const QString& ifName, WirelessData& data );
-    void updateInterfaceData( const QString& ifName, InterfaceData& data, int type );
+    void updateAddresses( InterfaceData& data );
 #ifdef HAVE_LIBIW
     void updateWirelessEncData( int fd, const QString& ifName, const iw_range& range, WirelessData& data );
 #endif
-
+    nl_handle * rtsock;
+    nl_cache *addrCache, *linkCache, *routeCache;
+    int iwfd;
 };
 
-#endif // SYSBACKEND_H
+#endif // NETLINKBACKEND_H
