@@ -35,6 +35,7 @@
  */
 
 #define TEXTICON "texticon"
+
 using namespace std;
 
 /* This is for clamping min/max values read from the settings file */

@@ -23,8 +23,6 @@
 #include <netlink/route/link.h>
 #include <netlink/route/route.h>
 
-#include <QDebug>
-
 #include <KLocale>
 #include <kio/global.h>
 

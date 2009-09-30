@@ -33,11 +33,9 @@
 #include <net/if_var.h>
 #include <netinet/in_var.h>
 
-#include <QDebug>
-#include <QDir>
-
 #include <KLocale>
 #include <kio/global.h>
+#include <stdio.h>
 
 #include "config-knemo.h"
 #include "bsdbackend.h"
