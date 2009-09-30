@@ -179,11 +179,6 @@ QString InterfaceTray::toolTipData()
             tipData += leftTags + mToolTips.value( STATUS ) + centerTags + i18n( "Nonexistent" ) + rightTags;
     }
 
-    if ( ! mInterface->getData().existing )
-        tipData += leftTags + i18n( "Nonexistent" ) + centerTags + rightTags;
-    else if ( ! mInterface->getData().available )
-        tipData += leftTags + i18n( "Disconnected" ) + centerTags + rightTags;
-
     if ( data.available )
     {
         if ( toolTipContent & UPTIME )
