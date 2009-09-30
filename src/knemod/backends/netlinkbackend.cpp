@@ -185,7 +185,6 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, InterfaceData& 
     data.addrData.clear();
     data.ip4DefaultGateway = ip4DefGw;
     data.ip6DefaultGateway = ip6DefGw;
-    data.interfaceType = Interface::ETHERNET;
 
     struct rtnl_link * link = rtnl_link_get_by_name( linkCache, ifName.toLocal8Bit().data() );
     if ( link )
@@ -195,7 +194,7 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, InterfaceData& 
         char mac[ 20 ];
         memset( mac, 0, sizeof( mac ) );
 
-        if ( rtnl_link_get_arptype( link ) == ARPHRD_PPP )
+        if ( rtnl_link_get_flags( link ) & IFF_POINTOPOINT )
             data.interfaceType = Interface::PPP;
         else
             data.interfaceType = Interface::ETHERNET;
