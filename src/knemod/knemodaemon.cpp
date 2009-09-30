@@ -95,7 +95,7 @@ void KNemoDaemon::readConfig()
     mGeneralData.pollInterval = clamp<int>(generalGroup.readEntry( "PollInterval", 1 ), 1, 60 );
     mGeneralData.saveInterval = clamp<int>(generalGroup.readEntry( "SaveInterval", 60 ), 1, 300 );
     mGeneralData.statisticsDir = generalGroup.readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
-    mGeneralData.toolTipContent = generalGroup.readEntry( "ToolTipContent", 2 );
+    mGeneralData.toolTipContent = generalGroup.readEntry( "ToolTipContent", defaultTip );
     // If we already have an Interfaces key--even if its empty--then we
     // shouldn't try to set up a default interface
     if ( generalGroup.hasKey( "Interfaces" ) )
@@ -257,7 +257,6 @@ void KNemoDaemon::updateInterfaces()
 
             InterfaceSettings& settings = iface->getSettings();
             settings.iconSet = "monitor";
-            settings.alias = ifaceName;
             mHaveInterfaces = true;
             iface->configChanged();
         }

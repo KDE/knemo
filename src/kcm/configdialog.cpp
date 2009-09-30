@@ -240,7 +240,7 @@ void ConfigDialog::load()
     mDlg->numInputPollInterval->setValue( clamp<int>(generalGroup.readEntry( "PollInterval", 1 ), 1, 60 ) );
     mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( "SaveInterval", 60 ), 1, 300 ) );
     mDlg->lineEditStatisticsDir->setUrl( generalGroup.readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) ) );
-    mToolTipContent = generalGroup.readEntry( "ToolTipContent", 2 );
+    mToolTipContent = generalGroup.readEntry( "ToolTipContent", defaultTip );
 
     QStringList list = generalGroup.readEntry( "Interfaces", QStringList() );
 
@@ -506,10 +506,9 @@ void ConfigDialog::defaults()
         settings->hideWhenNotExisting = false;
         settings->activateStatistics = false;
         settings->iconSet = "monitor";
-        settings->alias = interface;
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
-        mDlg->lineEditAlias->setText( interface );
+        mDlg->lineEditAlias->clear();
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
         mDlg->pushButtonDelete->setDisabled( false );
         mDlg->groupBoxIfaceMisc->setDisabled( false );
@@ -522,7 +521,7 @@ void ConfigDialog::defaults()
     mDlg->lineEditStatisticsDir->setUrl( KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
 
     // Default tool tips
-    mToolTipContent = 2;
+    mToolTipContent = defaultTip;
     setupToolTipTab();
 
     // Default plotter settings
@@ -566,7 +565,7 @@ void ConfigDialog::buttonNewSelected()
         mDlg->pushButtonDelete->setDisabled( false );
         mDlg->groupBoxIfaceMisc->setDisabled( false );
         mDlg->groupBoxIfaceMenu->setDisabled( false );
-        mDlg->lineEditAlias->setText( ifname );
+        mDlg->lineEditAlias->clear();
         changed( true );
     }
 }
@@ -620,7 +619,6 @@ void ConfigDialog::buttonAllSelected()
         settings->hideWhenNotExisting = false;
         settings->activateStatistics = false;
         settings->iconSet = "monitor";
-        settings->alias = ifname;
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->addItem( ifname );
     }

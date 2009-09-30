@@ -154,9 +154,12 @@ QString InterfaceTray::toolTipData()
     tipData = "<table cellspacing='2'>";
 
 #ifndef USE_KNOTIFICATIONITEM
-    if ( ( toolTipContent & ALIAS ) &&
-         !mInterface->getSettings().alias.isEmpty() )
-        tipData += "<tr><th colspan='2' style='text-align:center;'>" + mInterface->getSettings().alias + "</th></tr>";
+    QString title = mInterface->getSettings().alias;
+    if ( title.isEmpty() )
+        title = mInterface->getName();
+
+    if ( toolTipContent & ALIAS )
+        tipData += "<tr><th colspan='2' style='text-align:center;'>" + title + "</th></tr>";
 #endif
     if ( toolTipContent & INTERFACE )
         tipData += leftTags + mToolTips.value( INTERFACE ) + centerTags + mInterface->getName() + rightTags;

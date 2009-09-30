@@ -110,4 +110,6 @@ enum ToolTipEnums
     ENCRYPTION       = 0x00800000
 };
 
+const static int defaultTip = INTERFACE | STATUS | IP_ADDRESS | ESSID | LINK_QUALITY | DOWNLOAD_SPEED | UPLOAD_SPEED;
+
 #endif // DATA_H
