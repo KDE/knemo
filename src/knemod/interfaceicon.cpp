@@ -82,7 +82,7 @@ void InterfaceIcon::configChanged( QColor incoming, QColor outgoing, int status 
     // handle changed iconset by user
     if ( mTray != 0L )
     {
-        if ( mInterface->getSettings().iconSet.isEmpty() )
+        if ( mInterface->getSettings().iconSet == TEXTICON )
             updateIconText( true );
         else
             updateIconImage( status );
@@ -95,37 +95,36 @@ void InterfaceIcon::updateIconImage( int status )
     // We need the iconset name in all cases.
     QString iconSet = mInterface->getSettings().iconSet;
 
-    if ( mTray == 0L || iconSet.isEmpty() )
+    if ( mTray == 0L || iconSet == TEXTICON )
         return;
 
     // Now set the correct icon depending on the status of the interface.
-    QString iconName = iconSet;
     if ( status == Interface::NOT_AVAILABLE ||
          status == Interface::NOT_EXISTING )
     {
-        iconName += ICON_DISCONNECTED;
+        iconSet += ICON_DISCONNECTED;
     }
     else if ( ( status & Interface::RX_TRAFFIC ) &&
               ( status & Interface::TX_TRAFFIC ) )
     {
-        iconName += ICON_TRAFFIC;
+        iconSet += ICON_TRAFFIC;
     }
     else if ( status & Interface::RX_TRAFFIC )
     {
-        iconName += ICON_INCOMING;
+        iconSet += ICON_INCOMING;
     }
     else if ( status & Interface::TX_TRAFFIC )
     {
-        iconName += ICON_OUTGOING;
+        iconSet += ICON_OUTGOING;
     }
     else
     {
-        iconName += ICON_CONNECTED;
+        iconSet += ICON_CONNECTED;
     }
 #ifdef USE_KNOTIFICATIONITEM
-    mTray->setIconByPixmap( UserIcon( iconName ) );
+    mTray->setIconByPixmap( UserIcon( iconSet ) );
 #else
-    mTray->setIcon( UserIcon( iconName ) );
+    mTray->setIcon( UserIcon( iconSet ) );
 #endif
 }
 
@@ -229,7 +228,7 @@ void InterfaceIcon::updateToolTip()
 {
     if ( mTray == 0L )
         return;
-    if ( mInterface->getSettings().iconSet.isEmpty() )
+    if ( mInterface->getSettings().iconSet == TEXTICON )
         updateIconText();
     mTray->updateToolTip();
 }
@@ -344,7 +343,9 @@ void InterfaceIcon::updateTrayStatus( int previousState )
         connect( configAction, SIGNAL( triggered() ),
                  this, SLOT( showConfigDialog() ) );
 
-        if ( !mInterface->getSettings().iconSet.isEmpty() )
+        if ( mInterface->getSettings().iconSet == TEXTICON )
+            updateIconText( true );
+        else
             updateIconImage( mInterface->getState() );
         updateMenu();
 #ifndef USE_KNOTIFICATIONITEM
@@ -375,7 +376,7 @@ void InterfaceIcon::updateTrayStatus( int previousState )
 
         // Tray text may need to appear active/inactive
         // Force an update
-        if ( mInterface->getSettings().iconSet.isEmpty() )
+        if ( mInterface->getSettings().iconSet == TEXTICON )
              updateIconText( true );
     }
 }

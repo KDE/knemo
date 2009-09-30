@@ -29,6 +29,7 @@
 #include "config-knemo.h"
 #include "knemodaemon.h"
 #include "interface.h"
+#include "utils.h"
 #include "backends/backendbase.h"
 #include "backends/daemonregistry.h"
 
@@ -159,6 +160,9 @@ void KNemoDaemon::readConfig()
             KConfigGroup interfaceGroup( config, group );
             settings->alias = interfaceGroup.readEntry( "Alias" ).trimmed();
             settings->iconSet = interfaceGroup.readEntry( "IconSet", "monitor" );
+            QStringList iconSets = findIconSets();
+            if ( !iconSets.contains( settings->iconSet ) )
+                settings->iconSet = TEXTICON;
             settings->customCommands = interfaceGroup.readEntry( "CustomCommands", false );
             settings->hideWhenNotAvailable = interfaceGroup.readEntry( "HideWhenNotAvailable",false );
             settings->hideWhenNotExisting = interfaceGroup.readEntry( "HideWhenNotExisting", false );

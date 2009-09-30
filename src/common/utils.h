@@ -27,3 +27,5 @@
  * data is by the netlink backend to pass nl_cache data
  */
 QString getDefaultRoute( int afType, QString * defaultGateway = NULL, void * data = NULL );
+
+QStringList findIconSets();

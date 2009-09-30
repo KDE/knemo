@@ -97,17 +97,11 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     iconDirs.addResourceType("knemo_pics", "data", "knemo/pics");
     QStringList iconlist = iconDirs.findAllResources( "knemo_pics", "*.png" );
 
-    foreach ( QString iconName, iconlist )
-    {
-        QRegExp rx( "pics\\/(.+)_(connected|disconnected|incoming|outgoing|traffic)\\.png" );
-        if ( rx.indexIn( iconName ) > -1 )
-            if ( !mIconSets.contains( rx.cap( 1 ) ) )
-                mIconSets << rx.cap( 1 );
-    }
+    mIconSets = findIconSets();
     mIconSets.sort();
-    // We want "Text" at the bottom of the list
-    mIconSets << i18n( "Text" );
     mDlg->comboBoxIconSet->addItems( mIconSets );
+    // We want "Text" at the bottom of the list
+    mDlg->comboBoxIconSet->addItem( i18n( "Text" ) );
     if ( mIconSets.contains( "monitor" ) )
         mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( "monitor" ) );
 
@@ -469,7 +463,7 @@ void ConfigDialog::defaults()
     if ( mIconSets.contains( "monitor" ) )
         mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( "monitor" ) );
     else
-        mDlg->comboBoxIconSet->setCurrentIndex( 0 );
+        mDlg->comboBoxIconSet->setCurrentIndex( mDlg->comboBoxIconSet->count() - 1 );
     mDlg->pixmapDisconnected->clear();
     mDlg->pixmapConnected->clear();
     mDlg->pixmapIncoming->clear();
@@ -501,11 +495,6 @@ void ConfigDialog::defaults()
     if ( !interface.isEmpty() )
     {
         InterfaceSettings* settings = new InterfaceSettings();
-        settings->customCommands = false;
-        settings->hideWhenNotAvailable = false;
-        settings->hideWhenNotExisting = false;
-        settings->activateStatistics = false;
-        settings->iconSet = "monitor";
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->lineEditAlias->clear();
@@ -614,11 +603,6 @@ void ConfigDialog::buttonAllSelected()
     foreach ( QString ifname, ifaces )
     {
         InterfaceSettings* settings = new InterfaceSettings();
-        settings->customCommands = false;
-        settings->hideWhenNotAvailable = false;
-        settings->hideWhenNotExisting = false;
-        settings->activateStatistics = false;
-        settings->iconSet = "monitor";
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->addItem( ifname );
     }
@@ -902,10 +886,8 @@ void ConfigDialog::interfaceSelected( int row )
     mDlg->lineEditAlias->setText( settings->alias );
     if ( mIconSets.contains( settings->iconSet ) )
         mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( settings->iconSet ) );
-    else if ( settings->iconSet.isEmpty() )
-        mDlg->comboBoxIconSet->setCurrentIndex( mDlg->comboBoxIconSet->count() - 1 );
     else
-        mDlg->comboBoxIconSet->setCurrentIndex( 0 );
+        mDlg->comboBoxIconSet->setCurrentIndex( mDlg->comboBoxIconSet->count() - 1 );
     mDlg->checkBoxCustom->setChecked( settings->customCommands );
     mDlg->checkBoxNotConnected->setChecked( settings->hideWhenNotAvailable );
     mDlg->checkBoxNotExisting->setChecked( settings->hideWhenNotExisting );
@@ -1010,8 +992,7 @@ void ConfigDialog::iconSetChanged( int set )
     InterfaceSettings* settings = mSettingsMap[selected->text()];
     if ( mDlg->comboBoxIconSet->count() - 1 == mDlg->comboBoxIconSet->currentIndex() )
     {
-        // empty iconSet = Text icon
-        settings->iconSet.clear();
+        settings->iconSet = TEXTICON;
         // Update the preview of the iconset.
         mDlg->pixmapDisconnected->setPixmap( textIcon( "0B", "0B", false ) );
         mDlg->pixmapConnected->setPixmap( textIcon( "0B", "0B", true ) );

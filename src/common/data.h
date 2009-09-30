@@ -34,6 +34,7 @@
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
+#define TEXTICON "texticon"
 using namespace std;
 
 /* This is for clamping min/max values read from the settings file */
@@ -52,7 +53,8 @@ struct InterfaceCommand
 struct InterfaceSettings
 {
     InterfaceSettings()
-      : numCommands( 0 ),
+      : iconSet( "monitor" ),
+        numCommands( 0 ),
         trafficThreshold( 0 ),
         hideWhenNotExisting( false ),
         hideWhenNotAvailable( false ),

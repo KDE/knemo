@@ -28,6 +28,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <net/if.h>
+#include <KStandardDirs>
 #include <QString>
 
 #ifdef __linux__
@@ -219,4 +220,21 @@ QString getDefaultRoute( int afType, QString *defaultGateway, void *data )
 #else
     return getSocketRoute( afType, defaultGateway );
 #endif
+}
+
+QStringList findIconSets()
+{
+    KStandardDirs iconDirs;
+    iconDirs.addResourceType("knemo_pics", "data", "knemo/pics");
+    QStringList iconlist = iconDirs.findAllResources( "knemo_pics", "*.png" );
+
+    QStringList iconSets;
+    foreach ( QString iconName, iconlist )
+    {
+        QRegExp rx( "pics\\/(.+)_(connected|disconnected|incoming|outgoing|traffic)\\.png" );
+        if ( rx.indexIn( iconName ) > -1 )
+            if ( !iconSets.contains( rx.cap( 1 ) ) )
+                iconSets << rx.cap( 1 );
+    }
+    return iconSets;
 }
