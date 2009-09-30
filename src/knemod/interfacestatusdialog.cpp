@@ -167,11 +167,14 @@ void InterfaceStatusDialog::updateDialog()
 
     if ( data.interfaceType == Interface::ETHERNET )
     {
+        ui.variableLabel2->setText( i18n( "Default Route" ) );
         ui.variableLabel3->setText( i18n( "MAC Address:" ) );
         ui.variableText3->setText( data.hwAddress );
     }
     else
     {
+        ui.variableLabel2->setText( QString::null );
+        ui.variableText2->setText( QString::null );
         ui.variableLabel3->setText( QString::null );
         ui.variableText3->setText( QString::null );
     }
@@ -233,12 +236,7 @@ void InterfaceStatusDialog::updateDialog()
         scope += addrData.ipv6Flags;
         ui.textLabelScope->setText( scope );
 
-        if ( data.interfaceType == Interface::PPP )
-        {
-            ui.variableLabel2->setText( QString::null );
-            ui.variableText2->setText( QString::null );
-        }
-        else
+        if ( data.interfaceType == Interface::ETHERNET )
         {
             if ( addrData.scope != RT_SCOPE_HOST )
             {
@@ -310,7 +308,8 @@ void InterfaceStatusDialog::disableNetworkGroups( int )
 
     // clear IP group
     ui.comboBoxIP->clear();
-    //ui.textLabelSubnet->setText( QString::null );
+    ui.textLabelAddrLabel->setText( QString::null );
+    ui.textLabelScope->setText( QString::null );
     ui.variableText1->setText( QString::null );
     ui.variableText2->setText( QString::null );
     ui.variableText3->setText( QString::null );
