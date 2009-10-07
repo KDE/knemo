@@ -22,6 +22,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <QAbstractItemView>
+#include <KGlobalSettings>
 
 #ifdef __linux__
   #include <netlink/netlink.h>
@@ -195,6 +196,9 @@ void InterfaceStatusDialog::updateDialog()
             else
                 ui.comboBoxIP->removeItem( i );
         }
+        QFont f = KGlobalSettings::generalFont();
+        QFontMetrics fm( f );
+        int w = 0;
         int keyCounter = 0;
         foreach( QString key, keys )
         {
@@ -202,8 +206,10 @@ void InterfaceStatusDialog::updateDialog()
             if ( ui.comboBoxIP->findText( key ) < 0 )
                 ui.comboBoxIP->insertItem( keyCounter, key );
             keyCounter++;
+            if ( fm.width( key ) > w )
+                w = fm.width( key );
         }
-        ui.comboBoxIP->setMinimumWidth( ui.comboBoxIP->view()->sizeHint().width() );
+        ui.comboBoxIP->setMinimumWidth( w + 35 );
 
         AddrData addrData = data.addrData.value( ui.comboBoxIP->currentText() );
 
