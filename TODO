@@ -1,13 +1,3 @@
- * include an option: "show as line" - like the signal plotter in kppp
- * another option: "show up/down speed" in the bottom right (those numbers
-   shown in tooltip)
- * add a button for context menu entries presets. I mean it would be great
-   if newbies could select entries for kppp, network start/stop/restart
  * show two dynamic bars with the current netload instead of an icon
- * It would also be great if the color of the animation tray icon will
-   reflect the current bandwidth... For example gray for 0-25%, light green
-   25-50% green 50-75%, red 75-100%. (The simplest way to achieve this is to
-   have 14 icons for each set. Or N icons and allow the user to select a
-   bandwith range and appropriate icon.)
  * configurable month periods for the statistics dialog; this might make
    sense for people whose billing cycles don't fall on the first of the month
