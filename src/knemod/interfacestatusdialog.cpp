@@ -167,16 +167,16 @@ void InterfaceStatusDialog::updateDialog()
 
     if ( data.interfaceType == Interface::ETHERNET )
     {
-        ui.variableLabel2->setText( i18n( "Default Route" ) );
-        ui.variableLabel3->setText( i18n( "MAC Address:" ) );
-        ui.variableText3->setText( data.hwAddress );
+        ui.gatewayLabel->setText( i18n( "Default Gateway:" ) );
+        ui.macLabel->setText( i18n( "MAC Address:" ) );
+        ui.macText->setText( data.hwAddress );
     }
     else
     {
-        ui.variableLabel2->setText( QString::null );
-        ui.variableText2->setText( QString::null );
-        ui.variableLabel3->setText( QString::null );
-        ui.variableText3->setText( QString::null );
+        ui.gatewayLabel->setText( QString::null );
+        ui.gatewayText->setText( QString::null );
+        ui.macLabel->setText( QString::null );
+        ui.macText->setText( QString::null );
     }
 
     if ( data.available )
@@ -241,9 +241,9 @@ void InterfaceStatusDialog::updateDialog()
             if ( addrData.scope != RT_SCOPE_HOST )
             {
                 if ( addrData.afType == AF_INET )
-                    ui.variableText2->setText( data.ip4DefaultGateway );
+                    ui.gatewayText->setText( data.ip4DefaultGateway );
                 else
-                    ui.variableText2->setText( data.ip6DefaultGateway );
+                    ui.gatewayText->setText( data.ip6DefaultGateway );
             }
         }
 
@@ -251,13 +251,13 @@ void InterfaceStatusDialog::updateDialog()
         {
             if ( addrData.hasPeer )
             {
-                ui.variableLabel1->setText( i18n( "PtP Address:" ) );
-                ui.variableText1->setText( addrData.broadcastAddress );
+                ui.broadcastLabel->setText( i18n( "PtP Address:" ) );
+                ui.broadcastText->setText( addrData.broadcastAddress );
             }
             else
             {
-                ui.variableLabel1->setText( i18n( "Broadcast Address:" ) );
-                ui.variableText1->setText( addrData.broadcastAddress );
+                ui.broadcastLabel->setText( i18n( "Broadcast Address:" ) );
+                ui.broadcastText->setText( addrData.broadcastAddress );
             }
         }
 
@@ -310,9 +310,9 @@ void InterfaceStatusDialog::disableNetworkGroups( int )
     ui.comboBoxIP->clear();
     ui.textLabelAddrLabel->setText( QString::null );
     ui.textLabelScope->setText( QString::null );
-    ui.variableText1->setText( QString::null );
-    ui.variableText2->setText( QString::null );
-    ui.variableText3->setText( QString::null );
+    ui.broadcastText->setText( QString::null );
+    ui.gatewayText->setText( QString::null );
+    ui.macText->setText( QString::null );
 
     // clear current connection group
     ui.textLabelPacketsSend->setText( QString::null );
