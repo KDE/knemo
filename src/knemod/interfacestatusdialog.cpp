@@ -174,6 +174,8 @@ void InterfaceStatusDialog::updateDialog()
     }
     else
     {
+        ui.gatewayLabel->hide();
+        ui.gatewayText->hide();
         ui.macLabel->hide();
         ui.macText->hide();
     }
