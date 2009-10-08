@@ -168,16 +168,14 @@ void InterfaceStatusDialog::updateDialog()
 
     if ( data.interfaceType == Interface::ETHERNET )
     {
-        ui.gatewayLabel->setText( i18n( "Default Gateway:" ) );
-        ui.macLabel->setText( i18n( "MAC Address:" ) );
         ui.macText->setText( data.hwAddress );
+        ui.macLabel->show();
+        ui.macText->show();
     }
     else
     {
-        ui.gatewayLabel->setText( QString::null );
-        ui.gatewayText->setText( QString::null );
-        ui.macLabel->setText( QString::null );
-        ui.macText->setText( QString::null );
+        ui.macLabel->hide();
+        ui.macText->hide();
     }
 
     if ( data.available )
@@ -250,21 +248,29 @@ void InterfaceStatusDialog::updateDialog()
                     ui.gatewayText->setText( data.ip4DefaultGateway );
                 else
                     ui.gatewayText->setText( data.ip6DefaultGateway );
-            }
-        }
-
-        if ( addrData.scope != RT_SCOPE_HOST )
-        {
-            if ( addrData.hasPeer )
-            {
-                ui.broadcastLabel->setText( i18n( "PtP Address:" ) );
-                ui.broadcastText->setText( addrData.broadcastAddress );
+                ui.gatewayLabel->show();
+                ui.gatewayText->show();
             }
             else
             {
-                ui.broadcastLabel->setText( i18n( "Broadcast Address:" ) );
-                ui.broadcastText->setText( addrData.broadcastAddress );
+                ui.gatewayLabel->hide();
+                ui.gatewayText->hide();
             }
+        }
+
+        ui.broadcastLabel->setText( i18n( "Broadcast Address:" ) );
+        if ( addrData.scope != RT_SCOPE_HOST )
+        {
+            ui.broadcastText->setText( addrData.broadcastAddress );
+            if ( addrData.hasPeer )
+                ui.broadcastLabel->setText( i18n( "PtP Address:" ) );
+            ui.broadcastLabel->show();
+            ui.broadcastText->show();
+        }
+        else
+        {
+            ui.broadcastLabel->hide();
+            ui.broadcastText->hide();
         }
 
         // traffic tab
