@@ -97,6 +97,16 @@ QString getNetlinkRoute( int afType, QString *defaultGateway, void *data )
 
     struct nl_cache* rtlcache = static_cast<struct nl_cache*>(data);
 
+    if ( afType == AF_INET )
+    {
+        ipv4gw.clear();
+        ipv4gwi.clear();
+    }
+    else if ( afType == AF_INET6 )
+    {
+        ipv6gw.clear();
+        ipv6gwi.clear();
+    }
     nl_cache_foreach( rtlcache, parseNetlinkRoute, NULL);
 
     if ( afType == AF_INET )
