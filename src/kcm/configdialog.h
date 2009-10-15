@@ -74,6 +74,8 @@ private slots:
     void checkBoxNotConnectedToggled( bool on );
     void checkBoxNotExistingToggled( bool on );
     void checkBoxStatisticsToggled( bool on );
+    void warnThresholdChanged( double val );
+    void warnRxTxToggled( bool on );
     void billingStartInputChanged( const QDate& );
     void checkBoxStartKNemoToggled( bool on );
     void spinBoxTrafficValueChanged( int value );

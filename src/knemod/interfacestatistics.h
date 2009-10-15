@@ -84,6 +84,7 @@ signals:
      * week, month and year also change.
      */
     void currentEntryChanged();
+    void warnMonthlyTraffic( quint64 );
     /**
      * The list has changed i.e. there is a new day entry or the list was cleared
      */
@@ -166,6 +167,7 @@ private:
 
     QTimer* mSaveTimer;
     Interface* mInterface;
+    bool mWarningDone;
     QDate mBillingStart;
     const KCalendarSystem* mCalendar;
     StatisticEntry* mCurrentDay;

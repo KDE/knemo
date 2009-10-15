@@ -165,6 +165,11 @@ private slots:
      */
     void updateDetails();
 
+    /**
+     * Emit a notification when monthly traffic exceeds a threshold
+     */
+    void warnMonthlyTraffic( quint64 );
+
 private:
     /**
      * Start the statistics and load previously saved ones

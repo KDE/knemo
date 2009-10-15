@@ -22,7 +22,9 @@
 
 #include <KCalendarSystem>
 #include <KColorScheme>
+#include <KNotification>
 #include <KWindowSystem>
+#include <kio/global.h>
 
 #include "backends/backendbase.h"
 #include "utils.h"
@@ -93,6 +95,8 @@ void Interface::configChanged()
     mSettings.hideWhenNotExisting = interfaceGroup.readEntry( "HideWhenNotExisting", false );
     mSettings.activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", false );
     mSettings.trafficThreshold = clamp<int>(interfaceGroup.readEntry( "TrafficThreshold", 0 ), 0, 1000 );
+    mSettings.warnThreshold = clamp<double>(interfaceGroup.readEntry( "BillingWarnThreshold", 0.0 ), 0.0, 9999.0 );
+    mSettings.warnTotalTraffic = interfaceGroup.readEntry( "BillingWarnRxTx", false );
 
     // TODO: Some of the calendars are a bit buggy, so default to Gregorian for now
     //mSettings.calendar = interfaceGroup.readEntry( "Calendar", KGlobal::locale()->calendarType() );
@@ -374,6 +378,8 @@ void Interface::updatePlotter()
 void Interface::startStatistics()
 {
     mStatistics = new InterfaceStatistics( this );
+    connect( mStatistics, SIGNAL( warnMonthlyTraffic( quint64 ) ),
+             this, SLOT( warnMonthlyTraffic( quint64 ) ) );
     if ( mStatusDialog != 0 )
     {
         connect( mStatistics, SIGNAL( currentEntryChanged() ),
@@ -392,6 +398,18 @@ void Interface::stopStatistics()
 
     delete mStatistics;
     mStatistics = 0;
+}
+
+void Interface::warnMonthlyTraffic( quint64 traffic )
+{
+    QString title = mSettings.alias;
+    if ( title.isEmpty() )
+        title = mName;
+
+    KNotification::event( "exceededMonthlyTraffic",
+                          title + ": " +
+                          i18n( "Monthly traffic limit exceeded (currently %1)" ).arg( KIO::convertSize( traffic ) )
+                        );
 }
 
 // taken from ksystemtray.cpp

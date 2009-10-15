@@ -129,6 +129,8 @@ struct InterfaceSettings
         colorDisabled( 0x888786 ),
         numCommands( 0 ),
         trafficThreshold( 0 ),
+        warnThreshold( 0.0 ),
+        warnTotalTraffic( false ),
         hideWhenNotExisting( false ),
         hideWhenNotAvailable( false ),
         activateStatistics( false ),
@@ -142,6 +144,8 @@ struct InterfaceSettings
     QColor colorDisabled;
     int numCommands;
     int trafficThreshold;
+    double warnThreshold;
+    bool warnTotalTraffic;
     bool hideWhenNotExisting;
     bool hideWhenNotAvailable;
     bool activateStatistics;

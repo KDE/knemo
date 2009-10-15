@@ -53,6 +53,7 @@
 #include <kstandarddirs.h>
 #include <kgenericfactory.h>
 #include <kdirselectdialog.h>
+#include <math.h>
 
 #include "ui_configdlg.h"
 #include "config-knemo.h"
@@ -164,6 +165,10 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( checkBoxStatisticsToggled ( bool ) ) );
     connect( mDlg->billingStartInput, SIGNAL( dateEntered( const QDate& ) ),
              this, SLOT( billingStartInputChanged( const QDate& ) ) );
+    connect( mDlg->warnThreshold, SIGNAL( valueChanged( double ) ),
+             this, SLOT( warnThresholdChanged ( double ) ) );
+    connect( mDlg->warnRxTx, SIGNAL( toggled( bool ) ),
+             this, SLOT( warnRxTxToggled ( bool ) ) );
     connect( mDlg->checkBoxStartKNemo, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxStartKNemoToggled( bool ) ) );
     connect( mDlg->spinBoxTrafficThreshold, SIGNAL( valueChanged( int ) ),
@@ -238,6 +243,8 @@ void ConfigDialog::load()
             settings->hideWhenNotAvailable = interfaceGroup.readEntry( "HideWhenNotAvailable", false );
             settings->hideWhenNotExisting = interfaceGroup.readEntry( "HideWhenNotExisting", false );
             settings->activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", false );
+            settings->warnThreshold = clamp<double>(interfaceGroup.readEntry( "BillingWarnThreshold", 0.0 ), 0.0, 9999.0 );
+            settings->warnTotalTraffic = interfaceGroup.readEntry( "BillingWarnRxTx", false );
 
             settings->calendar = interfaceGroup.readEntry( "Calendar", "" );
 
@@ -396,6 +403,8 @@ void ConfigDialog::save()
         interfaceGroup.writeEntry( "HideWhenNotAvailable", settings->hideWhenNotAvailable );
         interfaceGroup.writeEntry( "HideWhenNotExisting", settings->hideWhenNotExisting );
         interfaceGroup.writeEntry( "ActivateStatistics", settings->activateStatistics );
+        interfaceGroup.writeEntry( "BillingWarnThreshold", settings->warnThreshold );
+        interfaceGroup.writeEntry( "BillingWarnRxTx", settings->warnTotalTraffic );
         interfaceGroup.writeEntry( "BillingStart", mDlg->billingStartInput->date() );
         if ( settings->billingMonths > 0 )
             interfaceGroup.writeEntry( "BillingMonths", settings->billingMonths );
@@ -831,6 +840,11 @@ void ConfigDialog::interfaceSelected( int row )
     mDlg->checkBoxNotConnected->setChecked( settings->hideWhenNotAvailable );
     mDlg->checkBoxNotExisting->setChecked( settings->hideWhenNotExisting );
     mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
+    mDlg->warnThreshold->setValue( settings->warnThreshold );
+    if ( settings->warnTotalTraffic )
+        mDlg->warnRxTx->setChecked( true );
+    else
+        mDlg->warnRx->setChecked( true );
 
     if ( settings->calendar.isEmpty() )
     {
@@ -1018,6 +1032,33 @@ void ConfigDialog::checkBoxNotExistingToggled( bool on )
     if (!mLock) changed( true );
 }
 
+
+void ConfigDialog::warnThresholdChanged( double val )
+{
+    if ( !mDlg->listBoxInterfaces->currentItem() )
+        return;
+
+    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
+
+    InterfaceSettings* settings = mSettingsMap[selected->text()];
+    settings->warnThreshold = round(val*10.0)/10.0;
+
+    mDlg->warnRx->setEnabled( ( settings->warnThreshold > 0.0 ) );
+    mDlg->warnRxTx->setEnabled( ( settings->warnThreshold > 0.0 ) );
+    if (!mLock) changed( true );
+}
+
+void ConfigDialog::warnRxTxToggled( bool on )
+{
+    if ( !mDlg->listBoxInterfaces->currentItem() )
+        return;
+
+    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
+
+    InterfaceSettings* settings = mSettingsMap[selected->text()];
+    settings->warnTotalTraffic = on;
+    if (!mLock) changed( true );
+}
 
 void ConfigDialog::checkBoxStatisticsToggled( bool on )
 {

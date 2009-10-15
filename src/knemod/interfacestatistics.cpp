@@ -68,6 +68,7 @@ static bool statisticsLessThan( const StatisticEntry *s1, const StatisticEntry *
 InterfaceStatistics::InterfaceStatistics( Interface* interface )
     : QObject(),
       mInterface( interface ),
+      mWarningDone( false ),
       mBillingStart( mInterface->getSettings().billingStart ),
       mCalendar( KCalendarSystem::create( mInterface->getSettings().calendar ) )
 {
@@ -293,6 +294,7 @@ void InterfaceStatistics::configChanged()
     if ( mInterface->getGeneralData().saveInterval > 0 )
         mSaveTimer->setInterval( mInterface->getGeneralData().saveInterval * 1000 );
 
+    mWarningDone = false;
     // force a new ref day for billing periods
     mBillingStart = mInterface->getSettings().billingStart;
     // rebuildStats modifies mBillingStart, so copy first.
@@ -309,6 +311,24 @@ void InterfaceStatistics::addIncomingData( unsigned long data )
     mCurrentMonth->rxBytes += data;
     mCurrentYear->rxBytes += data;
 
+    // Only warn once per interface per session
+    if ( !mWarningDone && mInterface->getSettings().warnThreshold > 0.0 )
+    {
+        quint64 thresholdBytes = mInterface->getSettings().warnThreshold * 1073741824;
+        if ( mInterface->getSettings().warnTotalTraffic )
+        {
+            if ( mCurrentMonth->rxBytes + mCurrentMonth->txBytes >= thresholdBytes )
+            {
+                mWarningDone = true;
+                emit warnMonthlyTraffic( mCurrentMonth->rxBytes + mCurrentMonth->txBytes );
+            }
+        }
+        else if ( mCurrentMonth->rxBytes >= thresholdBytes )
+        {
+            mWarningDone = true;
+            emit warnMonthlyTraffic( mCurrentMonth->rxBytes );
+        }
+    }
     emit currentEntryChanged();
 }
 

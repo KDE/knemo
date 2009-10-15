@@ -391,6 +391,99 @@ of bluetooth adaptors.</string>
             </layout>
            </item>
            <item>
+            <widget class="QGroupBox" name="groupBox">
+             <property name="title">
+              <string>Traffic Notifications</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>Notify when monthly traffic exceeds:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="KDoubleNumInput" name="warnThreshold">
+                  <property name="singleStep">
+                   <double>0.100000000000000</double>
+                  </property>
+                  <property name="suffix">
+                   <string>GiB</string>
+                  </property>
+                  <property name="decimals">
+                   <number>1</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <item>
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="warnRx">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Download traffic only</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <item>
+                 <spacer name="horizontalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="warnRxTx">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Total traffic</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer_3">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -818,6 +911,11 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
    <header>kurlrequester.h</header>
   </customwidget>
   <customwidget>
+   <class>KDoubleNumInput</class>
+   <extends>QWidget</extends>
+   <header>knuminput.h</header>
+  </customwidget>
+  <customwidget>
    <class>KColorButton</class>
    <extends>QPushButton</extends>
    <header>kcolorbutton.h</header>
@@ -851,6 +949,9 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
   <tabstop>colorDisabled</tabstop>
   <tabstop>checkBoxStatistics</tabstop>
   <tabstop>billingStartInput</tabstop>
+  <tabstop>warnThreshold</tabstop>
+  <tabstop>warnRx</tabstop>
+  <tabstop>warnRxTx</tabstop>
   <tabstop>checkBoxCustom</tabstop>
   <tabstop>listViewCommands</tabstop>
   <tabstop>pushButtonAddCommand</tabstop>
@@ -888,12 +989,12 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>263</x>
-     <y>148</y>
+     <x>353</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>288</x>
-     <y>176</y>
+     <x>353</x>
+     <y>164</y>
     </hint>
    </hints>
   </connection>
@@ -904,12 +1005,12 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>263</x>
-     <y>420</y>
+     <x>353</x>
+     <y>145</y>
     </hint>
     <hint type="destinationlabel">
-     <x>263</x>
-     <y>447</y>
+     <x>305</x>
+     <y>172</y>
     </hint>
    </hints>
   </connection>
@@ -920,12 +1021,12 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>263</x>
-     <y>420</y>
+     <x>353</x>
+     <y>145</y>
     </hint>
     <hint type="destinationlabel">
-     <x>489</x>
-     <y>448</y>
+     <x>590</x>
+     <y>193</y>
     </hint>
    </hints>
   </connection>
@@ -936,12 +1037,12 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>330</y>
+     <x>544</x>
+     <y>159</y>
     </hint>
     <hint type="destinationlabel">
-     <x>373</x>
-     <y>348</y>
+     <x>436</x>
+     <y>228</y>
     </hint>
    </hints>
   </connection>
@@ -952,12 +1053,28 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>481</x>
-     <y>324</y>
+     <x>591</x>
+     <y>159</y>
     </hint>
     <hint type="destinationlabel">
-     <x>504</x>
-     <y>349</y>
+     <x>590</x>
+     <y>228</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxStatistics</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>groupBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>148</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>294</x>
+     <y>292</y>
     </hint>
    </hints>
   </connection>
