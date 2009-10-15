@@ -18,6 +18,20 @@
    Boston, MA 02110-1301, USA.
 */
 
+#ifndef UTILS_H
+#define UTILS_H
+
+#include <algorithm>
 #include <QStringList>
 
+using namespace std;
+
+/* This is for clamping min/max values read from the settings file */
+template <class T> inline T clamp(T x, T a, T b)
+{
+	return min(max(x,a),b);
+}
+
 QStringList findIconSets();
+
+#endif

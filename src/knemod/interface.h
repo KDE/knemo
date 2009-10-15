@@ -49,8 +49,7 @@ public:
      */
     Interface(const QString& ifname,
               const BackendData * const,
-              const GeneralData& generalData,
-              const PlotterSettings& plotterSettings );
+              const GeneralData& generalData );
 
     /**
      * Default Destructor
@@ -198,7 +197,6 @@ private:
     InterfacePlotterDialog* mPlotterDialog;
     const BackendData* mBackendData;
     const GeneralData& mGeneralData;
-    const PlotterSettings& mPlotterSettings;
 };
 
 #endif // INTERFACE_H

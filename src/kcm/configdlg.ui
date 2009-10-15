@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>587</width>
-    <height>605</height>
+    <width>612</width>
+    <height>386</height>
    </rect>
   </property>
   <layout class="QVBoxLayout">
@@ -74,6 +74,19 @@ for example 'eth0', 'wlan0' or 'ppp0'.</string>
          </item>
         </layout>
        </item>
+       <item row="2" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="0" column="1">
         <layout class="QHBoxLayout">
          <item>
@@ -99,312 +112,415 @@ icons.</string>
         </layout>
        </item>
        <item row="1" column="1">
-        <widget class="QGroupBox" name="groupBoxIfaceMisc">
-         <property name="title">
-          <string>Icon Appearance</string>
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QCheckBox" name="checkBoxNotConnected">
-            <property name="whatsThis">
-             <string>When selected the icon for this interface will be
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tab">
+          <attribute name="title">
+           <string>Icon Appearance</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QCheckBox" name="checkBoxNotConnected">
+             <property name="whatsThis">
+              <string>When selected the icon for this interface will be
 hidden when the interface is not connected. 
 When reconnected the icon will be shown again.</string>
-            </property>
-            <property name="text">
-             <string>Hide icon when &amp;not connected</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout">
-            <item>
-             <spacer name="spacer4_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>21</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="checkBoxNotExisting">
-              <property name="whatsThis">
-               <string>When selected the icon for this interface will be
+             </property>
+             <property name="text">
+              <string>Hide icon when &amp;not connected</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBoxNotExisting">
+             <property name="whatsThis">
+              <string>When selected the icon for this interface will be
 hidden when the interface does not exist. 
 This is useful for interfaces that are dynamically
 created and destroyed, for example interfaces
 of bluetooth adaptors.</string>
-              </property>
-              <property name="text">
-               <string>Hide icon &amp;when not existing</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout">
-            <item>
-             <widget class="QLabel" name="textLabel1_3_2">
-              <property name="whatsThis">
-               <string>Use this for networks with high noise i.e. many packets coming in and out all the time. Set this value high enough so that KNemo won't show incoming and outgoing traffic all the time.</string>
-              </property>
-              <property name="text">
-               <string>Traffic activity threshold:</string>
-              </property>
-              <property name="wordWrap">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="KIntSpinBox" name="spinBoxTrafficThreshold">
-              <property name="suffix">
-               <string> packets/s</string>
-              </property>
-              <property name="maximum">
-               <number>1000</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout">
-            <item>
-             <widget class="QLabel" name="textLabel1_2">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Iconset:</string>
-              </property>
-              <property name="wordWrap">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="comboBoxIconSet"/>
-            </item>
-            <item>
-             <widget class="QLabel" name="pixmapDisconnected">
-              <property name="wordWrap">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="pixmapConnected">
-              <property name="wordWrap">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="pixmapIncoming">
-              <property name="wordWrap">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="pixmapOutgoing">
-              <property name="wordWrap">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="pixmapTraffic">
-              <property name="wordWrap">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Statistics</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QCheckBox" name="checkBoxStatistics">
-            <property name="text">
-             <string>Activate statistics</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout">
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>17</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="billingStartLabel">
-              <property name="text">
-               <string>Billing start date:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="KDateEdit" name="billingStartInput">
-              <property name="whatsThis">
-               <string>By default, this shows the start date of the current month / billing period.  If you change the date, KNemo will resync the monthly statistics with that date.</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QGroupBox" name="groupBoxIfaceMenu">
-         <property name="title">
-          <string>&amp;Context Menu</string>
-         </property>
-         <layout class="QGridLayout">
-          <item row="0" column="0" colspan="2">
-           <widget class="QCheckBox" name="checkBoxCustom">
-            <property name="text">
-             <string>&amp;Display custom entries in context menu</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QTreeWidget" name="listViewCommands">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="rootIsDecorated">
-             <bool>false</bool>
-            </property>
-            <property name="itemsExpandable">
-             <bool>false</bool>
-            </property>
-            <property name="columnCount">
-             <number>3</number>
-            </property>
-            <column>
-             <property name="text">
-              <string>Root</string>
              </property>
-            </column>
-            <column>
              <property name="text">
-              <string>Menu text</string>
+              <string>Hide icon &amp;when not existing</string>
              </property>
-            </column>
-            <column>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout">
+             <item>
+              <widget class="QLabel" name="textLabel1_3_2">
+               <property name="whatsThis">
+                <string>Use this for networks with high noise i.e. many packets coming in and out all the time. Set this value high enough so that KNemo won't show incoming and outgoing traffic all the time.</string>
+               </property>
+               <property name="text">
+                <string>Traffic activity threshold:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="KIntSpinBox" name="spinBoxTrafficThreshold">
+               <property name="suffix">
+                <string> packets/s</string>
+               </property>
+               <property name="maximum">
+                <number>1000</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout">
+             <item>
+              <widget class="QLabel" name="textLabel1_2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Iconset:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="comboBoxIconSet"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="pixmapDisconnected">
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="pixmapConnected">
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="pixmapIncoming">
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="pixmapOutgoing">
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="pixmapTraffic">
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item>
+              <spacer name="horizontalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>1</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="colorIncomingLabel">
+               <property name="text">
+                <string>Receive color:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="KColorButton" name="colorIncoming"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <item>
+              <spacer name="horizontalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>1</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="colorOutgoingLabel">
+               <property name="text">
+                <string>Transmit color:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="KColorButton" name="colorOutgoing"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <spacer name="horizontalSpacer_8">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>1</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="colorDisabledLabel">
+               <property name="text">
+                <string>Disabled color:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="KColorButton" name="colorDisabled"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_2">
+          <attribute name="title">
+           <string>Statistics</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QCheckBox" name="checkBoxStatistics">
              <property name="text">
-              <string>Command</string>
+              <string>Activate statistics</string>
              </property>
-            </column>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <layout class="QVBoxLayout">
-            <item>
-             <widget class="QPushButton" name="pushButtonAddCommand">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="toolTip">
-               <string>Add a new entry</string>
-              </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout">
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>17</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="billingStartLabel">
+               <property name="text">
+                <string>Billing start date:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="KDateEdit" name="billingStartInput">
+               <property name="whatsThis">
+                <string>By default, this shows the start date of the current month / billing period.  If you change the date, KNemo will resync the monthly statistics with that date.</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_3">
+          <attribute name="title">
+           <string>Context Menu</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="0" colspan="2">
+            <widget class="QCheckBox" name="checkBoxCustom">
+             <property name="text">
+              <string>&amp;Display custom entries in context menu</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QTreeWidget" name="listViewCommands">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="rootIsDecorated">
+              <bool>false</bool>
+             </property>
+             <property name="itemsExpandable">
+              <bool>false</bool>
+             </property>
+             <property name="columnCount">
+              <number>3</number>
+             </property>
+             <column>
               <property name="text">
-               <string/>
+               <string>Root</string>
               </property>
-              <property name="shortcut">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButtonRemoveCommand">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="toolTip">
-               <string>Remove the selected entry</string>
-              </property>
+             </column>
+             <column>
               <property name="text">
-               <string/>
+               <string>Menu text</string>
               </property>
-              <property name="shortcut">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="spacer6_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Expanding</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>41</width>
-                <height>61</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButtonUp">
-              <property name="toolTip">
-               <string>Move the selected entry up</string>
-              </property>
+             </column>
+             <column>
               <property name="text">
-               <string/>
+               <string>Command</string>
               </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButtonDown">
-              <property name="toolTip">
-               <string>Move the selected entry down</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
+             </column>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <layout class="QVBoxLayout">
+             <item>
+              <widget class="QPushButton" name="pushButtonAddCommand">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>Add a new entry</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="shortcut">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButtonRemoveCommand">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>Remove the selected entry</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="shortcut">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="spacer6_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Expanding</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>41</width>
+                 <height>61</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButtonUp">
+               <property name="toolTip">
+                <string>Move the selected entry up</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButtonDown">
+               <property name="toolTip">
+                <string>Move the selected entry down</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -563,22 +679,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
            </widget>
           </item>
           <item>
-           <spacer name="spacer6">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Expanding</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>60</width>
-              <height>21</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
            <widget class="KIntNumInput" name="numInputPollInterval">
             <property name="whatsThis">
              <string>How often should KNemo poll for interface information. Lower number means more CPU load but faster reaction on changes. Larger number means less CPU load but slow reaction on changes.</string>
@@ -597,17 +697,8 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
             </property>
            </widget>
           </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBoxStatistics">
-         <property name="title">
-          <string>Statistics</string>
-         </property>
-         <layout class="QGridLayout">
-          <item row="0" column="1">
-           <spacer name="spacer7">
+          <item>
+           <spacer name="spacer6">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -616,13 +707,32 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>0</width>
-              <height>21</height>
+              <width>1</width>
+              <height>1</height>
              </size>
             </property>
            </spacer>
           </item>
-          <item row="0" column="2" colspan="2">
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBoxStatistics">
+         <property name="title">
+          <string>Statistics</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <item row="0" column="0">
+           <widget class="QLabel" name="textLabel1_6">
+            <property name="text">
+             <string>Save statistics every</string>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
            <widget class="KIntNumInput" name="numInputSaveInterval">
             <property name="value">
              <number>60</number>
@@ -638,28 +748,34 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
             </property>
            </widget>
           </item>
-          <item row="1" column="0" colspan="3">
+          <item row="0" column="2">
+           <spacer name="spacer7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Expanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>1</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="0">
            <widget class="QLabel" name="textLabel1_5">
             <property name="text">
-             <string>Statistics are stored in the following directory:</string>
+             <string>Statistics directory:</string>
             </property>
             <property name="wordWrap">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="3">
+          <item row="1" column="1" colspan="2">
            <widget class="KUrlRequester" name="lineEditStatisticsDir"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="textLabel1_6">
-            <property name="text">
-             <string>Save statistics every</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-           </widget>
           </item>
          </layout>
         </widget>
@@ -679,361 +795,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
           </size>
          </property>
         </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="trafficplotter">
-      <attribute name="title">
-       <string>Traffic &amp;Plotter</string>
-      </attribute>
-      <layout class="QGridLayout">
-       <item row="1" column="0" colspan="2">
-        <widget class="QGroupBox" name="groupBox7">
-         <property name="title">
-          <string>Scale</string>
-         </property>
-         <layout class="QGridLayout">
-          <item row="0" column="3">
-           <widget class="KIntSpinBox" name="spinBoxPixel">
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>50</number>
-            </property>
-            <property name="maxValue" stdset="0">
-             <number>50</number>
-            </property>
-            <property name="minValue" stdset="0">
-             <number>1</number>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="textLabel8_2">
-            <property name="text">
-             <string>Pixel per time period:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLabel" name="textLabel9_2_2">
-            <property name="text">
-             <string>Ma&amp;ximum value:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-            <property name="buddy">
-             <cstring>spinBoxMaxValue</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="KIntSpinBox" name="spinBoxMaxValue">
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>50000</number>
-            </property>
-            <property name="maxValue" stdset="0">
-             <number>50000</number>
-            </property>
-            <property name="minValue" stdset="0">
-             <number>1</number>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QCheckBox" name="checkBoxAutoDetection">
-            <property name="text">
-             <string>Automatic &amp;range detection</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="KIntSpinBox" name="spinBoxMinValue">
-            <property name="maximum">
-             <number>49999</number>
-            </property>
-            <property name="maxValue" stdset="0">
-             <number>49999</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="textLabel9_3">
-            <property name="text">
-             <string>&amp;Minimum value:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-            <property name="buddy">
-             <cstring>spinBoxMinValue</cstring>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QGroupBox" name="groupBox9">
-         <property name="title">
-          <string>Text</string>
-         </property>
-         <layout class="QGridLayout">
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="checkBoxLabels">
-            <property name="text">
-             <string>&amp;Labels</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="checkBoxBottomBar">
-            <property name="text">
-             <string>Bottom &amp;bar</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="textLabel3_2">
-            <property name="text">
-             <string>Fo&amp;nt size:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-            <property name="buddy">
-             <cstring>spinBoxFontSize</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="KIntSpinBox" name="spinBoxFontSize">
-            <property name="minimum">
-             <number>5</number>
-            </property>
-            <property name="maximum">
-             <number>24</number>
-            </property>
-            <property name="value">
-             <number>8</number>
-            </property>
-            <property name="maxValue" stdset="0">
-             <number>24</number>
-            </property>
-            <property name="minValue" stdset="0">
-             <number>5</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QGroupBox" name="groupBox8">
-         <property name="title">
-          <string>Lines</string>
-         </property>
-         <layout class="QGridLayout">
-          <item row="0" column="2">
-           <widget class="KIntSpinBox" name="spinBoxDistance">
-            <property name="minimum">
-             <number>10</number>
-            </property>
-            <property name="maximum">
-             <number>120</number>
-            </property>
-            <property name="value">
-             <number>30</number>
-            </property>
-            <property name="maxValue" stdset="0">
-             <number>120</number>
-            </property>
-            <property name="minValue" stdset="0">
-             <number>10</number>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="textLabel1_2_2">
-            <property name="text">
-             <string>&amp;Distance:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-            <property name="buddy">
-             <cstring>spinBoxDistance</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="checkBoxVLines">
-            <property name="text">
-             <string>Vertic&amp;al lines</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="checkBoxVLinesScroll">
-            <property name="text">
-             <string>V&amp;ertical lines scroll</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBoxHLines">
-            <property name="text">
-             <string>Hori&amp;zontal lines</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QGroupBox" name="groupBox10">
-         <property name="title">
-          <string>&amp;Colors</string>
-         </property>
-         <layout class="QGridLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="textLabel4_2">
-            <property name="text">
-             <string>Vertical lines:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="KColorButton" name="kColorButtonVLines">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="KColorButton" name="kColorButtonHLines">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="KColorButton" name="kColorButtonIncoming">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="textLabel6_2">
-            <property name="text">
-             <string>Background:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="KColorButton" name="kColorButtonBackground">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="textLabel5_2">
-            <property name="text">
-             <string>Horizontal lines:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLabel" name="textLabel7_2_2">
-            <property name="text">
-             <string>Outgoing traffic:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="textLabel7_3">
-            <property name="text">
-             <string>Incoming traffic:</string>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="KColorButton" name="kColorButtonOutgoing">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Traffic opacity:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QSpinBox" name="spinBoxOpacity">
-            <property name="suffix">
-             <string>%</string>
-            </property>
-            <property name="maximum">
-             <number>100</number>
-            </property>
-            <property name="value">
-             <number>20</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QGroupBox" name="groupBox15">
-         <property name="title">
-          <string>Traffic</string>
-         </property>
-         <layout class="QHBoxLayout">
-          <item>
-           <widget class="QCheckBox" name="checkBoxIncoming">
-            <property name="text">
-             <string>Sho&amp;w incoming traffic</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="checkBoxOutgoing">
-            <property name="text">
-             <string>Show &amp;outgoing traffic</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -1078,10 +839,14 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
   <tabstop>pushButtonAll</tabstop>
   <tabstop>pushButtonDelete</tabstop>
   <tabstop>lineEditAlias</tabstop>
+  <tabstop>tabWidget</tabstop>
   <tabstop>checkBoxNotConnected</tabstop>
   <tabstop>checkBoxNotExisting</tabstop>
   <tabstop>spinBoxTrafficThreshold</tabstop>
   <tabstop>comboBoxIconSet</tabstop>
+  <tabstop>colorIncoming</tabstop>
+  <tabstop>colorOutgoing</tabstop>
+  <tabstop>colorDisabled</tabstop>
   <tabstop>checkBoxStatistics</tabstop>
   <tabstop>billingStartInput</tabstop>
   <tabstop>checkBoxCustom</tabstop>
@@ -1091,32 +856,13 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
   <tabstop>pushButtonUp</tabstop>
   <tabstop>pushButtonDown</tabstop>
   <tabstop>listBoxAvailable</tabstop>
-  <tabstop>listBoxDisplay</tabstop>
   <tabstop>pushButtonRemoveToolTip</tabstop>
   <tabstop>pushButtonAddToolTip</tabstop>
+  <tabstop>listBoxDisplay</tabstop>
   <tabstop>pushButtonNotifications</tabstop>
   <tabstop>numInputPollInterval</tabstop>
   <tabstop>numInputSaveInterval</tabstop>
   <tabstop>lineEditStatisticsDir</tabstop>
-  <tabstop>checkBoxIncoming</tabstop>
-  <tabstop>checkBoxOutgoing</tabstop>
-  <tabstop>checkBoxAutoDetection</tabstop>
-  <tabstop>spinBoxPixel</tabstop>
-  <tabstop>spinBoxMinValue</tabstop>
-  <tabstop>spinBoxMaxValue</tabstop>
-  <tabstop>checkBoxVLines</tabstop>
-  <tabstop>spinBoxDistance</tabstop>
-  <tabstop>checkBoxVLinesScroll</tabstop>
-  <tabstop>checkBoxHLines</tabstop>
-  <tabstop>checkBoxLabels</tabstop>
-  <tabstop>checkBoxBottomBar</tabstop>
-  <tabstop>spinBoxFontSize</tabstop>
-  <tabstop>kColorButtonVLines</tabstop>
-  <tabstop>kColorButtonHLines</tabstop>
-  <tabstop>kColorButtonBackground</tabstop>
-  <tabstop>kColorButtonIncoming</tabstop>
-  <tabstop>kColorButtonOutgoing</tabstop>
-  <tabstop>spinBoxOpacity</tabstop>
  </tabstops>
  <includes>
   <include location="local">knuminput.h</include>
@@ -1146,150 +892,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
     <hint type="destinationlabel">
      <x>288</x>
      <y>176</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxAutoDetection</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>spinBoxMinValue</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxAutoDetection</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>spinBoxMaxValue</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxVLines</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>checkBoxVLinesScroll</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxVLines</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>spinBoxDistance</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxVLines</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>kColorButtonVLines</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>28</x>
-     <y>86</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxHLines</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>checkBoxLabels</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>60</x>
-     <y>82</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxHLines</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>kColorButtonHLines</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>28</x>
-     <y>86</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxIncoming</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>kColorButtonIncoming</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>28</x>
-     <y>86</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxOutgoing</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>kColorButtonOutgoing</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>28</x>
-     <y>82</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>28</x>
-     <y>86</y>
     </hint>
    </hints>
   </connection>

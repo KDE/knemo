@@ -109,8 +109,6 @@ private:
     QTimer* mPollTimer;
     // application wide settings are stored here
     GeneralData mGeneralData;
-    // settings for the traffic plotter are stored here
-    PlotterSettings mPlotterSettings;
     // the name of backend we currently use
     QString mBackendName;
     // a list of all interfaces the user wants to monitor

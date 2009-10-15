@@ -81,13 +81,7 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
       // going to need to track the original calendar type.
       // TODO: Some of the calendars are a bit buggy, so default to Gregorian for now
       //mDefaultCalendarType( KGlobal::locale()->calendarType() ),
-      mDefaultCalendarType( "gregorian" ),
-
-      mColorVLines( 0x04FB1D ),
-      mColorHLines( 0x04FB1D ),
-      mColorIncoming( 0x1889FF ),
-      mColorOutgoing( 0xFF7F08 ),
-      mColorBackground( 0x313031 )
+      mDefaultCalendarType( "gregorian" )
 {
     mConfig = KSharedConfig::openConfig( "knemorc" );
 
@@ -159,6 +153,12 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( aliasChanged( const QString& ) ) );
     connect( mDlg->comboBoxIconSet, SIGNAL( activated( int ) ),
              this, SLOT( iconSetChanged( int ) ) );
+    connect( mDlg->colorIncoming, SIGNAL( changed( const QColor& ) ),
+             this, SLOT( colorButtonChanged() ) );
+    connect( mDlg->colorOutgoing, SIGNAL( changed( const QColor& ) ),
+             this, SLOT( colorButtonChanged() ) );
+    connect( mDlg->colorDisabled, SIGNAL( changed( const QColor& ) ),
+             this, SLOT( colorButtonChanged() ) );
     connect( mDlg->checkBoxNotConnected, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxNotConnectedToggled ( bool ) ) );
     connect( mDlg->checkBoxNotExisting, SIGNAL( toggled( bool ) ),
@@ -179,49 +179,9 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( listViewCommandsSelectionChanged( QTreeWidgetItem*, QTreeWidgetItem* ) ) );
     connect( mDlg->listViewCommands, SIGNAL( itemChanged( QTreeWidgetItem*, int ) ),
              this, SLOT( listViewCommandsChanged( QTreeWidgetItem*, int ) ) );
-
-    // connect the plotter widgets
-    connect( mDlg->checkBoxBottomBar, SIGNAL( toggled( bool ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->checkBoxLabels, SIGNAL( toggled( bool ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->checkBoxVLines, SIGNAL( toggled( bool ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->checkBoxHLines, SIGNAL( toggled( bool ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->checkBoxIncoming, SIGNAL( toggled( bool ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->checkBoxOutgoing, SIGNAL( toggled( bool ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->checkBoxVLinesScroll, SIGNAL( toggled( bool ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->checkBoxAutoDetection, SIGNAL( toggled( bool ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->spinBoxPixel, SIGNAL( valueChanged( int ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->spinBoxDistance, SIGNAL( valueChanged( int ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->spinBoxFontSize, SIGNAL( valueChanged( int ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->spinBoxMinValue, SIGNAL( valueChanged( int ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->spinBoxMaxValue, SIGNAL( valueChanged( int ) ),
-             this, SLOT( changed() ) );
     connect( mDlg->numInputPollInterval, SIGNAL( valueChanged( int ) ),
              this, SLOT( changed() ) );
     connect( mDlg->numInputSaveInterval, SIGNAL( valueChanged( int ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->kColorButtonVLines, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->kColorButtonHLines, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->kColorButtonIncoming, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->kColorButtonOutgoing, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->kColorButtonBackground, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
-    connect( mDlg->spinBoxOpacity, SIGNAL( valueChanged( const int ) ),
              this, SLOT( changed() ) );
 }
 
@@ -273,6 +233,10 @@ void ConfigDialog::load()
             KConfigGroup interfaceGroup( config, group );
             settings->alias = interfaceGroup.readEntry( "Alias" ).trimmed();
             settings->iconSet = interfaceGroup.readEntry( "IconSet", "monitor" );
+            settings->colorIncoming = interfaceGroup.readEntry( "ColorIncoming", QColor( 0x1889FF ) );
+            settings->colorOutgoing = interfaceGroup.readEntry( "ColorOutgoing", QColor( 0xFF7F08 ) );
+            KColorScheme scheme(QPalette::Active, KColorScheme::View);
+            settings->colorDisabled = interfaceGroup.readEntry( "ColorDisabled", scheme.foreground( KColorScheme::InactiveText ).color() );
             settings->customCommands = interfaceGroup.readEntry( "CustomCommands", false );
             settings->hideWhenNotAvailable = interfaceGroup.readEntry( "HideWhenNotAvailable", false );
             settings->hideWhenNotExisting = interfaceGroup.readEntry( "HideWhenNotExisting", false );
@@ -325,31 +289,8 @@ void ConfigDialog::load()
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->pushButtonDelete->setDisabled( false );
-        mDlg->groupBoxIfaceMisc->setDisabled( false );
-        mDlg->groupBoxIfaceMenu->setDisabled( false );
+        mDlg->tabWidget->setDisabled( false );
     }
-
-    // Set the plotter widgets
-    KConfigGroup plotterGroup( config, "PlotterSettings" );
-    mDlg->spinBoxPixel->setValue( clamp<int>(plotterGroup.readEntry( "Pixel", 1 ), 1, 50 ) );
-    mDlg->spinBoxDistance->setValue( clamp<int>(plotterGroup.readEntry( "Distance", 30 ), 10, 120 ) );
-    mDlg->spinBoxFontSize->setValue( clamp<int>(plotterGroup.readEntry( "FontSize", 8 ), 5, 24 ) );
-    mDlg->spinBoxMinValue->setValue( clamp<int>(plotterGroup.readEntry( "MinimumValue", 0 ), 0, 49999 ) );
-    mDlg->spinBoxMaxValue->setValue( clamp<int>(plotterGroup.readEntry( "MaximumValue", 1 ), 1, 50000 ) );
-    mDlg->checkBoxLabels->setChecked( plotterGroup.readEntry( "Labels", true ) );
-    mDlg->checkBoxBottomBar->setChecked( plotterGroup.readEntry( "BottomBar", true ) );
-    mDlg->checkBoxVLines->setChecked( plotterGroup.readEntry( "VerticalLines", true ) );
-    mDlg->checkBoxHLines->setChecked( plotterGroup.readEntry( "HorizontalLines", true ) );
-    mDlg->checkBoxIncoming->setChecked( plotterGroup.readEntry( "ShowIncoming", true ) );
-    mDlg->checkBoxOutgoing->setChecked( plotterGroup.readEntry( "ShowOutgoing", true ) );
-    mDlg->checkBoxAutoDetection->setChecked( plotterGroup.readEntry( "AutomaticDetection", true ) );
-    mDlg->checkBoxVLinesScroll->setChecked( plotterGroup.readEntry( "VerticalLinesScroll", true ) );
-    mDlg->kColorButtonVLines->setColor( plotterGroup.readEntry( "ColorVLines", mColorVLines ) );
-    mDlg->kColorButtonHLines->setColor( plotterGroup.readEntry( "ColorHLines", mColorHLines ) );
-    mDlg->kColorButtonIncoming->setColor( plotterGroup.readEntry( "ColorIncoming", mColorIncoming ) );
-    mDlg->kColorButtonOutgoing->setColor( plotterGroup.readEntry( "ColorOutgoing", mColorOutgoing ) );
-    mDlg->kColorButtonBackground->setColor( plotterGroup.readEntry( "ColorBackground", mColorBackground ) );
-    mDlg->spinBoxOpacity->setValue( clamp<int>(plotterGroup.readEntry( "Opacity", 20 ), 0, 100 ) );
 
     // These things need to be here so that 'Reset' from the control
     // center is handled correctly.
@@ -412,7 +353,10 @@ void ConfigDialog::save()
     foreach ( QString delIface, mDeletedIfaces )
     {
         if ( !mSettingsMap.contains( delIface ) )
+        {
             config->deleteGroup( "Interface_" + delIface );
+            config->deleteGroup( "Plotter_" + delIface );
+        }
     }
 
     foreach ( QString it, mSettingsMap.keys() )
@@ -448,6 +392,9 @@ void ConfigDialog::save()
             interfaceGroup.writeEntry( "Alias", settings->alias );
 
         interfaceGroup.writeEntry( "IconSet", settings->iconSet );
+        interfaceGroup.writeEntry( "ColorIncoming", settings->colorIncoming );
+        interfaceGroup.writeEntry( "ColorOutgoing", settings->colorOutgoing );
+        interfaceGroup.writeEntry( "ColorDisabled", settings->colorDisabled );
         interfaceGroup.writeEntry( "CustomCommands", settings->customCommands );
         interfaceGroup.writeEntry( "HideWhenNotAvailable", settings->hideWhenNotAvailable );
         interfaceGroup.writeEntry( "HideWhenNotExisting", settings->hideWhenNotExisting );
@@ -481,27 +428,6 @@ void ConfigDialog::save()
     generalGroup.writeEntry( "ToolTipContent", mToolTipContent );
     generalGroup.writeEntry( "Interfaces", list );
 
-    KConfigGroup plotterGroup( config, "PlotterSettings" );
-    plotterGroup.writeEntry( "Pixel", mDlg->spinBoxPixel->value() );
-    plotterGroup.writeEntry( "Distance", mDlg->spinBoxDistance->value() );
-    plotterGroup.writeEntry( "FontSize", mDlg->spinBoxFontSize->value() );
-    plotterGroup.writeEntry( "MinimumValue", mDlg->spinBoxMinValue->value() );
-    plotterGroup.writeEntry( "MaximumValue", mDlg->spinBoxMaxValue->value() );
-    plotterGroup.writeEntry( "Labels", mDlg->checkBoxLabels->isChecked() );
-    plotterGroup.writeEntry( "BottomBar", mDlg->checkBoxBottomBar->isChecked() );
-    plotterGroup.writeEntry( "VerticalLines", mDlg->checkBoxVLines->isChecked() );
-    plotterGroup.writeEntry( "HorizontalLines", mDlg->checkBoxHLines->isChecked() );
-    plotterGroup.writeEntry( "ShowIncoming", mDlg->checkBoxIncoming->isChecked() );
-    plotterGroup.writeEntry( "ShowOutgoing", mDlg->checkBoxOutgoing->isChecked() );
-    plotterGroup.writeEntry( "AutomaticDetection", mDlg->checkBoxAutoDetection->isChecked() );
-    plotterGroup.writeEntry( "VerticalLinesScroll", mDlg->checkBoxVLinesScroll->isChecked() );
-    plotterGroup.writeEntry( "ColorVLines", mDlg->kColorButtonVLines->color() );
-    plotterGroup.writeEntry( "ColorHLines", mDlg->kColorButtonHLines->color() );
-    plotterGroup.writeEntry( "ColorIncoming", mDlg->kColorButtonIncoming->color() );
-    plotterGroup.writeEntry( "ColorOutgoing", mDlg->kColorButtonOutgoing->color() );
-    plotterGroup.writeEntry( "ColorBackground", mDlg->kColorButtonBackground->color() );
-    plotterGroup.writeEntry( "Opacity", mDlg->spinBoxOpacity->value() );
-
     config->sync();
     QDBusMessage reply = QDBusInterface("org.kde.knemo", "/knemo", "org.kde.knemo").call("reparseConfiguration");
 }
@@ -512,8 +438,7 @@ void ConfigDialog::defaults()
     mSettingsMap.clear();
     mDlg->listBoxInterfaces->clear();
     mDlg->pushButtonDelete->setDisabled( true );
-    mDlg->groupBoxIfaceMisc->setDisabled( true );
-    mDlg->groupBoxIfaceMenu->setDisabled( true );
+    mDlg->tabWidget->setDisabled( true );
     mDlg->lineEditAlias->setText( QString::null );
     mDlg->checkBoxNotConnected->setChecked( false );
     mDlg->checkBoxNotExisting->setChecked( false );
@@ -538,6 +463,10 @@ void ConfigDialog::defaults()
     mDlg->pixmapIncoming->clear();
     mDlg->pixmapOutgoing->clear();
     mDlg->pixmapTraffic->clear();
+    mDlg->colorIncoming->setColor( QColor( 0x1889FF ) );
+    mDlg->colorOutgoing->setColor( QColor( 0xFF7F08 ) );
+    KColorScheme scheme(QPalette::Active, KColorScheme::View);
+    mDlg->colorDisabled->setColor( scheme.foreground( KColorScheme::InactiveText ).color() );
 
     BackendBase * backend = BackendFactory::backend();
     QString interface = backend->getDefaultRouteIface( AF_INET );
@@ -549,13 +478,12 @@ void ConfigDialog::defaults()
     {
         InterfaceSettings* settings = new InterfaceSettings();
         settings->billingStart = startDate;
+        settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
-        mDlg->lineEditAlias->clear();
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
         mDlg->pushButtonDelete->setDisabled( false );
-        mDlg->groupBoxIfaceMisc->setDisabled( false );
-        mDlg->groupBoxIfaceMenu->setDisabled( false );
+        mDlg->tabWidget->setDisabled( false );
     }
 
     // Default misc settings
@@ -566,27 +494,6 @@ void ConfigDialog::defaults()
     // Default tool tips
     mToolTipContent = defaultTip;
     setupToolTipTab();
-
-    // Default plotter settings
-    mDlg->spinBoxPixel->setValue( 1 );
-    mDlg->spinBoxDistance->setValue( 30 );
-    mDlg->spinBoxFontSize->setValue( 8 );
-    mDlg->spinBoxMinValue->setValue( 0 );
-    mDlg->spinBoxMaxValue->setValue( 1 );
-    mDlg->checkBoxLabels->setChecked( true );
-    mDlg->checkBoxBottomBar->setChecked( true );
-    mDlg->checkBoxVLines->setChecked( true );
-    mDlg->checkBoxHLines->setChecked( true );
-    mDlg->checkBoxIncoming->setChecked( true );
-    mDlg->checkBoxOutgoing->setChecked( true );
-    mDlg->checkBoxAutoDetection->setChecked( true );
-    mDlg->checkBoxVLinesScroll->setChecked( true );
-    mDlg->kColorButtonVLines->setColor( mColorVLines );
-    mDlg->kColorButtonHLines->setColor( mColorHLines );
-    mDlg->kColorButtonIncoming->setColor( mColorIncoming );
-    mDlg->kColorButtonOutgoing->setColor( mColorOutgoing );
-    mDlg->kColorButtonBackground->setColor( mColorBackground );
-    mDlg->spinBoxOpacity->setValue( 20 );
 
     changed( true );
 }
@@ -606,8 +513,7 @@ void ConfigDialog::buttonNewSelected()
         mSettingsMap.insert( ifname, new InterfaceSettings() );
         mDlg->listBoxInterfaces->setCurrentRow( mDlg->listBoxInterfaces->row( item ) );
         mDlg->pushButtonDelete->setDisabled( false );
-        mDlg->groupBoxIfaceMisc->setDisabled( false );
-        mDlg->groupBoxIfaceMenu->setDisabled( false );
+        mDlg->tabWidget->setDisabled( false );
         mDlg->lineEditAlias->clear();
         changed( true );
     }
@@ -636,8 +542,7 @@ void ConfigDialog::buttonAllSelected()
     {
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
         mDlg->pushButtonDelete->setDisabled( false );
-        mDlg->groupBoxIfaceMisc->setDisabled( false );
-        mDlg->groupBoxIfaceMenu->setDisabled( false );
+        mDlg->tabWidget->setDisabled( false );
         QString iface = mDlg->listBoxInterfaces->item( 0 )->text();
         mDlg->lineEditAlias->blockSignals( true );
         mDlg->lineEditAlias->setText( mSettingsMap[iface]->alias );
@@ -695,8 +600,7 @@ void ConfigDialog::buttonDeleteSelected()
     if ( mDlg->listBoxInterfaces->count() < 1 )
     {
         mDlg->pushButtonDelete->setDisabled( true );
-        mDlg->groupBoxIfaceMisc->setDisabled( true );
-        mDlg->groupBoxIfaceMenu->setDisabled( true );
+        mDlg->tabWidget->setDisabled( true );
         mDlg->pixmapDisconnected->clear();
         mDlg->pixmapConnected->clear();
         mDlg->pixmapIncoming->clear();
@@ -923,6 +827,9 @@ void ConfigDialog::interfaceSelected( int row )
         mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( settings->iconSet ) );
     else
         mDlg->comboBoxIconSet->setCurrentIndex( mDlg->comboBoxIconSet->count() - 1 );
+    mDlg->colorIncoming->setColor( settings->colorIncoming );
+    mDlg->colorOutgoing->setColor( settings->colorOutgoing );
+    mDlg->colorDisabled->setColor( settings->colorDisabled );
     mDlg->checkBoxCustom->setChecked( settings->customCommands );
     mDlg->checkBoxNotConnected->setChecked( settings->hideWhenNotAvailable );
     mDlg->checkBoxNotExisting->setChecked( settings->hideWhenNotExisting );
@@ -984,9 +891,22 @@ void ConfigDialog::aliasChanged( const QString& text )
 
 void ConfigDialog::colorButtonChanged()
 {
+    if ( !mDlg->listBoxInterfaces->currentItem() )
+        return;
+
+    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
+
+    InterfaceSettings* settings = mSettingsMap[selected->text()];
+    if ( mDlg->colorIncoming->color().isValid() )
+        settings->colorIncoming = mDlg->colorIncoming->color();
+    if ( mDlg->colorOutgoing->color().isValid() )
+        settings->colorOutgoing = mDlg->colorOutgoing->color();
+    if ( mDlg->colorDisabled->color().isValid() )
+        settings->colorDisabled = mDlg->colorDisabled->color();
+
     if ( mDlg->comboBoxIconSet->count() - 1 == mDlg->comboBoxIconSet->currentIndex() )
         iconSetChanged( mDlg->comboBoxIconSet->currentIndex() );
-    changed( true );
+    if ( !mLock) changed( true );
 }
 
 QFont ConfigDialog::setIconFont( QString text )
@@ -1015,7 +935,6 @@ QFont ConfigDialog::setIconFont( QString text )
 
 QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, bool active )
 {
-    KColorScheme scheme(QPalette::Active, KColorScheme::View);
     QPixmap sampleIcon( 22, 22 );
     sampleIcon.fill( Qt::transparent );
     QPainter p( &sampleIcon );
@@ -1023,13 +942,13 @@ QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, bool
     p.setOpacity( 1.0 );
     p.setFont( setIconFont( incomingText ) );
     if ( active )
-        p.setPen( mDlg->kColorButtonIncoming->color() );
+        p.setPen( mDlg->colorIncoming->color() );
     else
-        p.setPen( scheme.foreground( KColorScheme::InactiveText ).color() );
+        p.setPen( mDlg->colorDisabled->color() );
     p.drawText( sampleIcon.rect(), Qt::AlignTop | Qt::AlignRight, incomingText );
     p.setFont( setIconFont( outgoingText ) );
     if ( active )
-        p.setPen( mDlg->kColorButtonOutgoing->color() );
+        p.setPen( mDlg->colorOutgoing->color() );
     p.drawText( sampleIcon.rect(), Qt::AlignBottom | Qt::AlignRight, outgoingText );
     return sampleIcon;
 }
@@ -1051,6 +970,12 @@ void ConfigDialog::iconSetChanged( int set )
         mDlg->pixmapIncoming->setPixmap( textIcon( "123K", "0B", true ) );
         mDlg->pixmapOutgoing->setPixmap( textIcon( "0B", "12K", true ) );
         mDlg->pixmapTraffic->setPixmap( textIcon( "123K", "12K", true ) );
+        mDlg->colorIncoming->show();
+        mDlg->colorIncomingLabel->show();
+        mDlg->colorOutgoing->show();
+        mDlg->colorOutgoingLabel->show();
+        mDlg->colorDisabled->show();
+        mDlg->colorDisabledLabel->show();
     }
     else
     {
@@ -1062,6 +987,12 @@ void ConfigDialog::iconSetChanged( int set )
         mDlg->pixmapIncoming->setPixmap( UserIcon( settings->iconSet + ICON_INCOMING ) );
         mDlg->pixmapOutgoing->setPixmap( UserIcon( settings->iconSet + ICON_OUTGOING ) );
         mDlg->pixmapTraffic->setPixmap( UserIcon( settings->iconSet + ICON_TRAFFIC ) );
+        mDlg->colorIncoming->hide();
+        mDlg->colorIncomingLabel->hide();
+        mDlg->colorOutgoing->hide();
+        mDlg->colorOutgoingLabel->hide();
+        mDlg->colorDisabled->hide();
+        mDlg->colorDisabledLabel->hide();
     }
     if (!mLock) changed( true );
 }

@@ -98,11 +98,6 @@ private:
     // Delete this once KCalendarSystem fixed
     QString mDefaultCalendarType;
 
-    QColor mColorVLines;
-    QColor mColorHLines;
-    QColor mColorIncoming;
-    QColor mColorOutgoing;
-    QColor mColorBackground;
     KSharedConfigPtr mConfig;
     QMap<QString, InterfaceSettings *> mSettingsMap;
     QMap<quint32, QString> mToolTips;

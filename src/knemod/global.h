@@ -41,29 +41,6 @@ struct GeneralData
     KUrl statisticsDir;
 };
 
-struct PlotterSettings
-{
-    int pixel;
-    int distance;
-    int fontSize;
-    int minimumValue;
-    int maximumValue;
-    bool labels;
-    bool bottomBar;
-    bool showIncoming;
-    bool showOutgoing;
-    bool verticalLines;
-    bool horizontalLines;
-    bool automaticDetection;
-    bool verticalLinesScroll;
-    QColor colorVLines;
-    QColor colorHLines;
-    QColor colorIncoming;
-    QColor colorOutgoing;
-    QColor colorBackground;
-    int opacity;
-};
-
 struct StatisticEntry
 {
     StatisticEntry()

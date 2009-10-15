@@ -80,7 +80,10 @@ public slots:
     /*
      * Set colors for text in the tray
      */
-    void configChanged( QColor colorIncoming, QColor colorOutgoing, int status );
+    void configChanged( const QColor& colorIncoming,
+                        const QColor& colorOutgoing,
+                        const QColor& colorDisabled,
+                        int status );
 
 private slots:
     /*
@@ -121,6 +124,7 @@ private:
     KAction* configAction;
     QColor colorIncoming;
     QColor colorOutgoing;
+    QColor colorDisabled;
     QString textIncoming;
     QString textOutgoing;
     int iconWidth;

@@ -24,7 +24,7 @@
 #include <KDialog>
 #include <KSharedConfig>
 
-#include "global.h"
+#include "plotterconfigdialog.h"
 
 class FancyPlotterLabel;
 class KSignalPlotter;
@@ -34,13 +34,8 @@ class InterfacePlotterDialog : public KDialog
 {
 Q_OBJECT
 public:
-    InterfacePlotterDialog( const PlotterSettings &, QString );
+    InterfacePlotterDialog( QString );
     virtual ~InterfacePlotterDialog();
-
-    /**
-     * Configure the signal plotter with user settings
-     */
-    void configChanged();
 
     /**
      * Update the signal plotter with new data
@@ -50,8 +45,15 @@ public:
 protected:
     bool event( QEvent *e );
 
+private slots:
+    void configFinished();
+    void saveConfig();
 
 private:
+    void showContextMenu( const QPoint& );
+    void loadConfig();
+    void configChanged();
+    void configPlotter();
     enum VisibleBeams
     {
         NONE = 0,
@@ -61,10 +63,16 @@ private:
     };
 
     KSharedConfigPtr mConfig;
+    PlotterConfigDialog *mConfigDlg;
     bool mSetPos;
     bool mWasShown;
-    const PlotterSettings& mPlotterSettings;
+    PlotterSettings mSettings;
     QString mName;
+    QColor mColorVLines;
+    QColor mColorHLines;
+    QColor mColorIncoming;
+    QColor mColorOutgoing;
+    QColor mColorBackground;
     int mOutgoingPos;
     int mIncomingPos;
     KSignalPlotter *mPlotter;

@@ -32,6 +32,7 @@
 #include "knemodaemon.h"
 #include "interface.h"
 #include "backends/backendfactory.h"
+#include "utils.h"
 
 QString KNemoDaemon::sSelectedInterface = QString::null;
 
@@ -86,28 +87,6 @@ void KNemoDaemon::readConfig()
         mHaveInterfaces = true;
     QStringList interfaceList = generalGroup.readEntry( "Interfaces", QStringList() );
 
-    // Plotter
-    KConfigGroup plotterGroup( config, "PlotterSettings" );
-    mPlotterSettings.pixel = clamp<int>(plotterGroup.readEntry( "Pixel", 1 ), 1, 50 );
-    mPlotterSettings.distance = clamp<int>(plotterGroup.readEntry( "Distance", 30 ), 10, 120 );
-    mPlotterSettings.fontSize = clamp<int>(plotterGroup.readEntry( "FontSize", 8 ), 5, 24 );
-    mPlotterSettings.minimumValue = clamp<int>(plotterGroup.readEntry( "MinimumValue", 0 ), 0, 49999 );
-    mPlotterSettings.maximumValue = clamp<int>(plotterGroup.readEntry( "MaximumValue", 1 ), 1, 50000 );
-    mPlotterSettings.labels = plotterGroup.readEntry( "Labels", true );
-    mPlotterSettings.bottomBar = plotterGroup.readEntry( "BottomBar", true );
-    mPlotterSettings.showIncoming = plotterGroup.readEntry( "ShowIncoming", true );
-    mPlotterSettings.showOutgoing = plotterGroup.readEntry( "ShowOutgoing", true );
-    mPlotterSettings.verticalLines = plotterGroup.readEntry( "VerticalLines", true );
-    mPlotterSettings.horizontalLines = plotterGroup.readEntry( "HorizontalLines", true );
-    mPlotterSettings.automaticDetection = plotterGroup.readEntry( "AutomaticDetection", true );
-    mPlotterSettings.verticalLinesScroll = plotterGroup.readEntry( "VerticalLinesScroll", true );
-    mPlotterSettings.colorVLines = plotterGroup.readEntry( "ColorVLines", mColorVLines );
-    mPlotterSettings.colorHLines = plotterGroup.readEntry( "ColorHLines", mColorHLines );
-    mPlotterSettings.colorIncoming = plotterGroup.readEntry( "ColorIncoming", mColorIncoming );
-    mPlotterSettings.colorOutgoing = plotterGroup.readEntry( "ColorOutgoing", mColorOutgoing );
-    mPlotterSettings.colorBackground = plotterGroup.readEntry( "ColorBackground", mColorBackground );
-    mPlotterSettings.opacity = clamp<int>(plotterGroup.readEntry( "Opacity", 20 ), 0, 100 );
-
     // Remove interfaces that are no longer monitored
     foreach ( QString key, mInterfaceHash.keys() )
     {
@@ -126,7 +105,7 @@ void KNemoDaemon::readConfig()
         if ( !mInterfaceHash.contains( key ) )
         {
             const BackendData * data = backend->add( key );
-            iface = new Interface( key, data, mGeneralData, mPlotterSettings );
+            iface = new Interface( key, data, mGeneralData );
             mInterfaceHash.insert( key, iface );
             connect( backend, SIGNAL( updateComplete() ), iface, SLOT( activateMonitor() ) );
         }
@@ -171,7 +150,7 @@ void KNemoDaemon::updateInterfaces()
         if ( !ifaceName.isEmpty() )
         {
             const BackendData* data = backend->add( ifaceName );
-            Interface *iface = new Interface( ifaceName, data, mGeneralData, mPlotterSettings );
+            Interface *iface = new Interface( ifaceName, data, mGeneralData );
             mInterfaceHash.insert( ifaceName, iface );
             connect( backend, SIGNAL( updateComplete() ), iface, SLOT( activateMonitor() ) );
             mHaveInterfaces = true;

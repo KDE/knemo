@@ -21,6 +21,7 @@
 #include <QTimer>
 
 #include <KCalendarSystem>
+#include <KColorScheme>
 #include <KWindowSystem>
 
 #include "backends/backendbase.h"
@@ -33,8 +34,7 @@
 
 Interface::Interface( const QString &ifname,
                       const BackendData* data,
-                      const GeneralData& generalData,
-                      const PlotterSettings& plotterSettings )
+                      const GeneralData& generalData )
     : QObject(),
       mType( KNemoIface::UNKNOWN_TYPE ),
       mState( UNKNOWN_STATE ),
@@ -46,10 +46,9 @@ Interface::Interface( const QString &ifname,
       mStatisticsDialog(  0 ),
       mPlotterDialog( 0 ),
       mBackendData( data ),
-      mGeneralData( generalData ),
-      mPlotterSettings( plotterSettings )
+      mGeneralData( generalData )
 {
-    mPlotterDialog = new InterfacePlotterDialog( mPlotterSettings, mName );
+    mPlotterDialog = new InterfacePlotterDialog( mName );
     mPlotterTimer = new QTimer();
 
     connect( mPlotterTimer, SIGNAL( timeout() ),
@@ -85,6 +84,10 @@ void Interface::configChanged()
     QStringList iconSets = findIconSets();
     if ( !iconSets.contains( mSettings.iconSet ) )
         mSettings.iconSet = TEXTICON;
+    mSettings.colorIncoming = interfaceGroup.readEntry( "ColorIncoming", QColor( 0x1889FF ) );
+    mSettings.colorOutgoing = interfaceGroup.readEntry( "ColorOutgoing", QColor( 0xFF7F08 ) );
+    KColorScheme scheme(QPalette::Active, KColorScheme::View);
+    mSettings.colorDisabled = interfaceGroup.readEntry( "ColorDisabled", scheme.foreground( KColorScheme::InactiveText ).color() );
     mSettings.customCommands = interfaceGroup.readEntry( "CustomCommands", false );
     mSettings.hideWhenNotAvailable = interfaceGroup.readEntry( "HideWhenNotAvailable",false );
     mSettings.hideWhenNotExisting = interfaceGroup.readEntry( "HideWhenNotExisting", false );
@@ -119,12 +122,12 @@ void Interface::configChanged()
         }
     }
 
-    mIcon.configChanged( mPlotterSettings.colorIncoming, mPlotterSettings.colorOutgoing, mState );
+    mIcon.configChanged( mSettings.colorIncoming, mSettings.colorOutgoing, mSettings.colorDisabled, mState );
 
-    if ( mPlotterDialog != 0L )
+    /*if ( mPlotterDialog != 0L )
     {
         mPlotterDialog->configChanged();
-    }
+    }*/
 
     if ( mStatistics != 0 )
     {

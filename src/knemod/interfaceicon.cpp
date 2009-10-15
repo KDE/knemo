@@ -69,13 +69,17 @@ InterfaceIcon::~InterfaceIcon()
         delete mTray;
 }
 
-void InterfaceIcon::configChanged( QColor incoming, QColor outgoing, int status )
+void InterfaceIcon::configChanged( const QColor& incoming,
+                                   const QColor& outgoing,
+                                   const QColor& disabled,
+                                   int status )
 {
     KConfigGroup cg( KGlobal::mainComponent().config(), "System Tray" );
     iconWidth = cg.readEntry( "systrayIconWidth", 22 );
 
     colorIncoming = incoming;
     colorOutgoing = outgoing;
+    colorDisabled = disabled;
 
     // UNKNOWN_STATE to avoid notification
     updateTrayStatus( Interface::UNKNOWN_STATE );
@@ -211,7 +215,7 @@ void InterfaceIcon::updateIconText( bool proceed )
     if ( data->isAvailable )
         p.setPen( colorIncoming );
     else
-        p.setPen( scheme.foreground( KColorScheme::InactiveText ).color() );
+        p.setPen( colorDisabled );
     p.drawText( textIcon.rect(), Qt::AlignTop | Qt::AlignRight, textIncoming );
 
     p.setFont( setIconFont( byteText ) );

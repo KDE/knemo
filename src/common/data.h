@@ -21,7 +21,7 @@
 #ifndef DATA_H
 #define DATA_H
 
-#include <algorithm>
+#include <QColor>
 #include <QDate>
 #include <QString>
 #include <QList>
@@ -38,14 +38,6 @@
 #define TEXTICON "texticon"
 
 #include <QMap>
-
-using namespace std;
-
-/* This is for clamping min/max values read from the settings file */
-template <class T> inline T clamp(T x, T a, T b)
-{
-	return min(max(x,a),b);
-}
 
 namespace KNemoIface {
     enum Type
@@ -132,6 +124,9 @@ struct InterfaceSettings
 {
     InterfaceSettings()
       : iconSet( "monitor" ),
+        colorIncoming( 0x1889FF ),
+        colorOutgoing( 0xFF7F08 ),
+        colorDisabled( 0x888786 ),
         numCommands( 0 ),
         trafficThreshold( 0 ),
         hideWhenNotExisting( false ),
@@ -142,6 +137,9 @@ struct InterfaceSettings
     {}
 
     QString iconSet;
+    QColor colorIncoming;
+    QColor colorOutgoing;
+    QColor colorDisabled;
     int numCommands;
     int trafficThreshold;
     bool hideWhenNotExisting;
