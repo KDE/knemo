@@ -133,9 +133,14 @@ struct PlotterSettings
 
 struct StatisticEntry
 {
-    int day;
-    int month;
-    int year;
+    StatisticEntry()
+        : span( 0 ),
+          rxBytes( 0 ),
+          txBytes( 0 )
+    {}
+
+    QDate date;
+    int span;
     quint64 rxBytes;
     quint64 txBytes;
 };

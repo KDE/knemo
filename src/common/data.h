@@ -22,6 +22,7 @@
 #define DATA_H
 
 #include <algorithm>
+#include <QDate>
 #include <QString>
 #include <QList>
 
@@ -60,6 +61,7 @@ struct InterfaceSettings
         hideWhenNotExisting( false ),
         hideWhenNotAvailable( false ),
         activateStatistics( false ),
+        billingMonths( 1 ),
         customCommands( false )
     {}
 
@@ -69,6 +71,9 @@ struct InterfaceSettings
     bool hideWhenNotExisting;
     bool hideWhenNotAvailable;
     bool activateStatistics;
+    QDate billingStart;
+    int billingMonths;
+    QString calendar;
     bool customCommands;
     QString alias;
     QList<InterfaceCommand> commands;

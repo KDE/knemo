@@ -183,18 +183,16 @@ void Interface::showStatisticsDialog()
         }
         connect( mStatistics, SIGNAL( dayStatisticsChanged() ),
                  mStatisticsDialog, SLOT( updateDays() ) );
-        connect( mStatistics, SIGNAL( monthStatisticsChanged() ),
-                 mStatisticsDialog, SLOT( updateMonths() ) );
+        connect( mStatistics, SIGNAL( weekStatisticsChanged() ),
+                 mStatisticsDialog, SLOT( updateWeeks() ) );
+        connect( mStatistics, SIGNAL( monthStatisticsChanged( bool ) ),
+                 mStatisticsDialog, SLOT( updateMonths( bool ) ) );
         connect( mStatistics, SIGNAL( yearStatisticsChanged() ),
                  mStatisticsDialog, SLOT( updateYears() ) );
         connect( mStatistics, SIGNAL( currentEntryChanged() ),
                  mStatisticsDialog, SLOT( updateCurrentEntry() ) );
-        connect( mStatisticsDialog, SIGNAL( clearDailyStatisticsClicked() ),
-                 mStatistics, SLOT( clearDayStatistics() ) );
-        connect( mStatisticsDialog, SIGNAL( clearMonthlyStatisticsClicked() ),
-                 mStatistics, SLOT( clearMonthStatistics() ) );
-        connect( mStatisticsDialog, SIGNAL( clearYearlyStatisticsClicked() ),
-                 mStatistics, SLOT( clearYearStatistics() ) );
+        connect( mStatisticsDialog, SIGNAL( clearStatistics() ),
+                 mStatistics, SLOT( clearStatistics() ) );
 
         /* We need to show the dialog before we update the stats.  That way
          * the viewport doesn't get messed up when we scroll to the most recent
@@ -202,7 +200,8 @@ void Interface::showStatisticsDialog()
         mStatisticsDialog->show();
 
         mStatisticsDialog->updateDays();
-        mStatisticsDialog->updateMonths();
+        mStatisticsDialog->updateWeeks();
+        mStatisticsDialog->updateMonths( false );
         mStatisticsDialog->updateYears();
     }
     else
@@ -277,8 +276,6 @@ void Interface::startStatistics()
                  mStatusDialog, SLOT( statisticsChanged() ) );
         mStatusDialog->statisticsChanged();
     }
-
-    mStatistics->loadStatistics();
 }
 
 void Interface::stopStatistics()

@@ -3,6 +3,8 @@ include_directories( ${KDE4_INCLUDES} ../common )
 set( kcm_knemo_SRCS
     configdialog.cpp
     ../common/utils.cpp
+    kdateedit.cpp
+    kdatepickerpopup.cpp
 )
 
 kde4_add_ui_files( kcm_knemo_SRCS configdlg.ui )

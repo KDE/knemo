@@ -21,11 +21,15 @@
 #ifndef INTERFACESTATISTICS_H
 #define INTERFACESTATISTICS_H
 
+#include <QDate>
 #include <QList>
 
 #include "global.h"
 
+class QDomDocument;
+class QDomElement;
 class QTimer;
+class KCalendarSystem;
 class Interface;
 
 /**
@@ -51,28 +55,33 @@ public:
     virtual ~InterfaceStatistics();
 
     /**
-     * Load the statistics from a xml file
-     */
-    void loadStatistics();
-
-    /**
      * Called from Interface::configChanged() when the user
      * changed the settings.
      */
     void configChanged();
 
-    const StatisticEntry* getCurrentDay() const;
-    const StatisticEntry* getCurrentMonth() const;
-    const StatisticEntry* getCurrentYear() const;
-    const QList<StatisticEntry *>& getDayStatistics() const;
-    const QList<StatisticEntry *>& getMonthStatistics() const;
-    const QList<StatisticEntry *>& getYearStatistics() const;
+    const StatisticEntry* getCurrentDay() const { return mCurrentDay; }
+    const StatisticEntry* getCurrentWeek() const { return mCurrentWeek; }
+    const StatisticEntry* getCurrentMonth() const { return mCurrentMonth; }
+    const StatisticEntry* getCurrentYear() const { return mCurrentYear; }
+    const QList<StatisticEntry *>& getDayStatistics() const { return mDayStatistics; }
+    const QList<StatisticEntry *>& getWeekStatistics() const { return mWeekStatistics; }
+    const QList<StatisticEntry *>& getMonthStatistics() const { return mMonthStatistics; }
+    const QList<StatisticEntry *>& getYearStatistics() const { return mYearStatistics; }
+
+    enum GroupType
+    {
+        Day   = 1,
+        Week  = 2,
+        Month = 4,
+        Year  = 8
+    };
 
 signals:
     /**
      * The current entry has changed. There is only one signal
-     * for day, month and year because if the day changes,
-     * month and year also change.
+     * for day, week, month and year because if the day changes,
+     * week, month and year also change.
      */
     void currentEntryChanged();
     /**
@@ -80,9 +89,13 @@ signals:
      */
     void dayStatisticsChanged();
     /**
+     * The list has changed i.e. there is a new week entry or the list was cleared
+     */
+    void weekStatisticsChanged();
+    /**
      * The list has changed i.e. there is a new month entry or the list was cleared
      */
-    void monthStatisticsChanged();
+    void monthStatisticsChanged( bool );
     /**
      * The list has changed i.e. there is a new year entry or the list was cleared
      */
@@ -95,31 +108,27 @@ public slots:
      */
     void saveStatistics();
     /**
-     * Add incoming data to the current day, month and year
+     * Add incoming data to the current day, week, month and year
      */
     void addIncomingData( unsigned long data );
     /**
-     * Add outgoing data to the current day, month and year
+     * Add outgoing data to the current day, week, month and year
      */
     void addOutgoingData( unsigned long data );
     /**
-     * Clear all entries of the day statistics
+     * Clear all statistics
      */
-    void clearDayStatistics();
-    /**
-     * Clear all entries of the month statistics
-     */
-    void clearMonthStatistics();
-    /**
-     * Clear all entries of the year statistics
-     */
-    void clearYearStatistics();
+    void clearStatistics();
 
 private:
     /**
      * Make sure the current entry corresponds with the current date
      */
     void checkCurrentEntry();
+    /**
+     * Load the statistics from a xml file
+     */
+    void loadStatistics();
     /**
      * Fill the statistics with a current entry
      */
@@ -128,24 +137,43 @@ private:
      * Check if the current day is in the day statistics. If found set
      * mCurrentDay to the found entry else create a new one.
      */
-    void updateCurrentDay();
+    void updateCurrentDay( const QDate & );
+    /**
+     * Check if the current week is in the week statistics. If found set
+     * mCurrentWeek to the found entry else create a new one.
+     */
+    StatisticEntry * genNewWeek( const QDate & );
+    StatisticEntry * genNewMonth( const QDate &, QDate = QDate() );
+    StatisticEntry * genNewYear( const QDate & );
+    void updateCurrentWeek( const QDate & );
     /**
      * Check if the current month is in the month statistics. If found set
      * mCurrentMonth to the found entry else create a new one.
      */
-    void updateCurrentMonth();
+    void updateCurrentMonth( const QDate & );
     /**
      * Check if the current year is in the year statistics. If found set
      * mCurrentYear to the found entry else create a new one.
      */
-    void updateCurrentYear();
+    void updateCurrentYear( const QDate & );
+    QDate setRebuildDate( QList<StatisticEntry *>& statistics, const QDate &recalcDate, int group );
+    QDate getNextMonthStart( QDate );
+    void rebuildStats( const QDate &recalcDate, int group );
+    StatisticEntry* appendStats( QList<StatisticEntry *>& statistics, StatisticEntry* entry );
+    void saveBillingStart();
+    void loadStatsGroup( const KCalendarSystem * cal, const QDomElement& root, int group, QList<StatisticEntry *>& statistics );
+    void buildStatsGroup( QDomDocument& doc, int group, const QList<StatisticEntry *>& statistics );
 
     QTimer* mSaveTimer;
     Interface* mInterface;
+    QDate mBillingStart;
+    const KCalendarSystem* mCalendar;
     StatisticEntry* mCurrentDay;
+    StatisticEntry* mCurrentWeek;
     StatisticEntry* mCurrentMonth;
     StatisticEntry* mCurrentYear;
     QList<StatisticEntry *> mDayStatistics;
+    QList<StatisticEntry *> mWeekStatistics;
     QList<StatisticEntry *> mMonthStatistics;
     QList<StatisticEntry *> mYearStatistics;
 };

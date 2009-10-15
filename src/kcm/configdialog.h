@@ -27,6 +27,7 @@
 #include "ui_configdlg.h"
 
 class QTreeWidgetItem;
+class KCalendarSystem;
 
 /**
  * This is the configuration dialog for KNemo
@@ -73,6 +74,7 @@ private slots:
     void checkBoxNotConnectedToggled( bool on );
     void checkBoxNotExistingToggled( bool on );
     void checkBoxStatisticsToggled( bool on );
+    void billingStartInputChanged( const QDate& );
     void checkBoxStartKNemoToggled( bool on );
     void spinBoxTrafficValueChanged( int value );
     void checkBoxCustomToggled( bool on );
@@ -81,9 +83,9 @@ private slots:
     void listViewCommandsChanged( QTreeWidgetItem* item, int column );
 
 private:
+    void setMaxDay();
     void setupToolTipTab();
     void setupToolTipMap();
-    void updateStatisticsEntries( void );
     QPixmap textIcon( QString incomingText, QString outgoingText, bool active );
     QFont setIconFont( QString );
 
@@ -98,6 +100,12 @@ private:
     int mToolTipContent;
     bool mLock;
     Ui::ConfigDlg* mDlg;
+    const KCalendarSystem* mCalendar;
+    int mMaxDay;
+
+    // Delete this once KCalendarSystem fixed
+    QString mDefaultCalendarType;
+
     QColor mColorVLines;
     QColor mColorHLines;
     QColor mColorIncoming;

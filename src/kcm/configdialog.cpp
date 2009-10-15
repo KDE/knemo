@@ -39,6 +39,7 @@
 #include <KColorScheme>
 #include <kglobal.h>
 #include <KGlobalSettings>
+#include <KCalendarSystem>
 #include <kconfig.h>
 #include <klocale.h>
 #include <knuminput.h>
@@ -47,6 +48,7 @@
 #include <kcolorbutton.h>
 #include <kinputdialog.h>
 #include <kapplication.h>
+#include <KMessageBox>
 #include <KNotifyConfigWidget>
 #include <kstandarddirs.h>
 #include <kgenericfactory.h>
@@ -78,6 +80,13 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     : KCModule( KNemoFactory::componentData(), parent, args ),
       mLock( false ),
       mDlg( new Ui::ConfigDlg() ),
+
+      // If we're going to change KGlobal::locale()->calendar() we're
+      // going to need to track the original calendar type.
+      // TODO: Some of the calendars are a bit buggy, so default to Gregorian for now
+      //mDefaultCalendarType( KGlobal::locale()->calendarType() ),
+      mDefaultCalendarType( "gregorian" ),
+
       mColorVLines( 0x04FB1D ),
       mColorHLines( 0x04FB1D ),
       mColorIncoming( 0x1889FF ),
@@ -85,6 +94,7 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
       mColorBackground( 0x313031 )
 {
     mConfig = KSharedConfig::openConfig( "knemorc" );
+
     setupToolTipMap();
 
     QWidget *main = new QWidget( this );
@@ -159,6 +169,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( checkBoxNotExistingToggled ( bool ) ) );
     connect( mDlg->checkBoxStatistics, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxStatisticsToggled ( bool ) ) );
+    connect( mDlg->billingStartInput, SIGNAL( dateEntered( const QDate& ) ),
+             this, SLOT( billingStartInputChanged( const QDate& ) ) );
     connect( mDlg->checkBoxStartKNemo, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxStartKNemoToggled( bool ) ) );
     connect( mDlg->spinBoxTrafficThreshold, SIGNAL( valueChanged( int ) ),
@@ -222,6 +234,23 @@ ConfigDialog::~ConfigDialog()
     delete mDlg;
 }
 
+void ConfigDialog::setMaxDay()
+{
+    QDate date = QDate::currentDate();
+    mMaxDay = mCalendar->daysInMonth( date );
+    if ( mCalendar->isLeapYear( date ) )
+        date = date.addDays( 0 - mCalendar->dayOfYear( date ) );
+    int months = mCalendar->monthsInYear( date );
+    for ( int i = 1; i < months; i++ )
+    {
+        QDate month;
+        mCalendar->setYMD( month, mCalendar->year( date ), i, 1 );
+        int days = mCalendar->daysInMonth( month );
+        if ( days < mMaxDay )
+            mMaxDay = days;
+    }
+}
+
 void ConfigDialog::load()
 {
     mSettingsMap.clear();
@@ -232,7 +261,7 @@ void ConfigDialog::load()
     bool startKNemo = generalGroup.readEntry( "AutoStart", true );
     mDlg->checkBoxStartKNemo->setChecked( startKNemo );
     mDlg->numInputPollInterval->setValue( clamp<int>(generalGroup.readEntry( "PollInterval", 1 ), 1, 60 ) );
-    mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( "SaveInterval", 60 ), 1, 300 ) );
+    mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( "SaveInterval", 60 ), 0, 300 ) );
     mDlg->lineEditStatisticsDir->setUrl( generalGroup.readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) ) );
     mToolTipContent = generalGroup.readEntry( "ToolTipContent", defaultTip );
 
@@ -252,6 +281,36 @@ void ConfigDialog::load()
             settings->hideWhenNotAvailable = interfaceGroup.readEntry( "HideWhenNotAvailable", false );
             settings->hideWhenNotExisting = interfaceGroup.readEntry( "HideWhenNotExisting", false );
             settings->activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", false );
+
+            settings->calendar = interfaceGroup.readEntry( "Calendar", "" );
+
+            if ( settings->calendar.isEmpty() )
+                mCalendar = KCalendarSystem::create( mDefaultCalendarType );
+            else
+                mCalendar = KCalendarSystem::create( settings->calendar );
+
+            settings->billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", 0 ), 0, 6 );
+
+             // If no start date saved, default to first of month.
+            QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
+            settings->billingStart = interfaceGroup.readEntry( "BillingStart", startDate );
+
+            // If date is saved but very old, update it to current period
+            QDate currentDate = QDate::currentDate();
+            QDate nextMonthStart = settings->billingStart;
+            if ( nextMonthStart <= currentDate )
+            {
+                int length = settings->billingMonths;
+                if ( length < 1 )
+                    length = 1;
+                while ( nextMonthStart <= currentDate )
+                {
+                    settings->billingStart = nextMonthStart;
+                    for ( int i = 0; i < length; i++ )
+                        nextMonthStart = nextMonthStart.addDays( mCalendar->daysInMonth( nextMonthStart ) );
+                }
+            }
+
             settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( "TrafficThreshold", 0 ), 0, 1000 );
             int numCommands = interfaceGroup.readEntry( "NumCommands", 0 );
             for ( int i = 0; i < numCommands; i++ )
@@ -273,9 +332,6 @@ void ConfigDialog::load()
         mDlg->groupBoxIfaceMisc->setDisabled( false );
         mDlg->groupBoxIfaceMenu->setDisabled( false );
     }
-
-    // enable or disable statistics entries
-    updateStatisticsEntries();
 
     // Set the plotter widgets
     KConfigGroup plotterGroup( config, "PlotterSettings" );
@@ -347,6 +403,7 @@ void ConfigDialog::load()
         // Started from control center. Select first entry in list.
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
     }
+    setMaxDay();
 }
 
 void ConfigDialog::save()
@@ -399,6 +456,12 @@ void ConfigDialog::save()
         interfaceGroup.writeEntry( "HideWhenNotAvailable", settings->hideWhenNotAvailable );
         interfaceGroup.writeEntry( "HideWhenNotExisting", settings->hideWhenNotExisting );
         interfaceGroup.writeEntry( "ActivateStatistics", settings->activateStatistics );
+        interfaceGroup.writeEntry( "BillingStart", mDlg->billingStartInput->date() );
+        if ( settings->billingMonths > 0 )
+            interfaceGroup.writeEntry( "BillingMonths", settings->billingMonths );
+        if ( !settings->calendar.isEmpty() )
+            interfaceGroup.writeEntry( "Calendar", settings->calendar );
+
         interfaceGroup.writeEntry( "TrafficThreshold", settings->trafficThreshold );
         interfaceGroup.writeEntry( "NumCommands", settings->commands.size() );
         for ( int i = 0; i < settings->commands.size(); i++ )
@@ -459,6 +522,16 @@ void ConfigDialog::defaults()
     mDlg->checkBoxNotConnected->setChecked( false );
     mDlg->checkBoxNotExisting->setChecked( false );
     mDlg->checkBoxStatistics->setChecked( false );
+
+    // TODO: Test for a KDE release that contains SVN commit 1013534
+    KGlobal::locale()->setCalendar( mDefaultCalendarType );
+
+    mCalendar = KCalendarSystem::create( mDefaultCalendarType );
+    setMaxDay();
+
+    QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
+    mDlg->billingStartInput->setDate( startDate );
+
     mDlg->checkBoxCustom->setChecked( false );
     if ( mIconSets.contains( "monitor" ) )
         mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( "monitor" ) );
@@ -495,6 +568,7 @@ void ConfigDialog::defaults()
     if ( !interface.isEmpty() )
     {
         InterfaceSettings* settings = new InterfaceSettings();
+        settings->billingStart = startDate;
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->lineEditAlias->clear();
@@ -652,6 +726,16 @@ void ConfigDialog::buttonDeleteSelected()
     mDlg->checkBoxStatistics->blockSignals( true );
     mDlg->checkBoxStatistics->setChecked( false );
     mDlg->checkBoxStatistics->blockSignals( false );
+    mDlg->billingStartInput->blockSignals( true );
+
+    // TODO: Test for a KDE release that contains SVN commit 1013534
+    KGlobal::locale()->setCalendar( mDefaultCalendarType );
+
+    mCalendar = KCalendarSystem::create( mDefaultCalendarType );
+    setMaxDay();
+    QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
+    mDlg->billingStartInput->setDate( startDate );
+    mDlg->billingStartInput->blockSignals( false );
     mDlg->checkBoxCustom->blockSignals( true );
     mDlg->checkBoxCustom->setChecked( false );
     mDlg->checkBoxCustom->blockSignals( false );
@@ -892,6 +976,23 @@ void ConfigDialog::interfaceSelected( int row )
     mDlg->checkBoxNotConnected->setChecked( settings->hideWhenNotAvailable );
     mDlg->checkBoxNotExisting->setChecked( settings->hideWhenNotExisting );
     mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
+
+    if ( settings->calendar.isEmpty() )
+    {
+        // TODO: Test for a KDE release that contains SVN commit 1013534
+        KGlobal::locale()->setCalendar( mDefaultCalendarType );
+
+        mCalendar = KCalendarSystem::create( mDefaultCalendarType );
+    }
+    else
+    {
+        // TODO: Test for a KDE release that contains SVN commit 1013534
+        KGlobal::locale()->setCalendar( settings->calendar );
+
+        mCalendar = KCalendarSystem::create( settings->calendar );
+    }
+    setMaxDay();
+    mDlg->billingStartInput->setDate( settings->billingStart );
     mDlg->spinBoxTrafficThreshold->setValue( settings->trafficThreshold );
 
     mDlg->listViewCommands->clear();
@@ -1049,9 +1150,26 @@ void ConfigDialog::checkBoxStatisticsToggled( bool on )
     InterfaceSettings* settings = mSettingsMap[selected->text()];
     settings->activateStatistics = on;
     if (!mLock) changed( true );
+}
 
-    // enable or disable statistics entries
-    updateStatisticsEntries();
+void ConfigDialog::billingStartInputChanged( const QDate& date )
+{
+    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
+    InterfaceSettings* settings = mSettingsMap[selected->text()];
+
+    // KDateEdit doesn't guarantee a valid date
+    if ( !date.isValid() ||
+         date > QDate::currentDate() ||
+         mCalendar->day( date ) > mMaxDay )
+    {
+        KMessageBox::error( this, i18n( "The billing day of the month can be any day from 1 - %1, and the complete date must be a valid, non-future date." ).arg( QString::number( mMaxDay ) ) );
+        mDlg->billingStartInput->setDate( settings->billingStart );
+    }
+    else
+    {
+        settings->billingStart = date;
+        changed( true );
+    }
 }
 
 void ConfigDialog::checkBoxStartKNemoToggled( bool on )
@@ -1163,21 +1281,6 @@ void ConfigDialog::setupToolTipMap()
     mToolTips.insert( LINK_QUALITY, i18n( "Link Quality" ) );
     mToolTips.insert( NICK_NAME, i18n( "Nickname" ) );
     mToolTips.insert( ENCRYPTION, i18n( "Encryption" ) );
-}
-
-void ConfigDialog::updateStatisticsEntries( void )
-{
-    bool statisticsActive = false;
-    foreach ( InterfaceSettings *it, mSettingsMap )
-    {
-        if ( it->activateStatistics )
-        {
-            statisticsActive = true;
-            break;
-        }
-    }
-
-    mDlg->groupBoxStatistics->setEnabled( statisticsActive );
 }
 
 void ConfigDialog::listViewCommandsSelectionChanged( QTreeWidgetItem* item, QTreeWidgetItem* )

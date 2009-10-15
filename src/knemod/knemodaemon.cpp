@@ -21,7 +21,10 @@
 #include <QtDBus/QDBusConnection>
 #include <QTimer>
 
+#include <QDebug>
+
 #include <KAboutData>
+#include <KCalendarSystem>
 #include <KConfigGroup>
 #include <KLocale>
 #include <KStandardDirs>
@@ -94,7 +97,7 @@ void KNemoDaemon::readConfig()
     // General
     KConfigGroup generalGroup( config, "General" );
     mGeneralData.pollInterval = clamp<int>(generalGroup.readEntry( "PollInterval", 1 ), 1, 60 );
-    mGeneralData.saveInterval = clamp<int>(generalGroup.readEntry( "SaveInterval", 60 ), 1, 300 );
+    mGeneralData.saveInterval = clamp<int>(generalGroup.readEntry( "SaveInterval", 60 ), 0, 300 );
     mGeneralData.statisticsDir = generalGroup.readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
     mGeneralData.toolTipContent = generalGroup.readEntry( "ToolTipContent", defaultTip );
     // If we already have an Interfaces key--even if its empty--then we
@@ -168,6 +171,18 @@ void KNemoDaemon::readConfig()
             settings->hideWhenNotExisting = interfaceGroup.readEntry( "HideWhenNotExisting", false );
             settings->activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", false );
             settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( "TrafficThreshold", 0 ), 0, 1000 );
+
+            // TODO: Some of the calendars are a bit buggy, so default to Gregorian for now
+            //settings->calendar = interfaceGroup.readEntry( "Calendar", KGlobal::locale()->calendarType() );
+            settings->calendar = interfaceGroup.readEntry( "Calendar", "gregorian" );
+
+            KCalendarSystem* calendar = KCalendarSystem::create( settings->calendar );
+            QDate startDate = QDate::currentDate().addDays( 1 - calendar->day( QDate::currentDate() ) );
+            settings->billingStart = interfaceGroup.readEntry( "BillingStart", startDate );
+            // No future start period
+            if ( settings->billingStart > QDate::currentDate() )
+                settings->billingStart = startDate;
+            settings->billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", 0 ), 0, 6 );
             if ( settings->customCommands )
             {
                 int numCommands = interfaceGroup.readEntry( "NumCommands", 0 );
@@ -219,6 +234,9 @@ void KNemoDaemon::readConfig()
         settings.activateStatistics = settingsHash.value( key )->activateStatistics;
         settings.trafficThreshold = settingsHash.value( key )->trafficThreshold;
         settings.commands = settingsHash.value( key )->commands;
+        settings.billingStart = settingsHash.value( key )->billingStart;
+        settings.billingMonths = settingsHash.value( key )->billingMonths;
+        settings.calendar = settingsHash.value( key )->calendar;
         iface->configChanged();  // important to activate the statistics
     }
 }
