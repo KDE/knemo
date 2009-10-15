@@ -24,7 +24,6 @@
 #include <QDebug>
 
 #include <KAboutData>
-#include <KCalendarSystem>
 #include <KConfigGroup>
 #include <KLocale>
 #include <KStandardDirs>
@@ -32,7 +31,6 @@
 #include "config-knemo.h"
 #include "knemodaemon.h"
 #include "interface.h"
-#include "utils.h"
 #include "backends/backendfactory.h"
 
 QString KNemoDaemon::sSelectedInterface = QString::null;
@@ -110,62 +108,10 @@ void KNemoDaemon::readConfig()
     mPlotterSettings.colorBackground = plotterGroup.readEntry( "ColorBackground", mColorBackground );
     mPlotterSettings.opacity = clamp<int>(plotterGroup.readEntry( "Opacity", 20 ), 0, 100 );
 
-    // Interfaces
-    QHash< QString, InterfaceSettings *> settingsHash;
-    foreach ( QString interface, interfaceList )
-    {
-        QString group( "Interface_" );
-        group += interface;
-        InterfaceSettings* settings = new InterfaceSettings();
-        if ( config->hasGroup( group ) )
-        {
-            KConfigGroup interfaceGroup( config, group );
-            settings->alias = interfaceGroup.readEntry( "Alias" ).trimmed();
-            settings->iconSet = interfaceGroup.readEntry( "IconSet", "monitor" );
-            QStringList iconSets = findIconSets();
-            if ( !iconSets.contains( settings->iconSet ) )
-                settings->iconSet = TEXTICON;
-            settings->customCommands = interfaceGroup.readEntry( "CustomCommands", false );
-            settings->hideWhenNotAvailable = interfaceGroup.readEntry( "HideWhenNotAvailable",false );
-            settings->hideWhenNotExisting = interfaceGroup.readEntry( "HideWhenNotExisting", false );
-            settings->activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", false );
-            settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( "TrafficThreshold", 0 ), 0, 1000 );
-
-            // TODO: Some of the calendars are a bit buggy, so default to Gregorian for now
-            //settings->calendar = interfaceGroup.readEntry( "Calendar", KGlobal::locale()->calendarType() );
-            settings->calendar = interfaceGroup.readEntry( "Calendar", "gregorian" );
-
-            KCalendarSystem* calendar = KCalendarSystem::create( settings->calendar );
-            QDate startDate = QDate::currentDate().addDays( 1 - calendar->day( QDate::currentDate() ) );
-            settings->billingStart = interfaceGroup.readEntry( "BillingStart", startDate );
-            // No future start period
-            if ( settings->billingStart > QDate::currentDate() )
-                settings->billingStart = startDate;
-            settings->billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", 0 ), 0, 6 );
-            if ( settings->customCommands )
-            {
-                int numCommands = interfaceGroup.readEntry( "NumCommands", 0 );
-                for ( int i = 0; i < numCommands; i++ )
-                {
-                    QString entry;
-                    InterfaceCommand cmd;
-                    entry = QString( "RunAsRoot%1" ).arg( i + 1 );
-                    cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
-                    entry = QString( "Command%1" ).arg( i + 1 );
-                    cmd.command = interfaceGroup.readEntry( entry );
-                    entry = QString( "MenuText%1" ).arg( i + 1 );
-                    cmd.menuText = interfaceGroup.readEntry( entry );
-                    settings->commands.append( cmd );
-                }
-            }
-        }
-        settingsHash.insert( interface, settings );
-    }
-
     // Remove interfaces that are no longer monitored
     foreach ( QString key, mInterfaceHash.keys() )
     {
-        if ( !settingsHash.contains( key ) )
+        if ( !interfaceList.contains( key ) )
         {
             Interface *interface = mInterfaceHash.take( key );
             delete interface;
@@ -174,7 +120,7 @@ void KNemoDaemon::readConfig()
     }
 
     // Add/update those that do need to be monitored
-    foreach ( QString key, settingsHash.keys() )
+    foreach ( QString key, interfaceList )
     {
         Interface* iface;
         if ( !mInterfaceHash.contains( key ) )
@@ -186,20 +132,7 @@ void KNemoDaemon::readConfig()
         }
         else
             iface = mInterfaceHash.value( key );
-
-        InterfaceSettings& settings = iface->getSettings();
-        settings.alias = settingsHash.value( key )->alias;
-        settings.iconSet = settingsHash.value( key )->iconSet;
-        settings.customCommands = settingsHash.value( key )->customCommands;
-        settings.hideWhenNotAvailable = settingsHash.value( key )->hideWhenNotAvailable;
-        settings.hideWhenNotExisting = settingsHash.value( key )->hideWhenNotExisting;
-        settings.activateStatistics = settingsHash.value( key )->activateStatistics;
-        settings.trafficThreshold = settingsHash.value( key )->trafficThreshold;
-        settings.commands = settingsHash.value( key )->commands;
-        settings.billingStart = settingsHash.value( key )->billingStart;
-        settings.billingMonths = settingsHash.value( key )->billingMonths;
-        settings.calendar = settingsHash.value( key )->calendar;
-        iface->configChanged();  // important to activate the statistics
+        iface->configChanged();
     }
 }
 
@@ -241,9 +174,6 @@ void KNemoDaemon::updateInterfaces()
             Interface *iface = new Interface( ifaceName, data, mGeneralData, mPlotterSettings );
             mInterfaceHash.insert( ifaceName, iface );
             connect( backend, SIGNAL( updateComplete() ), iface, SLOT( activateMonitor() ) );
-
-            InterfaceSettings& settings = iface->getSettings();
-            settings.iconSet = "monitor";
             mHaveInterfaces = true;
             iface->configChanged();
         }

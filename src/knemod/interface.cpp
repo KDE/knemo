@@ -20,9 +20,11 @@
 
 #include <QTimer>
 
+#include <KCalendarSystem>
 #include <KWindowSystem>
 
 #include "backends/backendbase.h"
+#include "utils.h"
 #include "interface.h"
 #include "interfaceplotterdialog.h"
 #include "interfacestatistics.h"
@@ -88,6 +90,49 @@ Interface::~Interface()
 
 void Interface::configChanged()
 {
+    KSharedConfigPtr config = KGlobal::config();
+    QString group( "Interface_" );
+    group += mName;
+    KConfigGroup interfaceGroup( config, group );
+    mSettings.alias = interfaceGroup.readEntry( "Alias" ).trimmed();
+    mSettings.iconSet = interfaceGroup.readEntry( "IconSet", "monitor" );
+    QStringList iconSets = findIconSets();
+    if ( !iconSets.contains( mSettings.iconSet ) )
+        mSettings.iconSet = TEXTICON;
+    mSettings.customCommands = interfaceGroup.readEntry( "CustomCommands", false );
+    mSettings.hideWhenNotAvailable = interfaceGroup.readEntry( "HideWhenNotAvailable",false );
+    mSettings.hideWhenNotExisting = interfaceGroup.readEntry( "HideWhenNotExisting", false );
+    mSettings.activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", false );
+    mSettings.trafficThreshold = clamp<int>(interfaceGroup.readEntry( "TrafficThreshold", 0 ), 0, 1000 );
+
+    // TODO: Some of the calendars are a bit buggy, so default to Gregorian for now
+    //mSettings.calendar = interfaceGroup.readEntry( "Calendar", KGlobal::locale()->calendarType() );
+    mSettings.calendar = interfaceGroup.readEntry( "Calendar", "gregorian" );
+
+    KCalendarSystem* calendar = KCalendarSystem::create( mSettings.calendar );
+    QDate startDate = QDate::currentDate().addDays( 1 - calendar->day( QDate::currentDate() ) );
+    mSettings.billingStart = interfaceGroup.readEntry( "BillingStart", startDate );
+    // No future start period
+    if ( mSettings.billingStart > QDate::currentDate() )
+        mSettings.billingStart = startDate;
+    mSettings.billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", 0 ), 0, 6 );
+    if ( mSettings.customCommands )
+    {
+        int numCommands = interfaceGroup.readEntry( "NumCommands", 0 );
+        for ( int i = 0; i < numCommands; i++ )
+        {
+            QString entry;
+            InterfaceCommand cmd;
+            entry = QString( "RunAsRoot%1" ).arg( i + 1 );
+            cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
+            entry = QString( "Command%1" ).arg( i + 1 );
+            cmd.command = interfaceGroup.readEntry( entry );
+            entry = QString( "MenuText%1" ).arg( i + 1 );
+            cmd.menuText = interfaceGroup.readEntry( entry );
+            mSettings.commands.append( cmd );
+        }
+    }
+
     mIcon.configChanged( mPlotterSettings.colorIncoming, mPlotterSettings.colorOutgoing, mState );
 
     if ( mPlotterDialog != 0L )
