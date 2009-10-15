@@ -64,7 +64,7 @@ public slots:
     /*
      * Creates or deletes the tray icon
      */
-    void updateTrayStatus( int previousState );
+    void updateTrayStatus();
 
     /*
      * Change the tooltip according to the alias of the interface

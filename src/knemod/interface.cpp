@@ -157,6 +157,10 @@ void Interface::activateMonitor()
     int previousState = mState;
     int trafficThreshold = mSettings.trafficThreshold;
 
+    QString title = mSettings.alias;
+    if ( title.isEmpty() )
+        title = mName;
+
     if ( !mBackendData->isExisting )
         // the interface does not exist
         currentState = Interface::NOT_EXISTING;
@@ -186,8 +190,14 @@ void Interface::activateMonitor()
            previousState == Interface::UNKNOWN_STATE ) &&
          currentState & Interface::AVAILABLE )
     {
-        mIcon.updateTrayStatus( previousState );
+        mIcon.updateTrayStatus();
         setStartTime();
+        QString connectedStr = i18n( "Connected" );
+        if ( mBackendData->isWireless )
+            connectedStr = i18n( "Connected to %1", mBackendData->essid );
+        if ( previousState != Interface::UNKNOWN_STATE )
+            KNotification::event( "connected",
+                                  title + ": " + connectedStr );
         if ( mStatusDialog )
             mStatusDialog->enableNetworkGroups();
     }
@@ -196,7 +206,10 @@ void Interface::activateMonitor()
                 previousState == Interface::UNKNOWN_STATE ) &&
               currentState == Interface::NOT_AVAILABLE )
     {
-        mIcon.updateTrayStatus( previousState );
+        mIcon.updateTrayStatus();
+        if ( previousState == Interface::AVAILABLE )
+            KNotification::event( "disconnected",
+                                  title + ": " + i18n( "Disconnected" ) );
         if ( mStatusDialog )
             mStatusDialog->disableNetworkGroups();
     }
@@ -205,7 +218,10 @@ void Interface::activateMonitor()
                 previousState == Interface::UNKNOWN_STATE ) &&
               currentState == Interface::NOT_EXISTING )
     {
-        mIcon.updateTrayStatus( previousState );
+        mIcon.updateTrayStatus();
+        if ( previousState != Interface::UNKNOWN_STATE )
+            KNotification::event( "nonexistent",
+                                  title + ": " + i18n( "Nonexistent" ) );
         if ( mStatusDialog )
             mStatusDialog->disableNetworkGroups();
     }

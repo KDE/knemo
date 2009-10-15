@@ -32,7 +32,6 @@
 #include <KLocale>
 #include <KMenu>
 #include <KProcess>
-#include <KNotification>
 #include <KStandardDirs>
 
 #include "data.h"
@@ -81,8 +80,7 @@ void InterfaceIcon::configChanged( const QColor& incoming,
     colorOutgoing = outgoing;
     colorDisabled = disabled;
 
-    // UNKNOWN_STATE to avoid notification
-    updateTrayStatus( Interface::UNKNOWN_STATE );
+    updateTrayStatus();
 
     // handle changed iconset by user
     if ( mTray != 0L )
@@ -270,7 +268,7 @@ void InterfaceIcon::updateMenu()
         menu->insertAction( configAction, statisticsAction );
 }
 
-void InterfaceIcon::updateTrayStatus( int previousState )
+void InterfaceIcon::updateTrayStatus()
 {
     const QString ifaceName( mInterface->getName() );
     const BackendData * data = mInterface->getData();
@@ -282,29 +280,6 @@ void InterfaceIcon::updateTrayStatus( int previousState )
     QString title = mInterface->getSettings().alias;
     if ( title.isEmpty() )
         title = ifaceName;
-
-    if ( mTray != 0L )
-    {
-        // notification 'interface not available'
-        if ( !interfaceAvailable && previousState == Interface::AVAILABLE )
-        {
-            /* When KNemo is starting we don't show the change in connection
-             * status as this would be annoying when KDE starts.
-             */
-            KNotification::event( "disconnected",
-                           title + ": " + i18n( "Disconnected" ) );
-        }
-
-        // notification 'interface nonexistent'
-        if ( !interfaceExists && previousState != Interface::UNKNOWN_STATE )
-        {
-            /* When KNemo is starting we don't show the change in connection
-             * status as this would be annoying when KDE starts.
-             */
-            KNotification::event( "nonexistent",
-                                  title + ": " + i18n( "Nonexistent" ) );
-        }
-    }
 
     /* Remove the icon if
      * - the interface is not available and the option to hide it is selected
@@ -362,25 +337,6 @@ void InterfaceIcon::updateTrayStatus( int previousState )
 
     if ( mTray != 0L )
     {
-        // notification 'interface available'
-        if ( interfaceAvailable && previousState != Interface::UNKNOWN_STATE )
-        {
-            /* When KNemo is starting we don't show the change in connection
-             * status as this would be annoying.
-             */
-            if ( mInterface->getData()->isWireless )
-            {
-                KNotification::event( "connected",
-                                      title + ": " +
-                                      i18n( "Connected to %1", mInterface->getData()->essid ) );
-            }
-            else
-            {
-                KNotification::event( "connected",
-                                      title + ": " + i18n( "Connected" ) );
-            }
-        }
-
         // Tray text may need to appear active/inactive
         // Force an update
         if ( mInterface->getSettings().iconSet == TEXTICON )
