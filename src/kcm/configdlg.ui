@@ -11,6 +11,9 @@
    </rect>
   </property>
   <layout class="QVBoxLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QCheckBox" name="checkBoxStartKNemo">
      <property name="text">
@@ -803,8 +806,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
- <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>KIntSpinBox</class>
