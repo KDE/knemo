@@ -23,7 +23,7 @@
 
 #include <QHash>
 
-#include "interface.h"
+#include "../../common/data.h"
 
 /**
  * This is the baseclass for all backends. Every backend that
@@ -33,10 +33,11 @@
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
-class BackendBase
+class BackendBase : public QObject
 {
+    Q_OBJECT
 public:
-    BackendBase( QHash<QString, Interface *>& interfaces );
+    BackendBase();
     virtual ~BackendBase();
 
     /**
@@ -50,21 +51,30 @@ public:
      * interfaces in the QHash.
      */
     virtual void update() = 0;
+    virtual QStringList getIfaceList() = 0;
     virtual QString getDefaultRouteIface( int afInet ) = 0;
+    const BackendData* add( const QString& iface );
+    void remove( const QString& iface );
+    void clearTraffic( const QString& iface );
+    void updatePackets( const QString& iface );
 
-protected:
+signals:
     /**
-     * Call this function when you have completed the
+     * Emit this signal when you have completed the
      * update. It will trigger the interfaces to check
      * if there state has changed.
      */
-    virtual void updateComplete();
+    void updateComplete();
 
-    const QHash<QString, Interface *>& mInterfaces;
+protected:
+    QHash<QString, BackendData *> mInterfaces;
     QString ip4DefGw;
     QString ip6DefGw;
-    void incBytes( int type, unsigned long bytes, unsigned long &changed, unsigned long &prevDataBytes, quint64 &curDataBytes );
-    virtual void updateInterfaceData( const QString&, InterfaceData& ) = 0;
+    void incBytes( KNemoIface::Type type, unsigned long bytes,
+                   unsigned long &changed,
+                   unsigned long &prevDataBytes, quint64 &curDataBytes );
 };
+
+extern BackendBase *backend;
 
 #endif // BACKENDBASE_H

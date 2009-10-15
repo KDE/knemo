@@ -19,10 +19,8 @@
 */
 
 #include "backendbase.h"
-#include "utils.h"
 
-BackendBase::BackendBase( QHash<QString, Interface *>& interfaces )
-    : mInterfaces( interfaces )
+BackendBase::BackendBase() : QObject()
 {
 }
 
@@ -30,22 +28,61 @@ BackendBase::~BackendBase()
 {
 }
 
-void BackendBase::updateComplete()
+const BackendData* BackendBase::add( const QString& iface )
 {
-    foreach ( QString key, mInterfaces.keys() )
+    BackendData * data;
+    if ( mInterfaces.contains( iface ) )
     {
-        mInterfaces.value( key )->activateMonitor();
+        return mInterfaces.value( iface );
+    }
+    else
+    {
+        data = new BackendData();
+        mInterfaces.insert( iface, data );
+        return data;
     }
 }
 
-void BackendBase::incBytes( int type, unsigned long bytes, unsigned long &changed, unsigned long &prevDataBytes, quint64 &curDataBytes )
+void BackendBase::remove( const QString& iface )
+{
+    mInterfaces.remove( iface );
+}
+
+void BackendBase::clearTraffic( const QString& iface )
+{
+    if ( mInterfaces.value( iface ) )
+    {
+        BackendData * data = mInterfaces.value( iface );
+        data->prevTxBytes = data->txBytes = 0;
+        data->prevRxBytes = data->rxBytes = 0;
+        data->prevTxPackets = data->txPackets = 0;
+        data->prevRxPackets = data->rxPackets = 0;
+    }
+}
+
+void BackendBase::updatePackets( const QString& iface )
+{
+    if ( mInterfaces.value( iface ) )
+    {
+        BackendData * data = mInterfaces.value( iface );
+        data->prevRxPackets = data->rxPackets;
+        data->prevTxPackets = data->txPackets;
+    }
+}
+
+void BackendBase::incBytes( KNemoIface::Type type,
+                            unsigned long bytes,
+                            unsigned long &changed,
+                            unsigned long &prevDataBytes,
+                            quint64 &curDataBytes
+                          )
 {
     // We count the traffic on ourself to avoid an overflow after
     // 4GB of traffic.
     if ( bytes < prevDataBytes )
     {
         // there was an overflow
-        if ( type == Interface::ETHERNET )
+        if ( type == KNemoIface::ETHERNET )
         {
             // This makes data counting more accurate but will not work
             // for interfaces that reset the transfered data to zero

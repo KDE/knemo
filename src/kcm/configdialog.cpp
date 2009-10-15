@@ -59,11 +59,7 @@
 #include "configdialog.h"
 #include "utils.h"
 
-#ifdef __linux__
-  #include <netlink/route/rtnl.h>
-  #include <netlink/route/link.h>
-  #include <netlink/route/route.h>
-#endif
+#include "../knemod/backends/backendfactory.h"
 
 const QString ConfigDialog::ICON_DISCONNECTED = "_disconnected";
 const QString ConfigDialog::ICON_CONNECTED = "_connected";
@@ -543,27 +539,11 @@ void ConfigDialog::defaults()
     mDlg->pixmapOutgoing->clear();
     mDlg->pixmapTraffic->clear();
 
-    // Default interface
-    void *cache = NULL;
-
-#ifdef __linux__
-	nl_handle *rtsock = nl_handle_alloc();
-	int c = nl_connect(rtsock, NETLINK_ROUTE);
-    if ( c >= 0 )
-    {
-	    cache = rtnl_route_alloc_cache( rtsock );
-    }
-#endif
-
-    QString interface = getDefaultRoute( AF_INET, NULL, cache );
+    BackendBase * backend = BackendFactory::backend();
+    QString interface = backend->getDefaultRouteIface( AF_INET );
     if ( interface.isEmpty() )
-        interface = getDefaultRoute( AF_INET6, NULL, cache );
-
-#ifdef __linux__
-    nl_cache_free( static_cast<nl_cache*>(cache) );
-    nl_close( rtsock );
-    nl_handle_destroy( rtsock );
-#endif
+        interface = backend->getDefaultRouteIface( AF_INET6 );
+    delete backend;
 
     if ( !interface.isEmpty() )
     {
@@ -637,45 +617,16 @@ void ConfigDialog::buttonAllSelected()
 {
     QStringList ifaces;
 
-#ifdef __linux__
-    nl_cache * linkCache = NULL;
-    nl_handle *rtsock = nl_handle_alloc();
-    int c = nl_connect(rtsock, NETLINK_ROUTE);
-    if ( c >= 0 )
-    {
-        linkCache = rtnl_link_alloc_cache( rtsock );
-
-        struct rtnl_link * rtlink;
-        for ( rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_first( linkCache ));
-              rtlink != NULL;
-              rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_next( reinterpret_cast<struct nl_object *>(rtlink) ))
-            )
-        {
-            QString ifname( rtnl_link_get_name( rtlink ) );
-            if ( "lo" == ifname || mSettingsMap.contains( ifname ) )
-                continue;
-            ifaces << ifname;
-        }
-    }
-    nl_cache_free( linkCache );
-    nl_close( rtsock );
-    nl_handle_destroy( rtsock );
-#else
-    struct ifaddrs *ifaddr;
-    struct ifaddrs *ifa;
-    getifaddrs( &ifaddr );
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        QString ifname( ifa->ifa_name );
-        if ( "lo" == ifname || "lo0" == ifname || ifaces.contains( ifname ) || mSettingsMap.contains( ifname ) )
-            continue;
-        ifaces << ifname;
-    }
-    freeifaddrs( ifaddr );
-#endif
+    BackendBase * backend = BackendFactory::backend();
+    ifaces = backend->getIfaceList();
+    delete backend;
+    ifaces.removeAll( "lo" );
+    ifaces.removeAll( "lo0" );
 
     foreach ( QString ifname, ifaces )
     {
+        if ( mSettingsMap.contains( ifname ) )
+            continue;
         InterfaceSettings* settings = new InterfaceSettings();
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->addItem( ifname );

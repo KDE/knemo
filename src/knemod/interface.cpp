@@ -22,6 +22,7 @@
 
 #include <KWindowSystem>
 
+#include "backends/backendbase.h"
 #include "interface.h"
 #include "interfaceplotterdialog.h"
 #include "interfacestatistics.h"
@@ -29,10 +30,11 @@
 #include "interfacestatisticsdialog.h"
 
 Interface::Interface( const QString &ifname,
+                      const BackendData* data,
                       const GeneralData& generalData,
                       const PlotterSettings& plotterSettings )
     : QObject(),
-      mType( UNKNOWN_TYPE ),
+      mType( KNemoIface::UNKNOWN_TYPE ),
       mState( UNKNOWN_STATE ),
       mName( ifname ),
       mPlotterTimer( 0 ),
@@ -41,6 +43,7 @@ Interface::Interface( const QString &ifname,
       mStatusDialog( 0 ),
       mStatisticsDialog(  0 ),
       mPlotterDialog( 0 ),
+      mBackendData( data ),
       mGeneralData( generalData ),
       mPlotterSettings( plotterSettings )
 {
@@ -214,24 +217,19 @@ void Interface::resetData( int state )
     // interface gets disconnected. If the driver also resets its data
     // (like PPP seems to do) we will start from zero for every new
     // connection.
-    if ( mType == PPP &&
+    if ( mType == KNemoIface::PPP &&
          ( state == NOT_AVAILABLE ||
            state == NOT_EXISTING ) )
     {
-        mData.prevTxBytes = mData.txBytes = 0;
-        mData.prevRxBytes = mData.rxBytes = 0;
-        mData.prevTxPackets = mData.txPackets = 0;
-        mData.prevRxPackets = mData.rxPackets = 0;
+        backend->clearTraffic( mName );
     }
 }
 
 void Interface::updateDetails()
 {
-    InterfaceData &data = getData();
-
     mUptime += mGeneralData.pollInterval;
     QString uptime;
-    if ( data.available )
+    if ( mBackendData->isAvailable )
     {
         time_t upsecs = mUptime;
         time_t updays = upsecs / 86400;
@@ -257,8 +255,8 @@ void Interface::updatePlotter()
 {
     if ( mPlotterDialog )
     {
-        double outgoingBytes = mData.outgoingBytes / 1024.0 / (double) mGeneralData.pollInterval;
-        double incomingBytes = mData.incomingBytes / 1024.0 / (double) mGeneralData.pollInterval;
+        double outgoingBytes = mBackendData->outgoingBytes / 1024.0 / (double) mGeneralData.pollInterval;
+        double incomingBytes = mBackendData->incomingBytes / 1024.0 / (double) mGeneralData.pollInterval;
         mPlotterDialog->updatePlotter( incomingBytes, outgoingBytes );
     }
 }

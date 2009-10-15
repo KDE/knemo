@@ -26,6 +26,7 @@
 #include <net/ethernet.h>
 #include <sys/socket.h>
 #include <net/if.h>
+#include <net/route.h>
 #include <netinet/in.h>
 
 #include <net/if_dl.h>
@@ -33,16 +34,21 @@
 #include <net/if_var.h>
 #include <netinet/in_var.h>
 
+#include <unistd.h>
+#define NEXTADDR(w, u) \
+      if (rtm_addrs & (w)) {\
+          l = sizeof(struct sockaddr); memmove(cp, &(u), l); cp += l;\
+      }
+#define rtm m_rtmsg.m_rtm
+
 #include <KLocale>
 #include <kio/global.h>
 #include <stdio.h>
 
 #include "config-knemo.h"
 #include "bsdbackend.h"
-#include "utils.h"
 
-BSDBackend::BSDBackend( QHash<QString, Interface *>& interfaces )
-    : BackendBase( interfaces )
+BSDBackend::BSDBackend()
 {
 }
 
@@ -50,9 +56,23 @@ BSDBackend::~BSDBackend()
 {
 }
 
-BackendBase* BSDBackend::createInstance( QHash<QString, Interface *>& interfaces )
+BackendBase* BSDBackend::createInstance()
 {
-    return new BSDBackend( interfaces );
+    return new BSDBackend();
+}
+
+QStringList BSDBackend::getIfaceList()
+{
+    QStringList ifaces;
+    struct ifaddrs *ifaddr;
+    struct ifaddrs *ifa;
+    getifaddrs( &ifaddr );
+    for ( ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next )
+    {
+        ifaces << ifa->ifa_name;
+    }
+    freeifaddrs( ifaddr );
+    return ifaces;
 }
 
 void BSDBackend::update()
@@ -65,17 +85,17 @@ void BSDBackend::update()
 
     foreach ( QString key, mInterfaces.keys() )
     {
-        Interface *interface = mInterfaces.value( key );
-        interface->getData().existing = false;
-        interface->getData().available = false;
-        interface->getData().incomingBytes = 0;
-        interface->getData().outgoingBytes = 0;
-        interface->getData().addrData.clear();
-        interface->getData().ip4DefaultGateway = ip4DefGw;
-        interface->getData().ip6DefaultGateway = ip6DefGw;
-        interface->getData().interfaceType = Interface::ETHERNET;
+        BackendData *interface = mInterfaces.value( key );
+        interface->isExisting = false;
+        interface->isAvailable = false;
+        interface->incomingBytes = 0;
+        interface->outgoingBytes = 0;
+        interface->addrData.clear();
+        interface->ip4DefaultGateway = ip4DefGw;
+        interface->ip6DefaultGateway = ip6DefGw;
+        interface->interfaceType = KNemoIface::ETHERNET;
 
-        updateInterfaceData( key, interface->getData() );
+        updateInterfaceData( key, interface );
     }
 
     freeifaddrs( ifaddr );
@@ -85,6 +105,104 @@ void BSDBackend::update()
 QString BSDBackend::getDefaultRouteIface( int afInet )
 {
     return getDefaultRoute( afInet );
+}
+
+QString BSDBackend::getDefaultRoute( int afType, QString *defaultGateway )
+{
+    struct
+    {
+        struct rt_msghdr m_rtm;
+        char m_space[ 512 ];
+    } m_rtmsg;
+
+    int s, seq, l, rtm_addrs, i;
+    pid_t pid;
+    struct sockaddr so_dst, so_mask;
+    char *cp = m_rtmsg.m_space;
+    struct sockaddr *gate = NULL, *sa;
+    struct rt_msghdr *msg_hdr;
+
+    char outBuf[ INET6_ADDRSTRLEN ];
+    memset( &outBuf, 0, sizeof( outBuf ) );
+    void *tempAddrPtr = NULL;
+    QString ifname;
+
+    pid = getpid();
+    seq = 0;
+    rtm_addrs = RTA_DST | RTA_NETMASK;
+
+    memset( &so_dst, 0, sizeof( so_dst ) );
+    memset( &so_mask, 0, sizeof( so_mask ) );
+    memset( &rtm, 0, sizeof( struct rt_msghdr ) );
+
+    rtm.rtm_type = RTM_GET;
+    rtm.rtm_flags = RTF_UP | RTF_GATEWAY;
+    rtm.rtm_version = RTM_VERSION;
+    rtm.rtm_seq = ++seq;
+    rtm.rtm_addrs = rtm_addrs;
+
+    if ( afType == AF_INET )
+    {
+        so_dst.sa_family = AF_INET;
+        so_mask.sa_family = AF_INET;
+    }
+    else
+    {
+        so_dst.sa_family = AF_INET6;
+        so_mask.sa_family = AF_INET6;
+    }
+
+    NEXTADDR( RTA_DST, so_dst );
+    NEXTADDR( RTA_NETMASK, so_mask );
+
+    rtm.rtm_msglen = l = cp - reinterpret_cast<char *>(&m_rtmsg);
+
+    s = socket(PF_ROUTE, SOCK_RAW, 0);
+
+    if ( write( s, reinterpret_cast<char *>(&m_rtmsg), l ) < 0 )
+    {
+        close( s );
+        return ifname;
+    }
+
+    do
+    {
+        l = read(s, reinterpret_cast<char *>(&m_rtmsg), sizeof( m_rtmsg ) );
+    } while ( l > 0 && (rtm.rtm_seq != seq || rtm.rtm_pid != pid) );
+
+    close( s );
+
+    msg_hdr = &rtm;
+
+    cp = reinterpret_cast<char *>(msg_hdr + 1);
+    if ( msg_hdr->rtm_addrs )
+    {
+        for ( i = 1; i; i <<= 1 )
+            if ( i & msg_hdr->rtm_addrs )
+            {
+                sa = reinterpret_cast<struct sockaddr *>(cp);
+                if ( i == RTA_GATEWAY )
+                {
+                    gate = sa;
+                    char tempname[ IFNAMSIZ ];
+                    if_indextoname( msg_hdr->rtm_index, tempname );
+                    ifname = tempname;
+                }
+
+                cp += sizeof( struct sockaddr );
+            }
+    }
+    else
+        return ifname;
+
+    if ( AF_INET == afType )
+        tempAddrPtr = & reinterpret_cast<struct sockaddr_in *>(gate)->sin_addr;
+    else
+        tempAddrPtr = & reinterpret_cast<struct sockaddr_in6 *>(gate)->sin6_addr;
+    inet_ntop( gate->sa_family, tempAddrPtr, outBuf, sizeof( outBuf ) );
+    if ( defaultGateway && strncmp( outBuf, "0.0.0.0", 7 ) != 0 )
+        *defaultGateway = outBuf;
+    return ifname;
 }
 
 QString BSDBackend::formattedAddr( struct sockaddr* addr )
@@ -229,7 +347,7 @@ int BSDBackend::getSubnet( struct ifaddrs * ifa )
     return len;
 }
 
-void BSDBackend::updateInterfaceData( const QString& ifName, InterfaceData& data )
+void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
 {
     struct ifaddrs *ifa;
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
@@ -247,20 +365,20 @@ void BSDBackend::updateInterfaceData( const QString& ifName, InterfaceData& data
         {
             unsigned long rx_bytes = 0, tx_bytes = 0;
             struct if_data * stats = static_cast<if_data *>(ifa->ifa_data);
-            data.rxPackets = stats->ifi_ipackets;
-            data.txPackets = stats->ifi_opackets;
+            data->rxPackets = stats->ifi_ipackets;
+            data->txPackets = stats->ifi_opackets;
             rx_bytes = stats->ifi_ibytes;
             tx_bytes = stats->ifi_obytes;
             if ( IFT_PPP == stats->ifi_type )
-                data.interfaceType == Interface::PPP;
-            incBytes( data.interfaceType, rx_bytes, data.incomingBytes, data.prevRxBytes, data.rxBytes );
-            data.rxString = KIO::convertSize( data.rxBytes );
+                data->interfaceType == KNemoIface::PPP;
+            incBytes( data->interfaceType, rx_bytes, data->incomingBytes, data->prevRxBytes, data->rxBytes );
+            data->rxString = KIO::convertSize( data->rxBytes );
 
-            incBytes( data.interfaceType, tx_bytes, data.outgoingBytes, data.prevTxBytes, data.txBytes );
-            data.txString = KIO::convertSize( data.txBytes );
+            incBytes( data->interfaceType, tx_bytes, data->outgoingBytes, data->prevTxBytes, data->txBytes );
+            data->txString = KIO::convertSize( data->txBytes );
         }
 
-        data.existing = true;
+        data->isExisting = true;
 
         // mac address, interface type
         if ( ifa->ifa_addr )
@@ -278,7 +396,7 @@ void BSDBackend::updateInterfaceData( const QString& ifName, InterfaceData& data
                 snprintf( macstr, sizeof(macstr), "%02x:%02x:%02x:%02x:%02x:%02x",
                           macBuffer[0], macBuffer[1], macBuffer[2],
                           macBuffer[3], macBuffer[4], macBuffer[5] );
-                data.hwAddress = macstr;
+                data->hwAddress = macstr;
             }
             else if ( ifa->ifa_addr->sa_family == AF_INET ||
                       ifa->ifa_addr->sa_family == AF_INET6 )
@@ -287,18 +405,18 @@ void BSDBackend::updateInterfaceData( const QString& ifName, InterfaceData& data
                 AddrData addrVal;
 
                 if ( ifa->ifa_flags && IFF_UP )
-                    data.available = true;
+                    data->isAvailable = true;
 
                 addrKey = getAddr( ifa, addrVal );
 
                 if ( !addrKey.isEmpty() )
-                    data.addrData.insert( addrKey, addrVal );
+                    data->addrData.insert( addrKey, addrVal );
             }
         }
     }
 }
 
-void BSDBackend::updateWirelessData( int fd, const QString& ifName, WirelessData& data )
+void BSDBackend::updateWirelessData( int fd, const QString& ifName, BackendData* data )
 {
     // TODO
 }

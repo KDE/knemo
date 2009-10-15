@@ -53,7 +53,10 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     connect( ui.comboBoxIP, SIGNAL( activated(int) ), this, SLOT( updateDialog() ) );
 
     updateDialog();
-    if ( interface->getData().available )
+    const BackendData * data = mInterface->getData();
+    if ( !data )
+        return;
+    if ( data->isAvailable )
     {
         enableNetworkGroups( 0 );
     }
@@ -61,7 +64,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     {
         disableNetworkGroups( 0 );
     }
-    if ( !interface->getData().wirelessDevice )
+    if ( !data->isWireless )
     {
         QWidget* wirelessTab = ui.tabWidget->widget( 2 );
         ui.tabWidget->removeTab( 2 );
@@ -132,13 +135,15 @@ void InterfaceStatusDialog::updateDialog()
     if ( isHidden() )
         return;
 
-    InterfaceData& data = mInterface->getData();
+    const BackendData* data = mInterface->getData();
+    if ( !data )
+        return;
     InterfaceSettings& settings = mInterface->getSettings();
 
     // connection tab
     ui.textLabelInterface->setText( mInterface->getName() );
     ui.textLabelAlias->setText( settings.alias );
-    if ( data.available )
+    if ( data->isAvailable )
     {
         ui.textLabelStatus->setText( i18n( "Connected" ) );
         time_t upsecs = mInterface->getUptime();
@@ -155,7 +160,7 @@ void InterfaceStatusDialog::updateDialog()
         uptime += time;
         ui.textLabelUptime->setText( uptime );
     }
-    else if ( data.existing )
+    else if ( data->isExisting )
     {
         ui.textLabelStatus->setText( i18n( "Disconnected" ) );
         ui.textLabelUptime->setText( "00:00:00" );
@@ -166,9 +171,9 @@ void InterfaceStatusDialog::updateDialog()
         ui.textLabelUptime->setText( "00:00:00" );
     }
 
-    if ( data.interfaceType == Interface::ETHERNET )
+    if ( data->interfaceType == KNemoIface::ETHERNET )
     {
-        ui.macText->setText( data.hwAddress );
+        ui.macText->setText( data->hwAddress );
         ui.macLabel->show();
         ui.macText->show();
     }
@@ -180,7 +185,7 @@ void InterfaceStatusDialog::updateDialog()
         ui.macText->hide();
     }
 
-    if ( data.available )
+    if ( data->isAvailable )
     {
         // ip tab
 
@@ -188,7 +193,7 @@ void InterfaceStatusDialog::updateDialog()
         // But then if we're selecting, the highlighted item would get
         // cleared each poll period.
         int i = 0;
-        QStringList keys = data.addrData.keys();
+        QStringList keys = data->addrData.keys();
         while ( i < ui.comboBoxIP->count() )
         {
             if ( keys.contains( ui.comboBoxIP->itemText( i ) ) )
@@ -211,7 +216,7 @@ void InterfaceStatusDialog::updateDialog()
         }
         ui.comboBoxIP->setMinimumWidth( w + 35 );
 
-        AddrData addrData = data.addrData.value( ui.comboBoxIP->currentText() );
+        AddrData addrData = data->addrData.value( ui.comboBoxIP->currentText() );
 
 #ifdef __linux__
         if ( addrData.label.isEmpty() )
@@ -242,14 +247,14 @@ void InterfaceStatusDialog::updateDialog()
         scope += addrData.ipv6Flags;
         ui.textLabelScope->setText( scope );
 
-        if ( data.interfaceType == Interface::ETHERNET )
+        if ( data->interfaceType == KNemoIface::ETHERNET )
         {
             if ( addrData.scope != RT_SCOPE_HOST )
             {
                 if ( addrData.afType == AF_INET )
-                    ui.gatewayText->setText( data.ip4DefaultGateway );
+                    ui.gatewayText->setText( data->ip4DefaultGateway );
                 else
-                    ui.gatewayText->setText( data.ip6DefaultGateway );
+                    ui.gatewayText->setText( data->ip6DefaultGateway );
                 ui.gatewayLabel->show();
                 ui.gatewayText->show();
             }
@@ -276,28 +281,26 @@ void InterfaceStatusDialog::updateDialog()
         }
 
         // traffic tab
-        ui.textLabelPacketsSend->setText( QString::number( data.txPackets ) );
-        ui.textLabelPacketsReceived->setText( QString::number( data.rxPackets ) );
-        ui.textLabelBytesSend->setText( data.txString );
-        ui.textLabelBytesReceived->setText( data.rxString );
-        unsigned long bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().pollInterval;
+        ui.textLabelPacketsSend->setText( QString::number( data->txPackets ) );
+        ui.textLabelPacketsReceived->setText( QString::number( data->rxPackets ) );
+        ui.textLabelBytesSend->setText( data->txString );
+        ui.textLabelBytesReceived->setText( data->rxString );
+        unsigned long bytesPerSecond = data->outgoingBytes / mInterface->getGeneralData().pollInterval;
         ui.textLabelSpeedSend->setText( KIO::convertSize( bytesPerSecond  ) + i18n( "/s" ) );
-        bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().pollInterval;
+        bytesPerSecond = data->incomingBytes / mInterface->getGeneralData().pollInterval;
         ui.textLabelSpeedReceived->setText( KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) );
 
-        if ( data.wirelessDevice )
+        if ( data->isWireless )
         {
-            WirelessData& wdata = mInterface->getWirelessData();
-
             // wireless tab
-            ui.textLabelESSID->setText( wdata.essid );
-            ui.textLabelAccessPoint->setText( wdata.accessPoint );
-            ui.textLabelNickName->setText( wdata.nickName );
-            ui.textLabelMode->setText( wdata.mode );
-            ui.textLabelFreqChannel->setText( wdata.frequency + " [" + wdata.channel + "]" );
-            ui.textLabelBitRate->setText( wdata.bitRate );
-            ui.textLabelLinkQuality->setText( wdata.linkQuality );
-            if ( wdata.encryption == true )
+            ui.textLabelESSID->setText( data->essid );
+            ui.textLabelAccessPoint->setText( data->accessPoint );
+            ui.textLabelNickName->setText( data->nickName );
+            ui.textLabelMode->setText( data->mode );
+            ui.textLabelFreqChannel->setText( data->frequency + " [" + data->channel + "]" );
+            ui.textLabelBitRate->setText( data->bitRate );
+            ui.textLabelLinkQuality->setText( data->linkQuality );
+            if ( data->isEncrypted == true )
             {
                 ui.textLabelEncryption->setText( i18n( "active" ) );
             }
@@ -337,7 +340,7 @@ void InterfaceStatusDialog::disableNetworkGroups( int )
     ui.textLabelSpeedReceived->setText( QString::null );
 
     // clear wireless tab
-    if ( mInterface->getData().wirelessDevice )
+    if ( mInterface->getData()->isWireless )
     {
         ui.textLabelESSID->setText( QString::null );
         ui.textLabelAccessPoint->setText( QString::null );

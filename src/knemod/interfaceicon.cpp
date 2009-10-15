@@ -20,6 +20,7 @@
 
 #include <unistd.h>
 
+#include <QDebug>
 #include <QPainter>
 #include <KColorScheme>
 #include <KConfigGroup>
@@ -178,16 +179,16 @@ QString InterfaceIcon::compactTrayText(unsigned long bytes )
 
 void InterfaceIcon::updateIconText( bool proceed )
 {
-    InterfaceData& data = mInterface->getData();
+    const BackendData * data = mInterface->getData();
 
-    unsigned long bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().pollInterval;
+    unsigned long bytesPerSecond = data->incomingBytes / mInterface->getGeneralData().pollInterval;
     QString byteText = compactTrayText( bytesPerSecond );
     if ( byteText != textIncoming )
     {
         proceed = true;
         textIncoming = byteText;
     }
-    bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().pollInterval;
+    bytesPerSecond = data->outgoingBytes / mInterface->getGeneralData().pollInterval;
     byteText = compactTrayText( bytesPerSecond );
     if ( byteText != textOutgoing )
     {
@@ -207,14 +208,14 @@ void InterfaceIcon::updateIconText( bool proceed )
 
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
     p.setFont( setIconFont( byteText ) );
-    if ( data.available )
+    if ( data->isAvailable )
         p.setPen( colorIncoming );
     else
         p.setPen( scheme.foreground( KColorScheme::InactiveText ).color() );
     p.drawText( textIcon.rect(), Qt::AlignTop | Qt::AlignRight, textIncoming );
 
     p.setFont( setIconFont( byteText ) );
-    if ( data.available )
+    if ( data->isAvailable )
         p.setPen( colorOutgoing );
     p.drawText( textIcon.rect(), Qt::AlignBottom | Qt::AlignRight, textOutgoing );
 #ifdef USE_KNOTIFICATIONITEM
@@ -267,14 +268,16 @@ void InterfaceIcon::updateMenu()
 
 void InterfaceIcon::updateTrayStatus( int previousState )
 {
-    bool interfaceExists = mInterface->getData().existing;
-    bool interfaceAvailable = mInterface->getData().available;
+    const QString ifaceName( mInterface->getName() );
+    const BackendData * data = mInterface->getData();
+    bool interfaceExists = data->isExisting;
+    bool interfaceAvailable = data->isAvailable;
     bool hideWhenNotExisting = mInterface->getSettings().hideWhenNotExisting;
     bool hideWhenNotAvailable = mInterface->getSettings().hideWhenNotAvailable;
 
     QString title = mInterface->getSettings().alias;
     if ( title.isEmpty() )
-        title = mInterface->getName();
+        title = ifaceName;
 
     if ( mTray != 0L )
     {
@@ -323,7 +326,7 @@ void InterfaceIcon::updateTrayStatus( int previousState )
                 ( !interfaceAvailable && !hideWhenNotAvailable && interfaceExists ) ||
                 ( !interfaceExists && !hideWhenNotExisting && !hideWhenNotAvailable ) ) )
     {
-        mTray = new InterfaceTray( mInterface, mInterface->getName() );
+        mTray = new InterfaceTray( mInterface, ifaceName );
         KMenu* menu = (KMenu *)mTray->contextMenu();
 
         menu->removeAction( menu->actions().at( 0 ) );
@@ -361,11 +364,11 @@ void InterfaceIcon::updateTrayStatus( int previousState )
             /* When KNemo is starting we don't show the change in connection
              * status as this would be annoying.
              */
-            if ( mInterface->getData().wirelessDevice )
+            if ( mInterface->getData()->isWireless )
             {
                 KNotification::event( "connected",
                                       title + ": " +
-                                      i18n( "Connected to %1", mInterface->getWirelessData().essid ) );
+                                      i18n( "Connected to %1", mInterface->getData()->essid ) );
             }
             else
             {

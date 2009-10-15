@@ -89,14 +89,6 @@ private:
     QPixmap textIcon( QString incomingText, QString outgoingText, bool active );
     QFont setIconFont( QString );
 
-    enum IconSet
-    {
-        MONITOR = 0,
-        MODEM,
-        NETWORK,
-        WIRELESS
-    };
-
     int mToolTipContent;
     bool mLock;
     Ui::ConfigDlg* mDlg;

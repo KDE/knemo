@@ -21,6 +21,7 @@
 #define BSDBACKEND_H
 
 #include <sys/socket.h>
+#include <QStringList>
 
 #include "backendbase.h"
 
@@ -35,21 +36,24 @@
 
 class BSDBackend : public BackendBase
 {
+    Q_OBJECT
 public:
-    BSDBackend(QHash<QString, Interface *>& interfaces );
+    BSDBackend();
     virtual ~BSDBackend();
 
-    static BackendBase* createInstance( QHash<QString, Interface *>& interfaces );
+    static BackendBase* createInstance();
 
     virtual void update();
+    virtual QStringList getIfaceList();
     virtual QString getDefaultRouteIface( int afInet );
 
 private:
+    void updateInterfaceData( const QString& ifName, BackendData* data );
+    void updateWirelessData( int fd, const QString& ifName, BackendData* data );
+    QString getDefaultRoute( int afType, QString *defaultGateway = NULL );
     QString formattedAddr( struct sockaddr * addr );
     QString getAddr( struct ifaddrs *ifa, AddrData& addrData );
     int getSubnet( struct ifaddrs *ifa );
-    void updateWirelessData( int fd, const QString& ifName, WirelessData& data );
-    void updateInterfaceData( const QString& ifName, InterfaceData& data );
     struct ifaddrs *ifaddr;
     QHash<QByteArray, QStringList>ipv6Hash;
     QStringList mProcIfInet6;

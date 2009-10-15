@@ -18,6 +18,7 @@
    Boston, MA 02110-1301, USA.
 */
 
+#include <arpa/inet.h>
 #include <netlink/route/addr.h>
 #include <netlink/route/rtnl.h>
 #include <netlink/route/link.h>
@@ -28,11 +29,15 @@
 
 #include "config-knemo.h"
 #include "netlinkbackend.h"
-#include "utils.h"
 
-NetlinkBackend::NetlinkBackend( QHash<QString, Interface *>& interfaces )
-    : BackendBase( interfaces ),
-      rtsock( NULL ),
+QString ipv4gwi;
+QString ipv6gwi;
+
+QString ipv4gw;
+QString ipv6gw;
+
+NetlinkBackend::NetlinkBackend()
+    : rtsock( NULL ),
       addrCache( NULL ),
       linkCache( NULL ),
       routeCache( NULL ),
@@ -64,6 +69,20 @@ NetlinkBackend::~NetlinkBackend()
 #endif
 }
 
+QStringList NetlinkBackend::getIfaceList()
+{
+    QStringList ifaces;
+    struct rtnl_link * rtlink;
+    for ( rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_first( linkCache ));
+          rtlink != NULL;
+          rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_next( reinterpret_cast<struct nl_object *>(rtlink) ))
+        )
+    {
+        QString ifname( rtnl_link_get_name( rtlink ) );
+        ifaces << ifname;
+    }
+    return ifaces;
+}
 void NetlinkBackend::update()
 {
     nl_cache_refill( rtsock, addrCache );
@@ -75,8 +94,8 @@ void NetlinkBackend::update()
 
     foreach ( QString key, mInterfaces.keys() )
     {
-        Interface *interface = mInterfaces.value( key );
-        updateInterfaceData( key, interface->getData() );
+        BackendData *interface = mInterfaces.value( key );
+        updateInterfaceData( key, interface );
 
 #ifdef HAVE_LIBIW
         if ( iwfd > 0 )
@@ -84,13 +103,13 @@ void NetlinkBackend::update()
             struct wireless_config wc;
             if ( iw_get_basic_config( iwfd, key.toLatin1(), &wc ) >= 0 )
             {
-                interface->getData().wirelessDevice = true;
-                updateWirelessData( iwfd, key, interface->getWirelessData() );
+                interface->isWireless = true;
+                updateWirelessData( iwfd, key, interface );
             }
         }
 #endif
     }
-    updateComplete();
+    emit updateComplete();
 }
 
 QString NetlinkBackend::getDefaultRouteIface( int afInet )
@@ -98,12 +117,82 @@ QString NetlinkBackend::getDefaultRouteIface( int afInet )
     return getDefaultRoute( afInet, NULL, routeCache );
 }
 
-BackendBase* NetlinkBackend::createInstance( QHash<QString, Interface *>& interfaces )
+void parseNetlinkRoute( struct nl_object *object, void * )
 {
-    return new NetlinkBackend( interfaces );
+    struct rtnl_route *const route = reinterpret_cast<struct rtnl_route *>(object);
+
+    int rtfamily = rtnl_route_get_family( route );
+
+    if ( rtfamily == AF_INET ||
+         rtfamily == AF_INET6 )
+    {
+        struct nl_addr *dst = rtnl_route_get_dst( route );
+        struct nl_addr *addr = rtnl_route_get_gateway( route );
+
+        if ( nl_addr_get_len( dst ) == 0 && addr )
+        {
+            char gwaddr[ INET6_ADDRSTRLEN ];
+            char gwname[ IFNAMSIZ ];
+            memset( gwaddr, 0, sizeof( gwaddr ) );
+            struct in_addr * inad = reinterpret_cast<struct in_addr *>(nl_addr_get_binary_addr( addr ));
+            nl_addr2str( addr, gwaddr, sizeof( gwaddr ) );
+            inet_ntop( rtfamily, &inad->s_addr, gwaddr, sizeof( gwaddr ) );
+            int oif = rtnl_route_get_oif( route );
+            if_indextoname( oif, gwname );
+
+            if ( rtfamily == AF_INET )
+            {
+                ipv4gw = gwaddr;
+                ipv4gwi = gwname;
+            }
+            else if ( rtfamily == AF_INET6 )
+            {
+                ipv6gw = gwaddr;
+                ipv6gwi = gwname;
+            }
+        }
+    }
 }
 
-void NetlinkBackend::updateAddresses( InterfaceData &data )
+QString NetlinkBackend::getDefaultRoute( int afType, QString *defaultGateway, void *data )
+{
+    if ( !data )
+        return QString();
+
+    struct nl_cache* rtlcache = static_cast<struct nl_cache*>(data);
+
+    if ( afType == AF_INET )
+    {
+        ipv4gw.clear();
+        ipv4gwi.clear();
+    }
+    else if ( afType == AF_INET6 )
+    {
+        ipv6gw.clear();
+        ipv6gwi.clear();
+    }
+    nl_cache_foreach( rtlcache, parseNetlinkRoute, NULL);
+
+    if ( afType == AF_INET )
+    {
+        if ( defaultGateway )
+            *defaultGateway = ipv4gw;
+        return ipv4gwi;
+    }
+    else
+    {
+        if ( defaultGateway )
+            *defaultGateway = ipv6gw;
+        return ipv6gwi;
+    }
+}
+
+BackendBase* NetlinkBackend::createInstance()
+{
+    return new NetlinkBackend();
+}
+
+void NetlinkBackend::updateAddresses( BackendData *data )
 {
     struct rtnl_addr * rtaddr;
     for ( rtaddr = reinterpret_cast<struct rtnl_addr *>(nl_cache_get_first( addrCache ));
@@ -111,10 +200,10 @@ void NetlinkBackend::updateAddresses( InterfaceData &data )
           rtaddr = reinterpret_cast<struct rtnl_addr *>(nl_cache_get_next( reinterpret_cast<struct nl_object *>(rtaddr) ))
         )
     {
-        if ( data.index != rtnl_addr_get_ifindex( rtaddr ) )
+        if ( data->index != rtnl_addr_get_ifindex( rtaddr ) )
             continue;
 
-        data.available = true;
+        data->isAvailable = true;
         struct nl_addr * addr = rtnl_addr_get_local( rtaddr );
         char buf[ 128 ];
         QString addrKey;
@@ -169,53 +258,53 @@ void NetlinkBackend::updateAddresses( InterfaceData &data )
                 addrKey = addrKey + "/" + QString::number( prefixlen );
         }
 
-        data.addrData.insert( addrKey, addrVal );
+        data->addrData.insert( addrKey, addrVal );
     }
 }
 
-void NetlinkBackend::updateInterfaceData( const QString& ifName, InterfaceData& data )
+void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* data )
 {
     if ( !linkCache || !addrCache )
         return;
 
-    data.existing = false;
-    data.available = false;
-    data.incomingBytes = 0;
-    data.outgoingBytes = 0;
-    data.addrData.clear();
-    data.ip4DefaultGateway = ip4DefGw;
-    data.ip6DefaultGateway = ip6DefGw;
+    data->isExisting = false;
+    data->isAvailable = false;
+    data->incomingBytes = 0;
+    data->outgoingBytes = 0;
+    data->addrData.clear();
+    data->ip4DefaultGateway = ip4DefGw;
+    data->ip6DefaultGateway = ip6DefGw;
 
     struct rtnl_link * link = rtnl_link_get_by_name( linkCache, ifName.toLocal8Bit().data() );
     if ( link )
     {
-        data.index = rtnl_link_get_ifindex( link );
+        data->index = rtnl_link_get_ifindex( link );
         unsigned long rx_bytes = 0, tx_bytes = 0;
         char mac[ 20 ];
         memset( mac, 0, sizeof( mac ) );
 
         if ( rtnl_link_get_flags( link ) & IFF_POINTOPOINT )
-            data.interfaceType = Interface::PPP;
+            data->interfaceType = KNemoIface::PPP;
         else
-            data.interfaceType = Interface::ETHERNET;
-        data.existing = true;
+            data->interfaceType = KNemoIface::ETHERNET;
+        data->isExisting = true;
 
         // hw address
         struct nl_addr * addr = rtnl_link_get_addr( link );
         if ( addr && nl_addr_get_len( addr ) )
             nl_addr2str( addr, mac, sizeof( mac ) );
-        data.hwAddress = mac;
+        data->hwAddress = mac;
 
         // traffic statistics
-        data.rxPackets = rtnl_link_get_stat( link, RTNL_LINK_RX_PACKETS );
-        data.txPackets = rtnl_link_get_stat( link, RTNL_LINK_TX_PACKETS );
+        data->rxPackets = rtnl_link_get_stat( link, RTNL_LINK_RX_PACKETS );
+        data->txPackets = rtnl_link_get_stat( link, RTNL_LINK_TX_PACKETS );
         rx_bytes = rtnl_link_get_stat( link, RTNL_LINK_RX_BYTES );
         tx_bytes = rtnl_link_get_stat( link, RTNL_LINK_TX_BYTES );
 
-        incBytes( data.interfaceType, rx_bytes, data.incomingBytes, data.prevRxBytes, data.rxBytes );
-        incBytes( data.interfaceType, tx_bytes, data.outgoingBytes, data.prevTxBytes, data.txBytes );
-        data.rxString = KIO::convertSize( data.rxBytes );
-        data.txString = KIO::convertSize( data.txBytes );
+        incBytes( data->interfaceType, rx_bytes, data->incomingBytes, data->prevRxBytes, data->rxBytes );
+        incBytes( data->interfaceType, tx_bytes, data->outgoingBytes, data->prevTxBytes, data->txBytes );
+        data->rxString = KIO::convertSize( data->rxBytes );
+        data->txString = KIO::convertSize( data->txBytes );
 
         updateAddresses( data );
 
@@ -223,7 +312,7 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, InterfaceData& 
     }
 }
 
-void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, WirelessData& data )
+void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, BackendData* data )
 {
 #ifdef HAVE_LIBIW
     if ( fd > 0 )
@@ -240,12 +329,12 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, Wireless
             if ( has_range )
             {
                 if ( range.max_qual.qual > 0 )
-                    data.linkQuality = QString( "%1%" ).arg( 100 * info.stats.qual.qual / range.max_qual.qual );
+                    data->linkQuality = QString( "%1%" ).arg( 100 * info.stats.qual.qual / range.max_qual.qual );
                 else
-                    data.linkQuality = "0";
+                    data->linkQuality = "0";
             }
             else
-                data.linkQuality = QString::number( info.stats.qual.qual );
+                data->linkQuality = QString::number( info.stats.qual.qual );
         }
 
         if ( iw_get_ext( fd, ifName.toLatin1(), SIOCGIWFREQ, &wrq ) >= 0 )
@@ -263,8 +352,8 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, Wireless
                     channel = iw_freq_to_channel( freq, &range );
                 }
                 iw_print_freq_value( buffer, sizeof( buffer ), freq );
-                data.frequency = buffer;
-                data.channel = QString::number( channel );
+                data->frequency = buffer;
+                data->channel = QString::number( channel );
             }
         }
 
@@ -277,11 +366,11 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, Wireless
         {
             if ( wrq.u.data.flags > 0 )
             {
-                data.essid = essid;
+                data->essid = essid;
             }
             else
             {
-                data.essid = "any";
+                data->essid = "any";
             }
         }
 
@@ -289,10 +378,10 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, Wireless
         {
             char ap_addr[128];
             iw_ether_ntop( reinterpret_cast<const ether_addr *>(wrq.u.ap_addr.sa_data), ap_addr );
-            data.accessPoint = ap_addr;
+            data->accessPoint = ap_addr;
         }
         else
-            data.accessPoint.clear();
+            data->accessPoint.clear();
 
         memset( essid, 0, IW_ESSID_MAX_SIZE + 1 );
         wrq.u.essid.pointer = (caddr_t) essid;
@@ -302,11 +391,11 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, Wireless
         {
             if ( wrq.u.data.length > 1 )
             {
-                data.nickName = essid;
+                data->nickName = essid;
             }
             else
             {
-                data.nickName = QString::null;
+                data->nickName = QString::null;
             }
         }
 
@@ -315,7 +404,7 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, Wireless
             iwparam bitrate;
             memcpy (&(bitrate), &(wrq.u.bitrate), sizeof (iwparam));
             iw_print_bitrate( buffer, sizeof( buffer ), wrq.u.bitrate.value );
-            data.bitRate = buffer;
+            data->bitRate = buffer;
         }
 
         if ( iw_get_ext( fd, ifName.toLatin1(), SIOCGIWMODE, &wrq ) >= 0 )
@@ -323,19 +412,19 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, Wireless
             int mode = wrq.u.mode;
             if ( mode < IW_NUM_OPER_MODE && mode >= 0 )
             {
-                data.mode = iw_operation_mode[mode];
+                data->mode = iw_operation_mode[mode];
             }
             else
             {
-                data.mode = QString::null;
+                data->mode = QString::null;
             }
         }
 
-        if ( data.accessPoint != data.prevAccessPoint )
+        if ( data->accessPoint != data->prevAccessPoint )
         {
             /* Reset encryption status for new access point */
-            data.encryption = false;
-            data.prevAccessPoint = data.accessPoint;
+            data->isEncrypted = false;
+            data->prevAccessPoint = data->accessPoint;
         }
         if ( has_range )
             updateWirelessEncData( fd, ifName, range, data );
@@ -345,7 +434,7 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, Wireless
 
 #ifdef HAVE_LIBIW
 void NetlinkBackend::updateWirelessEncData( int fd, const QString& ifName,
-                                        const iw_range& range, WirelessData& data )
+                                        const iw_range& range, BackendData* data )
 {
     /* We only use left-over wireless scans to prevent doing a new scan every
      * polling period.  If our current access point disappears from the results
@@ -418,16 +507,16 @@ realloc:
                 switch ( iwe.cmd )
                 {
                     case SIOCGIWAP:
-                        if ( data.accessPoint == iw_saether_ntop( &iwe.u.ap_addr, reinterpret_cast<char *>(buffer) ) )
+                        if ( data->accessPoint == iw_saether_ntop( &iwe.u.ap_addr, reinterpret_cast<char *>(buffer) ) )
                             foundAP = true;
                         break;
                     case SIOCGIWENCODE:
                         if ( foundAP )
                         {
                             if ( iwe.u.data.flags & IW_ENCODE_DISABLED )
-                                data.encryption = false;
+                                data->isEncrypted = false;
                             else
-                                data.encryption = true;
+                                data->isEncrypted = true;
                             free( buffer );
                             return;
                         }

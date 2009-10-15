@@ -18,8 +18,8 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef DAEMONREGISTRY_H
-#define DAEMONREGISTRY_H
+#ifndef BACKENDFACTORY_H
+#define BACKENDFACTORY_H
 
 #ifdef __linux__
   #include "netlinkbackend.h"
@@ -27,30 +27,17 @@
   #include "bsdbackend.h"
 #endif
 
-/**
- * This registry tells KNemo what backends are available
- * and how they can be created. It is only used by the daemon
- * to create the selected backend. Two registries were
- * necessary to avoid linking the KCM module against all backends.
- *
- * @short Registry for all backends
- * @author Percy Leonhardt <percy@eris23.de>
- */
-
-struct DaemonRegistryEntry
+class BackendFactory
 {
-    QString name;
-    BackendBase* (*function) ( QHash<QString, Interface *>& );
-};
-
-DaemonRegistryEntry DaemonRegistry[] =
-{
+public:
+    static BackendBase * backend()
+    {
 #ifdef __linux__
-    { "Sys", NetlinkBackend::createInstance },
+        return NetlinkBackend::createInstance();
 #else
-    { "Sys", BSDBackend::createInstance },
+        return BSDBackend::createInstance();
 #endif
-    { QString::null, 0 }
+    }
 };
 
-#endif // DAEMONREGISTRY_H
+#endif // BACKENDFACTORY_H

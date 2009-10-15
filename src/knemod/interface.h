@@ -49,6 +49,7 @@ public:
      * Default Constructor
      */
     Interface(const QString& ifname,
+              const BackendData * const,
               const GeneralData& generalData,
               const PlotterSettings& plotterSettings );
 
@@ -82,19 +83,14 @@ public:
         return mName;
     }
 
-    InterfaceData& getData()
+    const BackendData* getData() const
     {
-        return mData;
+        return mBackendData;
     }
 
     InterfaceSettings& getSettings()
     {
         return mSettings;
-    }
-
-    WirelessData& getWirelessData()
-    {
-        return mWirelessData;
     }
 
     const GeneralData& getGeneralData() const
@@ -113,13 +109,6 @@ public:
      */
     void configChanged();
 
-    /**
-     * Called from the interface updater class after new data from
-     * 'ifconfig' has been read. This will trigger the monitor to
-     * to look for changes in interface data or interface state.
-     */
-    void activateMonitor();
-
     enum InterfaceState
     {
         UNKNOWN_STATE = -1,
@@ -130,22 +119,14 @@ public:
         TX_TRAFFIC    = 8
     };
 
-    enum InterfaceType
-    {
-        UNKNOWN_TYPE,
-        ETHERNET,
-        PPP
-    };
-
-    enum IconSet
-    {
-        MONITOR = 0,
-        MODEM,
-        NETWORK,
-        WIRELESS
-    };
-
 public slots:
+    /**
+     * Called from the interface updater class after new data from
+     * 'ifconfig' has been read. This will trigger the monitor to
+     * to look for changes in interface data or interface state.
+     */
+    void activateMonitor();
+
     /*
      * Called when the user left-clicks on the tray icon
      * Toggles the status dialog by showing it on the first click and
@@ -204,21 +185,20 @@ private:
      */
     void activateOrHide( QWidget* widget, bool onlyActivate = false );
 
-    int mType;
+    KNemoIface::Type mType;
     int mState;
     QString mName;
     QTimer* mPlotterTimer;
     time_t mUptime;
     QString mUptimeString;
     InterfaceIcon mIcon;
-    InterfaceData mData;
     InterfaceMonitor mMonitor;
     InterfaceSettings mSettings;
     InterfaceStatistics* mStatistics;
-    WirelessData mWirelessData;
     InterfaceStatusDialog* mStatusDialog;
     InterfaceStatisticsDialog* mStatisticsDialog;
     InterfacePlotterDialog* mPlotterDialog;
+    const BackendData* mBackendData;
     const GeneralData& mGeneralData;
     const PlotterSettings& mPlotterSettings;
 };

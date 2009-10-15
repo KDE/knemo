@@ -146,7 +146,9 @@ QString InterfaceTray::toolTipData()
 {
     QString tipData;
     int toolTipContent = mInterface->getGeneralData().toolTipContent;
-    InterfaceData& data = mInterface->getData();
+    const BackendData * data = mInterface->getData();
+    if ( !data )
+        return QString();
     QString leftTags = "<tr><td style='padding-right:1em; white-space:nowrap;'>";
     QString centerTags = "</td><td style='white-space:nowrap;'>";
     QString rightTags = "</td></tr>";
@@ -163,12 +165,12 @@ QString InterfaceTray::toolTipData()
 #endif
     if ( toolTipContent & INTERFACE )
         tipData += leftTags + mToolTips.value( INTERFACE ) + centerTags + mInterface->getName() + rightTags;
-    if ( data.available )
+    if ( data->isAvailable )
     {
         if ( toolTipContent & STATUS )
             tipData += leftTags + mToolTips.value( STATUS ) + centerTags + i18n( "Connected" ) + rightTags;
     }
-    else if ( data.existing )
+    else if ( data->isExisting )
     {
         if ( toolTipContent & STATUS )
             tipData += leftTags + mToolTips.value( STATUS ) + centerTags + i18n( "Disconnected" ) + rightTags;
@@ -179,16 +181,16 @@ QString InterfaceTray::toolTipData()
             tipData += leftTags + mToolTips.value( STATUS ) + centerTags + i18n( "Nonexistent" ) + rightTags;
     }
 
-    if ( data.available )
+    if ( data->isAvailable )
     {
         if ( toolTipContent & UPTIME )
             tipData += leftTags + mToolTips.value( UPTIME ) + centerTags + mInterface->getUptimeString() + rightTags ;
-        QStringList keys = data.addrData.keys();
+        QStringList keys = data->addrData.keys();
         QString ip4Tip;
         QString ip6Tip;
         foreach ( QString key, keys )
         {
-            AddrData addrData = data.addrData.value( key );
+            AddrData addrData = data->addrData.value( key );
 
             if ( addrData.afType == AF_INET )
             {
@@ -213,58 +215,57 @@ QString InterfaceTray::toolTipData()
         }
         tipData += ip4Tip + ip6Tip;
 
-        if ( Interface::ETHERNET == data.interfaceType )
+        if ( KNemoIface::ETHERNET == data->interfaceType )
         {
             if ( toolTipContent & GATEWAY )
             {
-                if ( !data.ip4DefaultGateway.isEmpty() )
-                    tipData += leftTags + i18n( "IPv4 Default Gateway" ) + centerTags + data.ip4DefaultGateway + rightTags;
-                if ( !data.ip6DefaultGateway.isEmpty() )
-                    tipData += leftTags + i18n( "IPv6 Default Gateway" ) + centerTags + data.ip6DefaultGateway + rightTags;
+                if ( !data->ip4DefaultGateway.isEmpty() )
+                    tipData += leftTags + i18n( "IPv4 Default Gateway" ) + centerTags + data->ip4DefaultGateway + rightTags;
+                if ( !data->ip6DefaultGateway.isEmpty() )
+                    tipData += leftTags + i18n( "IPv6 Default Gateway" ) + centerTags + data->ip6DefaultGateway + rightTags;
             }
             if ( toolTipContent & HW_ADDRESS )
-                tipData += leftTags + mToolTips.value( HW_ADDRESS ) + centerTags + data.hwAddress + rightTags;
+                tipData += leftTags + mToolTips.value( HW_ADDRESS ) + centerTags + data->hwAddress + rightTags;
         }
         if ( toolTipContent & RX_PACKETS )
-            tipData += leftTags + mToolTips.value( RX_PACKETS ) + centerTags + QString::number( data.rxPackets ) + rightTags;
+            tipData += leftTags + mToolTips.value( RX_PACKETS ) + centerTags + QString::number( data->rxPackets ) + rightTags;
         if ( toolTipContent & TX_PACKETS )
-            tipData += leftTags + mToolTips.value( TX_PACKETS ) + centerTags + QString::number( data.txPackets ) + rightTags;
+            tipData += leftTags + mToolTips.value( TX_PACKETS ) + centerTags + QString::number( data->txPackets ) + rightTags;
         if ( toolTipContent & RX_BYTES )
-            tipData += leftTags + mToolTips.value( RX_BYTES ) + centerTags + data.rxString + rightTags;
+            tipData += leftTags + mToolTips.value( RX_BYTES ) + centerTags + data->rxString + rightTags;
         if ( toolTipContent & TX_BYTES )
-            tipData += leftTags + mToolTips.value( TX_BYTES ) + centerTags + data.txString + rightTags;
+            tipData += leftTags + mToolTips.value( TX_BYTES ) + centerTags + data->txString + rightTags;
         if ( toolTipContent & DOWNLOAD_SPEED )
         {
-            unsigned long bytesPerSecond = data.incomingBytes / mInterface->getGeneralData().pollInterval;
+            unsigned long bytesPerSecond = data->incomingBytes / mInterface->getGeneralData().pollInterval;
             tipData += leftTags + mToolTips.value( DOWNLOAD_SPEED ) + centerTags + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + rightTags;
         }
         if ( toolTipContent & UPLOAD_SPEED )
         {
-            unsigned long bytesPerSecond = data.outgoingBytes / mInterface->getGeneralData().pollInterval;
+            unsigned long bytesPerSecond = data->outgoingBytes / mInterface->getGeneralData().pollInterval;
             tipData += leftTags + mToolTips.value( UPLOAD_SPEED ) + centerTags + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + rightTags;
         }
     }
 
-    if ( data.available && data.wirelessDevice )
+    if ( data->isAvailable && data->isWireless )
     {
-        WirelessData& wdata = mInterface->getWirelessData();
         if ( toolTipContent & ESSID )
-            tipData += leftTags + mToolTips.value( ESSID ) + centerTags + wdata.essid + rightTags;
+            tipData += leftTags + mToolTips.value( ESSID ) + centerTags + data->essid + rightTags;
         if ( toolTipContent & MODE )
-            tipData += leftTags + mToolTips.value( MODE ) + centerTags + wdata.mode + rightTags;
+            tipData += leftTags + mToolTips.value( MODE ) + centerTags + data->mode + rightTags;
         if ( toolTipContent & FREQUENCY )
-            tipData += leftTags + mToolTips.value( FREQUENCY ) + centerTags + wdata.frequency + rightTags;
+            tipData += leftTags + mToolTips.value( FREQUENCY ) + centerTags + data->frequency + rightTags;
         if ( toolTipContent & BIT_RATE )
-            tipData += leftTags + mToolTips.value( BIT_RATE ) + centerTags + wdata.bitRate + rightTags;
+            tipData += leftTags + mToolTips.value( BIT_RATE ) + centerTags + data->bitRate + rightTags;
         if ( toolTipContent & ACCESS_POINT )
-            tipData += leftTags + mToolTips.value( ACCESS_POINT ) + centerTags + wdata.accessPoint + rightTags;
+            tipData += leftTags + mToolTips.value( ACCESS_POINT ) + centerTags + data->accessPoint + rightTags;
         if ( toolTipContent & LINK_QUALITY )
-            tipData += leftTags + mToolTips.value( LINK_QUALITY ) + centerTags + wdata.linkQuality + rightTags;
+            tipData += leftTags + mToolTips.value( LINK_QUALITY ) + centerTags + data->linkQuality + rightTags;
         if ( toolTipContent & NICK_NAME )
-            tipData += leftTags + mToolTips.value( NICK_NAME ) + centerTags + wdata.nickName + rightTags;
+            tipData += leftTags + mToolTips.value( NICK_NAME ) + centerTags + data->nickName + rightTags;
         if ( toolTipContent & ENCRYPTION )
         {
-            if ( wdata.encryption == true )
+            if ( data->isEncrypted == true )
             {
                 tipData += leftTags + mToolTips.value( ENCRYPTION ) + centerTags + i18n( "active" ) + rightTags;
             }

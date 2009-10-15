@@ -38,23 +38,24 @@
 
 class NetlinkBackend : public BackendBase
 {
+    Q_OBJECT
 public:
-    NetlinkBackend(QHash<QString, Interface *>& interfaces );
+    NetlinkBackend();
     virtual ~NetlinkBackend();
 
-    static BackendBase* createInstance( QHash<QString, Interface *>& interfaces );
+    static BackendBase* createInstance();
 
     virtual void update();
+    virtual QStringList getIfaceList();
     virtual QString getDefaultRouteIface( int afInet );
 
-protected:
-    virtual void updateInterfaceData( const QString& ifName, InterfaceData& data );
-
 private:
-    void updateWirelessData( int fd, const QString& ifName, WirelessData& data );
-    void updateAddresses( InterfaceData& data );
+    void updateInterfaceData( const QString& ifName, BackendData* data );
+    void updateWirelessData( int fd, const QString& ifName, BackendData* data );
+    QString getDefaultRoute( int afType, QString *defaultGateway, void *data );
+    void updateAddresses( BackendData* data );
 #ifdef HAVE_LIBIW
-    void updateWirelessEncData( int fd, const QString& ifName, const iw_range& range, WirelessData& data );
+    void updateWirelessEncData( int fd, const QString& ifName, const iw_range& range, BackendData* data );
 #endif
     nl_handle * rtsock;
     nl_cache *addrCache, *linkCache, *routeCache;

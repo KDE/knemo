@@ -33,10 +33,11 @@
 #include "knemodaemon.h"
 #include "interface.h"
 #include "utils.h"
-#include "backends/backendbase.h"
-#include "backends/daemonregistry.h"
+#include "backends/backendfactory.h"
 
 QString KNemoDaemon::sSelectedInterface = QString::null;
+
+BackendBase *backend = NULL;
 
 KNemoDaemon::KNemoDaemon()
     : QObject(),
@@ -46,29 +47,11 @@ KNemoDaemon::KNemoDaemon()
       mColorHLines( 0x04FB1D ),
       mColorIncoming( 0x1889FF ),
       mColorOutgoing( 0xFF7F08 ),
-      mColorBackground( 0x313031 ),
-      mBackend( 0 )
+      mColorBackground( 0x313031 )
 {
+    backend = BackendFactory::backend();
     readConfig();
     QDBusConnection::sessionBus().registerObject("/knemo", this, QDBusConnection::ExportScriptableSlots);
-
-    /*bool foundBackend = false;
-    int i;
-    for ( i = 0; DaemonRegistry[i].name != QString::null; i++ )
-    {
-        if ( DaemonRegistry[i].name == mBackendName )
-        {
-            foundBackend = true;
-            break;
-        }
-    }
-
-    if ( !foundBackend )
-    {
-        i = 0; // use the first backend (Sys)
-    }*/
-    mBackend = ( *DaemonRegistry[0].function )( mInterfaceHash );
-
     mPollTimer = new QTimer();
     connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );
     mPollTimer->start( mGeneralData.pollInterval * 1000 );
@@ -78,7 +61,6 @@ KNemoDaemon::~KNemoDaemon()
 {
     mPollTimer->stop();
     delete mPollTimer;
-    delete mBackend;
 
     foreach ( QString key, mInterfaceHash.keys() )
     {
@@ -105,29 +87,6 @@ void KNemoDaemon::readConfig()
     if ( generalGroup.hasKey( "Interfaces" ) )
         mHaveInterfaces = true;
     QStringList interfaceList = generalGroup.readEntry( "Interfaces", QStringList() );
-    /*QString backend = generalGroup.readEntry( "Backend", "Sys" );
-
-    if ( mBackendName != backend )
-    {
-        bool foundBackend = false;
-        mBackendName = backend;
-        int i;
-        for ( i = 0; DaemonRegistry[i].name != QString::null; i++ )
-        {
-            if ( DaemonRegistry[i].name == backend )
-            {
-                foundBackend = true;
-                break;
-            }
-        }
-
-        if ( foundBackend )
-        {
-            if ( mBackend )
-                delete mBackend;
-            mBackend = ( *DaemonRegistry[i].function )( mInterfaceHash );
-        }
-    }*/
 
     // Plotter
     KConfigGroup plotterGroup( config, "PlotterSettings" );
@@ -210,6 +169,7 @@ void KNemoDaemon::readConfig()
         {
             Interface *interface = mInterfaceHash.take( key );
             delete interface;
+            backend->remove( key );
         }
     }
 
@@ -219,8 +179,10 @@ void KNemoDaemon::readConfig()
         Interface* iface;
         if ( !mInterfaceHash.contains( key ) )
         {
-            iface = new Interface( key, mGeneralData, mPlotterSettings );
+            const BackendData * data = backend->add( key );
+            iface = new Interface( key, data, mGeneralData, mPlotterSettings );
             mInterfaceHash.insert( key, iface );
+            connect( backend, SIGNAL( updateComplete() ), iface, SLOT( activateMonitor() ) );
         }
         else
             iface = mInterfaceHash.value( key );
@@ -262,20 +224,23 @@ QString KNemoDaemon::getSelectedInterface()
 
 void KNemoDaemon::updateInterfaces()
 {
-    if ( !mBackend )
+    if ( !backend )
         return;
 
+    backend->update();
     if ( !mHaveInterfaces )
     {
         // If there's an interface for the default route, let's make that the
         // one to watch
-        QString ifaceName = mBackend->getDefaultRouteIface( AF_INET );
+        QString ifaceName = backend->getDefaultRouteIface( AF_INET );
         if ( ifaceName.isEmpty() )
-            ifaceName = mBackend->getDefaultRouteIface( AF_INET6 );
+            ifaceName = backend->getDefaultRouteIface( AF_INET6 );
         if ( !ifaceName.isEmpty() )
         {
-            Interface *iface = new Interface( ifaceName, mGeneralData, mPlotterSettings );
+            const BackendData* data = backend->add( ifaceName );
+            Interface *iface = new Interface( ifaceName, data, mGeneralData, mPlotterSettings );
             mInterfaceHash.insert( ifaceName, iface );
+            connect( backend, SIGNAL( updateComplete() ), iface, SLOT( activateMonitor() ) );
 
             InterfaceSettings& settings = iface->getSettings();
             settings.iconSet = "monitor";
@@ -283,8 +248,6 @@ void KNemoDaemon::updateInterfaces()
             iface->configChanged();
         }
     }
-
-    mBackend->update();
 }
 
 static const char * const description =

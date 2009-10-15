@@ -37,6 +37,8 @@
 
 #define TEXTICON "texticon"
 
+#include <QMap>
+
 using namespace std;
 
 /* This is for clamping min/max values read from the settings file */
@@ -44,6 +46,80 @@ template <class T> inline T clamp(T x, T a, T b)
 {
 	return min(max(x,a),b);
 }
+
+namespace KNemoIface {
+    enum Type
+    {
+        UNKNOWN_TYPE,
+        ETHERNET,
+        PPP
+    };
+}
+
+struct AddrData
+{
+    int afType;
+    QString broadcastAddress;
+    int scope;
+    QString ipv6Flags;
+    QString label;
+    bool hasPeer;
+};
+
+struct BackendData
+{
+    BackendData()
+      : isExisting( false ),
+        isAvailable( false ),
+        index( -1 ),
+        interfaceType( KNemoIface::UNKNOWN_TYPE ),
+        isWireless( false ),
+        prevRxPackets( 0L ),
+        prevTxPackets( 0L ),
+        rxPackets( 0L ),
+        txPackets( 0L ),
+        prevRxBytes( 0L ),
+        prevTxBytes( 0L ),
+        incomingBytes( 0L ),
+        outgoingBytes( 0L ),
+        rxBytes( 0L ),
+        txBytes( 0L ),
+        isEncrypted( false )
+    {}
+
+    bool isExisting;
+    bool isAvailable;
+    int index;
+    KNemoIface::Type interfaceType;
+    bool isWireless;
+    unsigned long prevRxPackets;
+    unsigned long prevTxPackets;
+    unsigned long rxPackets;
+    unsigned long txPackets;
+    unsigned long prevRxBytes;
+    unsigned long prevTxBytes;
+    unsigned long incomingBytes;
+    unsigned long outgoingBytes;
+    QMap<QString, AddrData> addrData;
+    QString hwAddress;
+    QString ip4DefaultGateway;
+    QString ip6DefaultGateway;
+    QString rxString;
+    QString txString;
+    quint64 rxBytes;
+    quint64 txBytes;
+
+    QString essid;
+    QString mode;
+    QString frequency;
+    QString channel;
+    QString bitRate;
+    QString linkQuality;
+    QString accessPoint;
+    QString prevAccessPoint;
+    QString nickName;
+    bool isEncrypted;
+};
 
 struct InterfaceCommand
 {

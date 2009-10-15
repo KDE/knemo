@@ -18,6 +18,7 @@
    Boston, MA 02110-1301, USA.
 */
 
+#include "backends/backendbase.h"
 #include "interface.h"
 #include "interfacemonitor.h"
 
@@ -34,37 +35,36 @@ void InterfaceMonitor::checkStatus( Interface* interface )
 {
     int currentState;
     int previousState = interface->getState();
-    InterfaceData& data = interface->getData();
+    const BackendData* data = interface->getData();
     int trafficThreshold = interface->getSettings().trafficThreshold;
 
-    if ( !data.existing )
+    if ( !data->isExisting )
         // the interface does not exist
         currentState = Interface::NOT_EXISTING;
-    else if ( !data.available )
+    else if ( !data->isAvailable )
         // the interface exists but is not connected
         currentState = Interface::NOT_AVAILABLE;
     else
     {
         // the interface is connected, look for traffic
         currentState = Interface::AVAILABLE;
-        if ( ( data.rxPackets - data.prevRxPackets ) > (unsigned int) trafficThreshold )
+        if ( ( data->rxPackets - data->prevRxPackets ) > (unsigned int) trafficThreshold )
             currentState |= Interface::RX_TRAFFIC;
-        if ( ( data.txPackets - data.prevTxPackets ) > (unsigned int) trafficThreshold )
+        if ( ( data->txPackets - data->prevTxPackets ) > (unsigned int) trafficThreshold )
             currentState |= Interface::TX_TRAFFIC;
     }
 
     // update the statistics
-    if ( data.incomingBytes > 0 )
+    if ( data->incomingBytes > 0 )
     {
-        emit incomingData( data.incomingBytes );
+        emit incomingData( data->incomingBytes );
     }
-    if ( data.outgoingBytes > 0 )
+    if ( data->outgoingBytes > 0 )
     {
-        emit outgoingData( data.outgoingBytes );
+        emit outgoingData( data->outgoingBytes );
     }
 
-    data.prevRxPackets = data.rxPackets;
-    data.prevTxPackets = data.txPackets;
+    backend->updatePackets( interface->getName() );
 
     if ( ( previousState == Interface::NOT_EXISTING ||
            previousState == Interface::NOT_AVAILABLE ||

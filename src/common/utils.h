@@ -18,14 +18,6 @@
    Boston, MA 02110-1301, USA.
 */
 
-#include <QString>
-
-/*
- * Finds the default gateway for AF_INET or AF_INET6
- * It fills defaultGateway with the address and returns the interface name
- * If one isn't found, both are empty.
- * data is by the netlink backend to pass nl_cache data
- */
-QString getDefaultRoute( int afType, QString * defaultGateway = NULL, void * data = NULL );
+#include <QStringList>
 
 QStringList findIconSets();
