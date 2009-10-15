@@ -53,7 +53,7 @@ InterfaceTray::InterfaceTray( Interface* interface, const QString &, QWidget* pa
     connect( this, SIGNAL( activated( QSystemTrayIcon::ActivationReason ) ),
              this, SLOT( iconActivated( QSystemTrayIcon::ActivationReason ) ) );
 #endif
-    setupToolTipArray();
+    setupMappings();
     // remove quit action added by KSystemTrayIcon
     actionCollection()->removeAction( actionCollection()->action( KStandardAction::name( KStandardAction::Quit ) ) );
     KStandardAction::quit( this, SLOT( slotQuit() ), actionCollection() );
@@ -164,30 +164,29 @@ QString InterfaceTray::toolTipData()
         tipData += "<tr><th colspan='2' style='text-align:center;'>" + title + "</th></tr>";
 #endif
     if ( toolTipContent & INTERFACE )
-        tipData += leftTags + mToolTips.value( INTERFACE ) + centerTags + mInterface->getName() + rightTags;
-    if ( data->isAvailable )
+        tipData += leftTags + i18n( "Interface" ) + centerTags + mInterface->getName() + rightTags;
+
+    if ( toolTipContent & STATUS )
     {
-        if ( toolTipContent & STATUS )
-            tipData += leftTags + mToolTips.value( STATUS ) + centerTags + i18n( "Connected" ) + rightTags;
-    }
-    else if ( data->isExisting )
-    {
-        if ( toolTipContent & STATUS )
-            tipData += leftTags + mToolTips.value( STATUS ) + centerTags + i18n( "Disconnected" ) + rightTags;
-    }
-    else
-    {
-        if ( toolTipContent & STATUS )
-            tipData += leftTags + mToolTips.value( STATUS ) + centerTags + i18n( "Nonexistent" ) + rightTags;
+        tipData += leftTags + i18n( "Status" ) + centerTags;
+        if ( data->isAvailable )
+            tipData += i18n( "Connected" );
+        else if ( data->isExisting )
+            tipData += i18n( "Disconnected" );
+        else
+            tipData += i18n( "Nonexistent" );
+        tipData += rightTags;
     }
 
     if ( data->isAvailable )
     {
         if ( toolTipContent & UPTIME )
-            tipData += leftTags + mToolTips.value( UPTIME ) + centerTags + mInterface->getUptimeString() + rightTags ;
+            tipData += leftTags + i18n( "Uptime" ) + centerTags + mInterface->getUptimeString() + rightTags ;
         QStringList keys = data->addrData.keys();
         QString ip4Tip;
         QString ip6Tip;
+        QString ptpaddress = i18n( "PtP Address" );
+        QString scope = i18n( "Scope & Flags" );
         foreach ( QString key, keys )
         {
             AddrData addrData = data->addrData.value( key );
@@ -197,20 +196,20 @@ QString InterfaceTray::toolTipData()
                 if ( toolTipContent & IP_ADDRESS )
                     ip4Tip += leftTags + i18n( "IPv4 Address" ) + centerTags + key + rightTags;
                 if ( toolTipContent & SCOPE )
-                    ip4Tip += leftTags + mToolTips.value( SCOPE ) + centerTags + mScope.value( addrData.scope ) + addrData.ipv6Flags + rightTags;
+                    ip4Tip += leftTags + scope + centerTags + mScope.value( addrData.scope ) + addrData.ipv6Flags + rightTags;
                 if ( toolTipContent & BCAST_ADDRESS && !addrData.hasPeer )
-                    ip4Tip += leftTags + mToolTips.value( BCAST_ADDRESS ) + centerTags + addrData.broadcastAddress + rightTags;
+                    ip4Tip += leftTags + i18n( "Broadcast Address" ) + centerTags + addrData.broadcastAddress + rightTags;
                 else if ( toolTipContent & PTP_ADDRESS && addrData.hasPeer )
-                    ip4Tip += leftTags + mToolTips.value( PTP_ADDRESS ) + centerTags + addrData.broadcastAddress + rightTags;
+                    ip4Tip += leftTags + ptpaddress + centerTags + addrData.broadcastAddress + rightTags;
             }
             else
             {
                 if ( toolTipContent & IP_ADDRESS )
                     ip6Tip += leftTags + i18n( "IPv6 Address" ) + centerTags + key + rightTags;
                 if ( toolTipContent & SCOPE )
-                    ip6Tip += leftTags + mToolTips.value( SCOPE ) + centerTags + mScope.value( addrData.scope ) + rightTags;
+                    ip6Tip += leftTags + scope + centerTags + mScope.value( addrData.scope ) + rightTags;
                 if ( toolTipContent & PTP_ADDRESS && addrData.hasPeer )
-                    ip6Tip += leftTags + mToolTips.value( PTP_ADDRESS ) + centerTags + addrData.broadcastAddress + rightTags;
+                    ip6Tip += leftTags + ptpaddress + centerTags + addrData.broadcastAddress + rightTags;
             }
         }
         tipData += ip4Tip + ip6Tip;
@@ -225,53 +224,54 @@ QString InterfaceTray::toolTipData()
                     tipData += leftTags + i18n( "IPv6 Default Gateway" ) + centerTags + data->ip6DefaultGateway + rightTags;
             }
             if ( toolTipContent & HW_ADDRESS )
-                tipData += leftTags + mToolTips.value( HW_ADDRESS ) + centerTags + data->hwAddress + rightTags;
+                tipData += leftTags + i18n( "MAC Address" ) + centerTags + data->hwAddress + rightTags;
         }
         if ( toolTipContent & RX_PACKETS )
-            tipData += leftTags + mToolTips.value( RX_PACKETS ) + centerTags + QString::number( data->rxPackets ) + rightTags;
+            tipData += leftTags + i18n( "Packets Received" ) + centerTags + QString::number( data->rxPackets ) + rightTags;
         if ( toolTipContent & TX_PACKETS )
-            tipData += leftTags + mToolTips.value( TX_PACKETS ) + centerTags + QString::number( data->txPackets ) + rightTags;
+            tipData += leftTags + i18n( "Packets Sent" ) + centerTags + QString::number( data->txPackets ) + rightTags;
         if ( toolTipContent & RX_BYTES )
-            tipData += leftTags + mToolTips.value( RX_BYTES ) + centerTags + data->rxString + rightTags;
+            tipData += leftTags + i18n( "Bytes Received" ) + centerTags + data->rxString + rightTags;
         if ( toolTipContent & TX_BYTES )
-            tipData += leftTags + mToolTips.value( TX_BYTES ) + centerTags + data->txString + rightTags;
+            tipData += leftTags + i18n( "Bytes Sent" ) + centerTags + data->txString + rightTags;
         if ( toolTipContent & DOWNLOAD_SPEED )
         {
             unsigned long bytesPerSecond = data->incomingBytes / mInterface->getGeneralData().pollInterval;
-            tipData += leftTags + mToolTips.value( DOWNLOAD_SPEED ) + centerTags + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + rightTags;
+            tipData += leftTags + i18n( "Download Speed" ) + centerTags + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + rightTags;
         }
         if ( toolTipContent & UPLOAD_SPEED )
         {
             unsigned long bytesPerSecond = data->outgoingBytes / mInterface->getGeneralData().pollInterval;
-            tipData += leftTags + mToolTips.value( UPLOAD_SPEED ) + centerTags + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + rightTags;
+            tipData += leftTags + i18n( "Upload Speed" ) + centerTags + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + rightTags;
         }
     }
 
     if ( data->isAvailable && data->isWireless )
     {
         if ( toolTipContent & ESSID )
-            tipData += leftTags + mToolTips.value( ESSID ) + centerTags + data->essid + rightTags;
+            tipData += leftTags + i18n( "ESSID" ) + centerTags + data->essid + rightTags;
         if ( toolTipContent & MODE )
-            tipData += leftTags + mToolTips.value( MODE ) + centerTags + data->mode + rightTags;
+            tipData += leftTags + i18n( "Mode" ) + centerTags + data->mode + rightTags;
         if ( toolTipContent & FREQUENCY )
-            tipData += leftTags + mToolTips.value( FREQUENCY ) + centerTags + data->frequency + rightTags;
+            tipData += leftTags + i18n( "Frequency" ) + centerTags + data->frequency + rightTags;
         if ( toolTipContent & BIT_RATE )
-            tipData += leftTags + mToolTips.value( BIT_RATE ) + centerTags + data->bitRate + rightTags;
+            tipData += leftTags + i18n( "Bit Rate" ) + centerTags + data->bitRate + rightTags;
         if ( toolTipContent & ACCESS_POINT )
-            tipData += leftTags + mToolTips.value( ACCESS_POINT ) + centerTags + data->accessPoint + rightTags;
+            tipData += leftTags + i18n( "Access Point" ) + centerTags + data->accessPoint + rightTags;
         if ( toolTipContent & LINK_QUALITY )
-            tipData += leftTags + mToolTips.value( LINK_QUALITY ) + centerTags + data->linkQuality + rightTags;
+            tipData += leftTags + i18n( "Link Quality" ) + centerTags + data->linkQuality + rightTags;
         if ( toolTipContent & NICK_NAME )
-            tipData += leftTags + mToolTips.value( NICK_NAME ) + centerTags + data->nickName + rightTags;
+            tipData += leftTags + i18n( "Nickname" ) + centerTags + data->nickName + rightTags;
         if ( toolTipContent & ENCRYPTION )
         {
+            QString encryption = i18n( "Encryption" );
             if ( data->isEncrypted == true )
             {
-                tipData += leftTags + mToolTips.value( ENCRYPTION ) + centerTags + i18n( "active" ) + rightTags;
+                tipData += leftTags + encryption + centerTags + i18n( "active" ) + rightTags;
             }
             else
             {
-                tipData += leftTags + mToolTips.value( ENCRYPTION ) + centerTags + i18n( "off" ) + rightTags;
+                tipData += leftTags + encryption + centerTags + i18n( "off" ) + rightTags;
             }
         }
     }
@@ -279,7 +279,7 @@ QString InterfaceTray::toolTipData()
     return tipData;
 }
 
-void InterfaceTray::setupToolTipArray()
+void InterfaceTray::setupMappings()
 {
     // Cannot make this data static as the i18n macro doesn't seem
     // to work when called to early i.e. before setting the catalogue.
@@ -288,29 +288,4 @@ void InterfaceTray::setupToolTipArray()
     mScope.insert( RT_SCOPE_LINK, i18n( "link" ) );
     mScope.insert( RT_SCOPE_SITE, i18n( "site" ) );
     mScope.insert( RT_SCOPE_UNIVERSE, i18n( "global" ) );
-
-    mToolTips.insert( INTERFACE, i18n( "Interface" ) );
-#ifndef USE_KNOTIFICATIONITEM
-    mToolTips.insert( ALIAS, i18n( "Alias" ) );
-#endif
-    mToolTips.insert( STATUS, i18n( "Status" ) );
-    mToolTips.insert( UPTIME, i18n( "Uptime" ) );
-    mToolTips.insert( SCOPE, i18n( "Scope & Flags" ) );
-    mToolTips.insert( HW_ADDRESS, i18n( "MAC Address" ) );
-    mToolTips.insert( PTP_ADDRESS, i18n( "PtP Address" ) );
-    mToolTips.insert( RX_PACKETS, i18n( "Packets Received" ) );
-    mToolTips.insert( TX_PACKETS, i18n( "Packets Sent" ) );
-    mToolTips.insert( RX_BYTES, i18n( "Bytes Received" ) );
-    mToolTips.insert( TX_BYTES, i18n( "Bytes Sent" ) );
-    mToolTips.insert( ESSID, i18n( "ESSID" ) );
-    mToolTips.insert( MODE, i18n( "Mode" ) );
-    mToolTips.insert( FREQUENCY, i18n( "Frequency" ) );
-    mToolTips.insert( BIT_RATE, i18n( "Bit Rate" ) );
-    mToolTips.insert( ACCESS_POINT, i18n( "Access Point" ) );
-    mToolTips.insert( LINK_QUALITY, i18n( "Link Quality" ) );
-    mToolTips.insert( BCAST_ADDRESS, i18n( "Broadcast Address" ) );
-    mToolTips.insert( DOWNLOAD_SPEED, i18n( "Download Speed" ) );
-    mToolTips.insert( UPLOAD_SPEED, i18n( "Upload Speed" ) );
-    mToolTips.insert( NICK_NAME, i18n( "Nickname" ) );
-    mToolTips.insert( ENCRYPTION, i18n( "Encryption" ) );
 }

@@ -71,11 +71,10 @@ protected:
 
 private:
     Interface* mInterface;
-    QMap<quint32, QString> mToolTips;
     QMap<int, QString> mScope;
 
     QString toolTipData();
-    void setupToolTipArray();
+    void setupMappings();
 
 private Q_SLOTS:
 #ifdef USE_KNOTIFICATIONITEM
