@@ -181,11 +181,14 @@ void Interface::activateMonitor()
             currentState |= Interface::TX_TRAFFIC;
     }
 
-    // update the statistics
-    if ( mBackendData->incomingBytes > 0 )
-        mStatistics->addIncomingData( mBackendData->incomingBytes );
-    if ( mBackendData->outgoingBytes > 0 )
-        mStatistics->addOutgoingData( mBackendData->outgoingBytes );
+    if ( mStatistics != 0 )
+    {
+        // update the statistics
+        if ( mBackendData->incomingBytes > 0 )
+            mStatistics->addIncomingData( mBackendData->incomingBytes );
+        if ( mBackendData->outgoingBytes > 0 )
+            mStatistics->addOutgoingData( mBackendData->outgoingBytes );
+    }
 
     backend->updatePackets( mName );
 
