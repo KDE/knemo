@@ -114,18 +114,15 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     mDlg->pushButtonDown->setIcon( SmallIcon( "arrow-down" ) );
     mDlg->pushButtonAddToolTip->setIcon( SmallIcon( "arrow-right" ) );
     mDlg->pushButtonRemoveToolTip->setIcon( SmallIcon( "arrow-left" ) );
+
+    mDlg->colorIncomingLabel->hide();
+    mDlg->colorIncoming->hide();
+    mDlg->colorOutgoingLabel->hide();
+    mDlg->colorOutgoing->hide();
+    mDlg->colorDisabledLabel->hide();
+    mDlg->colorDisabled->hide();
+
     //mDlg->listViewCommands->setSorting( -1 );
-    mDlg->listViewCommands->setWhatsThis (
-                     i18n("<p>In this area you can add the custom entries " \
-                          "for your context menu: <ol><li>check <b>Display " \
-                          "custom entries in context menu</b>;</li>" \
-                          "<li>push on the <b>Add</b> button to add a new " \
-                          "entry in the list;</li><li>edit the entry by " \
-                          "double clicking in column <b>Menu text</b> and " \
-                          "<b>Command</b>;</li><li>start from step 2 for " \
-                          "every new entry</li>.</ol>If you need to execute " \
-                          "the command as root user check the corresponding " \
-                          "<b>Root</b> CheckBox.") );
 
     setButtons( KCModule::Default | KCModule::Apply );
 

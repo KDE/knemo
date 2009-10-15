@@ -33,9 +33,7 @@
          <item row="0" column="0" colspan="3">
           <widget class="QListWidget" name="listBoxInterfaces">
            <property name="whatsThis">
-            <string>This is the list of icons you wish to monitor. Please
-use the names understood by the command 'ifconfig',
-for example 'eth0', 'wlan0' or 'ppp0'.</string>
+            <string>This is the list of icons you wish to monitor. Please use the names understood by the command 'ifconfig'.  For example 'eth0', 'wlan0', or 'ppp0'.</string>
            </property>
            <property name="sortingEnabled">
             <bool>true</bool>
@@ -420,6 +418,9 @@ of bluetooth adaptors.</string>
             <widget class="QTreeWidget" name="listViewCommands">
              <property name="enabled">
               <bool>false</bool>
+             </property>
+             <property name="whatsThis">
+              <string>In this area you can add the custom entries for your context menu: &lt;ol&gt;&lt;li&gt;check &lt;b&gt;Display custom entries in context menu&lt;/b&gt;;&lt;/li&gt;&lt;li&gt;push on the &lt;b&gt;Add&lt;/b&gt; button to add a new entry in the list;&lt;/li&gt;&lt;li&gt;edit the entry by double clicking in column &lt;b&gt;Menu text&lt;/b&gt; and &lt;b&gt;Command&lt;/b&gt;;&lt;/li&gt;&lt;li&gt;start from step 2 for every new entry&lt;/li&gt;.&lt;/ol&gt;If you need to execute the command as root user check the corresponding &lt;b&gt;Root&lt;/b&gt; CheckBox.</string>
              </property>
              <property name="rootIsDecorated">
               <bool>false</bool>
