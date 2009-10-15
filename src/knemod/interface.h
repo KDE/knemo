@@ -25,7 +25,6 @@
 #include "data.h"
 #include "global.h"
 #include "interfaceicon.h"
-#include "interfacemonitor.h"
 
 class QTimer;
 class InterfacePlotterDialog;
@@ -155,7 +154,7 @@ private slots:
     /**
      * Start the uptimer when the interface is connected
      */
-    void setStartTime( int );
+    void setStartTime();
 
     /**
      * Update the signal plotter with new data
@@ -192,7 +191,6 @@ private:
     time_t mUptime;
     QString mUptimeString;
     InterfaceIcon mIcon;
-    InterfaceMonitor mMonitor;
     InterfaceSettings mSettings;
     InterfaceStatistics* mStatistics;
     InterfaceStatusDialog* mStatusDialog;

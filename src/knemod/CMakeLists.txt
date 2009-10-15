@@ -4,7 +4,6 @@ set( knemo_SRCS
     main.cpp
     interface.cpp
     interfaceicon.cpp
-    interfacemonitor.cpp
     interfaceplotterdialog.cpp
     interfacestatistics.cpp
     interfacestatisticsdialog.cpp

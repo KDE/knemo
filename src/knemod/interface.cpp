@@ -54,20 +54,6 @@ Interface::Interface( const QString &ifname,
 
     connect( mPlotterTimer, SIGNAL( timeout() ),
              this, SLOT( updatePlotter() ) );
-    connect( &mMonitor, SIGNAL( statusChanged( int ) ),
-             &mIcon, SLOT( updateIconImage( int ) ) );
-    connect( &mMonitor, SIGNAL( available( int ) ),
-             &mIcon, SLOT( updateTrayStatus( int ) ) );
-    connect( &mMonitor, SIGNAL( notAvailable( int ) ),
-             &mIcon, SLOT( updateTrayStatus( int ) ) );
-    connect( &mMonitor, SIGNAL( notExisting( int ) ),
-             &mIcon, SLOT( updateTrayStatus( int ) ) );
-    connect( &mMonitor, SIGNAL( updateDetails() ),
-             this, SLOT( updateDetails() ) );
-    connect( &mMonitor, SIGNAL( available( int ) ),
-             this, SLOT( setStartTime( int ) ) );
-    connect( &mMonitor, SIGNAL( statusChanged( int ) ),
-             this, SLOT( resetData( int ) ) );
     connect( &mIcon, SIGNAL( statisticsSelected() ),
              this, SLOT( showStatisticsDialog() ) );
 }
@@ -164,10 +150,76 @@ void Interface::configChanged()
 
 void Interface::activateMonitor()
 {
-    mMonitor.checkStatus( this );
+    int currentState;
+    int previousState = mState;
+    int trafficThreshold = mSettings.trafficThreshold;
+
+    if ( !mBackendData->isExisting )
+        // the interface does not exist
+        currentState = Interface::NOT_EXISTING;
+    else if ( !mBackendData->isAvailable )
+        // the interface exists but is not connected
+        currentState = Interface::NOT_AVAILABLE;
+    else
+    {
+        // the interface is connected, look for traffic
+        currentState = Interface::AVAILABLE;
+        if ( ( mBackendData->rxPackets - mBackendData->prevRxPackets ) > (unsigned int) trafficThreshold )
+            currentState |= Interface::RX_TRAFFIC;
+        if ( ( mBackendData->txPackets - mBackendData->prevTxPackets ) > (unsigned int) trafficThreshold )
+            currentState |= Interface::TX_TRAFFIC;
+    }
+
+    // update the statistics
+    if ( mBackendData->incomingBytes > 0 )
+        mStatistics->addIncomingData( mBackendData->incomingBytes );
+    if ( mBackendData->outgoingBytes > 0 )
+        mStatistics->addOutgoingData( mBackendData->outgoingBytes );
+
+    backend->updatePackets( mName );
+
+    if ( ( previousState == Interface::NOT_EXISTING ||
+           previousState == Interface::NOT_AVAILABLE ||
+           previousState == Interface::UNKNOWN_STATE ) &&
+         currentState & Interface::AVAILABLE )
+    {
+        mIcon.updateTrayStatus( previousState );
+        setStartTime();
+        if ( mStatusDialog )
+            mStatusDialog->enableNetworkGroups();
+    }
+    else if ( ( previousState == Interface::NOT_EXISTING ||
+                previousState & Interface::AVAILABLE ||
+                previousState == Interface::UNKNOWN_STATE ) &&
+              currentState == Interface::NOT_AVAILABLE )
+    {
+        mIcon.updateTrayStatus( previousState );
+        if ( mStatusDialog )
+            mStatusDialog->disableNetworkGroups();
+    }
+    else if ( ( previousState == Interface::NOT_AVAILABLE ||
+                previousState & Interface::AVAILABLE ||
+                previousState == Interface::UNKNOWN_STATE ) &&
+              currentState == Interface::NOT_EXISTING )
+    {
+        mIcon.updateTrayStatus( previousState );
+        if ( mStatusDialog )
+            mStatusDialog->disableNetworkGroups();
+    }
+
+    // make sure the icon fits the current state
+    if ( previousState != currentState )
+    {
+        mIcon.updateIconImage( currentState );
+        setState( currentState );
+        resetData( currentState );
+    }
+
+    // The tooltip and status dialog always get updated
+    updateDetails();
 }
 
-void Interface::setStartTime( int )
+void Interface::setStartTime()
 {
     mUptime = 0;
     mUptimeString = "00:00:00";
@@ -182,12 +234,6 @@ void Interface::showStatusDialog()
     if ( mStatusDialog == 0L )
     {
         mStatusDialog = new InterfaceStatusDialog( this );
-        connect( &mMonitor, SIGNAL( available( int ) ),
-                 mStatusDialog, SLOT( enableNetworkGroups( int ) ) );
-        connect( &mMonitor, SIGNAL( notAvailable( int ) ),
-                 mStatusDialog, SLOT( disableNetworkGroups( int ) ) );
-        connect( &mMonitor, SIGNAL( notExisting( int ) ),
-                 mStatusDialog, SLOT( disableNetworkGroups( int ) ) );
         if ( mStatistics != 0 )
         {
             connect( mStatistics, SIGNAL( currentEntryChanged() ),
@@ -309,10 +355,6 @@ void Interface::updatePlotter()
 void Interface::startStatistics()
 {
     mStatistics = new InterfaceStatistics( this );
-    connect( &mMonitor, SIGNAL( incomingData( unsigned long ) ),
-             mStatistics, SLOT( addIncomingData( unsigned long ) ) );
-    connect( &mMonitor, SIGNAL( outgoingData( unsigned long ) ),
-             mStatistics, SLOT( addOutgoingData( unsigned long ) ) );
     if ( mStatusDialog != 0 )
     {
         connect( mStatistics, SIGNAL( currentEntryChanged() ),

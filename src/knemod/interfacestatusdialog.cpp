@@ -58,11 +58,11 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
         return;
     if ( data->isAvailable )
     {
-        enableNetworkGroups( 0 );
+        enableNetworkGroups();
     }
     else
     {
-        disableNetworkGroups( 0 );
+        disableNetworkGroups();
     }
     if ( !data->isWireless )
     {
@@ -312,13 +312,13 @@ void InterfaceStatusDialog::updateDialog()
     }
 }
 
-void InterfaceStatusDialog::enableNetworkGroups( int )
+void InterfaceStatusDialog::enableNetworkGroups()
 {
     ui.groupBoxIP->setEnabled( true );
     ui.groupBoxCurrentConnection->setEnabled( true );
 }
 
-void InterfaceStatusDialog::disableNetworkGroups( int )
+void InterfaceStatusDialog::disableNetworkGroups()
 {
     ui.groupBoxIP->setEnabled( false );
     ui.groupBoxCurrentConnection->setEnabled( false );

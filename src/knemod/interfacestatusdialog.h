@@ -59,11 +59,11 @@ public slots:
     /**
      * Enable the network groups when the interface is connected
      */
-    void enableNetworkGroups( int );
+    void enableNetworkGroups();
     /**
      * Disable the network groups when the interface is not connected
      */
-    void disableNetworkGroups( int );
+    void disableNetworkGroups();
     /**
      * Update the statistics tab when data changed
      */
