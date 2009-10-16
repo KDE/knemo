@@ -60,7 +60,11 @@
 #include "configdialog.h"
 #include "utils.h"
 
-#include "../knemod/backends/backendfactory.h"
+#ifdef __linux__
+  #include <netlink/route/rtnl.h>
+  #include <netlink/route/link.h>
+  #include <netlink/route/route.h>
+#endif
 
 const QString ConfigDialog::ICON_DISCONNECTED = "_disconnected";
 const QString ConfigDialog::ICON_CONNECTED = "_connected";
@@ -474,11 +478,26 @@ void ConfigDialog::defaults()
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
     mDlg->colorDisabled->setColor( scheme.foreground( KColorScheme::InactiveText ).color() );
 
-    BackendBase * backend = BackendFactory::backend();
-    QString interface = backend->getDefaultRouteIface( AF_INET );
+    // Default interface
+    void *cache = NULL;
+
+#ifdef __linux__
+	nl_handle *rtsock = nl_handle_alloc();
+	int c = nl_connect(rtsock, NETLINK_ROUTE);
+    if ( c >= 0 )
+    {
+	    cache = rtnl_route_alloc_cache( rtsock );
+    }
+#endif
+
+    QString interface = getDefaultRoute( AF_INET, NULL, cache );
     if ( interface.isEmpty() )
-        interface = backend->getDefaultRouteIface( AF_INET6 );
-    delete backend;
+        interface = getDefaultRoute( AF_INET6, NULL, cache );
+#ifdef __linux__
+    nl_cache_free( static_cast<nl_cache*>(cache) );
+    nl_close( rtsock );
+    nl_handle_destroy( rtsock );
+#endif
 
     if ( !interface.isEmpty() )
     {
@@ -529,9 +548,39 @@ void ConfigDialog::buttonAllSelected()
 {
     QStringList ifaces;
 
-    BackendBase * backend = BackendFactory::backend();
-    ifaces = backend->getIfaceList();
-    delete backend;
+#ifdef __linux__
+    nl_cache * linkCache = NULL;
+    nl_handle *rtsock = nl_handle_alloc();
+    int c = nl_connect(rtsock, NETLINK_ROUTE);
+    if ( c >= 0 )
+    {
+        linkCache = rtnl_link_alloc_cache( rtsock );
+
+        struct rtnl_link * rtlink;
+        for ( rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_first( linkCache ));
+              rtlink != NULL;
+              rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_next( reinterpret_cast<struct nl_object *>(rtlink) ))
+            )
+        {
+            QString ifname( rtnl_link_get_name( rtlink ) );
+            ifaces << ifname;
+        }
+    }
+    nl_cache_free( linkCache );
+    nl_close( rtsock );
+    nl_handle_destroy( rtsock );
+#else
+    struct ifaddrs *ifaddr;
+    struct ifaddrs *ifa;
+    getifaddrs( &ifaddr );
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        QString ifname( ifa->ifa_name );
+        ifaces << ifname;
+    }
+    freeifaddrs( ifaddr );
+#endif
+
     ifaces.removeAll( "lo" );
     ifaces.removeAll( "lo0" );
 

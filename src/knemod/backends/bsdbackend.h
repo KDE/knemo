@@ -50,7 +50,6 @@ public:
 private:
     void updateInterfaceData( const QString& ifName, BackendData* data );
     void updateWirelessData( int fd, const QString& ifName, BackendData* data );
-    QString getDefaultRoute( int afType, QString *defaultGateway = NULL );
     QString formattedAddr( struct sockaddr * addr );
     QString getAddr( struct ifaddrs *ifa, AddrData& addrData );
     int getSubnet( struct ifaddrs *ifa );

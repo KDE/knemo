@@ -26,7 +26,6 @@
 #include <net/ethernet.h>
 #include <sys/socket.h>
 #include <net/if.h>
-#include <net/route.h>
 #include <netinet/in.h>
 
 #include <net/if_dl.h>
@@ -34,19 +33,13 @@
 #include <net/if_var.h>
 #include <netinet/in_var.h>
 
-#include <unistd.h>
-#define NEXTADDR(w, u) \
-      if (rtm_addrs & (w)) {\
-          l = sizeof(struct sockaddr); memmove(cp, &(u), l); cp += l;\
-      }
-#define rtm m_rtmsg.m_rtm
-
 #include <KLocale>
 #include <kio/global.h>
 #include <stdio.h>
 
 #include "config-knemo.h"
 #include "bsdbackend.h"
+#include "utils.h"
 
 BSDBackend::BSDBackend()
 {
@@ -105,104 +98,6 @@ void BSDBackend::update()
 QString BSDBackend::getDefaultRouteIface( int afInet )
 {
     return getDefaultRoute( afInet );
-}
-
-QString BSDBackend::getDefaultRoute( int afType, QString *defaultGateway )
-{
-    struct
-    {
-        struct rt_msghdr m_rtm;
-        char m_space[ 512 ];
-    } m_rtmsg;
-
-    int s, seq, l, rtm_addrs, i;
-    pid_t pid;
-    struct sockaddr so_dst, so_mask;
-    char *cp = m_rtmsg.m_space;
-    struct sockaddr *gate = NULL, *sa;
-    struct rt_msghdr *msg_hdr;
-
-    char outBuf[ INET6_ADDRSTRLEN ];
-    memset( &outBuf, 0, sizeof( outBuf ) );
-    void *tempAddrPtr = NULL;
-    QString ifname;
-
-    pid = getpid();
-    seq = 0;
-    rtm_addrs = RTA_DST | RTA_NETMASK;
-
-    memset( &so_dst, 0, sizeof( so_dst ) );
-    memset( &so_mask, 0, sizeof( so_mask ) );
-    memset( &rtm, 0, sizeof( struct rt_msghdr ) );
-
-    rtm.rtm_type = RTM_GET;
-    rtm.rtm_flags = RTF_UP | RTF_GATEWAY;
-    rtm.rtm_version = RTM_VERSION;
-    rtm.rtm_seq = ++seq;
-    rtm.rtm_addrs = rtm_addrs;
-
-    if ( afType == AF_INET )
-    {
-        so_dst.sa_family = AF_INET;
-        so_mask.sa_family = AF_INET;
-    }
-    else
-    {
-        so_dst.sa_family = AF_INET6;
-        so_mask.sa_family = AF_INET6;
-    }
-
-    NEXTADDR( RTA_DST, so_dst );
-    NEXTADDR( RTA_NETMASK, so_mask );
-
-    rtm.rtm_msglen = l = cp - reinterpret_cast<char *>(&m_rtmsg);
-
-    s = socket(PF_ROUTE, SOCK_RAW, 0);
-
-    if ( write( s, reinterpret_cast<char *>(&m_rtmsg), l ) < 0 )
-    {
-        close( s );
-        return ifname;
-    }
-
-    do
-    {
-        l = read(s, reinterpret_cast<char *>(&m_rtmsg), sizeof( m_rtmsg ) );
-    } while ( l > 0 && (rtm.rtm_seq != seq || rtm.rtm_pid != pid) );
-
-    close( s );
-
-    msg_hdr = &rtm;
-
-    cp = reinterpret_cast<char *>(msg_hdr + 1);
-    if ( msg_hdr->rtm_addrs )
-    {
-        for ( i = 1; i; i <<= 1 )
-            if ( i & msg_hdr->rtm_addrs )
-            {
-                sa = reinterpret_cast<struct sockaddr *>(cp);
-                if ( i == RTA_GATEWAY )
-                {
-                    gate = sa;
-                    char tempname[ IFNAMSIZ ];
-                    if_indextoname( msg_hdr->rtm_index, tempname );
-                    ifname = tempname;
-                }
-
-                cp += sizeof( struct sockaddr );
-            }
-    }
-    else
-        return ifname;
-
-    if ( AF_INET == afType )
-        tempAddrPtr = & reinterpret_cast<struct sockaddr_in *>(gate)->sin_addr;
-    else
-        tempAddrPtr = & reinterpret_cast<struct sockaddr_in6 *>(gate)->sin6_addr;
-    inet_ntop( gate->sa_family, tempAddrPtr, outBuf, sizeof( outBuf ) );
-    if ( defaultGateway && strncmp( outBuf, "0.0.0.0", 7 ) != 0 )
-        *defaultGateway = outBuf;
-    return ifname;
 }
 
 QString BSDBackend::formattedAddr( struct sockaddr* addr )

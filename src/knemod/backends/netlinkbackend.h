@@ -52,7 +52,6 @@ public:
 private:
     void updateInterfaceData( const QString& ifName, BackendData* data );
     void updateWirelessData( int fd, const QString& ifName, BackendData* data );
-    QString getDefaultRoute( int afType, QString *defaultGateway, void *data );
     void updateAddresses( BackendData* data );
 #ifdef HAVE_LIBIW
     void updateWirelessEncData( int fd, const QString& ifName, const iw_range& range, BackendData* data );

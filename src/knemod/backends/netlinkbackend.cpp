@@ -18,7 +18,6 @@
    Boston, MA 02110-1301, USA.
 */
 
-#include <arpa/inet.h>
 #include <netlink/route/addr.h>
 #include <netlink/route/rtnl.h>
 #include <netlink/route/link.h>
@@ -28,13 +27,8 @@
 #include <kio/global.h>
 
 #include "config-knemo.h"
+#include "utils.h"
 #include "netlinkbackend.h"
-
-QString ipv4gwi;
-QString ipv6gwi;
-
-QString ipv4gw;
-QString ipv6gw;
 
 NetlinkBackend::NetlinkBackend()
     : rtsock( NULL ),
@@ -115,76 +109,6 @@ void NetlinkBackend::update()
 QString NetlinkBackend::getDefaultRouteIface( int afInet )
 {
     return getDefaultRoute( afInet, NULL, routeCache );
-}
-
-void parseNetlinkRoute( struct nl_object *object, void * )
-{
-    struct rtnl_route *const route = reinterpret_cast<struct rtnl_route *>(object);
-
-    int rtfamily = rtnl_route_get_family( route );
-
-    if ( rtfamily == AF_INET ||
-         rtfamily == AF_INET6 )
-    {
-        struct nl_addr *dst = rtnl_route_get_dst( route );
-        struct nl_addr *addr = rtnl_route_get_gateway( route );
-
-        if ( nl_addr_get_len( dst ) == 0 && addr )
-        {
-            char gwaddr[ INET6_ADDRSTRLEN ];
-            char gwname[ IFNAMSIZ ];
-            memset( gwaddr, 0, sizeof( gwaddr ) );
-            struct in_addr * inad = reinterpret_cast<struct in_addr *>(nl_addr_get_binary_addr( addr ));
-            nl_addr2str( addr, gwaddr, sizeof( gwaddr ) );
-            inet_ntop( rtfamily, &inad->s_addr, gwaddr, sizeof( gwaddr ) );
-            int oif = rtnl_route_get_oif( route );
-            if_indextoname( oif, gwname );
-
-            if ( rtfamily == AF_INET )
-            {
-                ipv4gw = gwaddr;
-                ipv4gwi = gwname;
-            }
-            else if ( rtfamily == AF_INET6 )
-            {
-                ipv6gw = gwaddr;
-                ipv6gwi = gwname;
-            }
-        }
-    }
-}
-
-QString NetlinkBackend::getDefaultRoute( int afType, QString *defaultGateway, void *data )
-{
-    if ( !data )
-        return QString();
-
-    struct nl_cache* rtlcache = static_cast<struct nl_cache*>(data);
-
-    if ( afType == AF_INET )
-    {
-        ipv4gw.clear();
-        ipv4gwi.clear();
-    }
-    else if ( afType == AF_INET6 )
-    {
-        ipv6gw.clear();
-        ipv6gwi.clear();
-    }
-    nl_cache_foreach( rtlcache, parseNetlinkRoute, NULL);
-
-    if ( afType == AF_INET )
-    {
-        if ( defaultGateway )
-            *defaultGateway = ipv4gw;
-        return ipv4gwi;
-    }
-    else
-    {
-        if ( defaultGateway )
-            *defaultGateway = ipv6gw;
-        return ipv6gwi;
-    }
 }
 
 BackendBase* NetlinkBackend::createInstance()

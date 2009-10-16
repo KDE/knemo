@@ -29,8 +29,16 @@ using namespace std;
 /* This is for clamping min/max values read from the settings file */
 template <class T> inline T clamp(T x, T a, T b)
 {
-	return min(max(x,a),b);
+    return min(max(x,a),b);
 }
+
+/*
+ * Finds the default gateway for AF_INET or AF_INET6
+ * It fills defaultGateway with the address and returns the interface name
+ * If one isn't found, both are empty.
+ * The netlink backend uses data to nl_cache data
+ */
+QString getDefaultRoute( int afType, QString * defaultGateway = NULL, void * data = NULL );
 
 QStringList findIconSets();
 
