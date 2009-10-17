@@ -51,9 +51,9 @@ public:
 
 private:
     void updateInterfaceData( const QString& ifName, BackendData* data );
-    void updateWirelessData( int fd, const QString& ifName, BackendData* data );
     void updateAddresses( BackendData* data );
 #ifdef HAVE_LIBIW
+    void updateWirelessData( int fd, const QString& ifName, BackendData* data );
     void updateWirelessEncData( int fd, const QString& ifName, const iw_range& range, BackendData* data );
 #endif
     nl_handle * rtsock;

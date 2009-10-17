@@ -23,6 +23,8 @@
 #include <netlink/route/link.h>
 #include <netlink/route/route.h>
 
+#include <net/if.h>
+
 #include <KLocale>
 #include <kio/global.h>
 
@@ -45,7 +47,7 @@ NetlinkBackend::NetlinkBackend()
         linkCache = rtnl_link_alloc_cache( rtsock );
         routeCache = rtnl_route_alloc_cache( rtsock );
     }
-#if HAVE_LIBIW
+#ifdef HAVE_LIBIW
     iwfd = iw_sockets_open();
 #endif
 }
@@ -236,9 +238,9 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
     }
 }
 
+#ifdef HAVE_LIBIW
 void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, BackendData* data )
 {
-#ifdef HAVE_LIBIW
     if ( fd > 0 )
     {
     // The following code was taken from iwconfig.c and iwlib.c.
@@ -353,10 +355,8 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, BackendD
         if ( has_range )
             updateWirelessEncData( fd, ifName, range, data );
     }
-#endif
 }
 
-#ifdef HAVE_LIBIW
 void NetlinkBackend::updateWirelessEncData( int fd, const QString& ifName,
                                         const iw_range& range, BackendData* data )
 {
