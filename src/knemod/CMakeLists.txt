@@ -34,4 +34,4 @@ install( FILES knemo.desktop DESTINATION ${XDG_APPS_INSTALL_DIR} )
 install( FILES knemo.desktop DESTINATION ${AUTOSTART_INSTALL_DIR} )
 
 add_subdirectory( icons )
-add_subdirectory( pics )
+add_subdirectory( themes )

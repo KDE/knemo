@@ -70,7 +70,7 @@ private slots:
     void buttonNotificationsSelected();
     void interfaceSelected( int row );
     void aliasChanged( const QString& text );
-    void iconSetChanged( int set );
+    void iconThemeChanged( int set );
     void checkBoxNotConnectedToggled( bool on );
     void checkBoxNotExistingToggled( bool on );
     void checkBoxStatisticsToggled( bool on );
@@ -88,6 +88,8 @@ private:
     void setMaxDay();
     void setupToolTipTab();
     void setupToolTipMap();
+    int findIndexFromName( const QString& internalName );
+    QString findNameFromIndex( int index );
     QPixmap textIcon( QString incomingText, QString outgoingText, bool active );
     QFont setIconFont( QString );
 
@@ -104,13 +106,6 @@ private:
     QMap<QString, InterfaceSettings *> mSettingsMap;
     QMap<quint32, QString> mToolTips;
     QList<QString> mDeletedIfaces;
-    QStringList mIconSets;
-
-    static const QString ICON_DISCONNECTED;
-    static const QString ICON_CONNECTED;
-    static const QString ICON_INCOMING;
-    static const QString ICON_OUTGOING;
-    static const QString ICON_TRAFFIC;
 };
 
 #endif // CONFIGDIALOG_H

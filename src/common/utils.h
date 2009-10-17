@@ -22,7 +22,9 @@
 #define UTILS_H
 
 #include <algorithm>
-#include <QStringList>
+#include <QList>
+#include <QString>
+#include "data.h"
 
 using namespace std;
 
@@ -40,6 +42,6 @@ template <class T> inline T clamp(T x, T a, T b)
  */
 QString getDefaultRoute( int afType, QString * defaultGateway = NULL, void * data = NULL );
 
-QStringList findIconSets();
+QList<KNemoTheme> findThemes();
 
 #endif

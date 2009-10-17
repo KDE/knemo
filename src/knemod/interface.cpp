@@ -82,10 +82,14 @@ void Interface::configChanged()
     group += mName;
     KConfigGroup interfaceGroup( config, group );
     mSettings.alias = interfaceGroup.readEntry( "Alias" ).trimmed();
-    mSettings.iconSet = interfaceGroup.readEntry( "IconSet", "monitor" );
-    QStringList iconSets = findIconSets();
-    if ( !iconSets.contains( mSettings.iconSet ) )
-        mSettings.iconSet = TEXTICON;
+    mSettings.iconTheme = interfaceGroup.readEntry( "IconSet", "monitor" );
+    QStringList themeNames;
+    QList<KNemoTheme> themes = findThemes();
+    // Let's check that it's available
+    foreach( KNemoTheme theme, themes )
+        themeNames << theme.internalName;
+    if ( !themeNames.contains( mSettings.iconTheme ) )
+        mSettings.iconTheme = TEXT_THEME;
     mSettings.colorIncoming = interfaceGroup.readEntry( "ColorIncoming", QColor( 0x1889FF ) );
     mSettings.colorOutgoing = interfaceGroup.readEntry( "ColorOutgoing", QColor( 0xFF7F08 ) );
     KColorScheme scheme(QPalette::Active, KColorScheme::View);

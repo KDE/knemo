@@ -40,12 +40,6 @@
 #include "interfaceicon.h"
 #include "interfacetray.h"
 
-const QString InterfaceIcon::ICON_DISCONNECTED = "_disconnected";
-const QString InterfaceIcon::ICON_CONNECTED = "_connected";
-const QString InterfaceIcon::ICON_INCOMING = "_incoming";
-const QString InterfaceIcon::ICON_OUTGOING = "_outgoing";
-const QString InterfaceIcon::ICON_TRAFFIC = "_traffic";
-
 Q_DECLARE_METATYPE(InterfaceCommand)
 
 InterfaceIcon::InterfaceIcon( Interface* interface )
@@ -82,10 +76,10 @@ void InterfaceIcon::configChanged( const QColor& incoming,
 
     updateTrayStatus();
 
-    // handle changed iconset by user
+    // handle changed theme
     if ( mTray != 0L )
     {
-        if ( mInterface->getSettings().iconSet == TEXTICON )
+        if ( mInterface->getSettings().iconTheme == TEXT_THEME )
             updateIconText( true );
         else
             updateIconImage( status );
@@ -95,39 +89,45 @@ void InterfaceIcon::configChanged( const QColor& incoming,
 
 void InterfaceIcon::updateIconImage( int status )
 {
-    // We need the iconset name in all cases.
-    QString iconSet = mInterface->getSettings().iconSet;
-
-    if ( mTray == 0L || iconSet == TEXTICON )
+    if ( mTray == 0L || mInterface->getSettings().iconTheme == TEXT_THEME )
         return;
 
+    QString iconName;
+    if ( mInterface->getSettings().iconTheme == SYSTEM_THEME )
+        iconName = "network-";
+    else
+        iconName = "knemo-" + mInterface->getSettings().iconTheme + "-";
+
     // Now set the correct icon depending on the status of the interface.
-    if ( status == Interface::NOT_AVAILABLE ||
-         status == Interface::NOT_EXISTING )
+    if ( status == Interface::NOT_EXISTING )
     {
-        iconSet += ICON_DISCONNECTED;
+        iconName += ICON_ERROR;
+    }
+    else if ( status == Interface::NOT_AVAILABLE )
+    {
+        iconName += ICON_OFFLINE;
     }
     else if ( ( status & Interface::RX_TRAFFIC ) &&
               ( status & Interface::TX_TRAFFIC ) )
     {
-        iconSet += ICON_TRAFFIC;
+        iconName += ICON_RX_TX;
     }
     else if ( status & Interface::RX_TRAFFIC )
     {
-        iconSet += ICON_INCOMING;
+        iconName += ICON_RX;
     }
     else if ( status & Interface::TX_TRAFFIC )
     {
-        iconSet += ICON_OUTGOING;
+        iconName += ICON_TX;
     }
     else
     {
-        iconSet += ICON_CONNECTED;
+        iconName += ICON_IDLE;
     }
 #ifdef USE_KNOTIFICATIONITEM
-    mTray->setIconByPixmap( UserIcon( iconSet ) );
+    mTray->setIconByPixmap( KIcon( iconName ) );
 #else
-    mTray->setIcon( UserIcon( iconSet ) );
+    mTray->setIcon( KIcon( iconName ) );
 #endif
 }
 
@@ -231,7 +231,7 @@ void InterfaceIcon::updateToolTip()
 {
     if ( mTray == 0L )
         return;
-    if ( mInterface->getSettings().iconSet == TEXTICON )
+    if ( mInterface->getSettings().iconTheme == TEXT_THEME )
         updateIconText();
     mTray->updateToolTip();
 }
@@ -325,7 +325,7 @@ void InterfaceIcon::updateTrayStatus()
         connect( configAction, SIGNAL( triggered() ),
                  this, SLOT( showConfigDialog() ) );
 
-        if ( mInterface->getSettings().iconSet == TEXTICON )
+        if ( mInterface->getSettings().iconTheme == TEXT_THEME )
             updateIconText( true );
         else
             updateIconImage( mInterface->getState() );
@@ -339,7 +339,7 @@ void InterfaceIcon::updateTrayStatus()
     {
         // Tray text may need to appear active/inactive
         // Force an update
-        if ( mInterface->getSettings().iconSet == TEXTICON )
+        if ( mInterface->getSettings().iconTheme == TEXT_THEME )
              updateIconText( true );
     }
 }

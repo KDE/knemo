@@ -66,16 +66,20 @@
   #include <netlink/route/route.h>
 #endif
 
-const QString ConfigDialog::ICON_DISCONNECTED = "_disconnected";
-const QString ConfigDialog::ICON_CONNECTED = "_connected";
-const QString ConfigDialog::ICON_INCOMING = "_incoming";
-const QString ConfigDialog::ICON_OUTGOING = "_outgoing";
-const QString ConfigDialog::ICON_TRAFFIC = "_traffic";
-
 
 K_PLUGIN_FACTORY(KNemoFactory, registerPlugin<ConfigDialog>();)
 K_EXPORT_PLUGIN(KNemoFactory("kcm_knemo"))
 
+Q_DECLARE_METATYPE( KNemoTheme )
+
+
+static bool themesLessThan( const KNemoTheme& s1, const KNemoTheme& s2 )
+{
+    if ( s1.name < s2.name )
+        return true;
+    else
+        return false;
+}
 
 ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     : KCModule( KNemoFactory::componentData(), parent, args ),
@@ -97,18 +101,29 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     mDlg->setupUi( main );
     top->addWidget( main );
 
-    // Search for iconsets and add them to comboBoxIconSet
-    KStandardDirs iconDirs;
-    iconDirs.addResourceType("knemo_pics", "data", "knemo/pics");
-    QStringList iconlist = iconDirs.findAllResources( "knemo_pics", "*.png" );
+    QList<KNemoTheme> themes = findThemes();
+    qSort( themes.begin(), themes.end(), themesLessThan );
+    foreach ( KNemoTheme theme, themes )
+        mDlg->comboBoxIconTheme->addItem( theme.name, QVariant::fromValue( theme ) );
 
-    mIconSets = findIconSets();
-    mIconSets.sort();
-    mDlg->comboBoxIconSet->addItems( mIconSets );
-    // We want "Text" at the bottom of the list
-    mDlg->comboBoxIconSet->addItem( i18n( "Text" ) );
-    if ( mIconSets.contains( "monitor" ) )
-        mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( "monitor" ) );
+    // We want these hardcoded and at the bottom of the list
+    KNemoTheme systemTheme;
+    systemTheme.name = i18n( "System Theme" );
+    systemTheme.comment = i18n( "Use the current icon theme's network status icons" );
+    systemTheme.internalName = SYSTEM_THEME;
+    // Leave this out for now.  Looks like none of the KDE icon themes provide
+    // status/network-* icons.
+    //mDlg->comboBoxIconTheme->addItem( systemTheme.name, QVariant::fromValue( systemTheme ) );
+    KNemoTheme textTheme;
+    textTheme.name = i18n( "Text Icon" );
+    textTheme.comment = i18n( "KNemo theme that shows text of upload/download speed" );
+    textTheme.internalName = TEXT_THEME;
+    mDlg->comboBoxIconTheme->addItem( textTheme.name, QVariant::fromValue( textTheme ) );
+
+    int index = findIndexFromName( "monitor" );
+    if ( index < 0 )
+        index = findIndexFromName( TEXT_THEME );
+    mDlg->comboBoxIconTheme->setCurrentIndex( index );
 
     mDlg->pushButtonNew->setIcon( SmallIcon( "list-add" ) );
     mDlg->pushButtonAll->setIcon( SmallIcon( "document-new" ) );
@@ -153,8 +168,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( buttonNotificationsSelected() ) );
     connect( mDlg->lineEditAlias, SIGNAL( textChanged( const QString& ) ),
              this, SLOT( aliasChanged( const QString& ) ) );
-    connect( mDlg->comboBoxIconSet, SIGNAL( activated( int ) ),
-             this, SLOT( iconSetChanged( int ) ) );
+    connect( mDlg->comboBoxIconTheme, SIGNAL( activated( int ) ),
+             this, SLOT( iconThemeChanged( int ) ) );
     connect( mDlg->colorIncoming, SIGNAL( changed( const QColor& ) ),
              this, SLOT( colorButtonChanged() ) );
     connect( mDlg->colorOutgoing, SIGNAL( changed( const QColor& ) ),
@@ -238,7 +253,7 @@ void ConfigDialog::load()
         {
             KConfigGroup interfaceGroup( config, group );
             settings->alias = interfaceGroup.readEntry( "Alias" ).trimmed();
-            settings->iconSet = interfaceGroup.readEntry( "IconSet", "monitor" );
+            settings->iconTheme = interfaceGroup.readEntry( "IconSet", "monitor" );
             settings->colorIncoming = interfaceGroup.readEntry( "ColorIncoming", QColor( 0x1889FF ) );
             settings->colorOutgoing = interfaceGroup.readEntry( "ColorOutgoing", QColor( 0xFF7F08 ) );
             KColorScheme scheme(QPalette::Active, KColorScheme::View);
@@ -399,7 +414,7 @@ void ConfigDialog::save()
         if ( !settings->alias.trimmed().isEmpty() )
             interfaceGroup.writeEntry( "Alias", settings->alias );
 
-        interfaceGroup.writeEntry( "IconSet", settings->iconSet );
+        interfaceGroup.writeEntry( "IconSet", settings->iconTheme );
         interfaceGroup.writeEntry( "ColorIncoming", settings->colorIncoming );
         interfaceGroup.writeEntry( "ColorOutgoing", settings->colorOutgoing );
         interfaceGroup.writeEntry( "ColorDisabled", settings->colorDisabled );
@@ -464,10 +479,11 @@ void ConfigDialog::defaults()
     mDlg->billingStartInput->setDate( startDate );
 
     mDlg->checkBoxCustom->setChecked( false );
-    if ( mIconSets.contains( "monitor" ) )
-        mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( "monitor" ) );
-    else
-        mDlg->comboBoxIconSet->setCurrentIndex( mDlg->comboBoxIconSet->count() - 1 );
+    int index = findIndexFromName( "monitor" );
+    if ( index < 0 )
+        index = findIndexFromName( TEXT_THEME );
+    mDlg->comboBoxIconTheme->setCurrentIndex( index );
+    mDlg->pixmapError->clear();
     mDlg->pixmapDisconnected->clear();
     mDlg->pixmapConnected->clear();
     mDlg->pixmapIncoming->clear();
@@ -622,12 +638,12 @@ void ConfigDialog::buttonDeleteSelected()
     mDlg->lineEditAlias->blockSignals( true );
     mDlg->lineEditAlias->setText( QString::null );
     mDlg->lineEditAlias->blockSignals( false );
-    mDlg->comboBoxIconSet->blockSignals( true );
-    if ( mIconSets.contains( "monitor" ) )
-        mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( "monitor" ) );
-    else
-        mDlg->comboBoxIconSet->setCurrentIndex( 0 );
-    mDlg->comboBoxIconSet->blockSignals( false );
+    mDlg->comboBoxIconTheme->blockSignals( true );
+    int index = findIndexFromName( "monitor" );
+    if ( index < 0 )
+        index = findIndexFromName( TEXT_THEME );
+    mDlg->comboBoxIconTheme->setCurrentIndex( index );
+    mDlg->comboBoxIconTheme->blockSignals( false );
     mDlg->checkBoxNotConnected->blockSignals( true );
     mDlg->checkBoxNotConnected->setChecked( false );
     mDlg->checkBoxNotConnected->blockSignals( false );
@@ -656,6 +672,7 @@ void ConfigDialog::buttonDeleteSelected()
     {
         mDlg->pushButtonDelete->setDisabled( true );
         mDlg->tabWidget->setDisabled( true );
+        mDlg->pixmapError->clear();
         mDlg->pixmapDisconnected->clear();
         mDlg->pixmapConnected->clear();
         mDlg->pixmapIncoming->clear();
@@ -870,6 +887,23 @@ void ConfigDialog::buttonNotificationsSelected()
     KNotifyConfigWidget::configure( this, "knemo" );
 }
 
+QString ConfigDialog::findNameFromIndex( int index )
+{
+    KNemoTheme theme = mDlg->comboBoxIconTheme->itemData( index ).value<KNemoTheme>();
+    return theme.internalName;
+}
+
+int ConfigDialog::findIndexFromName( const QString& internalName )
+{
+    for( int i = 0; i < mDlg->comboBoxIconTheme->count(); i++ )
+    {
+        KNemoTheme theme = mDlg->comboBoxIconTheme->itemData( i ).value<KNemoTheme>();
+        if ( theme.internalName == internalName )
+            return i;
+    }
+    return -1;
+}
+
 void ConfigDialog::interfaceSelected( int row )
 {
     if ( row < 0 )
@@ -878,10 +912,11 @@ void ConfigDialog::interfaceSelected( int row )
     InterfaceSettings* settings = mSettingsMap[interface];
     mLock = true;
     mDlg->lineEditAlias->setText( settings->alias );
-    if ( mIconSets.contains( settings->iconSet ) )
-        mDlg->comboBoxIconSet->setCurrentIndex( mIconSets.indexOf( settings->iconSet ) );
-    else
-        mDlg->comboBoxIconSet->setCurrentIndex( mDlg->comboBoxIconSet->count() - 1 );
+    int index = findIndexFromName( settings->iconTheme );
+    if ( index < 0 )
+        index = findIndexFromName( TEXT_THEME );
+    mDlg->comboBoxIconTheme->setCurrentIndex( index );
+    iconThemeChanged( index );
     mDlg->colorIncoming->setColor( settings->colorIncoming );
     mDlg->colorOutgoing->setColor( settings->colorOutgoing );
     mDlg->colorDisabled->setColor( settings->colorDisabled );
@@ -929,11 +964,6 @@ void ConfigDialog::interfaceSelected( int row )
     }
     mDlg->listViewCommands->addTopLevelItems( items );
 
-    // to update iconset preview
-    if ( mIconSets.contains( settings->iconSet ) )
-        iconSetChanged( mIconSets.indexOf( settings->iconSet ) );
-    else
-        iconSetChanged( 0 );
     mLock = false;
 }
 
@@ -964,8 +994,9 @@ void ConfigDialog::colorButtonChanged()
     if ( mDlg->colorDisabled->color().isValid() )
         settings->colorDisabled = mDlg->colorDisabled->color();
 
-    if ( mDlg->comboBoxIconSet->count() - 1 == mDlg->comboBoxIconSet->currentIndex() )
-        iconSetChanged( mDlg->comboBoxIconSet->currentIndex() );
+    KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
+    if ( curTheme.internalName == TEXT_THEME )
+        iconThemeChanged( mDlg->comboBoxIconTheme->currentIndex() );
     if ( !mLock) changed( true );
 }
 
@@ -1013,7 +1044,7 @@ QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, bool
     return sampleIcon;
 }
 
-void ConfigDialog::iconSetChanged( int set )
+void ConfigDialog::iconThemeChanged( int set )
 {
     if ( !mDlg->listBoxInterfaces->currentItem() )
         return;
@@ -1021,10 +1052,11 @@ void ConfigDialog::iconSetChanged( int set )
     QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
 
     InterfaceSettings* settings = mSettingsMap[selected->text()];
-    if ( mDlg->comboBoxIconSet->count() - 1 == mDlg->comboBoxIconSet->currentIndex() )
+    KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
+    if ( curTheme.internalName == TEXT_THEME )
     {
-        settings->iconSet = TEXTICON;
-        // Update the preview of the iconset.
+        settings->iconTheme = TEXT_THEME;
+        mDlg->pixmapError->setPixmap( textIcon( "0B", "0B", false ) );
         mDlg->pixmapDisconnected->setPixmap( textIcon( "0B", "0B", false ) );
         mDlg->pixmapConnected->setPixmap( textIcon( "0B", "0B", true ) );
         mDlg->pixmapIncoming->setPixmap( textIcon( "123K", "0B", true ) );
@@ -1039,14 +1071,18 @@ void ConfigDialog::iconSetChanged( int set )
     }
     else
     {
-        settings->iconSet = mDlg->comboBoxIconSet->itemText( set );
-        // Update the preview of the iconset.
-        KIconLoader::global()->addAppDir( "knemo" );
-        mDlg->pixmapDisconnected->setPixmap( UserIcon( settings->iconSet + ICON_DISCONNECTED ) );
-        mDlg->pixmapConnected->setPixmap( UserIcon( settings->iconSet + ICON_CONNECTED ) );
-        mDlg->pixmapIncoming->setPixmap( UserIcon( settings->iconSet + ICON_INCOMING ) );
-        mDlg->pixmapOutgoing->setPixmap( UserIcon( settings->iconSet + ICON_OUTGOING ) );
-        mDlg->pixmapTraffic->setPixmap( UserIcon( settings->iconSet + ICON_TRAFFIC ) );
+        settings->iconTheme = findNameFromIndex( set );
+        QString iconName;
+        if ( settings->iconTheme == SYSTEM_THEME )
+            iconName = "network-";
+        else
+            iconName = "knemo-" + settings->iconTheme + "-";
+        mDlg->pixmapError->setPixmap( KIcon( iconName + ICON_ERROR ).pixmap( 22 ) );
+        mDlg->pixmapDisconnected->setPixmap( KIcon( iconName + ICON_OFFLINE ).pixmap( 22 ) );
+        mDlg->pixmapConnected->setPixmap( KIcon( iconName + ICON_IDLE ).pixmap( 22 ) );
+        mDlg->pixmapIncoming->setPixmap( KIcon( iconName + ICON_RX ).pixmap( 22 ) );
+        mDlg->pixmapOutgoing->setPixmap( KIcon( iconName + ICON_TX ).pixmap( 22 ) );
+        mDlg->pixmapTraffic->setPixmap( KIcon( iconName + ICON_RX_TX ).pixmap( 22 ) );
         mDlg->colorIncoming->hide();
         mDlg->colorIncomingLabel->hide();
         mDlg->colorOutgoing->hide();

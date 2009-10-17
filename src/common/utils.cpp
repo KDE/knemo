@@ -28,8 +28,10 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <net/if.h>
+#include <KSharedConfig>
+#include <KSharedConfigPtr>
 #include <KStandardDirs>
-#include <QString>
+#include "utils.h"
 
 #ifdef __linux__
   #include <netlink/route/rtnl.h>
@@ -232,19 +234,22 @@ QString getDefaultRoute( int afType, QString *defaultGateway, void *data )
 #endif
 }
 
-QStringList findIconSets()
+QList<KNemoTheme> findThemes()
 {
-    KStandardDirs iconDirs;
-    iconDirs.addResourceType("knemo_pics", "data", "knemo/pics");
-    QStringList iconlist = iconDirs.findAllResources( "knemo_pics", "*.png" );
+    KStandardDirs themes;
+    themes.addResourceType("knemo_themes", "data", "knemo/themes");
+    QStringList themelist = themes.findAllResources( "knemo_themes", "*.desktop" );
 
-    QStringList iconSets;
-    foreach ( QString iconName, iconlist )
+    QList<KNemoTheme> iconThemes;
+    foreach ( QString themeFile, themelist )
     {
-        QRegExp rx( "pics\\/(.+)_(connected|disconnected|incoming|outgoing|traffic)\\.png" );
-        if ( rx.indexIn( iconName ) > -1 )
-            if ( !iconSets.contains( rx.cap( 1 ) ) )
-                iconSets << rx.cap( 1 );
+        KSharedConfigPtr conf = KSharedConfig::openConfig( themeFile );
+        KConfigGroup cfg( conf, "Desktop Entry" );
+        KNemoTheme theme;
+        theme.name = cfg.readEntry("Name");
+        theme.comment = cfg.readEntry("Comment");
+        theme.internalName = cfg.readEntry( "X-KNemo-Theme" );
+        iconThemes << theme;
     }
-    return iconSets;
+    return iconThemes;
 }

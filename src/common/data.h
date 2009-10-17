@@ -35,8 +35,6 @@
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
-#define TEXTICON "texticon"
-
 #include <QMap>
 
 namespace KNemoIface {
@@ -47,6 +45,23 @@ namespace KNemoIface {
         PPP
     };
 }
+
+//static const QString NETLOAD_THEME( "netloadtheme" );
+static const QString TEXT_THEME( "texttheme" );
+static const QString SYSTEM_THEME( "systemtheme" );
+static const QString ICON_ERROR( "error" );
+static const QString ICON_OFFLINE( "offline" );
+static const QString ICON_IDLE( "idle" );
+static const QString ICON_RX( "receive" );
+static const QString ICON_TX( "transmit" );
+static const QString ICON_RX_TX( "transmit-receive" );
+
+struct KNemoTheme
+{
+    QString name;
+    QString comment;
+    QString internalName;
+};
 
 struct AddrData
 {
@@ -123,7 +138,7 @@ struct InterfaceCommand
 struct InterfaceSettings
 {
     InterfaceSettings()
-      : iconSet( "monitor" ),
+      : iconTheme( "monitor" ),
         colorIncoming( 0x1889FF ),
         colorOutgoing( 0xFF7F08 ),
         colorDisabled( 0x888786 ),
@@ -138,7 +153,7 @@ struct InterfaceSettings
         customCommands( false )
     {}
 
-    QString iconSet;
+    QString iconTheme;
     QColor colorIncoming;
     QColor colorOutgoing;
     QColor colorDisabled;

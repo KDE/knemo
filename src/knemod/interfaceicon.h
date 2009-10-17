@@ -128,12 +128,6 @@ private:
     QString textIncoming;
     QString textOutgoing;
     int iconWidth;
-
-    static const QString ICON_DISCONNECTED;
-    static const QString ICON_CONNECTED;
-    static const QString ICON_INCOMING;
-    static const QString ICON_OUTGOING;
-    static const QString ICON_TRAFFIC;
 };
 
 #endif // INTERFACEICON_H
