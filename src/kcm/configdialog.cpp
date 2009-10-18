@@ -176,10 +176,10 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( colorButtonChanged() ) );
     connect( mDlg->colorDisabled, SIGNAL( changed( const QColor& ) ),
              this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->checkBoxNotConnected, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxNotConnectedToggled ( bool ) ) );
-    connect( mDlg->checkBoxNotExisting, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxNotExistingToggled ( bool ) ) );
+    connect( mDlg->checkBoxDisconnected, SIGNAL( toggled( bool ) ),
+             this, SLOT( checkBoxDisconnectedToggled ( bool ) ) );
+    connect( mDlg->checkBoxUnavailable, SIGNAL( toggled( bool ) ),
+             this, SLOT( checkBoxUnavailableToggled ( bool ) ) );
     connect( mDlg->checkBoxStatistics, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxStatisticsToggled ( bool ) ) );
     connect( mDlg->billingStartInput, SIGNAL( dateEntered( const QDate& ) ),
@@ -259,8 +259,8 @@ void ConfigDialog::load()
             KColorScheme scheme(QPalette::Active, KColorScheme::View);
             settings->colorDisabled = interfaceGroup.readEntry( "ColorDisabled", scheme.foreground( KColorScheme::InactiveText ).color() );
             settings->customCommands = interfaceGroup.readEntry( "CustomCommands", false );
-            settings->hideWhenNotAvailable = interfaceGroup.readEntry( "HideWhenNotAvailable", false );
-            settings->hideWhenNotExisting = interfaceGroup.readEntry( "HideWhenNotExisting", false );
+            settings->hideWhenDisconnected = interfaceGroup.readEntry( "HideWhenNotAvailable", false );
+            settings->hideWhenUnavailable = interfaceGroup.readEntry( "HideWhenNotExisting", false );
             settings->activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", false );
             settings->warnThreshold = clamp<double>(interfaceGroup.readEntry( "BillingWarnThreshold", 0.0 ), 0.0, 9999.0 );
             settings->warnTotalTraffic = interfaceGroup.readEntry( "BillingWarnRxTx", false );
@@ -419,8 +419,8 @@ void ConfigDialog::save()
         interfaceGroup.writeEntry( "ColorOutgoing", settings->colorOutgoing );
         interfaceGroup.writeEntry( "ColorDisabled", settings->colorDisabled );
         interfaceGroup.writeEntry( "CustomCommands", settings->customCommands );
-        interfaceGroup.writeEntry( "HideWhenNotAvailable", settings->hideWhenNotAvailable );
-        interfaceGroup.writeEntry( "HideWhenNotExisting", settings->hideWhenNotExisting );
+        interfaceGroup.writeEntry( "HideWhenNotAvailable", settings->hideWhenDisconnected );
+        interfaceGroup.writeEntry( "HideWhenNotExisting", settings->hideWhenUnavailable );
         interfaceGroup.writeEntry( "ActivateStatistics", settings->activateStatistics );
         interfaceGroup.writeEntry( "BillingWarnThreshold", settings->warnThreshold );
         interfaceGroup.writeEntry( "BillingWarnRxTx", settings->warnTotalTraffic );
@@ -465,8 +465,8 @@ void ConfigDialog::defaults()
     mDlg->pushButtonDelete->setDisabled( true );
     mDlg->tabWidget->setDisabled( true );
     mDlg->lineEditAlias->setText( QString::null );
-    mDlg->checkBoxNotConnected->setChecked( false );
-    mDlg->checkBoxNotExisting->setChecked( false );
+    mDlg->checkBoxDisconnected->setChecked( false );
+    mDlg->checkBoxUnavailable->setChecked( false );
     mDlg->checkBoxStatistics->setChecked( false );
 
     // TODO: Test for a KDE release that contains SVN commit 1013534
@@ -644,12 +644,12 @@ void ConfigDialog::buttonDeleteSelected()
         index = findIndexFromName( TEXT_THEME );
     mDlg->comboBoxIconTheme->setCurrentIndex( index );
     mDlg->comboBoxIconTheme->blockSignals( false );
-    mDlg->checkBoxNotConnected->blockSignals( true );
-    mDlg->checkBoxNotConnected->setChecked( false );
-    mDlg->checkBoxNotConnected->blockSignals( false );
-    mDlg->checkBoxNotExisting->blockSignals( true );
-    mDlg->checkBoxNotExisting->setChecked( false );
-    mDlg->checkBoxNotExisting->blockSignals( false );
+    mDlg->checkBoxDisconnected->blockSignals( true );
+    mDlg->checkBoxDisconnected->setChecked( false );
+    mDlg->checkBoxDisconnected->blockSignals( false );
+    mDlg->checkBoxUnavailable->blockSignals( true );
+    mDlg->checkBoxUnavailable->setChecked( false );
+    mDlg->checkBoxUnavailable->blockSignals( false );
     mDlg->checkBoxStatistics->blockSignals( true );
     mDlg->checkBoxStatistics->setChecked( false );
     mDlg->checkBoxStatistics->blockSignals( false );
@@ -921,8 +921,8 @@ void ConfigDialog::interfaceSelected( int row )
     mDlg->colorOutgoing->setColor( settings->colorOutgoing );
     mDlg->colorDisabled->setColor( settings->colorDisabled );
     mDlg->checkBoxCustom->setChecked( settings->customCommands );
-    mDlg->checkBoxNotConnected->setChecked( settings->hideWhenNotAvailable );
-    mDlg->checkBoxNotExisting->setChecked( settings->hideWhenNotExisting );
+    mDlg->checkBoxDisconnected->setChecked( settings->hideWhenDisconnected );
+    mDlg->checkBoxUnavailable->setChecked( settings->hideWhenUnavailable );
     mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
     mDlg->warnThreshold->setValue( settings->warnThreshold );
     if ( settings->warnTotalTraffic )
@@ -1093,7 +1093,7 @@ void ConfigDialog::iconThemeChanged( int set )
     if (!mLock) changed( true );
 }
 
-void ConfigDialog::checkBoxNotConnectedToggled( bool on )
+void ConfigDialog::checkBoxDisconnectedToggled( bool on )
 {
     if ( !mDlg->listBoxInterfaces->currentItem() )
         return;
@@ -1101,11 +1101,11 @@ void ConfigDialog::checkBoxNotConnectedToggled( bool on )
     QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
 
     InterfaceSettings* settings = mSettingsMap[selected->text()];
-    settings->hideWhenNotAvailable = on;
+    settings->hideWhenDisconnected = on;
     if (!mLock) changed( true );
 }
 
-void ConfigDialog::checkBoxNotExistingToggled( bool on )
+void ConfigDialog::checkBoxUnavailableToggled( bool on )
 {
     if ( !mDlg->listBoxInterfaces->currentItem() )
         return;
@@ -1113,7 +1113,7 @@ void ConfigDialog::checkBoxNotExistingToggled( bool on )
     QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
 
     InterfaceSettings* settings = mSettingsMap[selected->text()];
-    settings->hideWhenNotExisting = on;
+    settings->hideWhenUnavailable = on;
     if (!mLock) changed( true );
 }
 

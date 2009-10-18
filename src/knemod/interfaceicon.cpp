@@ -99,30 +99,30 @@ void InterfaceIcon::updateIconImage( int status )
         iconName = "knemo-" + mInterface->getSettings().iconTheme + "-";
 
     // Now set the correct icon depending on the status of the interface.
-    if ( status == Interface::NOT_EXISTING )
-    {
-        iconName += ICON_ERROR;
-    }
-    else if ( status == Interface::NOT_AVAILABLE )
+    if ( status == KNemoIface::Available )
     {
         iconName += ICON_OFFLINE;
     }
-    else if ( ( status & Interface::RX_TRAFFIC ) &&
-              ( status & Interface::TX_TRAFFIC ) )
+    else if ( ( status & KNemoIface::RxTraffic ) &&
+              ( status & KNemoIface::TxTraffic ) )
     {
         iconName += ICON_RX_TX;
     }
-    else if ( status & Interface::RX_TRAFFIC )
+    else if ( status & KNemoIface::RxTraffic )
     {
         iconName += ICON_RX;
     }
-    else if ( status & Interface::TX_TRAFFIC )
+    else if ( status & KNemoIface::TxTraffic )
     {
         iconName += ICON_TX;
     }
-    else
+    else if ( status & KNemoIface::Connected )
     {
         iconName += ICON_IDLE;
+    }
+    else
+    {
+        iconName += ICON_ERROR;
     }
 #ifdef USE_KNOTIFICATIONITEM
     mTray->setIconByPixmap( KIcon( iconName ) );
@@ -210,14 +210,14 @@ void InterfaceIcon::updateIconText( bool proceed )
 
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
     p.setFont( setIconFont( byteText ) );
-    if ( data->isAvailable )
+    if ( data->status & KNemoIface::Connected )
         p.setPen( colorIncoming );
     else
         p.setPen( colorDisabled );
     p.drawText( textIcon.rect(), Qt::AlignTop | Qt::AlignRight, textIncoming );
 
     p.setFont( setIconFont( byteText ) );
-    if ( data->isAvailable )
+    if ( data->status & KNemoIface::Connected )
         p.setPen( colorOutgoing );
     p.drawText( textIcon.rect(), Qt::AlignBottom | Qt::AlignRight, textOutgoing );
 #ifdef USE_KNOTIFICATIONITEM
@@ -272,10 +272,9 @@ void InterfaceIcon::updateTrayStatus()
 {
     const QString ifaceName( mInterface->getName() );
     const BackendData * data = mInterface->getData();
-    bool interfaceExists = data->isExisting;
-    bool interfaceAvailable = data->isAvailable;
-    bool hideWhenNotExisting = mInterface->getSettings().hideWhenNotExisting;
-    bool hideWhenNotAvailable = mInterface->getSettings().hideWhenNotAvailable;
+    int currentStatus = data->status;
+    bool hideWhenUnavailable = mInterface->getSettings().hideWhenUnavailable;
+    bool hideWhenDisconnected = mInterface->getSettings().hideWhenDisconnected;
 
     QString title = mInterface->getSettings().alias;
     if ( title.isEmpty() )
@@ -287,8 +286,8 @@ void InterfaceIcon::updateTrayStatus()
      *   and the other option is not selected
      */
     if ( mTray != 0L &&
-         ( ( !interfaceAvailable && hideWhenNotAvailable ) ||
-           ( !interfaceExists && hideWhenNotExisting && !hideWhenNotAvailable ) ) )
+         ( ( (currentStatus < KNemoIface::Connected ) && hideWhenDisconnected ) ||
+           ( (currentStatus < KNemoIface::Available ) && hideWhenUnavailable && !hideWhenDisconnected ) ) )
     {
         delete mTray;
         mTray = 0L;
@@ -301,9 +300,9 @@ void InterfaceIcon::updateTrayStatus()
      *   and the other option is not selected
      */
     else if ( mTray == 0L &&
-              ( interfaceAvailable ||
-                ( !interfaceAvailable && !hideWhenNotAvailable && interfaceExists ) ||
-                ( !interfaceExists && !hideWhenNotExisting && !hideWhenNotAvailable ) ) )
+              ( currentStatus > KNemoIface::Available ||
+                ( currentStatus == KNemoIface::Available && !hideWhenDisconnected ) ||
+                ( !hideWhenUnavailable && !hideWhenDisconnected ) ) )
     {
         mTray = new InterfaceTray( mInterface, ifaceName );
         KMenu* menu = (KMenu *)mTray->contextMenu();

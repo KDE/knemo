@@ -40,9 +40,19 @@
 namespace KNemoIface {
     enum Type
     {
-        UNKNOWN_TYPE,
-        ETHERNET,
+        UnknownType,
+        Ethernet,
         PPP
+    };
+    
+    enum InterfaceState
+    {
+        UnknownState =  0,
+        Unavailable  =  1,
+        Available    =  2,
+        Connected    =  4,
+        RxTraffic    =  8,
+        TxTraffic    = 16
     };
 }
 
@@ -76,10 +86,9 @@ struct AddrData
 struct BackendData
 {
     BackendData()
-      : isExisting( false ),
-        isAvailable( false ),
+      : status( KNemoIface::UnknownState ),
         index( -1 ),
-        interfaceType( KNemoIface::UNKNOWN_TYPE ),
+        interfaceType( KNemoIface::UnknownType ),
         isWireless( false ),
         prevRxPackets( 0L ),
         prevTxPackets( 0L ),
@@ -94,8 +103,7 @@ struct BackendData
         isEncrypted( false )
     {}
 
-    bool isExisting;
-    bool isAvailable;
+    int status;
     int index;
     KNemoIface::Type interfaceType;
     bool isWireless;
@@ -146,8 +154,8 @@ struct InterfaceSettings
         trafficThreshold( 0 ),
         warnThreshold( 0.0 ),
         warnTotalTraffic( false ),
-        hideWhenNotExisting( false ),
-        hideWhenNotAvailable( false ),
+        hideWhenUnavailable( false ),
+        hideWhenDisconnected( false ),
         activateStatistics( false ),
         billingMonths( 1 ),
         customCommands( false )
@@ -161,8 +169,8 @@ struct InterfaceSettings
     int trafficThreshold;
     double warnThreshold;
     bool warnTotalTraffic;
-    bool hideWhenNotExisting;
-    bool hideWhenNotAvailable;
+    bool hideWhenUnavailable;
+    bool hideWhenDisconnected;
     bool activateStatistics;
     QDate billingStart;
     int billingMonths;

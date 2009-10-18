@@ -38,8 +38,8 @@ Interface::Interface( const QString &ifname,
                       const BackendData* data,
                       const GeneralData& generalData )
     : QObject(),
-      mType( KNemoIface::UNKNOWN_TYPE ),
-      mState( UNKNOWN_STATE ),
+      mType( KNemoIface::UnknownType ),
+      mState( KNemoIface::UnknownState ),
       mName( ifname ),
       mPlotterTimer( 0 ),
       mIcon( this ),
@@ -95,8 +95,8 @@ void Interface::configChanged()
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
     mSettings.colorDisabled = interfaceGroup.readEntry( "ColorDisabled", scheme.foreground( KColorScheme::InactiveText ).color() );
     mSettings.customCommands = interfaceGroup.readEntry( "CustomCommands", false );
-    mSettings.hideWhenNotAvailable = interfaceGroup.readEntry( "HideWhenNotAvailable",false );
-    mSettings.hideWhenNotExisting = interfaceGroup.readEntry( "HideWhenNotExisting", false );
+    mSettings.hideWhenDisconnected = interfaceGroup.readEntry( "HideWhenNotAvailable",false );
+    mSettings.hideWhenUnavailable = interfaceGroup.readEntry( "HideWhenNotExisting", false );
     mSettings.activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", false );
     mSettings.trafficThreshold = clamp<int>(interfaceGroup.readEntry( "TrafficThreshold", 0 ), 0, 1000 );
     mSettings.warnThreshold = clamp<double>(interfaceGroup.readEntry( "BillingWarnThreshold", 0.0 ), 0.0, 9999.0 );
@@ -161,7 +161,7 @@ void Interface::configChanged()
 
 void Interface::activateMonitor()
 {
-    int currentState;
+    int currentState = mBackendData->status;
     int previousState = mState;
     int trafficThreshold = mSettings.trafficThreshold;
 
@@ -169,20 +169,13 @@ void Interface::activateMonitor()
     if ( title.isEmpty() )
         title = mName;
 
-    if ( !mBackendData->isExisting )
-        // the interface does not exist
-        currentState = Interface::NOT_EXISTING;
-    else if ( !mBackendData->isAvailable )
-        // the interface exists but is not connected
-        currentState = Interface::NOT_AVAILABLE;
-    else
+    if ( currentState & KNemoIface::Connected )
     {
         // the interface is connected, look for traffic
-        currentState = Interface::AVAILABLE;
         if ( ( mBackendData->rxPackets - mBackendData->prevRxPackets ) > (unsigned int) trafficThreshold )
-            currentState |= Interface::RX_TRAFFIC;
+            currentState |= KNemoIface::RxTraffic;
         if ( ( mBackendData->txPackets - mBackendData->prevTxPackets ) > (unsigned int) trafficThreshold )
-            currentState |= Interface::TX_TRAFFIC;
+            currentState |= KNemoIface::TxTraffic;
     }
 
     if ( mStatistics != 0 )
@@ -196,43 +189,45 @@ void Interface::activateMonitor()
 
     backend->updatePackets( mName );
 
-    if ( ( previousState == Interface::NOT_EXISTING ||
-           previousState == Interface::NOT_AVAILABLE ||
-           previousState == Interface::UNKNOWN_STATE ) &&
-         currentState & Interface::AVAILABLE )
+    if ( previousState < KNemoIface::Connected &&
+         currentState & KNemoIface::Connected )
     {
         mIcon.updateTrayStatus();
         setStartTime();
         QString connectedStr = i18n( "Connected" );
         if ( mBackendData->isWireless )
             connectedStr = i18n( "Connected to %1", mBackendData->essid );
-        if ( previousState != Interface::UNKNOWN_STATE )
+        if ( previousState != KNemoIface::UnknownState )
             KNotification::event( "connected",
                                   title + ": " + connectedStr );
         if ( mStatusDialog )
             mStatusDialog->enableNetworkGroups();
     }
-    else if ( ( previousState == Interface::NOT_EXISTING ||
-                previousState & Interface::AVAILABLE ||
-                previousState == Interface::UNKNOWN_STATE ) &&
-              currentState == Interface::NOT_AVAILABLE )
+    else if ( previousState > KNemoIface::Available &&
+              currentState == KNemoIface::Available )
     {
         mIcon.updateTrayStatus();
-        if ( previousState == Interface::AVAILABLE )
-            KNotification::event( "disconnected",
-                                  title + ": " + i18n( "Disconnected" ) );
+        KNotification::event( "disconnected",
+                              title + ": " + i18n( "Disconnected" ) );
         if ( mStatusDialog )
             mStatusDialog->disableNetworkGroups();
     }
-    else if ( ( previousState == Interface::NOT_AVAILABLE ||
-                previousState & Interface::AVAILABLE ||
-                previousState == Interface::UNKNOWN_STATE ) &&
-              currentState == Interface::NOT_EXISTING )
+    else if ( previousState < KNemoIface::Available &&
+              currentState == KNemoIface::Available )
     {
         mIcon.updateTrayStatus();
-        if ( previousState != Interface::UNKNOWN_STATE )
-            KNotification::event( "nonexistent",
-                                  title + ": " + i18n( "Nonexistent" ) );
+        if ( previousState != KNemoIface::UnknownState )
+            KNotification::event( "available",
+                                  title + ": " + i18n( "Available" ) );
+        if ( mStatusDialog )
+            mStatusDialog->disableNetworkGroups();
+    }
+    else if ( previousState > KNemoIface::Unavailable &&
+              currentState == KNemoIface::Unavailable )
+    {
+        mIcon.updateTrayStatus();
+        KNotification::event( "unavailable",
+                              title + ": " + i18n( "Unavailable" ) );
         if ( mStatusDialog )
             mStatusDialog->disableNetworkGroups();
     }
@@ -338,19 +333,15 @@ void Interface::resetData( int state )
     // interface gets disconnected. If the driver also resets its data
     // (like PPP seems to do) we will start from zero for every new
     // connection.
-    if ( mType == KNemoIface::PPP &&
-         ( state == NOT_AVAILABLE ||
-           state == NOT_EXISTING ) )
-    {
+    if ( mType == KNemoIface::PPP && state < KNemoIface::Connected )
         backend->clearTraffic( mName );
-    }
 }
 
 void Interface::updateDetails()
 {
     mUptime += mGeneralData.pollInterval;
     QString uptime;
-    if ( mBackendData->isAvailable )
+    if ( mBackendData->status & KNemoIface::Connected )
     {
         time_t upsecs = mUptime;
         time_t updays = upsecs / 86400;

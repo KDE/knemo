@@ -56,7 +56,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     const BackendData * data = mInterface->getData();
     if ( !data )
         return;
-    if ( data->isAvailable )
+    if ( data->status > KNemoIface::Available )
     {
         enableNetworkGroups();
     }
@@ -143,7 +143,7 @@ void InterfaceStatusDialog::updateDialog()
     // connection tab
     ui.textLabelInterface->setText( mInterface->getName() );
     ui.textLabelAlias->setText( settings.alias );
-    if ( data->isAvailable )
+    if ( data->status > KNemoIface::Available )
     {
         ui.textLabelStatus->setText( i18n( "Connected" ) );
         time_t upsecs = mInterface->getUptime();
@@ -160,18 +160,18 @@ void InterfaceStatusDialog::updateDialog()
         uptime += time;
         ui.textLabelUptime->setText( uptime );
     }
-    else if ( data->isExisting )
+    else if ( data->status > KNemoIface::Unavailable )
     {
         ui.textLabelStatus->setText( i18n( "Disconnected" ) );
         ui.textLabelUptime->setText( "00:00:00" );
     }
     else
     {
-        ui.textLabelStatus->setText( i18n( "Nonexistent" ) );
+        ui.textLabelStatus->setText( i18n( "Unavailable" ) );
         ui.textLabelUptime->setText( "00:00:00" );
     }
 
-    if ( data->interfaceType == KNemoIface::ETHERNET )
+    if ( data->interfaceType == KNemoIface::Ethernet )
     {
         ui.macText->setText( data->hwAddress );
         ui.macLabel->show();
@@ -185,7 +185,7 @@ void InterfaceStatusDialog::updateDialog()
         ui.macText->hide();
     }
 
-    if ( data->isAvailable )
+    if ( data->status > KNemoIface::Available )
     {
         // ip tab
 
@@ -247,7 +247,7 @@ void InterfaceStatusDialog::updateDialog()
         scope += addrData.ipv6Flags;
         ui.textLabelScope->setText( scope );
 
-        if ( data->interfaceType == KNemoIface::ETHERNET )
+        if ( data->interfaceType == KNemoIface::Ethernet )
         {
             if ( addrData.scope != RT_SCOPE_HOST )
             {

@@ -71,8 +71,8 @@ private slots:
     void interfaceSelected( int row );
     void aliasChanged( const QString& text );
     void iconThemeChanged( int set );
-    void checkBoxNotConnectedToggled( bool on );
-    void checkBoxNotExistingToggled( bool on );
+    void checkBoxDisconnectedToggled( bool on );
+    void checkBoxUnavailableToggled( bool on );
     void checkBoxStatisticsToggled( bool on );
     void warnThresholdChanged( double val );
     void warnRxTxToggled( bool on );

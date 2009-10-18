@@ -79,14 +79,13 @@ void BSDBackend::update()
     foreach ( QString key, mInterfaces.keys() )
     {
         BackendData *interface = mInterfaces.value( key );
-        interface->isExisting = false;
-        interface->isAvailable = false;
+        interface->status = KNemoIface::UnknownState;
         interface->incomingBytes = 0;
         interface->outgoingBytes = 0;
         interface->addrData.clear();
         interface->ip4DefaultGateway = ip4DefGw;
         interface->ip6DefaultGateway = ip6DefGw;
-        interface->interfaceType = KNemoIface::ETHERNET;
+        interface->interfaceType = KNemoIface::Ethernet;
 
         updateInterfaceData( key, interface );
     }
@@ -248,10 +247,6 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
     {
         QString ifaddrName( ifa->ifa_name );
-        int index = ifaddrName.indexOf( ':' );
-        if ( index > -1 )
-            ifaddrName = ifaddrName.left( index );
-
         if ( ifName != ifaddrName )
             continue;
 
@@ -273,7 +268,7 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
             data->txString = KIO::convertSize( data->txBytes );
         }
 
-        data->isExisting = true;
+        data->status = KNemoIface::Available;
 
         // mac address, interface type
         if ( ifa->ifa_addr )
@@ -300,7 +295,7 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
                 AddrData addrVal;
 
                 if ( ifa->ifa_flags && IFF_UP )
-                    data->isAvailable = true;
+                    data->status |= KNemoIface::Connected;
 
                 addrKey = getAddr( ifa, addrVal );
 
@@ -309,6 +304,8 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
             }
         }
     }
+    if ( data->status < KNemoIface::Available )
+        data->status = KNemoIface::Unavailable;
 }
 
 void BSDBackend::updateWirelessData( int fd, const QString& ifName, BackendData* data )

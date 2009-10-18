@@ -169,16 +169,16 @@ QString InterfaceTray::toolTipData()
     if ( toolTipContent & STATUS )
     {
         tipData += leftTags + i18n( "Status" ) + centerTags;
-        if ( data->isAvailable )
+        if ( data->status > KNemoIface::Available )
             tipData += i18n( "Connected" );
-        else if ( data->isExisting )
+        else if ( data->status > KNemoIface::Unavailable )
             tipData += i18n( "Disconnected" );
         else
-            tipData += i18n( "Nonexistent" );
+            tipData += i18n( "Unavailable" );
         tipData += rightTags;
     }
 
-    if ( data->isAvailable )
+    if ( data->status > KNemoIface::Available )
     {
         if ( toolTipContent & UPTIME )
             tipData += leftTags + i18n( "Uptime" ) + centerTags + mInterface->getUptimeString() + rightTags ;
@@ -214,7 +214,7 @@ QString InterfaceTray::toolTipData()
         }
         tipData += ip4Tip + ip6Tip;
 
-        if ( KNemoIface::ETHERNET == data->interfaceType )
+        if ( KNemoIface::Ethernet == data->interfaceType )
         {
             if ( toolTipContent & GATEWAY )
             {
@@ -246,7 +246,7 @@ QString InterfaceTray::toolTipData()
         }
     }
 
-    if ( data->isAvailable && data->isWireless )
+    if ( data->status > KNemoIface::Available && data->isWireless )
     {
         if ( toolTipContent & ESSID )
             tipData += leftTags + i18n( "ESSID" ) + centerTags + data->essid + rightTags;

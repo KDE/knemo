@@ -82,7 +82,7 @@ void BackendBase::incBytes( KNemoIface::Type type,
     if ( bytes < prevDataBytes )
     {
         // there was an overflow
-        if ( type == KNemoIface::ETHERNET )
+        if ( type == KNemoIface::Ethernet )
         {
             // This makes data counting more accurate but will not work
             // for interfaces that reset the transfered data to zero

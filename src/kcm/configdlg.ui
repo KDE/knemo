@@ -129,19 +129,19 @@ icons.</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
-            <widget class="QCheckBox" name="checkBoxNotConnected">
+            <widget class="QCheckBox" name="checkBoxDisconnected">
              <property name="whatsThis">
               <string>When selected the icon for this interface will be
 hidden when the interface is not connected. 
 When reconnected the icon will be shown again.</string>
              </property>
              <property name="text">
-              <string>Hide icon when &amp;not connected</string>
+              <string>Hide icon when not connected</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="checkBoxNotExisting">
+            <widget class="QCheckBox" name="checkBoxUnavailable">
              <property name="whatsThis">
               <string>When selected the icon for this interface will be
 hidden when the interface does not exist. 
@@ -150,7 +150,7 @@ created and destroyed, for example interfaces
 of bluetooth adaptors.</string>
              </property>
              <property name="text">
-              <string>Hide icon &amp;when not existing</string>
+              <string>Hide icon when not available</string>
              </property>
             </widget>
            </item>
@@ -947,8 +947,8 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
   <tabstop>pushButtonDelete</tabstop>
   <tabstop>lineEditAlias</tabstop>
   <tabstop>tabWidget</tabstop>
-  <tabstop>checkBoxNotConnected</tabstop>
-  <tabstop>checkBoxNotExisting</tabstop>
+  <tabstop>checkBoxDisconnected</tabstop>
+  <tabstop>checkBoxUnavailable</tabstop>
   <tabstop>spinBoxTrafficThreshold</tabstop>
   <tabstop>comboBoxIconTheme</tabstop>
   <tabstop>colorIncoming</tabstop>
@@ -990,9 +990,9 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
  <resources/>
  <connections>
   <connection>
-   <sender>checkBoxNotConnected</sender>
+   <sender>checkBoxDisconnected</sender>
    <signal>toggled(bool)</signal>
-   <receiver>checkBoxNotExisting</receiver>
+   <receiver>checkBoxUnavailable</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">

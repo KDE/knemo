@@ -107,16 +107,6 @@ public:
      */
     void configChanged();
 
-    enum InterfaceState
-    {
-        UNKNOWN_STATE = -1,
-        NOT_EXISTING  = 0,
-        NOT_AVAILABLE = 1,
-        AVAILABLE     = 2,
-        RX_TRAFFIC    = 4,
-        TX_TRAFFIC    = 8
-    };
-
 public slots:
     /**
      * Called from the interface updater class after new data from

@@ -129,7 +129,7 @@ void NetlinkBackend::updateAddresses( BackendData *data )
         if ( data->index != rtnl_addr_get_ifindex( rtaddr ) )
             continue;
 
-        data->isAvailable = true;
+        data->status |= KNemoIface::Connected;
         struct nl_addr * addr = rtnl_addr_get_local( rtaddr );
         char buf[ 128 ];
         QString addrKey;
@@ -193,8 +193,7 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
     if ( !linkCache || !addrCache )
         return;
 
-    data->isExisting = false;
-    data->isAvailable = false;
+    data->status = KNemoIface::UnknownState;
     data->incomingBytes = 0;
     data->outgoingBytes = 0;
     data->addrData.clear();
@@ -212,8 +211,8 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
         if ( rtnl_link_get_flags( link ) & IFF_POINTOPOINT )
             data->interfaceType = KNemoIface::PPP;
         else
-            data->interfaceType = KNemoIface::ETHERNET;
-        data->isExisting = true;
+            data->interfaceType = KNemoIface::Ethernet;
+        data->status = KNemoIface::Available;
 
         // hw address
         struct nl_addr * addr = rtnl_link_get_addr( link );
@@ -236,6 +235,8 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
 
         rtnl_link_put( link );
     }
+    else
+        data->status = KNemoIface::Unavailable;
 }
 
 #ifdef HAVE_LIBIW

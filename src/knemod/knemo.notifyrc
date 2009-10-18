@@ -176,8 +176,14 @@ Comment[zh_TW]=介面已斷線
 Sound=KDE_Sys-App-Negative.ogg
 Action=Popup
 
-[Event/nonexistent]
-Name=Nonexistent
+[Event/available]
+Name=Available
+Comment=The interface has become available
+Sound=KDE_Sys-App-Positive.ogg
+Action=Popup
+
+[Event/unavailable]
+Name=Unavailable
 Name[bg]=Несъществуващ
 Name[da]=Findes ikke
 Name[es]=Inexistente
@@ -192,7 +198,7 @@ Name[sv]=Existerar inte
 Name[tr]=Yok
 Name[uk]=Не існує
 Name[x-test]=xxNonexistentxx
-Comment=Interface does not exist
+Comment=The interface is unavailable
 Comment[be]=Інтэрфейс не існуе
 Comment[bg]=Интерфейсът не съществува
 Comment[cs]=Rozhraní neexistuje
@@ -226,7 +232,7 @@ Comment[x-test]=xxInterface does not existxx
 Comment[zh_CN]=接口当前不存在
 Comment[zh_TW]=介面不存在
 Sound=KDE_Sys-App-Message.ogg
-Action=None
+Action=Popup
 
 [Event/exceededMonthlyTraffic]
 Name=Monthly Traffic Limit Exceeded
