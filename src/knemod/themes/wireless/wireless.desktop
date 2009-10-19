@@ -1,5 +1,19 @@
 [Desktop Entry]
 Name=Wireless
+Name[da]=Trådløst
+Name[en_GB]=Wireless
+Name[nl]=Draadloos
+Name[pt]=Sem-Fios
+Name[sv]=Trådlöst
+Name[uk]=Бездротові
+Name[x-test]=xxWirelessxx
 Comment=KNemo wireless icon theme
+Comment[da]=KNemo ikontema til trådløst
+Comment[en_GB]=KNemo wireless icon theme
+Comment[nl]=KNemo draadloos-pictogramthema
+Comment[pt]=Tema de ícones sem-fios do KNemo
+Comment[sv]=Knemo trådlöst ikontema
+Comment[uk]=Тема з піктограмами бездротових з’єднань для KNemo
+Comment[x-test]=xxKNemo wireless icon themexx
 Type=Application
 X-KNemo-Theme=wireless

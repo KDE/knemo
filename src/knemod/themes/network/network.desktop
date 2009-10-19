@@ -1,5 +1,19 @@
 [Desktop Entry]
 Name=Network
+Name[da]=Netværk
+Name[en_GB]=Network
+Name[nl]=Netwerk
+Name[pt]=Rede
+Name[sv]=Nätverk
+Name[uk]=Мережа
+Name[x-test]=xxNetworkxx
 Comment=KNemo Network icon theme
+Comment[da]=KNemo ikontema til netværk
+Comment[en_GB]=KNemo Network icon theme
+Comment[nl]=KNemo Network-pictogramthema
+Comment[pt]=Tema de ícones de Rede do KNemo
+Comment[sv]=Knemo nätverksikontema
+Comment[uk]=Тема з піктограмами мереж для KNemo
+Comment[x-test]=xxKNemo Network icon themexx
 Type=Application
 X-KNemo-Theme=network
