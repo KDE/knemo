@@ -21,8 +21,6 @@
 #include <QtDBus/QDBusConnection>
 #include <QTimer>
 
-#include <QDebug>
-
 #include <KAboutData>
 #include <KConfigGroup>
 #include <KLocale>
@@ -49,11 +47,10 @@ KNemoDaemon::KNemoDaemon()
       mColorBackground( 0x313031 )
 {
     backend = BackendFactory::backend();
-    readConfig();
     QDBusConnection::sessionBus().registerObject("/knemo", this, QDBusConnection::ExportScriptableSlots);
     mPollTimer = new QTimer();
     connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );
-    mPollTimer->start( mGeneralData.pollInterval * 1000 );
+    readConfig();
 }
 
 KNemoDaemon::~KNemoDaemon()
@@ -70,6 +67,7 @@ KNemoDaemon::~KNemoDaemon()
 
 void KNemoDaemon::readConfig()
 {
+    mPollTimer->stop();
     KConfig *config = mConfig.data();
 
     // For when reparseConfiguration() is called
@@ -99,28 +97,39 @@ void KNemoDaemon::readConfig()
     }
 
     // Add/update those that do need to be monitored
+    QStringList newIfaces;
     foreach ( QString key, interfaceList )
     {
-        Interface* iface;
         if ( !mInterfaceHash.contains( key ) )
         {
             const BackendData * data = backend->add( key );
-            iface = new Interface( key, data, mGeneralData );
+            Interface *iface = new Interface( key, data, mGeneralData );
             mInterfaceHash.insert( key, iface );
-            connect( backend, SIGNAL( updateComplete() ), iface, SLOT( activateMonitor() ) );
+            newIfaces << key;
         }
-        else
-            iface = mInterfaceHash.value( key );
-        iface->configChanged();
     }
+
+    // Now (re)config interfaces, but new interfaces need extra work so
+    // they don't show bogus icon traffic states on startup.
+    updateInterfaces();
+    foreach( QString key, interfaceList )
+    {
+        Interface *iface = mInterfaceHash.value( key );
+        iface->configChanged();
+
+        if ( newIfaces.contains( key ) )
+        {
+            backend->updatePackets( key );
+            iface->processUpdate();
+            connect( backend, SIGNAL( updateComplete() ), iface, SLOT( processUpdate() ) );
+        }
+    }
+    mPollTimer->start( mGeneralData.pollInterval * 1000 );
 }
 
 void KNemoDaemon::reparseConfiguration()
 {
-    mPollTimer->stop();
     readConfig();
-    // restart the timer with the new interval
-    mPollTimer->start( mGeneralData.pollInterval * 1000 );
 }
 
 QString KNemoDaemon::getSelectedInterface()

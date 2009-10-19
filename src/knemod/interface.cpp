@@ -40,6 +40,7 @@ Interface::Interface( const QString &ifname,
     : QObject(),
       mType( KNemoIface::UnknownType ),
       mState( KNemoIface::UnknownState ),
+      mPreviousState( KNemoIface::UnknownState ),
       mName( ifname ),
       mPlotterTimer( 0 ),
       mIcon( this ),
@@ -130,7 +131,13 @@ void Interface::configChanged()
         }
     }
 
-    mIcon.configChanged( mSettings.colorIncoming, mSettings.colorOutgoing, mSettings.colorDisabled, mState );
+    // This prevents needless regeneration of icon when first shown in tray
+    if ( mState == KNemoIface::UnknownState )
+    {
+        mState = mBackendData->status;
+        mPreviousState = mState;
+    }
+    mIcon.configChanged( mSettings.colorIncoming, mSettings.colorOutgoing, mSettings.colorDisabled );
 
     /*if ( mPlotterDialog != 0L )
     {
@@ -159,23 +166,23 @@ void Interface::configChanged()
     }
 }
 
-void Interface::activateMonitor()
+void Interface::processUpdate()
 {
-    int currentState = mBackendData->status;
-    int previousState = mState;
+    mPreviousState = mState;
     int trafficThreshold = mSettings.trafficThreshold;
+    mState = mBackendData->status;
 
     QString title = mSettings.alias;
     if ( title.isEmpty() )
         title = mName;
 
-    if ( currentState & KNemoIface::Connected )
+    if ( mState & KNemoIface::Connected )
     {
         // the interface is connected, look for traffic
         if ( ( mBackendData->rxPackets - mBackendData->prevRxPackets ) > (unsigned int) trafficThreshold )
-            currentState |= KNemoIface::RxTraffic;
+            mState |= KNemoIface::RxTraffic;
         if ( ( mBackendData->txPackets - mBackendData->prevTxPackets ) > (unsigned int) trafficThreshold )
-            currentState |= KNemoIface::TxTraffic;
+            mState |= KNemoIface::TxTraffic;
     }
 
     if ( mStatistics != 0 )
@@ -189,56 +196,50 @@ void Interface::activateMonitor()
 
     backend->updatePackets( mName );
 
-    if ( previousState < KNemoIface::Connected &&
-         currentState & KNemoIface::Connected )
+    if ( mState & KNemoIface::Connected &&
+         mPreviousState < KNemoIface::Connected )
     {
-        mIcon.updateTrayStatus();
         setStartTime();
         QString connectedStr = i18n( "Connected" );
         if ( mBackendData->isWireless )
             connectedStr = i18n( "Connected to %1", mBackendData->essid );
-        if ( previousState != KNemoIface::UnknownState )
+        if ( mPreviousState != KNemoIface::UnknownState )
             KNotification::event( "connected",
                                   title + ": " + connectedStr );
         if ( mStatusDialog )
             mStatusDialog->enableNetworkGroups();
     }
-    else if ( previousState > KNemoIface::Available &&
-              currentState == KNemoIface::Available )
+    else if ( mState == KNemoIface::Available )
     {
-        mIcon.updateTrayStatus();
-        KNotification::event( "disconnected",
-                              title + ": " + i18n( "Disconnected" ) );
-        if ( mStatusDialog )
-            mStatusDialog->disableNetworkGroups();
+        if ( mPreviousState > KNemoIface::Available )
+        {
+            KNotification::event( "disconnected",
+                                  title + ": " + i18n( "Disconnected" ) );
+            if ( mStatusDialog )
+                mStatusDialog->disableNetworkGroups();
+            if ( mType == KNemoIface::PPP )
+                backend->clearTraffic( mName );
+        }
+        else if ( mPreviousState < KNemoIface::Available )
+        {
+            if ( mPreviousState != KNemoIface::UnknownState )
+                KNotification::event( "available",
+                                      title + ": " + i18n( "Available" ) );
+        }
     }
-    else if ( previousState < KNemoIface::Available &&
-              currentState == KNemoIface::Available )
+    else if ( mState == KNemoIface::Unavailable &&
+              mPreviousState > KNemoIface::Unavailable )
     {
-        mIcon.updateTrayStatus();
-        if ( previousState != KNemoIface::UnknownState )
-            KNotification::event( "available",
-                                  title + ": " + i18n( "Available" ) );
-        if ( mStatusDialog )
-            mStatusDialog->disableNetworkGroups();
-    }
-    else if ( previousState > KNemoIface::Unavailable &&
-              currentState == KNemoIface::Unavailable )
-    {
-        mIcon.updateTrayStatus();
         KNotification::event( "unavailable",
                               title + ": " + i18n( "Unavailable" ) );
         if ( mStatusDialog )
             mStatusDialog->disableNetworkGroups();
+        if ( mType == KNemoIface::PPP )
+            backend->clearTraffic( mName );
     }
 
-    // make sure the icon fits the current state
-    if ( previousState != currentState )
-    {
-        mIcon.updateIconImage( currentState );
-        setState( currentState );
-        resetData( currentState );
-    }
+    if ( mPreviousState != mState )
+        mIcon.updateTrayStatus();
 
     // The tooltip and status dialog always get updated
     updateDetails();
@@ -313,16 +314,6 @@ void Interface::showStatisticsDialog()
     }
     else
         mStatisticsDialog->show();
-}
-
-void Interface::resetData( int state )
-{
-    // For PPP interfaces we will reset all data to zero when the
-    // interface gets disconnected. If the driver also resets its data
-    // (like PPP seems to do) we will start from zero for every new
-    // connection.
-    if ( mType == KNemoIface::PPP && state < KNemoIface::Connected )
-        backend->clearTraffic( mName );
 }
 
 void Interface::updateDetails()

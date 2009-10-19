@@ -20,7 +20,6 @@
 
 #include <unistd.h>
 
-#include <QDebug>
 #include <QPainter>
 #include <KColorScheme>
 #include <KConfigGroup>
@@ -65,8 +64,7 @@ InterfaceIcon::~InterfaceIcon()
 
 void InterfaceIcon::configChanged( const QColor& incoming,
                                    const QColor& outgoing,
-                                   const QColor& disabled,
-                                   int status )
+                                   const QColor& disabled )
 {
     KConfigGroup cg( KGlobal::mainComponent().config(), "System Tray" );
     iconWidth = cg.readEntry( "systrayIconWidth", 22 );
@@ -77,14 +75,11 @@ void InterfaceIcon::configChanged( const QColor& incoming,
 
     updateTrayStatus();
 
-    // handle changed theme
     if ( mTray != 0L )
     {
-        if ( mInterface->getSettings().iconTheme == TEXT_THEME )
-            updateIconText( true );
-        else
-            updateIconImage( status );
         updateMenu();
+        if ( mInterface->getSettings().iconTheme == TEXT_THEME )
+             updateIconText( true );
     }
 }
 
@@ -180,7 +175,7 @@ QString InterfaceIcon::compactTrayText(unsigned long bytes )
     return byteString;
 }
 
-void InterfaceIcon::updateIconText( bool proceed )
+void InterfaceIcon::updateIconText( bool doUpdate )
 {
     const BackendData * data = mInterface->getData();
 
@@ -188,19 +183,24 @@ void InterfaceIcon::updateIconText( bool proceed )
     QString byteText = compactTrayText( bytesPerSecond );
     if ( byteText != textIncoming )
     {
-        proceed = true;
+        doUpdate = true;
         textIncoming = byteText;
     }
     bytesPerSecond = data->outgoingBytes / mInterface->getGeneralData().pollInterval;
     byteText = compactTrayText( bytesPerSecond );
     if ( byteText != textOutgoing )
     {
-        proceed = true;
+        doUpdate = true;
         textOutgoing = byteText;
     }
+    int state = mInterface->getState();
+    int prevState = mInterface->getPreviousState();
+    // Need to change color, though text not changed
+    if ( ( state >= KNemoIface::Connected && prevState <  KNemoIface::Connected ) ||
+         ( state <  KNemoIface::Connected && prevState >= KNemoIface::Connected ) )
+        doUpdate = true;
 
-    // Do we even need to repaint?
-    if ( !proceed )
+    if ( !doUpdate )
         return;
 
     QPixmap textIcon(iconWidth, iconWidth);
@@ -338,13 +338,10 @@ void InterfaceIcon::updateTrayStatus()
         mTray->show();
 #endif
     }
-
-    if ( mTray != 0L )
+    else if ( mTray != 0L )
     {
-        // Tray text may need to appear active/inactive
-        // Force an update
-        if ( mInterface->getSettings().iconTheme == TEXT_THEME )
-             updateIconText( true );
+        if ( mInterface->getSettings().iconTheme != TEXT_THEME )
+            updateIconImage( mInterface->getState() );
     }
 }
 

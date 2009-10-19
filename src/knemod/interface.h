@@ -56,14 +56,14 @@ public:
      */
     virtual ~Interface();
 
-    void setState( int state )
-    {
-        mState = state;
-    }
-
     int getState()
     {
         return mState;
+    }
+
+    int getPreviousState()
+    {
+        return mPreviousState;
     }
 
     time_t getUptime()
@@ -109,11 +109,10 @@ public:
 
 public slots:
     /**
-     * Called from the interface updater class after new data from
-     * 'ifconfig' has been read. This will trigger the monitor to
-     * to look for changes in interface data or interface state.
+     * Called when the backend emits the updateComplete signal.
+     * This looks for changes in interface data or state.
      */
-    void activateMonitor();
+    void processUpdate();
 
     /*
      * Called when the user left-clicks on the tray icon
@@ -133,11 +132,6 @@ public slots:
      * Called when the user selects the appropriate entry in the context menu.
      */
     void showStatisticsDialog();
-
-    /*
-     * Reset data when PPP interface is disconnected
-     */
-    void resetData( int state );
 
 private slots:
     /**
@@ -180,6 +174,7 @@ private:
 
     KNemoIface::Type mType;
     int mState;
+    int mPreviousState;
     QString mName;
     QTimer* mPlotterTimer;
     time_t mUptime;

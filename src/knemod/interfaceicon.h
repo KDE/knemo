@@ -57,11 +57,6 @@ signals:
 
 public slots:
     /*
-     * Changes the icon displayed in the tray
-     */
-    void updateIconImage( int status );
-
-    /*
      * Creates or deletes the tray icon
      */
     void updateTrayStatus();
@@ -82,8 +77,7 @@ public slots:
      */
     void configChanged( const QColor& colorIncoming,
                         const QColor& colorOutgoing,
-                        const QColor& colorDisabled,
-                        int status );
+                        const QColor& colorDisabled );
 
 private slots:
     /*
@@ -114,7 +108,12 @@ private slots:
     void showStatistics();
 
 private:
-    void updateIconText( bool proceed = false );
+    /*
+     * Changes the icon displayed in the tray
+     */
+    void updateIconImage( int status );
+
+    void updateIconText( bool doUpdate = false );
     // the interface this icon belongs to
     Interface* mInterface;
     // the real tray icon
