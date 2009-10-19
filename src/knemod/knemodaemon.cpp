@@ -96,6 +96,18 @@ void KNemoDaemon::readConfig()
         }
     }
 
+    if ( !mHaveInterfaces )
+    {
+        QString ifaceName = backend->getDefaultRouteIface( AF_INET );
+        if ( ifaceName.isEmpty() )
+            ifaceName = backend->getDefaultRouteIface( AF_INET6 );
+        if ( !ifaceName.isEmpty() )
+        {
+            interfaceList << ifaceName;
+            mHaveInterfaces = true;
+        }
+    }
+
     // Add/update those that do need to be monitored
     QStringList newIfaces;
     foreach ( QString key, interfaceList )
@@ -145,27 +157,7 @@ QString KNemoDaemon::getSelectedInterface()
 
 void KNemoDaemon::updateInterfaces()
 {
-    if ( !backend )
-        return;
-
     backend->update();
-    if ( !mHaveInterfaces )
-    {
-        // If there's an interface for the default route, let's make that the
-        // one to watch
-        QString ifaceName = backend->getDefaultRouteIface( AF_INET );
-        if ( ifaceName.isEmpty() )
-            ifaceName = backend->getDefaultRouteIface( AF_INET6 );
-        if ( !ifaceName.isEmpty() )
-        {
-            const BackendData* data = backend->add( ifaceName );
-            Interface *iface = new Interface( ifaceName, data, mGeneralData );
-            mInterfaceHash.insert( ifaceName, iface );
-            connect( backend, SIGNAL( updateComplete() ), iface, SLOT( activateMonitor() ) );
-            mHaveInterfaces = true;
-            iface->configChanged();
-        }
-    }
 }
 
 static const char * const description =
