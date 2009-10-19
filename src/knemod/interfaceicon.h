@@ -109,6 +109,7 @@ private slots:
      */
     QString compactTrayText( unsigned long );
 
+    void showStatus();
     void showGraph();
     void showStatistics();
 
@@ -119,6 +120,7 @@ private:
     // the real tray icon
     InterfaceTray* mTray;
     KActionCollection* commandActions;
+    KAction* statusAction;
     KAction* plotterAction;
     KAction* statisticsAction;
     KAction* configAction;

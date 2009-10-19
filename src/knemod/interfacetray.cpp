@@ -106,12 +106,12 @@ void InterfaceTray::slotQuit()
 #ifdef USE_KNOTIFICATIONITEM
 void InterfaceTray::activate(const QPoint&)
 {
-    mInterface->showStatusDialog();
+    mInterface->showStatusDialog( false );
 }
 
 void InterfaceTray::togglePlotter()
 {
-     mInterface->showSignalPlotter( true );
+     mInterface->showSignalPlotter( false );
 }
 #else
 void InterfaceTray::iconActivated( QSystemTrayIcon::ActivationReason reason )
@@ -119,10 +119,10 @@ void InterfaceTray::iconActivated( QSystemTrayIcon::ActivationReason reason )
     switch (reason)
     {
      case QSystemTrayIcon::Trigger:
-         mInterface->showStatusDialog();
+         mInterface->showStatusDialog( false );
          break;
      case QSystemTrayIcon::MiddleClick:
-         mInterface->showSignalPlotter( true );
+         mInterface->showSignalPlotter( false );
          break;
      default:
          ;

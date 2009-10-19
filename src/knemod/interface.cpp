@@ -252,7 +252,7 @@ void Interface::setStartTime()
         mPlotterTimer->start( 1000 );
 }
 
-void Interface::showStatusDialog()
+void Interface::showStatusDialog( bool fromContextMenu )
 {
     // Toggle the status dialog.
     // First click will show the status dialog, second will hide it.
@@ -265,27 +265,15 @@ void Interface::showStatusDialog()
                      mStatusDialog, SLOT( statisticsChanged() ) );
             mStatusDialog->statisticsChanged();
         }
-        activateOrHide( mStatusDialog, true );
     }
-    else
-    {
-        // Toggle the status dialog.
-        activateOrHide( mStatusDialog );
-    }
+
+    activateOrHide( mStatusDialog, fromContextMenu );
 }
 
-void Interface::showSignalPlotter( bool wasMiddleButton )
+void Interface::showSignalPlotter( bool fromContextMenu )
 {
-    if ( wasMiddleButton )
-    {
-        // Toggle the signal plotter.
-        activateOrHide( mPlotterDialog );
-    }
-    else
-    {
-        // Called from the context menu, show the dialog.
-        activateOrHide( mPlotterDialog, true );
-    }
+    // Toggle the signal plotter.
+    activateOrHide( mPlotterDialog, fromContextMenu );
     if ( mPlotterDialog->isVisible() && !mPlotterTimer->isActive() )
         mPlotterTimer->start( 1000 );
 }

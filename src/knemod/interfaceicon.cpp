@@ -48,10 +48,11 @@ InterfaceIcon::InterfaceIcon( Interface* interface )
       mTray( 0L )
 {
     commandActions = new KActionCollection( this );
+    statusAction = new KAction( i18n( "Show &Status Dialog" ), this );
     plotterAction = new KAction( KIcon( "utilities-system-monitor" ),
-                       i18n( "&Open Traffic Plotter" ), this );
+                       i18n( "Show &Traffic Plotter" ), this );
     statisticsAction = new KAction( KIcon( "view-statistics" ),
-                          i18n( "Open &Statistics" ), this );
+                          i18n( "Show St&atistics" ), this );
     configAction = new KAction( KIcon( "configure" ),
                        i18n( "&Configure KNemo..." ), this );
 }
@@ -261,6 +262,7 @@ void InterfaceIcon::updateMenu()
         }
         QAction* sep = menu->addSeparator();
         commandActions->addAction( "sep", sep );
+        menu->insertActions( statusAction, commandActions->actions() );
         menu->insertActions( plotterAction, commandActions->actions() );
     }
 
@@ -309,6 +311,7 @@ void InterfaceIcon::updateTrayStatus()
 
         menu->removeAction( menu->actions().at( 0 ) );
         menu->addTitle( KIcon( "knemo" ), i18n( "KNemo - " ) + title );
+        menu->addAction( statusAction );
         menu->addAction( plotterAction );
         menu->addAction( statisticsAction );
         menu->addAction( configAction );
@@ -317,6 +320,8 @@ void InterfaceIcon::updateTrayStatus()
 
         connect( menu, SIGNAL( triggered( QAction * ) ),
                  this, SLOT( menuTriggered( QAction * ) ) );
+        connect( statusAction, SIGNAL( triggered() ),
+                 this, SLOT( showStatus() ) );
         connect( plotterAction, SIGNAL( triggered() ),
                  this, SLOT( showGraph() ) );
         connect( statisticsAction, SIGNAL( triggered() ),
@@ -375,9 +380,14 @@ void InterfaceIcon::showStatistics()
     emit statisticsSelected();
 }
 
+void InterfaceIcon::showStatus()
+{
+    mInterface->showStatusDialog( true );
+}
+
 void InterfaceIcon::showGraph()
 {
-    mInterface->showSignalPlotter( false );
+    mInterface->showSignalPlotter( true );
 }
 
 #include "interfaceicon.moc"

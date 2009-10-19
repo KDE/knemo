@@ -120,14 +120,14 @@ public slots:
      * Toggles the status dialog by showing it on the first click and
      * hiding it on the second click.
      */
-    void showStatusDialog();
+    void showStatusDialog( bool fromContextMenu );
 
     /*
      * Called when the user middle-clicks on the tray icon
      * Toggles the signal plotter that displays the incoming and
      * outgoing traffic.
      */
-    void showSignalPlotter( bool wasMiddleButton );
+    void showSignalPlotter( bool fromContextMenu );
 
     /*
      * Called when the user selects the appropriate entry in the context menu.
