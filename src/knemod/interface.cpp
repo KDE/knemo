@@ -137,6 +137,8 @@ void Interface::configChanged()
     {
         mState = mBackendData->status;
         mPreviousState = mState;
+        if ( mState & KNemoIface::Connected )
+            setStartTime();
     }
     mIcon.configChanged( mSettings.colorIncoming, mSettings.colorOutgoing, mSettings.colorDisabled );
 
