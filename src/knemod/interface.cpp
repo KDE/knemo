@@ -114,6 +114,7 @@ void Interface::configChanged()
     if ( mSettings.billingStart > QDate::currentDate() )
         mSettings.billingStart = startDate;
     mSettings.billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", 0 ), 0, 6 );
+    mSettings.commands.clear();
     if ( mSettings.customCommands )
     {
         int numCommands = interfaceGroup.readEntry( "NumCommands", 0 );

@@ -54,6 +54,15 @@ InterfaceIcon::InterfaceIcon( Interface* interface )
                           i18n( "Show St&atistics" ), this );
     configAction = new KAction( KIcon( "configure" ),
                        i18n( "&Configure KNemo..." ), this );
+
+    connect( statusAction, SIGNAL( triggered() ),
+             this, SLOT( showStatus() ) );
+    connect( plotterAction, SIGNAL( triggered() ),
+             this, SLOT( showGraph() ) );
+    connect( statisticsAction, SIGNAL( triggered() ),
+             this, SLOT( showStatistics() ) );
+    connect( configAction, SIGNAL( triggered() ),
+             this, SLOT( showConfigDialog() ) );
 }
 
 InterfaceIcon::~InterfaceIcon()
@@ -245,7 +254,6 @@ void InterfaceIcon::updateMenu()
     foreach ( QAction* action, commandActions->actions() )
         menu->removeAction( action );
     commandActions->clear();
-    menu->removeAction( statisticsAction );
 
     InterfaceSettings& settings = mInterface->getSettings();
 
@@ -263,11 +271,12 @@ void InterfaceIcon::updateMenu()
         QAction* sep = menu->addSeparator();
         commandActions->addAction( "sep", sep );
         menu->insertActions( statusAction, commandActions->actions() );
-        menu->insertActions( plotterAction, commandActions->actions() );
     }
 
     if ( settings.activateStatistics )
         menu->insertAction( configAction, statisticsAction );
+    else
+        menu->removeAction( statisticsAction );
 }
 
 void InterfaceIcon::updateTrayStatus()
@@ -313,21 +322,12 @@ void InterfaceIcon::updateTrayStatus()
         menu->addTitle( KIcon( "knemo" ), i18n( "KNemo - " ) + title );
         menu->addAction( statusAction );
         menu->addAction( plotterAction );
-        menu->addAction( statisticsAction );
         menu->addAction( configAction );
         KHelpMenu* helpMenu( new KHelpMenu( menu, KNemoDaemon::aboutData(), false ) );
         menu->addMenu( helpMenu->menu() )->setIcon( KIcon( "help-contents" ) );
 
         connect( menu, SIGNAL( triggered( QAction * ) ),
                  this, SLOT( menuTriggered( QAction * ) ) );
-        connect( statusAction, SIGNAL( triggered() ),
-                 this, SLOT( showStatus() ) );
-        connect( plotterAction, SIGNAL( triggered() ),
-                 this, SLOT( showGraph() ) );
-        connect( statisticsAction, SIGNAL( triggered() ),
-                 this, SLOT( showStatistics() ) );
-        connect( configAction, SIGNAL( triggered() ),
-                 this, SLOT( showConfigDialog() ) );
 
         if ( mInterface->getSettings().iconTheme == TEXT_THEME )
             updateIconText( true );
