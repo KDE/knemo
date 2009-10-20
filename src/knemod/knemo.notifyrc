@@ -178,13 +178,33 @@ Action=Popup
 
 [Event/available]
 Name=Available
+Name[en_GB]=Available
+Name[pt]=Disponível
+Name[sv]=Tillgängligt
+Name[uk]=Доступний
+Name[x-test]=xxAvailablexx
 Comment=The interface has become available
+Comment[en_GB]=The interface has become available
+Comment[pt]=A interface ficou disponível
+Comment[sv]=Gränssnittet har blivit tillgängligt
+Comment[uk]=Інтерфейс став доступним
+Comment[x-test]=xxThe interface has become availablexx
 Sound=KDE_Sys-App-Positive.ogg
 Action=Popup
 
 [Event/unavailable]
 Name=Unavailable
+Name[en_GB]=Unavailable
+Name[pt]=Indisponível
+Name[sv]=Inte tillgängligt
+Name[uk]=Недоступний
+Name[x-test]=xxUnavailablexx
 Comment=The interface is unavailable
+Comment[en_GB]=The interface is unavailable
+Comment[pt]=A interface ficou indisponível
+Comment[sv]=Gränssnittet är inte tillgängligt
+Comment[uk]=Інтерфейс недоступний
+Comment[x-test]=xxThe interface is unavailablexx
 Sound=KDE_Sys-App-Message.ogg
 Action=Popup
 
