@@ -168,6 +168,7 @@ private:
     QTimer* mSaveTimer;
     Interface* mInterface;
     bool mWarningDone;
+    bool mAllMonths;
     QDate mBillingStart;
     const KCalendarSystem* mCalendar;
     StatisticEntry* mCurrentDay;

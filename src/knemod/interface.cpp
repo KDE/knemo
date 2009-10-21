@@ -107,13 +107,20 @@ void Interface::configChanged()
     //mSettings.calendar = interfaceGroup.readEntry( "Calendar", KGlobal::locale()->calendarType() );
     mSettings.calendar = interfaceGroup.readEntry( "Calendar", "gregorian" );
 
+    mSettings.customBilling = interfaceGroup.readEntry( "CustomBilling", false );
+
     KCalendarSystem* calendar = KCalendarSystem::create( mSettings.calendar );
     QDate startDate = QDate::currentDate().addDays( 1 - calendar->day( QDate::currentDate() ) );
     mSettings.billingStart = interfaceGroup.readEntry( "BillingStart", startDate );
     // No future start period
     if ( mSettings.billingStart > QDate::currentDate() )
         mSettings.billingStart = startDate;
-    mSettings.billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", 0 ), 0, 6 );
+    mSettings.billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", 1 ), 1, 6 );
+    if ( mSettings.customBilling == false )
+    {
+        mSettings.billingMonths = 1;
+        mSettings.billingStart = mSettings.billingStart.addDays( 1 - calendar->day( mSettings.billingStart ) );
+    }
     mSettings.commands.clear();
     if ( mSettings.customCommands )
     {

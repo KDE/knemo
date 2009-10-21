@@ -157,6 +157,7 @@ struct InterfaceSettings
         hideWhenUnavailable( false ),
         hideWhenDisconnected( false ),
         activateStatistics( false ),
+        customBilling( false ),
         billingMonths( 1 ),
         customCommands( false )
     {}
@@ -172,6 +173,7 @@ struct InterfaceSettings
     bool hideWhenUnavailable;
     bool hideWhenDisconnected;
     bool activateStatistics;
+    bool customBilling;
     QDate billingStart;
     int billingMonths;
     QString calendar;

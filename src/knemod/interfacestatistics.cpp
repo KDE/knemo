@@ -69,6 +69,7 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
     : QObject(),
       mInterface( interface ),
       mWarningDone( false ),
+      mAllMonths( true ),
       mBillingStart( mInterface->getSettings().billingStart ),
       mCalendar( KCalendarSystem::create( mInterface->getSettings().calendar ) )
 {
@@ -112,6 +113,7 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
             break;
         case Month:
             groupName = group_months;
+            mAllMonths = true;
             break;
         case Year:
             groupName = group_years;
@@ -165,6 +167,9 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                         // Old format had no span, so daysInMonth using gregorian
                         if ( entry->span == 0 )
                             entry->span = entry->date.daysInMonth();
+                        if ( cal->day( entry->date ) != 1 ||
+                             entry->span != cal->daysInMonth( entry->date ) )
+                            mAllMonths = false;
                         break;
                     case Year:
                         cal->setYMD( entry->date,
@@ -222,6 +227,8 @@ void InterfaceStatistics::loadStatistics()
     if ( root.attribute( attrib_calendar ).isEmpty() ||
          inCal->calendarType() != mCalendar->calendarType() )
         rebuildStats( mDayStatistics.first()->date, Week | Year );
+    if ( mAllMonths == false && mInterface->getSettings().customBilling == false )
+        rebuildStats( mMonthStatistics.first()->date, Month );
 }
 
 void InterfaceStatistics::buildStatsGroup( QDomDocument& doc, int group, const QList<StatisticEntry *>& statistics )
@@ -297,8 +304,18 @@ void InterfaceStatistics::configChanged()
     mWarningDone = false;
     // force a new ref day for billing periods
     mBillingStart = mInterface->getSettings().billingStart;
+    if ( mAllMonths == false && mInterface->getSettings().customBilling == false )
+        mBillingStart = mMonthStatistics.first()->date.addDays( 1 - mCalendar->day( mMonthStatistics.first()->date ) );
     // rebuildStats modifies mBillingStart, so copy first.
     rebuildStats( QDate( mBillingStart ), Month );
+
+    mAllMonths = true;
+    foreach ( StatisticEntry *entry, mMonthStatistics )
+    {
+        if ( mCalendar->day( entry->date ) != 1 ||
+             entry->span != mCalendar->daysInMonth( entry->date ) )
+            mAllMonths = false;
+    }
     emit monthStatisticsChanged( true );
 }
 
@@ -417,8 +434,6 @@ StatisticEntry * InterfaceStatistics::genNewWeek( const QDate &date )
 QDate InterfaceStatistics::getNextMonthStart( QDate nextMonthStart )
 {
     int length = mInterface->getSettings().billingMonths;
-    if ( length < 1 )
-        length = 1;
     for ( int i = 0; i < length; i++ )
     {
         QDate refDay;
@@ -455,9 +470,6 @@ StatisticEntry * InterfaceStatistics::genNewMonth( const QDate &date, QDate reca
     // billing period that the day belongs in.
     month->date = mBillingStart;
     QDate nextMonthStart = month->date;
-    int length = mInterface->getSettings().billingMonths;
-    if ( length < 1 )
-        length = 1;
     while ( nextMonthStart <= date )
     {
         month->date = nextMonthStart;
@@ -552,7 +564,21 @@ QDate InterfaceStatistics::setRebuildDate( QList<StatisticEntry *>& statistics, 
     }
 
     // now take care of instances when we're going earlier than the first recorded stats.
-    // Should only affect wk & yr
+
+    // force full rebuild on months
+    if ( group & Month &&
+         mAllMonths == false &&
+         mInterface->getSettings().customBilling == false
+       )
+    {
+        if ( statistics.size() > 0 )
+        {
+            returnDate = returnDate.addDays( 1 - mCalendar->day( statistics.at( 0 )->date ) );
+            statistics.clear();
+        }
+        returnDate = returnDate.addDays( 1 - mCalendar->day( returnDate ) );
+    }
+
     if ( group & Week )
     {
         returnDate = returnDate.addDays( 1 - mCalendar->dayOfWeek( returnDate ) );

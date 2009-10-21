@@ -182,8 +182,12 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( checkBoxUnavailableToggled ( bool ) ) );
     connect( mDlg->checkBoxStatistics, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxStatisticsToggled ( bool ) ) );
+    connect( mDlg->checkBoxCustomBilling, SIGNAL( toggled( bool ) ),
+             this, SLOT( checkBoxCustomBillingToggled( bool ) ) );
     connect( mDlg->billingStartInput, SIGNAL( dateEntered( const QDate& ) ),
              this, SLOT( billingStartInputChanged( const QDate& ) ) );
+    connect( mDlg->billingMonthsInput, SIGNAL( valueChanged( int ) ),
+             this, SLOT( billingMonthsInputChanged( int ) ) );
     connect( mDlg->warnThreshold, SIGNAL( valueChanged( double ) ),
              this, SLOT( warnThresholdChanged ( double ) ) );
     connect( mDlg->warnRxTx, SIGNAL( toggled( bool ) ),
@@ -272,7 +276,8 @@ void ConfigDialog::load()
             else
                 mCalendar = KCalendarSystem::create( settings->calendar );
 
-            settings->billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", 0 ), 0, 6 );
+            settings->customBilling = interfaceGroup.readEntry( "CustomBilling", false );
+            settings->billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", 1 ), 1, 6 );
 
              // If no start date saved, default to first of month.
             QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
@@ -284,8 +289,6 @@ void ConfigDialog::load()
             if ( nextMonthStart <= currentDate )
             {
                 int length = settings->billingMonths;
-                if ( length < 1 )
-                    length = 1;
                 while ( nextMonthStart <= currentDate )
                 {
                     settings->billingStart = nextMonthStart;
@@ -312,7 +315,7 @@ void ConfigDialog::load()
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->pushButtonDelete->setDisabled( false );
-        mDlg->tabWidget->setDisabled( false );
+        mDlg->ifaceTab->setDisabled( false );
     }
 
     // These things need to be here so that 'Reset' from the control
@@ -424,11 +427,15 @@ void ConfigDialog::save()
         interfaceGroup.writeEntry( "ActivateStatistics", settings->activateStatistics );
         interfaceGroup.writeEntry( "BillingWarnThreshold", settings->warnThreshold );
         interfaceGroup.writeEntry( "BillingWarnRxTx", settings->warnTotalTraffic );
-        interfaceGroup.writeEntry( "BillingStart", mDlg->billingStartInput->date() );
-        if ( settings->billingMonths > 0 )
-            interfaceGroup.writeEntry( "BillingMonths", settings->billingMonths );
-        if ( !settings->calendar.isEmpty() )
-            interfaceGroup.writeEntry( "Calendar", settings->calendar );
+        interfaceGroup.writeEntry( "CustomBilling", settings->customBilling );
+        if ( settings->customBilling )
+        {
+            interfaceGroup.writeEntry( "BillingStart", mDlg->billingStartInput->date() );
+            if ( settings->billingMonths > 0 )
+                interfaceGroup.writeEntry( "BillingMonths", settings->billingMonths );
+            if ( !settings->calendar.isEmpty() )
+                interfaceGroup.writeEntry( "Calendar", settings->calendar );
+        }
 
         interfaceGroup.writeEntry( "TrafficThreshold", settings->trafficThreshold );
         interfaceGroup.writeEntry( "NumCommands", settings->commands.size() );
@@ -463,7 +470,7 @@ void ConfigDialog::defaults()
     mSettingsMap.clear();
     mDlg->listBoxInterfaces->clear();
     mDlg->pushButtonDelete->setDisabled( true );
-    mDlg->tabWidget->setDisabled( true );
+    mDlg->ifaceTab->setDisabled( true );
     mDlg->lineEditAlias->setText( QString::null );
     mDlg->checkBoxDisconnected->setChecked( false );
     mDlg->checkBoxUnavailable->setChecked( false );
@@ -475,6 +482,7 @@ void ConfigDialog::defaults()
     mCalendar = KCalendarSystem::create( mDefaultCalendarType );
     setMaxDay();
 
+    mDlg->checkBoxCustomBilling->setChecked( false );
     QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
     mDlg->billingStartInput->setDate( startDate );
 
@@ -518,13 +526,14 @@ void ConfigDialog::defaults()
     if ( !interface.isEmpty() )
     {
         InterfaceSettings* settings = new InterfaceSettings();
+        settings->customBilling = false;
         settings->billingStart = startDate;
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
         mDlg->pushButtonDelete->setDisabled( false );
-        mDlg->tabWidget->setDisabled( false );
+        mDlg->ifaceTab->setDisabled( false );
     }
 
     // Default misc settings
@@ -551,11 +560,11 @@ void ConfigDialog::buttonNewSelected()
     {
         QListWidgetItem *item = new QListWidgetItem( ifname );
         mDlg->listBoxInterfaces->addItem( item );
-        mSettingsMap.insert( ifname, new InterfaceSettings() );
+        InterfaceSettings *settings = new InterfaceSettings();
+        settings->billingStart = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
+        mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->setCurrentRow( mDlg->listBoxInterfaces->row( item ) );
         mDlg->pushButtonDelete->setDisabled( false );
-        mDlg->tabWidget->setDisabled( false );
-        mDlg->lineEditAlias->clear();
         changed( true );
     }
 }
@@ -605,6 +614,8 @@ void ConfigDialog::buttonAllSelected()
         if ( mSettingsMap.contains( ifname ) )
             continue;
         InterfaceSettings* settings = new InterfaceSettings();
+        mCalendar = KCalendarSystem::create( mDefaultCalendarType );
+        settings->billingStart = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->addItem( ifname );
     }
@@ -613,7 +624,7 @@ void ConfigDialog::buttonAllSelected()
     {
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
         mDlg->pushButtonDelete->setDisabled( false );
-        mDlg->tabWidget->setDisabled( false );
+        mDlg->ifaceTab->setDisabled( false );
         QString iface = mDlg->listBoxInterfaces->item( 0 )->text();
         mDlg->lineEditAlias->blockSignals( true );
         mDlg->lineEditAlias->setText( mSettingsMap[iface]->alias );
@@ -671,7 +682,7 @@ void ConfigDialog::buttonDeleteSelected()
     if ( mDlg->listBoxInterfaces->count() < 1 )
     {
         mDlg->pushButtonDelete->setDisabled( true );
-        mDlg->tabWidget->setDisabled( true );
+        mDlg->ifaceTab->setDisabled( true );
         mDlg->pixmapError->clear();
         mDlg->pixmapDisconnected->clear();
         mDlg->pixmapConnected->clear();
@@ -929,6 +940,10 @@ void ConfigDialog::interfaceSelected( int row )
         mDlg->warnRxTx->setChecked( true );
     else
         mDlg->warnRx->setChecked( true );
+    if ( settings->customBilling )
+        mDlg->checkBoxCustomBilling->setChecked( true );
+    else
+        mDlg->checkBoxCustomBilling->setChecked( false );
 
     if ( settings->calendar.isEmpty() )
     {
@@ -1117,6 +1132,20 @@ void ConfigDialog::checkBoxUnavailableToggled( bool on )
     if (!mLock) changed( true );
 }
 
+void ConfigDialog::checkBoxCustomBillingToggled( bool on )
+{
+    if ( !mDlg->listBoxInterfaces->currentItem() )
+        return;
+
+    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
+
+    InterfaceSettings* settings = mSettingsMap[selected->text()];
+    settings->customBilling = on;
+    mDlg->billingStartInput->setDate( QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) ) );
+    mDlg->billingMonthsInput->setValue( 1 );
+
+    if (!mLock) changed( true );
+}
 
 void ConfigDialog::warnThresholdChanged( double val )
 {
@@ -1175,6 +1204,17 @@ void ConfigDialog::billingStartInputChanged( const QDate& date )
         settings->billingStart = date;
         changed( true );
     }
+}
+
+void ConfigDialog::billingMonthsInputChanged( int value )
+{
+    if ( !mDlg->listBoxInterfaces->currentItem() )
+        return;
+
+    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
+
+    InterfaceSettings* settings = mSettingsMap[selected->text()];
+    settings->billingMonths = value;
 }
 
 void ConfigDialog::checkBoxStartKNemoToggled( bool on )
