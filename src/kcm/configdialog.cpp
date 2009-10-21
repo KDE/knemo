@@ -146,28 +146,28 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
 
     setButtons( KCModule::Default | KCModule::Apply );
 
+    connect( mDlg->checkBoxStartKNemo, SIGNAL( toggled( bool ) ),
+             this, SLOT( checkBoxStartKNemoToggled( bool ) ) );
+
+    // Interface
+    connect( mDlg->listBoxInterfaces, SIGNAL( currentRowChanged( int ) ),
+             this, SLOT( interfaceSelected( int ) ) );
     connect( mDlg->pushButtonNew, SIGNAL( clicked() ),
              this, SLOT( buttonNewSelected() ) );
     connect( mDlg->pushButtonAll, SIGNAL( clicked() ),
              this, SLOT( buttonAllSelected() ) );
     connect( mDlg->pushButtonDelete, SIGNAL( clicked() ),
              this, SLOT( buttonDeleteSelected() ) );
-    connect( mDlg->pushButtonAddCommand, SIGNAL( clicked() ),
-             this, SLOT( buttonAddCommandSelected() ) );
-    connect( mDlg->pushButtonRemoveCommand, SIGNAL( clicked() ),
-             this, SLOT( buttonRemoveCommandSelected() ) );
-    connect( mDlg->pushButtonUp, SIGNAL( clicked() ),
-             this, SLOT( buttonCommandUpSelected() ) );
-    connect( mDlg->pushButtonDown, SIGNAL( clicked() ),
-             this, SLOT( buttonCommandDownSelected() ) );
-    connect( mDlg->pushButtonAddToolTip, SIGNAL( clicked() ),
-             this, SLOT( buttonAddToolTipSelected() ) );
-    connect( mDlg->pushButtonRemoveToolTip, SIGNAL( clicked() ),
-             this, SLOT( buttonRemoveToolTipSelected() ) );
-    connect( mDlg->pushButtonNotifications, SIGNAL( clicked() ),
-             this, SLOT( buttonNotificationsSelected() ) );
     connect( mDlg->lineEditAlias, SIGNAL( textChanged( const QString& ) ),
              this, SLOT( aliasChanged( const QString& ) ) );
+
+    // Interface - Icon Appearance
+    connect( mDlg->checkBoxDisconnected, SIGNAL( toggled( bool ) ),
+             this, SLOT( checkBoxDisconnectedToggled ( bool ) ) );
+    connect( mDlg->checkBoxUnavailable, SIGNAL( toggled( bool ) ),
+             this, SLOT( checkBoxUnavailableToggled ( bool ) ) );
+    connect( mDlg->spinBoxTrafficThreshold, SIGNAL( valueChanged( int ) ),
+             this, SLOT( spinBoxTrafficValueChanged ( int ) ) );
     connect( mDlg->comboBoxIconTheme, SIGNAL( activated( int ) ),
              this, SLOT( iconThemeChanged( int ) ) );
     connect( mDlg->colorIncoming, SIGNAL( changed( const QColor& ) ),
@@ -176,10 +176,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( colorButtonChanged() ) );
     connect( mDlg->colorDisabled, SIGNAL( changed( const QColor& ) ),
              this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->checkBoxDisconnected, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxDisconnectedToggled ( bool ) ) );
-    connect( mDlg->checkBoxUnavailable, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxUnavailableToggled ( bool ) ) );
+
+    // Interface - Statistics
     connect( mDlg->checkBoxStatistics, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxStatisticsToggled ( bool ) ) );
     connect( mDlg->checkBoxCustomBilling, SIGNAL( toggled( bool ) ),
@@ -192,18 +190,32 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( warnThresholdChanged ( double ) ) );
     connect( mDlg->warnRxTx, SIGNAL( toggled( bool ) ),
              this, SLOT( warnRxTxToggled ( bool ) ) );
-    connect( mDlg->checkBoxStartKNemo, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxStartKNemoToggled( bool ) ) );
-    connect( mDlg->spinBoxTrafficThreshold, SIGNAL( valueChanged( int ) ),
-             this, SLOT( spinBoxTrafficValueChanged ( int ) ) );
+
+    // Interface - Context Menu
     connect( mDlg->checkBoxCustom, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxCustomToggled ( bool ) ) );
-    connect( mDlg->listBoxInterfaces, SIGNAL( currentRowChanged( int ) ),
-             this, SLOT( interfaceSelected( int ) ) );
     connect( mDlg->listViewCommands, SIGNAL( currentItemChanged( QTreeWidgetItem*, QTreeWidgetItem* ) ),
              this, SLOT( listViewCommandsSelectionChanged( QTreeWidgetItem*, QTreeWidgetItem* ) ) );
     connect( mDlg->listViewCommands, SIGNAL( itemChanged( QTreeWidgetItem*, int ) ),
              this, SLOT( listViewCommandsChanged( QTreeWidgetItem*, int ) ) );
+    connect( mDlg->pushButtonAddCommand, SIGNAL( clicked() ),
+             this, SLOT( buttonAddCommandSelected() ) );
+    connect( mDlg->pushButtonRemoveCommand, SIGNAL( clicked() ),
+             this, SLOT( buttonRemoveCommandSelected() ) );
+    connect( mDlg->pushButtonUp, SIGNAL( clicked() ),
+             this, SLOT( buttonCommandUpSelected() ) );
+    connect( mDlg->pushButtonDown, SIGNAL( clicked() ),
+             this, SLOT( buttonCommandDownSelected() ) );
+
+    // ToolTip
+    connect( mDlg->pushButtonAddToolTip, SIGNAL( clicked() ),
+             this, SLOT( buttonAddToolTipSelected() ) );
+    connect( mDlg->pushButtonRemoveToolTip, SIGNAL( clicked() ),
+             this, SLOT( buttonRemoveToolTipSelected() ) );
+
+    // Misc
+    connect( mDlg->pushButtonNotifications, SIGNAL( clicked() ),
+             this, SLOT( buttonNotificationsSelected() ) );
     connect( mDlg->numInputPollInterval, SIGNAL( valueChanged( int ) ),
              this, SLOT( changed() ) );
     connect( mDlg->numInputSaveInterval, SIGNAL( valueChanged( int ) ),
@@ -248,6 +260,8 @@ void ConfigDialog::load()
 
     QStringList list = generalGroup.readEntry( "Interfaces", QStringList() );
 
+    // Get defaults from the struct
+    InterfaceSettings s;
     foreach ( QString interface, list )
     {
         QString group( "Interface_" );
@@ -257,29 +271,23 @@ void ConfigDialog::load()
         {
             KConfigGroup interfaceGroup( config, group );
             settings->alias = interfaceGroup.readEntry( "Alias" ).trimmed();
-            settings->iconTheme = interfaceGroup.readEntry( "IconSet", "monitor" );
-            settings->colorIncoming = interfaceGroup.readEntry( "ColorIncoming", QColor( 0x1889FF ) );
-            settings->colorOutgoing = interfaceGroup.readEntry( "ColorOutgoing", QColor( 0xFF7F08 ) );
+            settings->hideWhenDisconnected = interfaceGroup.readEntry( "HideWhenNotAvailable", s.hideWhenDisconnected );
+            settings->hideWhenUnavailable = interfaceGroup.readEntry( "HideWhenNotExisting", s.hideWhenUnavailable );
+            settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( "TrafficThreshold", s.trafficThreshold ), 0, 1000 );
+            settings->iconTheme = interfaceGroup.readEntry( "IconSet", s.iconTheme );
+            settings->colorIncoming = interfaceGroup.readEntry( "ColorIncoming", s.colorIncoming );
+            settings->colorOutgoing = interfaceGroup.readEntry( "ColorOutgoing", s.colorOutgoing );
             KColorScheme scheme(QPalette::Active, KColorScheme::View);
             settings->colorDisabled = interfaceGroup.readEntry( "ColorDisabled", scheme.foreground( KColorScheme::InactiveText ).color() );
-            settings->customCommands = interfaceGroup.readEntry( "CustomCommands", false );
-            settings->hideWhenDisconnected = interfaceGroup.readEntry( "HideWhenNotAvailable", false );
-            settings->hideWhenUnavailable = interfaceGroup.readEntry( "HideWhenNotExisting", false );
-            settings->activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", false );
-            settings->warnThreshold = clamp<double>(interfaceGroup.readEntry( "BillingWarnThreshold", 0.0 ), 0.0, 9999.0 );
-            settings->warnTotalTraffic = interfaceGroup.readEntry( "BillingWarnRxTx", false );
-
-            settings->calendar = interfaceGroup.readEntry( "Calendar", "" );
-
-            if ( settings->calendar.isEmpty() )
-                mCalendar = KCalendarSystem::create( mDefaultCalendarType );
-            else
-                mCalendar = KCalendarSystem::create( settings->calendar );
-
-            settings->customBilling = interfaceGroup.readEntry( "CustomBilling", false );
-            settings->billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", 1 ), 1, 6 );
+            settings->activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", s.activateStatistics );
+            settings->customBilling = interfaceGroup.readEntry( "CustomBilling", s.customBilling );
+            settings->calendar = interfaceGroup.readEntry( "Calendar", mDefaultCalendarType );
+            settings->billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", s.billingMonths ), 1, 6 );
+            settings->warnThreshold = clamp<double>(interfaceGroup.readEntry( "BillingWarnThreshold", s.warnThreshold ), 0.0, 9999.0 );
+            settings->warnTotalTraffic = interfaceGroup.readEntry( "BillingWarnRxTx", s.warnTotalTraffic );
 
              // If no start date saved, default to first of month.
+            mCalendar = KCalendarSystem::create( settings->calendar );
             QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
             settings->billingStart = interfaceGroup.readEntry( "BillingStart", startDate );
 
@@ -297,8 +305,8 @@ void ConfigDialog::load()
                 }
             }
 
-            settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( "TrafficThreshold", 0 ), 0, 1000 );
-            int numCommands = interfaceGroup.readEntry( "NumCommands", 0 );
+            settings->customCommands = interfaceGroup.readEntry( "CustomCommands", s.customCommands );
+            int numCommands = interfaceGroup.readEntry( "NumCommands", s.numCommands );
             for ( int i = 0; i < numCommands; i++ )
             {
                 QString entry;
@@ -314,59 +322,48 @@ void ConfigDialog::load()
         }
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
-        mDlg->pushButtonDelete->setDisabled( false );
-        mDlg->ifaceTab->setDisabled( false );
+        mDlg->pushButtonDelete->setEnabled( true );
+        mDlg->ifaceTab->setEnabled( true );
     }
 
     // These things need to be here so that 'Reset' from the control
     // center is handled correctly.
     setupToolTipTab();
 
-    // No dcop call if KNemo is not activated by the user. Otherwise
-    // load-on-demand will start KNemo.
-    if ( mDlg->checkBoxStartKNemo->isChecked() )
+    // In case the user opened the control center via the context menu
+    // this call to the daemon will deliver the interface the menu
+    // belongs to. This way we can preselect the appropriate entry in the list.
+    QString selectedInterface = QString::null;
+    QDBusMessage reply = QDBusInterface("org.kde.knemo", "/knemo", "org.kde.knemo").call("getSelectedInterface");
+    if ( reply.arguments().count() )
     {
-        // In case the user opened the control center via the context menu
-        // this call to the daemon will deliver the interface the menu
-        // belongs to. This way we can preselect the appropriate entry in the list.
-        QString selectedInterface = QString::null;
-        QDBusMessage reply = QDBusInterface("org.kde.knemo", "/knemo", "org.kde.knemo").call("getSelectedInterface");
-        if ( reply.arguments().count() )
-        {
-            selectedInterface = reply.arguments().first().toString();
-        }
+        selectedInterface = reply.arguments().first().toString();
+    }
 
-        if ( selectedInterface != QString::null )
+    if ( selectedInterface != QString::null )
+    {
+        // Try to preselect the interface.
+        int i;
+        for ( i = 0; i < mDlg->listBoxInterfaces->count(); i++ )
         {
-            // Try to preselect the interface.
-            int i;
-            for ( i = 0; i < mDlg->listBoxInterfaces->count(); i++ )
+            if ( mDlg->listBoxInterfaces->item( i )->text() == selectedInterface )
             {
-                if ( mDlg->listBoxInterfaces->item( i )->text() == selectedInterface )
-                {
-                    // Found it.
-                    mDlg->listBoxInterfaces->setCurrentRow( i );
-                    break;
-                }
-            }
-            if ( i == mDlg->listBoxInterfaces->count() )
-            {
-                // Not found. Select first entry in list.
-                mDlg->listBoxInterfaces->setCurrentRow( 0 );
+                // Found it.
+                mDlg->listBoxInterfaces->setCurrentRow( i );
+                break;
             }
         }
-        else if ( mDlg->listBoxInterfaces->count() )
+        if ( i == mDlg->listBoxInterfaces->count() )
         {
-            // No interface from daemon. Select first entry in list.
+            // Not found. Select first entry in list.
             mDlg->listBoxInterfaces->setCurrentRow( 0 );
         }
     }
-    else
+    else if ( mDlg->listBoxInterfaces->count() )
     {
-        // Started from control center. Select first entry in list.
+        // No interface from KNemo. Select first entry in list.
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
     }
-    setMaxDay();
 }
 
 void ConfigDialog::save()
@@ -417,27 +414,28 @@ void ConfigDialog::save()
         if ( !settings->alias.trimmed().isEmpty() )
             interfaceGroup.writeEntry( "Alias", settings->alias );
 
-        interfaceGroup.writeEntry( "IconSet", settings->iconTheme );
-        interfaceGroup.writeEntry( "ColorIncoming", settings->colorIncoming );
-        interfaceGroup.writeEntry( "ColorOutgoing", settings->colorOutgoing );
-        interfaceGroup.writeEntry( "ColorDisabled", settings->colorDisabled );
-        interfaceGroup.writeEntry( "CustomCommands", settings->customCommands );
         interfaceGroup.writeEntry( "HideWhenNotAvailable", settings->hideWhenDisconnected );
         interfaceGroup.writeEntry( "HideWhenNotExisting", settings->hideWhenUnavailable );
+        interfaceGroup.writeEntry( "TrafficThreshold", settings->trafficThreshold );
+        interfaceGroup.writeEntry( "IconSet", settings->iconTheme );
+        if ( settings->iconTheme == TEXT_THEME )
+        {
+            interfaceGroup.writeEntry( "ColorIncoming", settings->colorIncoming );
+            interfaceGroup.writeEntry( "ColorOutgoing", settings->colorOutgoing );
+            interfaceGroup.writeEntry( "ColorDisabled", settings->colorDisabled );
+        }
         interfaceGroup.writeEntry( "ActivateStatistics", settings->activateStatistics );
-        interfaceGroup.writeEntry( "BillingWarnThreshold", settings->warnThreshold );
-        interfaceGroup.writeEntry( "BillingWarnRxTx", settings->warnTotalTraffic );
         interfaceGroup.writeEntry( "CustomBilling", settings->customBilling );
         if ( settings->customBilling )
         {
             interfaceGroup.writeEntry( "BillingStart", mDlg->billingStartInput->date() );
-            if ( settings->billingMonths > 0 )
-                interfaceGroup.writeEntry( "BillingMonths", settings->billingMonths );
-            if ( !settings->calendar.isEmpty() )
-                interfaceGroup.writeEntry( "Calendar", settings->calendar );
+            interfaceGroup.writeEntry( "BillingMonths", settings->billingMonths );
+            interfaceGroup.writeEntry( "Calendar", settings->calendar );
         }
+        interfaceGroup.writeEntry( "BillingWarnThreshold", settings->warnThreshold );
+        interfaceGroup.writeEntry( "BillingWarnRxTx", settings->warnTotalTraffic );
 
-        interfaceGroup.writeEntry( "TrafficThreshold", settings->trafficThreshold );
+        interfaceGroup.writeEntry( "CustomCommands", settings->customCommands );
         interfaceGroup.writeEntry( "NumCommands", settings->commands.size() );
         for ( int i = 0; i < settings->commands.size(); i++ )
         {
@@ -469,38 +467,10 @@ void ConfigDialog::defaults()
     // Set these values before we check for default interfaces
     mSettingsMap.clear();
     mDlg->listBoxInterfaces->clear();
-    mDlg->pushButtonDelete->setDisabled( true );
-    mDlg->ifaceTab->setDisabled( true );
-    mDlg->lineEditAlias->setText( QString::null );
-    mDlg->checkBoxDisconnected->setChecked( false );
-    mDlg->checkBoxUnavailable->setChecked( false );
-    mDlg->checkBoxStatistics->setChecked( false );
+    mDlg->pushButtonDelete->setEnabled( false );
 
-    // TODO: Test for a KDE release that contains SVN commit 1013534
-    KGlobal::locale()->setCalendar( mDefaultCalendarType );
-
-    mCalendar = KCalendarSystem::create( mDefaultCalendarType );
-    setMaxDay();
-
-    mDlg->checkBoxCustomBilling->setChecked( false );
-    QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
-    mDlg->billingStartInput->setDate( startDate );
-
-    mDlg->checkBoxCustom->setChecked( false );
-    int index = findIndexFromName( "monitor" );
-    if ( index < 0 )
-        index = findIndexFromName( TEXT_THEME );
-    mDlg->comboBoxIconTheme->setCurrentIndex( index );
-    mDlg->pixmapError->clear();
-    mDlg->pixmapDisconnected->clear();
-    mDlg->pixmapConnected->clear();
-    mDlg->pixmapIncoming->clear();
-    mDlg->pixmapOutgoing->clear();
-    mDlg->pixmapTraffic->clear();
-    mDlg->colorIncoming->setColor( QColor( 0x1889FF ) );
-    mDlg->colorOutgoing->setColor( QColor( 0xFF7F08 ) );
-    KColorScheme scheme(QPalette::Active, KColorScheme::View);
-    mDlg->colorDisabled->setColor( scheme.foreground( KColorScheme::InactiveText ).color() );
+    InterfaceSettings emptySettings;
+    updateControls( &emptySettings );
 
     // Default interface
     void *cache = NULL;
@@ -523,17 +493,32 @@ void ConfigDialog::defaults()
     nl_handle_destroy( rtsock );
 #endif
 
-    if ( !interface.isEmpty() )
+    if ( interface.isEmpty() )
+    {
+        mDlg->aliasLabel->setEnabled( false );
+        mDlg->lineEditAlias->setEnabled( false );
+        mDlg->ifaceTab->setEnabled( false );
+        mDlg->pixmapError->clear();
+        mDlg->pixmapDisconnected->clear();
+        mDlg->pixmapConnected->clear();
+        mDlg->pixmapIncoming->clear();
+        mDlg->pixmapOutgoing->clear();
+        mDlg->pixmapTraffic->clear();
+    }
+    else
     {
         InterfaceSettings* settings = new InterfaceSettings();
-        settings->customBilling = false;
+        QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
         settings->billingStart = startDate;
+        KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
-        mDlg->pushButtonDelete->setDisabled( false );
-        mDlg->ifaceTab->setDisabled( false );
+        mDlg->pushButtonDelete->setEnabled( true );
+        mDlg->aliasLabel->setEnabled( false );
+        mDlg->lineEditAlias->setEnabled( false );
+        mDlg->ifaceTab->setEnabled( true );
     }
 
     // Default misc settings
@@ -548,354 +533,39 @@ void ConfigDialog::defaults()
     changed( true );
 }
 
-void ConfigDialog::buttonNewSelected()
+void ConfigDialog::checkBoxStartKNemoToggled( bool on )
 {
-    bool ok = false;
-    QString ifname = KInputDialog::getText( i18n( "Add new interface" ),
-                                            i18n( "Please enter the name of the interface to be monitored.\nIt should be something like 'eth1', 'wlan2' or 'ppp0'." ),
-                                            QString::null,
-                                            &ok );
-
-    if ( ok )
+    if ( on )
     {
-        QListWidgetItem *item = new QListWidgetItem( ifname );
-        mDlg->listBoxInterfaces->addItem( item );
-        InterfaceSettings *settings = new InterfaceSettings();
-        settings->billingStart = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
-        mSettingsMap.insert( ifname, settings );
-        mDlg->listBoxInterfaces->setCurrentRow( mDlg->listBoxInterfaces->row( item ) );
-        mDlg->pushButtonDelete->setDisabled( false );
-        changed( true );
-    }
-}
-
-void ConfigDialog::buttonAllSelected()
-{
-    QStringList ifaces;
-
-#ifdef __linux__
-    nl_cache * linkCache = NULL;
-    nl_handle *rtsock = nl_handle_alloc();
-    int c = nl_connect(rtsock, NETLINK_ROUTE);
-    if ( c >= 0 )
-    {
-        linkCache = rtnl_link_alloc_cache( rtsock );
-
-        struct rtnl_link * rtlink;
-        for ( rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_first( linkCache ));
-              rtlink != NULL;
-              rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_next( reinterpret_cast<struct nl_object *>(rtlink) ))
-            )
+        KConfig *config = mConfig.data();
+        KConfigGroup generalGroup( config, "General" );
+        if ( generalGroup.readEntry( "FirstStart", true ) )
         {
-            QString ifname( rtnl_link_get_name( rtlink ) );
-            ifaces << ifname;
+            // Populate the dialog with some default values if the user starts
+            // KNemo for the very first time.
+            defaults();
         }
     }
-    nl_cache_free( linkCache );
-    nl_close( rtsock );
-    nl_handle_destroy( rtsock );
-#else
-    struct ifaddrs *ifaddr;
-    struct ifaddrs *ifa;
-    getifaddrs( &ifaddr );
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        QString ifname( ifa->ifa_name );
-        ifaces << ifname;
-    }
-    freeifaddrs( ifaddr );
-#endif
 
-    ifaces.removeAll( "lo" );
-    ifaces.removeAll( "lo0" );
-
-    foreach ( QString ifname, ifaces )
-    {
-        if ( mSettingsMap.contains( ifname ) )
-            continue;
-        InterfaceSettings* settings = new InterfaceSettings();
-        mCalendar = KCalendarSystem::create( mDefaultCalendarType );
-        settings->billingStart = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
-        mSettingsMap.insert( ifname, settings );
-        mDlg->listBoxInterfaces->addItem( ifname );
-    }
-
-    if ( mDlg->listBoxInterfaces->count() > 0 )
-    {
-        mDlg->listBoxInterfaces->setCurrentRow( 0 );
-        mDlg->pushButtonDelete->setDisabled( false );
-        mDlg->ifaceTab->setDisabled( false );
-        QString iface = mDlg->listBoxInterfaces->item( 0 )->text();
-        mDlg->lineEditAlias->blockSignals( true );
-        mDlg->lineEditAlias->setText( mSettingsMap[iface]->alias );
-        mDlg->lineEditAlias->blockSignals( false );
-    }
-    changed( true );
+    if (!mLock) changed( true );
 }
 
-void ConfigDialog::buttonDeleteSelected()
+
+
+/******************************************
+ *                                        *
+ * Interface tab                          *
+ *                                        *
+ ******************************************/
+
+InterfaceSettings * ConfigDialog::getItemSettings()
 {
     if ( !mDlg->listBoxInterfaces->currentItem() )
-        return;
+        return NULL;
 
     QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
 
-    // To prevent bloat when we save
-    if ( !mDeletedIfaces.contains( selected->text() ) )
-        mDeletedIfaces << selected->text();
-
-    // TODO: find a better way than blocking signals
-    mSettingsMap.remove( selected->text() );
-    mDlg->lineEditAlias->blockSignals( true );
-    mDlg->lineEditAlias->setText( QString::null );
-    mDlg->lineEditAlias->blockSignals( false );
-    mDlg->comboBoxIconTheme->blockSignals( true );
-    int index = findIndexFromName( "monitor" );
-    if ( index < 0 )
-        index = findIndexFromName( TEXT_THEME );
-    mDlg->comboBoxIconTheme->setCurrentIndex( index );
-    mDlg->comboBoxIconTheme->blockSignals( false );
-    mDlg->checkBoxDisconnected->blockSignals( true );
-    mDlg->checkBoxDisconnected->setChecked( false );
-    mDlg->checkBoxDisconnected->blockSignals( false );
-    mDlg->checkBoxUnavailable->blockSignals( true );
-    mDlg->checkBoxUnavailable->setChecked( false );
-    mDlg->checkBoxUnavailable->blockSignals( false );
-    mDlg->checkBoxStatistics->blockSignals( true );
-    mDlg->checkBoxStatistics->setChecked( false );
-    mDlg->checkBoxStatistics->blockSignals( false );
-    mDlg->billingStartInput->blockSignals( true );
-
-    // TODO: Test for a KDE release that contains SVN commit 1013534
-    KGlobal::locale()->setCalendar( mDefaultCalendarType );
-
-    mCalendar = KCalendarSystem::create( mDefaultCalendarType );
-    setMaxDay();
-    QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
-    mDlg->billingStartInput->setDate( startDate );
-    mDlg->billingStartInput->blockSignals( false );
-    mDlg->checkBoxCustom->blockSignals( true );
-    mDlg->checkBoxCustom->setChecked( false );
-    mDlg->checkBoxCustom->blockSignals( false );
-    QListWidgetItem *taken = mDlg->listBoxInterfaces->takeItem( mDlg->listBoxInterfaces->row( selected ) );
-    delete taken;
-    if ( mDlg->listBoxInterfaces->count() < 1 )
-    {
-        mDlg->pushButtonDelete->setDisabled( true );
-        mDlg->ifaceTab->setDisabled( true );
-        mDlg->pixmapError->clear();
-        mDlg->pixmapDisconnected->clear();
-        mDlg->pixmapConnected->clear();
-        mDlg->pixmapIncoming->clear();
-        mDlg->pixmapOutgoing->clear();
-        mDlg->pixmapTraffic->clear();
-    }
-    changed( true );
-}
-
-void ConfigDialog::buttonAddCommandSelected()
-{
-    if ( !mDlg->listBoxInterfaces->currentItem() )
-        return;
-
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    InterfaceSettings* settings = mSettingsMap.value( selected->text() );
-
-    InterfaceCommand cmd;
-    cmd.runAsRoot = false;
-    cmd.menuText = QString();
-    cmd.command = QString();
-    settings->commands.append( cmd );
-
-    QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setCheckState( 0, Qt::Unchecked );
-    item->setFlags( item->flags() | Qt::ItemIsEditable );
-    mDlg->listViewCommands->addTopLevelItem( item );
-
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::buttonRemoveCommandSelected()
-{
-    if ( !mDlg->listBoxInterfaces->currentItem() ||
-         !mDlg->listViewCommands->currentItem() )
-        return;
-
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    QTreeWidgetItem *item = mDlg->listViewCommands->currentItem();
-    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
-    mDlg->listViewCommands->takeTopLevelItem( index );
-    delete item;
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
-
-    QList<InterfaceCommand> cmds;
-    QTreeWidgetItemIterator i( mDlg->listViewCommands );
-    while ( QTreeWidgetItem * item = *i )
-    {
-        InterfaceCommand cmd;
-        cmd.runAsRoot = item->checkState( 0 );
-        cmd.menuText = item->text( 1 );
-        cmd.command = item->text( 2 );
-        cmds.append( cmd );
-        ++i;
-    }
-
-    settings->commands = cmds;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::buttonCommandUpSelected()
-{
-    if ( !mDlg->listBoxInterfaces->currentItem() ||
-         !mDlg->listViewCommands->currentItem() )
-        return;
-
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-    QTreeWidgetItem* item = mDlg->listViewCommands->currentItem();
-    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
-    if ( index == 0 )
-        return;
-
-    mDlg->listViewCommands->takeTopLevelItem( index );
-    mDlg->listViewCommands->insertTopLevelItem( index - 1, item );
-    mDlg->listViewCommands->setCurrentItem( item );
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
-
-    QList<InterfaceCommand> cmds;
-    QTreeWidgetItemIterator i( mDlg->listViewCommands );
-    while ( QTreeWidgetItem * item = *i )
-    {
-        InterfaceCommand cmd;
-        cmd.runAsRoot = item->checkState( 0 );
-        cmd.menuText = item->text( 1 );
-        cmd.command = item->text( 2 );
-        cmds.append( cmd );
-        ++i;
-    }
-
-    settings->commands = cmds;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::buttonCommandDownSelected()
-{
-    if ( !mDlg->listBoxInterfaces->currentItem() ||
-         !mDlg->listViewCommands->currentItem() )
-        return;
-
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-    QTreeWidgetItem* item = mDlg->listViewCommands->currentItem();
-    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
-    if ( index == mDlg->listViewCommands->topLevelItemCount() - 1 )
-        return;
-
-    mDlg->listViewCommands->takeTopLevelItem( index );
-    mDlg->listViewCommands->insertTopLevelItem( index + 1, item );
-    mDlg->listViewCommands->setCurrentItem( item );
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
-
-    QList<InterfaceCommand> cmds;
-    QTreeWidgetItemIterator i( mDlg->listViewCommands );
-    while ( QTreeWidgetItem * item = *i )
-    {
-        InterfaceCommand cmd;
-        cmd.runAsRoot = item->checkState( 0 );
-        cmd.menuText = item->text( 1 );
-        cmd.command = item->text( 2 );
-        cmds.append( cmd );
-        ++i;
-    }
-
-    settings->commands = cmds;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::buttonAddToolTipSelected()
-{
-    // Support extended selection
-    if ( mDlg->listBoxAvailable->count() == 0 )
-        return;
-
-    QList<QListWidgetItem *> selectedItems = mDlg->listBoxAvailable->selectedItems();
-
-    foreach ( QListWidgetItem *selected, selectedItems )
-    {
-        quint32 key = mToolTips.key( selected->text() );
-
-        int newIndex = -1;
-        int count = mDlg->listBoxDisplay->count();
-        for ( int i = 0; i < count; i++ )
-        {
-            QListWidgetItem *item = mDlg->listBoxDisplay->item( i );
-            if ( mToolTips.key( item->text() ) > key )
-            {
-                newIndex = i;
-                break;
-            }
-        }
-        if ( newIndex < 0 )
-            newIndex = count;
-
-        selected->setSelected( false );
-        mDlg->listBoxAvailable->takeItem( mDlg->listBoxAvailable->row( selected ) );
-        mDlg->listBoxDisplay->insertItem( newIndex, selected );
-        if ( mDlg->listBoxAvailable->count() == 0 )
-            mDlg->pushButtonAddToolTip->setEnabled( false );
-        if ( mDlg->listBoxDisplay->count() == 1 )
-            mDlg->pushButtonRemoveToolTip->setEnabled( true );
-
-        mToolTipContent += mToolTips.key( selected->text() );
-        changed( true );
-    }
-}
-
-void ConfigDialog::buttonRemoveToolTipSelected()
-{
-    // Support extended selection
-    if ( mDlg->listBoxDisplay->count() == 0 )
-        return;
-
-    QList<QListWidgetItem *> selectedItems = mDlg->listBoxDisplay->selectedItems();
-
-    foreach ( QListWidgetItem *selected, selectedItems )
-    {
-        quint32 key = mToolTips.key( selected->text() );
-
-        int newIndex = -1;
-        int count = mDlg->listBoxAvailable->count();
-        for ( int i = 0; i < count; i++ )
-        {
-            QListWidgetItem *item = mDlg->listBoxAvailable->item( i );
-            if ( mToolTips.key( item->text() ) > key )
-            {
-                newIndex = i;
-                break;
-            }
-        }
-        if ( newIndex < 0 )
-            newIndex = count;
-
-        selected->setSelected( false );
-        mDlg->listBoxDisplay->takeItem( mDlg->listBoxDisplay->row( selected ) );
-        mDlg->listBoxAvailable->insertItem( newIndex, selected );
-        if ( mDlg->listBoxDisplay->count() == 0 )
-            mDlg->pushButtonRemoveToolTip->setEnabled( false );
-        if ( mDlg->listBoxAvailable->count() == 1 )
-            mDlg->pushButtonAddToolTip->setEnabled( true );
-
-        mToolTipContent -= mToolTips.key( selected->text() );
-        changed( true );
-    }
-}
-
-void ConfigDialog::buttonNotificationsSelected()
-{
-    KNotifyConfigWidget::configure( this, "knemo" );
+    return mSettingsMap[selected->text()];
 }
 
 QString ConfigDialog::findNameFromIndex( int index )
@@ -915,12 +585,8 @@ int ConfigDialog::findIndexFromName( const QString& internalName )
     return -1;
 }
 
-void ConfigDialog::interfaceSelected( int row )
+void ConfigDialog::updateControls( InterfaceSettings *settings )
 {
-    if ( row < 0 )
-        return;
-    QString interface = mDlg->listBoxInterfaces->item( row )->text();
-    InterfaceSettings* settings = mSettingsMap[interface];
     mLock = true;
     mDlg->lineEditAlias->setText( settings->alias );
     int index = findIndexFromName( settings->iconTheme );
@@ -978,42 +644,157 @@ void ConfigDialog::interfaceSelected( int row )
         items << item;
     }
     mDlg->listViewCommands->addTopLevelItems( items );
-
     mLock = false;
+}
+
+void ConfigDialog::interfaceSelected( int row )
+{
+    if ( row < 0 )
+        return;
+    QString interface = mDlg->listBoxInterfaces->item( row )->text();
+    InterfaceSettings* settings = mSettingsMap[interface];
+    mDlg->ifaceTab->setEnabled( true );
+    mDlg->aliasLabel->setEnabled( true );
+    mDlg->lineEditAlias->setEnabled( true );
+    updateControls( settings );
+}
+
+void ConfigDialog::buttonNewSelected()
+{
+    bool ok = false;
+    QString ifname = KInputDialog::getText( i18n( "Add new interface" ),
+                                            i18n( "Please enter the name of the interface to be monitored.\nIt should be something like 'eth1', 'wlan2' or 'ppp0'." ),
+                                            QString::null,
+                                            &ok );
+
+    if ( ok )
+    {
+        QListWidgetItem *item = new QListWidgetItem( ifname );
+        mDlg->listBoxInterfaces->addItem( item );
+        InterfaceSettings *settings = new InterfaceSettings();
+        mCalendar = KCalendarSystem::create( mDefaultCalendarType );
+        settings->billingStart = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
+        KColorScheme scheme(QPalette::Active, KColorScheme::View);
+        settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
+        mSettingsMap.insert( ifname, settings );
+        mDlg->listBoxInterfaces->setCurrentRow( mDlg->listBoxInterfaces->row( item ) );
+        mDlg->pushButtonDelete->setEnabled( true );
+        changed( true );
+    }
+}
+
+void ConfigDialog::buttonAllSelected()
+{
+    QStringList ifaces;
+
+#ifdef __linux__
+    nl_cache * linkCache = NULL;
+    nl_handle *rtsock = nl_handle_alloc();
+    int c = nl_connect(rtsock, NETLINK_ROUTE);
+    if ( c >= 0 )
+    {
+        linkCache = rtnl_link_alloc_cache( rtsock );
+
+        struct rtnl_link * rtlink;
+        for ( rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_first( linkCache ));
+              rtlink != NULL;
+              rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_next( reinterpret_cast<struct nl_object *>(rtlink) ))
+            )
+        {
+            QString ifname( rtnl_link_get_name( rtlink ) );
+            ifaces << ifname;
+        }
+    }
+    nl_cache_free( linkCache );
+    nl_close( rtsock );
+    nl_handle_destroy( rtsock );
+#else
+    struct ifaddrs *ifaddr;
+    struct ifaddrs *ifa;
+    getifaddrs( &ifaddr );
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        QString ifname( ifa->ifa_name );
+        ifaces << ifname;
+    }
+    freeifaddrs( ifaddr );
+#endif
+
+    ifaces.removeAll( "lo" );
+    ifaces.removeAll( "lo0" );
+
+    foreach ( QString ifname, ifaces )
+    {
+        if ( mSettingsMap.contains( ifname ) )
+            continue;
+        InterfaceSettings* settings = new InterfaceSettings();
+        mCalendar = KCalendarSystem::create( mDefaultCalendarType );
+        settings->billingStart = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
+        KColorScheme scheme(QPalette::Active, KColorScheme::View);
+        settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
+        mSettingsMap.insert( ifname, settings );
+        mDlg->listBoxInterfaces->addItem( ifname );
+    }
+
+    if ( mDlg->listBoxInterfaces->count() > 0 )
+    {
+        mDlg->listBoxInterfaces->setCurrentRow( 0 );
+        mDlg->pushButtonDelete->setEnabled( true );
+        mDlg->ifaceTab->setEnabled( true );
+        QString iface = mDlg->listBoxInterfaces->item( 0 )->text();
+    }
+    changed( true );
+}
+
+void ConfigDialog::buttonDeleteSelected()
+{
+    if ( !mDlg->listBoxInterfaces->currentItem() )
+        return;
+
+    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
+
+    // To prevent bloat when we save
+    if ( !mDeletedIfaces.contains( selected->text() ) )
+        mDeletedIfaces << selected->text();
+    mSettingsMap.remove( selected->text() );
+
+    QListWidgetItem *taken = mDlg->listBoxInterfaces->takeItem( mDlg->listBoxInterfaces->row( selected ) );
+    delete taken;
+
+    if ( mDlg->listBoxInterfaces->count() < 1 )
+    {
+        InterfaceSettings emptySettings;
+        updateControls( &emptySettings );
+        mDlg->pushButtonDelete->setEnabled( false );
+        mDlg->aliasLabel->setEnabled( false );
+        mDlg->lineEditAlias->setEnabled( false );
+        mDlg->ifaceTab->setEnabled( false );
+        mDlg->pixmapError->clear();
+        mDlg->pixmapDisconnected->clear();
+        mDlg->pixmapConnected->clear();
+        mDlg->pixmapIncoming->clear();
+        mDlg->pixmapOutgoing->clear();
+        mDlg->pixmapTraffic->clear();
+    }
+    changed( true );
 }
 
 void ConfigDialog::aliasChanged( const QString& text )
 {
-    if ( !mDlg->listBoxInterfaces->currentItem() )
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
         return;
 
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
     settings->alias = text;
     if (!mLock) changed( true );
 }
 
-void ConfigDialog::colorButtonChanged()
-{
-    if ( !mDlg->listBoxInterfaces->currentItem() )
-        return;
 
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
-    if ( mDlg->colorIncoming->color().isValid() )
-        settings->colorIncoming = mDlg->colorIncoming->color();
-    if ( mDlg->colorOutgoing->color().isValid() )
-        settings->colorOutgoing = mDlg->colorOutgoing->color();
-    if ( mDlg->colorDisabled->color().isValid() )
-        settings->colorDisabled = mDlg->colorDisabled->color();
-
-    KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
-    if ( curTheme.internalName == TEXT_THEME )
-        iconThemeChanged( mDlg->comboBoxIconTheme->currentIndex() );
-    if ( !mLock) changed( true );
-}
+/******************************************
+ *                                        *
+ * Interface tab - Icon Appearance        *
+ *                                        *
+ ******************************************/
 
 QFont ConfigDialog::setIconFont( QString text )
 {
@@ -1059,14 +840,42 @@ QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, bool
     return sampleIcon;
 }
 
-void ConfigDialog::iconThemeChanged( int set )
+void ConfigDialog::checkBoxDisconnectedToggled( bool on )
 {
-    if ( !mDlg->listBoxInterfaces->currentItem() )
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
         return;
 
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
+    settings->hideWhenDisconnected = on;
+    if (!mLock) changed( true );
+}
 
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
+void ConfigDialog::checkBoxUnavailableToggled( bool on )
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
+    settings->hideWhenUnavailable = on;
+    if (!mLock) changed( true );
+}
+
+void ConfigDialog::spinBoxTrafficValueChanged( int value )
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
+    settings->trafficThreshold = value;
+    if (!mLock) changed( true );
+}
+
+void ConfigDialog::iconThemeChanged( int set )
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
     KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
     if ( curTheme.internalName == TEXT_THEME )
     {
@@ -1108,88 +917,59 @@ void ConfigDialog::iconThemeChanged( int set )
     if (!mLock) changed( true );
 }
 
-void ConfigDialog::checkBoxDisconnectedToggled( bool on )
+void ConfigDialog::colorButtonChanged()
 {
-    if ( !mDlg->listBoxInterfaces->currentItem() )
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
         return;
 
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
+    if ( mDlg->colorIncoming->color().isValid() )
+        settings->colorIncoming = mDlg->colorIncoming->color();
+    if ( mDlg->colorOutgoing->color().isValid() )
+        settings->colorOutgoing = mDlg->colorOutgoing->color();
+    if ( mDlg->colorDisabled->color().isValid() )
+        settings->colorDisabled = mDlg->colorDisabled->color();
 
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
-    settings->hideWhenDisconnected = on;
-    if (!mLock) changed( true );
+    KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
+    if ( curTheme.internalName == TEXT_THEME )
+        iconThemeChanged( mDlg->comboBoxIconTheme->currentIndex() );
+    if ( !mLock) changed( true );
 }
 
-void ConfigDialog::checkBoxUnavailableToggled( bool on )
+
+/******************************************
+ *                                        *
+ * Interface tab - Statistics             *
+ *                                        *
+ ******************************************/
+
+void ConfigDialog::checkBoxStatisticsToggled( bool on )
 {
-    if ( !mDlg->listBoxInterfaces->currentItem() )
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
         return;
 
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
-    settings->hideWhenUnavailable = on;
+    settings->activateStatistics = on;
     if (!mLock) changed( true );
 }
 
 void ConfigDialog::checkBoxCustomBillingToggled( bool on )
 {
-    if ( !mDlg->listBoxInterfaces->currentItem() )
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
         return;
 
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
     settings->customBilling = on;
     mDlg->billingStartInput->setDate( QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) ) );
     mDlg->billingMonthsInput->setValue( 1 );
-
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::warnThresholdChanged( double val )
-{
-    if ( !mDlg->listBoxInterfaces->currentItem() )
-        return;
-
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
-    settings->warnThreshold = round(val*10.0)/10.0;
-
-    mDlg->warnRx->setEnabled( ( settings->warnThreshold > 0.0 ) );
-    mDlg->warnRxTx->setEnabled( ( settings->warnThreshold > 0.0 ) );
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::warnRxTxToggled( bool on )
-{
-    if ( !mDlg->listBoxInterfaces->currentItem() )
-        return;
-
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
-    settings->warnTotalTraffic = on;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::checkBoxStatisticsToggled( bool on )
-{
-    if ( !mDlg->listBoxInterfaces->currentItem() )
-        return;
-
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
-    settings->activateStatistics = on;
     if (!mLock) changed( true );
 }
 
 void ConfigDialog::billingStartInputChanged( const QDate& date )
 {
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
 
     // KDateEdit doesn't guarantee a valid date
     if ( !date.isValid() ||
@@ -1208,52 +988,50 @@ void ConfigDialog::billingStartInputChanged( const QDate& date )
 
 void ConfigDialog::billingMonthsInputChanged( int value )
 {
-    if ( !mDlg->listBoxInterfaces->currentItem() )
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
         return;
 
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
     settings->billingMonths = value;
 }
 
-void ConfigDialog::checkBoxStartKNemoToggled( bool on )
+void ConfigDialog::warnThresholdChanged( double val )
 {
-    if ( on )
-    {
-        KConfig *config = mConfig.data();
-        KConfigGroup generalGroup( config, "General" );
-        if ( generalGroup.readEntry( "FirstStart", true ) )
-        {
-            // Populate the dialog with some default values if the user starts
-            // KNemo for the very first time.
-            defaults();
-        }
-    }
-
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::spinBoxTrafficValueChanged( int value )
-{
-    if ( !mDlg->listBoxInterfaces->currentItem() )
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
         return;
 
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
-    settings->trafficThreshold = value;
+    settings->warnThreshold = round(val*10.0)/10.0;
+    bool enable = settings->warnThreshold > 0.0;
+    mDlg->warnRx->setEnabled( enable );
+    mDlg->warnRxTx->setEnabled( enable );
     if (!mLock) changed( true );
 }
+
+void ConfigDialog::warnRxTxToggled( bool on )
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
+    settings->warnTotalTraffic = on;
+    if (!mLock) changed( true );
+}
+
+
+
+/******************************************
+ *                                        *
+ * Interface tab - Context Menu           *
+ *                                        *
+ ******************************************/
 
 void ConfigDialog::checkBoxCustomToggled( bool on )
 {
-    if ( !mDlg->listBoxInterfaces->currentItem() )
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
         return;
 
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
     settings->customCommands = on;
     if ( on )
     {
@@ -1266,35 +1044,159 @@ void ConfigDialog::checkBoxCustomToggled( bool on )
     if (!mLock) changed( true );
 }
 
-void ConfigDialog::setupToolTipTab()
+void ConfigDialog::buttonAddCommandSelected()
 {
-    mDlg->listBoxDisplay->clear();
-    mDlg->listBoxAvailable->clear();
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
 
-    foreach ( QString tip, mToolTips )
-    {
-        if ( mToolTipContent & mToolTips.key( tip ) )
-            mDlg->listBoxDisplay->addItem( tip );
-        else
-            mDlg->listBoxAvailable->addItem( tip );
-    }
+    InterfaceCommand cmd;
+    cmd.runAsRoot = false;
+    cmd.menuText = QString();
+    cmd.command = QString();
+    settings->commands.append( cmd );
 
-    if ( mDlg->listBoxDisplay->count() > 0 )
-    {
-        mDlg->listBoxDisplay->item( 0 )->setSelected( true );
-        mDlg->pushButtonRemoveToolTip->setEnabled( true );
-    }
-    else
-        mDlg->pushButtonRemoveToolTip->setEnabled( false );
+    QTreeWidgetItem* item = new QTreeWidgetItem();
+    item->setCheckState( 0, Qt::Unchecked );
+    item->setFlags( item->flags() | Qt::ItemIsEditable );
+    mDlg->listViewCommands->addTopLevelItem( item );
 
-    if ( mDlg->listBoxAvailable->count() > 0 )
-    {
-        mDlg->listBoxAvailable->item( 0 )->setSelected( true );
-        mDlg->pushButtonAddToolTip->setEnabled( true );
-    }
-    else
-        mDlg->pushButtonAddToolTip->setEnabled( false );
+    if (!mLock) changed( true );
 }
+
+void ConfigDialog::buttonRemoveCommandSelected()
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
+    if ( !mDlg->listViewCommands->currentItem() )
+        return;
+
+    QTreeWidgetItem *item = mDlg->listViewCommands->currentItem();
+    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
+    mDlg->listViewCommands->takeTopLevelItem( index );
+    delete item;
+
+    QList<InterfaceCommand> cmds;
+    QTreeWidgetItemIterator i( mDlg->listViewCommands );
+    while ( QTreeWidgetItem * item = *i )
+    {
+        InterfaceCommand cmd;
+        cmd.runAsRoot = item->checkState( 0 );
+        cmd.menuText = item->text( 1 );
+        cmd.command = item->text( 2 );
+        cmds.append( cmd );
+        ++i;
+    }
+
+    settings->commands = cmds;
+    if (!mLock) changed( true );
+}
+
+void ConfigDialog::buttonCommandUpSelected()
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
+    if ( !mDlg->listViewCommands->currentItem() )
+        return;
+
+    QTreeWidgetItem* item = mDlg->listViewCommands->currentItem();
+    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
+    if ( index == 0 )
+        return;
+
+    mDlg->listViewCommands->takeTopLevelItem( index );
+    mDlg->listViewCommands->insertTopLevelItem( index - 1, item );
+    mDlg->listViewCommands->setCurrentItem( item );
+
+    QList<InterfaceCommand> cmds;
+    QTreeWidgetItemIterator i( mDlg->listViewCommands );
+    while ( QTreeWidgetItem * item = *i )
+    {
+        InterfaceCommand cmd;
+        cmd.runAsRoot = item->checkState( 0 );
+        cmd.menuText = item->text( 1 );
+        cmd.command = item->text( 2 );
+        cmds.append( cmd );
+        ++i;
+    }
+
+    settings->commands = cmds;
+    if (!mLock) changed( true );
+}
+
+void ConfigDialog::buttonCommandDownSelected()
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
+    if ( !mDlg->listViewCommands->currentItem() )
+        return;
+
+    QTreeWidgetItem* item = mDlg->listViewCommands->currentItem();
+    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
+    if ( index == mDlg->listViewCommands->topLevelItemCount() - 1 )
+        return;
+
+    mDlg->listViewCommands->takeTopLevelItem( index );
+    mDlg->listViewCommands->insertTopLevelItem( index + 1, item );
+    mDlg->listViewCommands->setCurrentItem( item );
+
+    QList<InterfaceCommand> cmds;
+    QTreeWidgetItemIterator i( mDlg->listViewCommands );
+    while ( QTreeWidgetItem * item = *i )
+    {
+        InterfaceCommand cmd;
+        cmd.runAsRoot = item->checkState( 0 );
+        cmd.menuText = item->text( 1 );
+        cmd.command = item->text( 2 );
+        cmds.append( cmd );
+        ++i;
+    }
+
+    settings->commands = cmds;
+    if (!mLock) changed( true );
+}
+
+void ConfigDialog::listViewCommandsSelectionChanged( QTreeWidgetItem* item, QTreeWidgetItem* )
+{
+    mDlg->pushButtonRemoveCommand->setEnabled( item != NULL );
+}
+
+void ConfigDialog::listViewCommandsChanged( QTreeWidgetItem* item, int column )
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
+    int row = mDlg->listViewCommands->indexOfTopLevelItem( item );
+    InterfaceCommand& cmd = settings->commands[row];
+    switch ( column )
+    {
+        case 0:
+            cmd.runAsRoot = item->checkState( 0 );
+            break;
+        case 1:
+            cmd.menuText = item->text( 1 );
+            break;
+        case 2:
+            cmd.command = item->text( 2 );
+    }
+
+    if (!mLock) changed( true );
+}
+
+
+
+/******************************************
+ *                                        *
+ * ToolTip tab                            *
+ *                                        *
+ ******************************************/
 
 void ConfigDialog::setupToolTipMap()
 {
@@ -1328,38 +1230,92 @@ void ConfigDialog::setupToolTipMap()
     mToolTips.insert( ENCRYPTION, i18n( "Encryption" ) );
 }
 
-void ConfigDialog::listViewCommandsSelectionChanged( QTreeWidgetItem* item, QTreeWidgetItem* )
+void ConfigDialog::setupToolTipTab()
 {
-    if ( item )
-        mDlg->pushButtonRemoveCommand->setEnabled( true );
-    else
-        mDlg->pushButtonRemoveCommand->setEnabled( false );
-}
+    mDlg->listBoxDisplay->clear();
+    mDlg->listBoxAvailable->clear();
 
-void ConfigDialog::listViewCommandsChanged( QTreeWidgetItem* item, int column )
-{
-    if ( !mDlg->listBoxInterfaces->currentItem() )
-        return;
-
-    QListWidgetItem* selected = mDlg->listBoxInterfaces->currentItem();
-
-    int row = mDlg->listViewCommands->indexOfTopLevelItem( item );
-
-    InterfaceSettings* settings = mSettingsMap[selected->text()];
-    InterfaceCommand& cmd = settings->commands[row];
-    switch ( column )
+    foreach ( QString tip, mToolTips )
     {
-        case 0:
-            cmd.runAsRoot = item->checkState( 0 );
-            break;
-        case 1:
-            cmd.menuText = item->text( 1 );
-            break;
-        case 2:
-            cmd.command = item->text( 2 );
+        if ( mToolTipContent & mToolTips.key( tip ) )
+            mDlg->listBoxDisplay->addItem( tip );
+        else
+            mDlg->listBoxAvailable->addItem( tip );
     }
 
-    if (!mLock) changed( true );
+    if ( mDlg->listBoxDisplay->count() > 0 )
+        mDlg->listBoxDisplay->item( 0 )->setSelected( true );
+
+    if ( mDlg->listBoxAvailable->count() > 0 )
+        mDlg->listBoxAvailable->item( 0 )->setSelected( true );
+
+    mDlg->pushButtonRemoveToolTip->setEnabled( (mDlg->listBoxDisplay->count() > 0) );
+    mDlg->pushButtonAddToolTip->setEnabled( (mDlg->listBoxAvailable->count() > 0) );
+}
+
+void ConfigDialog::moveTips( QListWidget *from, QListWidget* to )
+{
+    QList<QListWidgetItem *> selectedItems = from->selectedItems();
+
+    foreach ( QListWidgetItem *selected, selectedItems )
+    {
+        quint32 key = mToolTips.key( selected->text() );
+
+        int newIndex = -1;
+        int count = to->count();
+        for ( int i = 0; i < count; i++ )
+        {
+            QListWidgetItem *item = to->item( i );
+            if ( mToolTips.key( item->text() ) > key )
+            {
+                newIndex = i;
+                break;
+            }
+        }
+        if ( newIndex < 0 )
+            newIndex = count;
+
+        selected->setSelected( false );
+        from->takeItem( from->row( selected ) );
+        to->insertItem( newIndex, selected );
+        mDlg->pushButtonAddToolTip->setEnabled( (mDlg->listBoxAvailable->count() > 0) );
+        mDlg->pushButtonRemoveToolTip->setEnabled( (mDlg->listBoxDisplay->count() > 0) );
+        changed( true );
+    }
+    mToolTipContent = 0;
+    for ( int i = 0; i < mDlg->listBoxDisplay->count(); i++ )
+        mToolTipContent += mToolTips.key( mDlg->listBoxDisplay->item( i )->text() );
+}
+
+void ConfigDialog::buttonAddToolTipSelected()
+{
+    // Support extended selection
+    if ( mDlg->listBoxAvailable->count() == 0 )
+        return;
+
+    moveTips( mDlg->listBoxAvailable, mDlg->listBoxDisplay );
+}
+
+void ConfigDialog::buttonRemoveToolTipSelected()
+{
+    // Support extended selection
+    if ( mDlg->listBoxDisplay->count() == 0 )
+        return;
+
+    moveTips( mDlg->listBoxDisplay, mDlg->listBoxAvailable );
+}
+
+
+
+/******************************************
+ *                                        *
+ * Misc tab                               *
+ *                                        *
+ ******************************************/
+
+void ConfigDialog::buttonNotificationsSelected()
+{
+    KNotifyConfigWidget::configure( this, "knemo" );
 }
 
 #include "configdialog.moc"

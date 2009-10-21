@@ -85,11 +85,14 @@ private slots:
     void colorButtonChanged();
     void listViewCommandsSelectionChanged( QTreeWidgetItem *current, QTreeWidgetItem *previous );
     void listViewCommandsChanged( QTreeWidgetItem* item, int column );
+    void moveTips( QListWidget *from, QListWidget *to );
 
 private:
     void setMaxDay();
     void setupToolTipTab();
     void setupToolTipMap();
+    void updateControls( InterfaceSettings *settings );
+    InterfaceSettings * getItemSettings();
     int findIndexFromName( const QString& internalName );
     QString findNameFromIndex( int index );
     QPixmap textIcon( QString incomingText, QString outgoingText, bool active );
