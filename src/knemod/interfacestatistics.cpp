@@ -96,7 +96,8 @@ InterfaceStatistics::~InterfaceStatistics()
     mMonthStatistics.clear();
     mYearStatistics.clear();
 
-    saveBillingStart();
+    if ( mInterface->getSettings().customBilling )
+        saveBillingStart();
 }
 
 void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDomElement& parentItem, int group, QList<StatisticEntry *>& statistics )
