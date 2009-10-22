@@ -27,7 +27,7 @@
 #include "kdateedit.h"
 
 #include <KCalendarSystem>
-#include <KDebug>
+//#include <KDebug>
 #include <KGlobal>
 #include <KGlobalSettings>
 #include <KLocale>

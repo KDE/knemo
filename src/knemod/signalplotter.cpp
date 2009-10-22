@@ -26,7 +26,7 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QPainterPath>
 
-#include <kdebug.h>
+//#include <kdebug.h>
 #include <kglobal.h>
 #include <klocale.h>
 #include <kapplication.h>
@@ -116,7 +116,7 @@ QColor KSignalPlotter::beamColor( int index ) {
 
 void KSignalPlotter::setBeamColor( int index, QColor color ) {
   if(!color.isValid()) {
-	  kDebug(1215) << "Invalid color";
+	  //kDebug(1215) << "Invalid color";
 	  return;
   }
 
@@ -168,7 +168,7 @@ void KSignalPlotter::addSample( const QList<double>& sampleBuf )
       return;
   }
   if(sampleBuf.count() != mBeamColors.count()) {
-	  kDebug(1215) << "Sample data discarded - contains wrong number of beams";
+	  //kDebug(1215) << "Sample data discarded - contains wrong number of beams";
 	  return;
   }
   mBeamData.prepend(sampleBuf);
@@ -208,7 +208,7 @@ void KSignalPlotter::reorderBeams( const QList<int>& newOrder )
   QList< QList<double> >::Iterator it;
   for(it = mBeamData.begin(); it != mBeamData.end(); ++it) {
     if(newOrder.count() != (*it).count()) {
-      kDebug(1215) << "Serious problem in move sample.  beamdata[i] has " << (*it).count() << " and neworder has " << newOrder.count();
+      //kDebug(1215) << "Serious problem in move sample.  beamdata[i] has " << (*it).count() << " and neworder has " << newOrder.count();
     } else {
      QList<double> newBeam;
      for(int i = 0; i < newOrder.count(); i++) {
@@ -334,7 +334,7 @@ void KSignalPlotter::setVerticalLinesColor( const QColor &color )
 {
   if(mVerticalLinesColor == color) return;
   if(!color.isValid()) {
-	  kDebug(1215) << "Invalid color";
+	  //kDebug(1215) << "Invalid color";
 	  return;
   }
 
@@ -402,7 +402,7 @@ bool KSignalPlotter::showHorizontalLines() const
 void KSignalPlotter::setAxisFontColor( const QColor &color )
 {
   if(!color.isValid()) {
-	  kDebug(1215) << "Invalid color";
+	  //kDebug(1215) << "Invalid color";
 	  return;
   }
 
@@ -418,7 +418,7 @@ QColor KSignalPlotter::axisFontColor() const
 void KSignalPlotter::setHorizontalLinesColor( const QColor &color )
 {
   if(!color.isValid()) {
-	  kDebug(1215) << "Invalid color";
+	  //kDebug(1215) << "Invalid color";
 	  return;
   }
 
@@ -487,7 +487,7 @@ void KSignalPlotter::setBackgroundColor( const QColor &color )
 {
   if(color == mBackgroundColor) return;
   if(!color.isValid()) {
-	  kDebug(1215) << "Invalid color";
+	  //kDebug(1215) << "Invalid color";
 	  return;
   }
   mBackgroundColor = color;
