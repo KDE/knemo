@@ -178,12 +178,14 @@ Action=Popup
 
 [Event/available]
 Name=Available
+Name[da]=Tilgængelig
 Name[en_GB]=Available
 Name[pt]=Disponível
 Name[sv]=Tillgängligt
 Name[uk]=Доступний
 Name[x-test]=xxAvailablexx
 Comment=The interface has become available
+Comment[da]=Netkortet er blevet tilgængeligt
 Comment[en_GB]=The interface has become available
 Comment[pt]=A interface ficou disponível
 Comment[sv]=Gränssnittet har blivit tillgängligt
@@ -194,12 +196,14 @@ Action=Popup
 
 [Event/unavailable]
 Name=Unavailable
+Name[da]=Utilgængeligt
 Name[en_GB]=Unavailable
 Name[pt]=Indisponível
 Name[sv]=Inte tillgängligt
 Name[uk]=Недоступний
 Name[x-test]=xxUnavailablexx
 Comment=The interface is unavailable
+Comment[da]=Netkortet er utilgængeligt
 Comment[en_GB]=The interface is unavailable
 Comment[pt]=A interface ficou indisponível
 Comment[sv]=Gränssnittet är inte tillgängligt
