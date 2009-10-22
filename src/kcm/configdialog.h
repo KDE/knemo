@@ -95,7 +95,7 @@ private:
     InterfaceSettings * getItemSettings();
     int findIndexFromName( const QString& internalName );
     QString findNameFromIndex( int index );
-    QPixmap textIcon( QString incomingText, QString outgoingText, bool active );
+    QPixmap textIcon( QString incomingText, QString outgoingText, int status );
     QFont setIconFont( QString );
 
     int mToolTipContent;

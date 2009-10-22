@@ -71,16 +71,10 @@ InterfaceIcon::~InterfaceIcon()
         delete mTray;
 }
 
-void InterfaceIcon::configChanged( const QColor& incoming,
-                                   const QColor& outgoing,
-                                   const QColor& disabled )
+void InterfaceIcon::configChanged()
 {
     KConfigGroup cg( KGlobal::mainComponent().config(), "System Tray" );
     iconWidth = cg.readEntry( "systrayIconWidth", 22 );
-
-    colorIncoming = incoming;
-    colorOutgoing = outgoing;
-    colorDisabled = disabled;
 
     updateTrayStatus();
 
@@ -221,14 +215,16 @@ void InterfaceIcon::updateIconText( bool doUpdate )
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
     p.setFont( setIconFont( byteText ) );
     if ( data->status & KNemoIface::Connected )
-        p.setPen( colorIncoming );
+        p.setPen( mInterface->getSettings().colorIncoming );
+    else if ( data->status == KNemoIface::Available )
+        p.setPen( mInterface->getSettings().colorDisabled );
     else
-        p.setPen( colorDisabled );
+        p.setPen( mInterface->getSettings().colorUnavailable );
     p.drawText( textIcon.rect(), Qt::AlignTop | Qt::AlignRight, textIncoming );
 
     p.setFont( setIconFont( byteText ) );
     if ( data->status & KNemoIface::Connected )
-        p.setPen( colorOutgoing );
+        p.setPen( mInterface->getSettings().colorOutgoing );
     p.drawText( textIcon.rect(), Qt::AlignBottom | Qt::AlignRight, textOutgoing );
 #ifdef USE_KNOTIFICATIONITEM
     mTray->setIconByPixmap( textIcon );

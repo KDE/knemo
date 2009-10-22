@@ -72,12 +72,7 @@ public slots:
      */
     void updateMenu();
 
-    /*
-     * Set colors for text in the tray
-     */
-    void configChanged( const QColor& colorIncoming,
-                        const QColor& colorOutgoing,
-                        const QColor& colorDisabled );
+    void configChanged();
 
 private slots:
     /*
@@ -123,9 +118,6 @@ private:
     KAction* plotterAction;
     KAction* statisticsAction;
     KAction* configAction;
-    QColor colorIncoming;
-    QColor colorOutgoing;
-    QColor colorDisabled;
     QString textIncoming;
     QString textOutgoing;
     int iconWidth;

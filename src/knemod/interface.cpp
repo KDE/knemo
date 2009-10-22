@@ -96,6 +96,7 @@ void Interface::configChanged()
     mSettings.colorOutgoing = interfaceGroup.readEntry( "ColorOutgoing", s.colorOutgoing );
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
     mSettings.colorDisabled = interfaceGroup.readEntry( "ColorDisabled", scheme.foreground( KColorScheme::InactiveText ).color() );
+    mSettings.colorUnavailable = interfaceGroup.readEntry( "ColorUnavailable", scheme.foreground( KColorScheme::InactiveText ).color() );
     mSettings.customCommands = interfaceGroup.readEntry( "CustomCommands", s.customCommands );
     mSettings.hideWhenDisconnected = interfaceGroup.readEntry( "HideWhenNotAvailable", s.hideWhenDisconnected );
     mSettings.hideWhenUnavailable = interfaceGroup.readEntry( "HideWhenNotExisting", s.hideWhenUnavailable );
@@ -148,7 +149,7 @@ void Interface::configChanged()
         if ( mState & KNemoIface::Connected )
             setStartTime();
     }
-    mIcon.configChanged( mSettings.colorIncoming, mSettings.colorOutgoing, mSettings.colorDisabled );
+    mIcon.configChanged();
 
     /*if ( mPlotterDialog != 0L )
     {

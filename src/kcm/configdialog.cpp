@@ -141,6 +141,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     mDlg->colorOutgoing->hide();
     mDlg->colorDisabledLabel->hide();
     mDlg->colorDisabled->hide();
+    mDlg->colorUnavailable->hide();
+    mDlg->colorUnavailable->hide();
 
     //mDlg->listViewCommands->setSorting( -1 );
 
@@ -175,6 +177,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     connect( mDlg->colorOutgoing, SIGNAL( changed( const QColor& ) ),
              this, SLOT( colorButtonChanged() ) );
     connect( mDlg->colorDisabled, SIGNAL( changed( const QColor& ) ),
+             this, SLOT( colorButtonChanged() ) );
+    connect( mDlg->colorUnavailable, SIGNAL( changed( const QColor& ) ),
              this, SLOT( colorButtonChanged() ) );
 
     // Interface - Statistics
@@ -279,6 +283,7 @@ void ConfigDialog::load()
             settings->colorOutgoing = interfaceGroup.readEntry( "ColorOutgoing", s.colorOutgoing );
             KColorScheme scheme(QPalette::Active, KColorScheme::View);
             settings->colorDisabled = interfaceGroup.readEntry( "ColorDisabled", scheme.foreground( KColorScheme::InactiveText ).color() );
+            settings->colorUnavailable = interfaceGroup.readEntry( "ColorUnavailable", scheme.foreground( KColorScheme::InactiveText ).color() );
             settings->activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", s.activateStatistics );
             settings->customBilling = interfaceGroup.readEntry( "CustomBilling", s.customBilling );
             settings->calendar = interfaceGroup.readEntry( "Calendar", mDefaultCalendarType );
@@ -423,6 +428,7 @@ void ConfigDialog::save()
             interfaceGroup.writeEntry( "ColorIncoming", settings->colorIncoming );
             interfaceGroup.writeEntry( "ColorOutgoing", settings->colorOutgoing );
             interfaceGroup.writeEntry( "ColorDisabled", settings->colorDisabled );
+            interfaceGroup.writeEntry( "ColorUnavailable", settings->colorUnavailable );
         }
         interfaceGroup.writeEntry( "ActivateStatistics", settings->activateStatistics );
         interfaceGroup.writeEntry( "CustomBilling", settings->customBilling );
@@ -512,6 +518,7 @@ void ConfigDialog::defaults()
         settings->billingStart = startDate;
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
+        settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
@@ -597,6 +604,7 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     mDlg->colorIncoming->setColor( settings->colorIncoming );
     mDlg->colorOutgoing->setColor( settings->colorOutgoing );
     mDlg->colorDisabled->setColor( settings->colorDisabled );
+    mDlg->colorUnavailable->setColor( settings->colorUnavailable );
     mDlg->checkBoxCustom->setChecked( settings->customCommands );
     mDlg->checkBoxDisconnected->setChecked( settings->hideWhenDisconnected );
     mDlg->checkBoxUnavailable->setChecked( settings->hideWhenUnavailable );
@@ -676,6 +684,7 @@ void ConfigDialog::buttonNewSelected()
         settings->billingStart = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
+        settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->setCurrentRow( mDlg->listBoxInterfaces->row( item ) );
         mDlg->pushButtonDelete->setEnabled( true );
@@ -732,6 +741,7 @@ void ConfigDialog::buttonAllSelected()
         settings->billingStart = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
+        settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->addItem( ifname );
     }
@@ -820,7 +830,7 @@ QFont ConfigDialog::setIconFont( QString text )
     return f;
 }
 
-QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, bool active )
+QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, int status )
 {
     QPixmap sampleIcon( 22, 22 );
     sampleIcon.fill( Qt::transparent );
@@ -828,13 +838,15 @@ QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, bool
     p.setBrush( Qt::NoBrush );
     p.setOpacity( 1.0 );
     p.setFont( setIconFont( incomingText ) );
-    if ( active )
+    if ( status >= KNemoIface::Connected )
         p.setPen( mDlg->colorIncoming->color() );
-    else
+    else if ( status == KNemoIface::Available )
         p.setPen( mDlg->colorDisabled->color() );
+    else
+        p.setPen( mDlg->colorUnavailable->color() );
     p.drawText( sampleIcon.rect(), Qt::AlignTop | Qt::AlignRight, incomingText );
     p.setFont( setIconFont( outgoingText ) );
-    if ( active )
+    if ( status >= KNemoIface::Connected )
         p.setPen( mDlg->colorOutgoing->color() );
     p.drawText( sampleIcon.rect(), Qt::AlignBottom | Qt::AlignRight, outgoingText );
     return sampleIcon;
@@ -880,18 +892,20 @@ void ConfigDialog::iconThemeChanged( int set )
     if ( curTheme.internalName == TEXT_THEME )
     {
         settings->iconTheme = TEXT_THEME;
-        mDlg->pixmapError->setPixmap( textIcon( "0B", "0B", false ) );
-        mDlg->pixmapDisconnected->setPixmap( textIcon( "0B", "0B", false ) );
-        mDlg->pixmapConnected->setPixmap( textIcon( "0B", "0B", true ) );
-        mDlg->pixmapIncoming->setPixmap( textIcon( "123K", "0B", true ) );
-        mDlg->pixmapOutgoing->setPixmap( textIcon( "0B", "12K", true ) );
-        mDlg->pixmapTraffic->setPixmap( textIcon( "123K", "12K", true ) );
+        mDlg->pixmapError->setPixmap( textIcon( "0B", "0B", KNemoIface::Unavailable ) );
+        mDlg->pixmapDisconnected->setPixmap( textIcon( "0B", "0B", KNemoIface::Available ) );
+        mDlg->pixmapConnected->setPixmap( textIcon( "0B", "0B", KNemoIface::Connected ) );
+        mDlg->pixmapIncoming->setPixmap( textIcon( "123K", "0B", KNemoIface::Connected ) );
+        mDlg->pixmapOutgoing->setPixmap( textIcon( "0B", "12K", KNemoIface::Connected ) );
+        mDlg->pixmapTraffic->setPixmap( textIcon( "123K", "12K", KNemoIface::Connected ) );
         mDlg->colorIncoming->show();
         mDlg->colorIncomingLabel->show();
         mDlg->colorOutgoing->show();
         mDlg->colorOutgoingLabel->show();
         mDlg->colorDisabled->show();
         mDlg->colorDisabledLabel->show();
+        mDlg->colorUnavailable->show();
+        mDlg->colorUnavailableLabel->show();
     }
     else
     {
@@ -913,6 +927,8 @@ void ConfigDialog::iconThemeChanged( int set )
         mDlg->colorOutgoingLabel->hide();
         mDlg->colorDisabled->hide();
         mDlg->colorDisabledLabel->hide();
+        mDlg->colorUnavailable->hide();
+        mDlg->colorUnavailableLabel->hide();
     }
     if (!mLock) changed( true );
 }
@@ -929,6 +945,8 @@ void ConfigDialog::colorButtonChanged()
         settings->colorOutgoing = mDlg->colorOutgoing->color();
     if ( mDlg->colorDisabled->color().isValid() )
         settings->colorDisabled = mDlg->colorDisabled->color();
+    if ( mDlg->colorUnavailable->color().isValid() )
+        settings->colorUnavailable = mDlg->colorUnavailable->color();
 
     KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
     if ( curTheme.internalName == TEXT_THEME )

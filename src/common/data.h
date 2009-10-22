@@ -150,6 +150,7 @@ struct InterfaceSettings
         colorIncoming( 0x1889FF ),
         colorOutgoing( 0xFF7F08 ),
         colorDisabled( 0x888786 ),
+        colorUnavailable( 0x888786 ),
         numCommands( 0 ),
         trafficThreshold( 0 ),
         warnThreshold( 0.0 ),
@@ -166,6 +167,7 @@ struct InterfaceSettings
     QColor colorIncoming;
     QColor colorOutgoing;
     QColor colorDisabled;
+    QColor colorUnavailable;
     int numCommands;
     int trafficThreshold;
     double warnThreshold;
