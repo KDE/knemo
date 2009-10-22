@@ -23,8 +23,9 @@
 
 #include <QColor>
 #include <QDate>
-#include <QString>
 #include <QList>
+#include <QMap>
+#include <QString>
 
 /**
  * This file contains data structures used to store information about
@@ -35,7 +36,6 @@
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
-#include <QMap>
 
 namespace KNemoIface {
     enum Type

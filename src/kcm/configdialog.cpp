@@ -18,47 +18,28 @@
    Boston, MA 02110-1301, USA.
 */
 
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <ifaddrs.h>
-#include <netdb.h>
 #include <QDBusInterface>
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qcheckbox.h>
-#include <qlineedit.h>
-#include <qcombobox.h>
-#include <qgroupbox.h>
-#include <qwhatsthis.h>
-#include <qtabwidget.h>
 #include <QPainter>
-#include <qpushbutton.h>
-#include <qstringlist.h>
-#include <qdatastream.h>
 
-#include <KColorScheme>
-#include <kglobal.h>
-#include <KGlobalSettings>
 #include <KCalendarSystem>
-#include <kconfig.h>
-#include <klocale.h>
-#include <knuminput.h>
-#include <kiconloader.h>
-#include <kfiledialog.h>
-#include <kcolorbutton.h>
-#include <kinputdialog.h>
-#include <kapplication.h>
+#include <KColorScheme>
+#include <KGenericFactory>
+#include <KGlobalSettings>
+#include <KInputDialog>
 #include <KMessageBox>
 #include <KNotifyConfigWidget>
-#include <kstandarddirs.h>
-#include <kgenericfactory.h>
-#include <kdirselectdialog.h>
-#include <math.h>
+#include <KStandardDirs>
 
 #include "ui_configdlg.h"
 #include "config-knemo.h"
 #include "configdialog.h"
 #include "utils.h"
+
+#include <math.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <ifaddrs.h>
+#include <netdb.h>
 
 #ifdef __linux__
   #include <netlink/route/rtnl.h>

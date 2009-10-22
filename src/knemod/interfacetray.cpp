@@ -27,10 +27,10 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <kio/global.h>
-#include <KLocale>
 #include <KActionCollection>
 #include <KApplication>
 #include <KConfigGroup>
+#include <KLocale>
 #include <KMessageBox>
 #include <KStandardAction>
 

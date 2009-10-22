@@ -21,8 +21,6 @@
 #ifndef INTERFACEICON_H
 #define INTERFACEICON_H
 
-#include <QSystemTrayIcon>
-
 class Interface;
 class InterfaceTray;
 class KAction;

@@ -24,8 +24,6 @@
 #include <KCalendarSystem>
 #include <KMessageBox>
 
-#include <QDebug>
-
 #include "data.h"
 #include "interface.h"
 #include "interfacestatistics.h"

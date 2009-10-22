@@ -21,13 +21,14 @@
 #include <unistd.h>
 
 #include <QPainter>
+
+#include <KAction>
+#include <KActionCollection>
 #include <KColorScheme>
 #include <KConfigGroup>
 #include <KGlobalSettings>
 #include <KHelpMenu>
 #include <KIcon>
-#include <KAction>
-#include <KActionCollection>
 #include <KLocale>
 #include <KMenu>
 #include <KProcess>

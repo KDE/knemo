@@ -18,17 +18,14 @@
    Boston, MA 02110-1301, USA.
 */
 
-#include <QDate>
 #include <QDomNode>
 #include <QFile>
 #include <QTextStream>
 #include <QTimer>
 
-#include <QDebug>
-
+#include <KCalendarSystem>
 #include <KConfigGroup>
 #include <KGlobal>
-#include <KCalendarSystem>
 
 #include "interface.h"
 #include "interfacestatistics.h"

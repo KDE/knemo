@@ -21,9 +21,6 @@
 #ifndef INTERFACESTATISTICS_H
 #define INTERFACESTATISTICS_H
 
-#include <QDate>
-#include <QList>
-
 #include "global.h"
 
 class QDomDocument;

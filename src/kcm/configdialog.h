@@ -21,7 +21,7 @@
 #ifndef CONFIGDIALOG_H
 #define CONFIGDIALOG_H
 
-#include <kcmodule.h>
+#include <KCModule>
 
 #include "data.h"
 #include "ui_configdlg.h"

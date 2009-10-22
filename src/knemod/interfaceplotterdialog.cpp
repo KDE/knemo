@@ -21,12 +21,8 @@
    Boston, MA 02110-1301, USA.
 */
 
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QLabel>
 #include <QMenu>
 #include <KApplication>
-#include <KLocale>
 
 #include "interfaceplotterdialog.h"
 #include "utils.h"

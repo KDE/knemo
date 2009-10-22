@@ -21,9 +21,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include <QColor>
-#include <QString>
-
+#include <QDate>
 #include <KUrl>
 
 /**
