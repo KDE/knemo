@@ -50,7 +50,7 @@ struct PlotterSettings
 
 class PlotterConfigDialog : public KDialog
 {
-    Q_OBJECT;
+    Q_OBJECT
     public:
         PlotterConfigDialog( QWidget *parent, const QString& iface, PlotterSettings* settings );
         virtual ~PlotterConfigDialog();
