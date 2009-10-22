@@ -212,12 +212,13 @@ void Interface::processUpdate()
          mPreviousState < KNemoIface::Connected )
     {
         setStartTime();
-        QString connectedStr = i18n( "Connected" );
+        QString connectedStr;
         if ( mBackendData->isWireless )
-            connectedStr = i18n( "Connected to %1", mBackendData->essid );
+            connectedStr = i18n( "%1: Connected to %2", title, mBackendData->essid );
+        else
+            connectedStr = i18n( "%1: Connected", title );
         if ( mPreviousState != KNemoIface::UnknownState )
-            KNotification::event( "connected",
-                                  title + ": " + connectedStr );
+            KNotification::event( "connected", connectedStr );
         if ( mStatusDialog )
             mStatusDialog->enableNetworkGroups();
     }
@@ -225,8 +226,7 @@ void Interface::processUpdate()
     {
         if ( mPreviousState > KNemoIface::Available )
         {
-            KNotification::event( "disconnected",
-                                  title + ": " + i18n( "Disconnected" ) );
+            KNotification::event( "disconnected", i18n( "%1: Disconnected", title ) );
             if ( mStatusDialog )
                 mStatusDialog->disableNetworkGroups();
             if ( mType == KNemoIface::PPP )
@@ -235,15 +235,13 @@ void Interface::processUpdate()
         else if ( mPreviousState < KNemoIface::Available )
         {
             if ( mPreviousState != KNemoIface::UnknownState )
-                KNotification::event( "available",
-                                      title + ": " + i18n( "Available" ) );
+                KNotification::event( "available", i18n( "%1: Available", title ) );
         }
     }
     else if ( mState == KNemoIface::Unavailable &&
               mPreviousState > KNemoIface::Unavailable )
     {
-        KNotification::event( "unavailable",
-                              title + ": " + i18n( "Unavailable" ) );
+        KNotification::event( "unavailable", i18n( "%1: Unavailable", title ) );
         if ( mStatusDialog )
             mStatusDialog->disableNetworkGroups();
         if ( mType == KNemoIface::PPP )
@@ -396,8 +394,7 @@ void Interface::warnMonthlyTraffic( quint64 traffic )
         title = mName;
 
     KNotification::event( "exceededMonthlyTraffic",
-                          title + ": " +
-                          i18n( "Monthly traffic limit exceeded (currently %1)" ).arg( KIO::convertSize( traffic ) )
+                          i18n( "%1: Monthly traffic limit exceeded (currently %2)", title, KIO::convertSize( traffic ) )
                         );
 }
 

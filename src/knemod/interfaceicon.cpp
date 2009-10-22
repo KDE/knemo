@@ -160,21 +160,21 @@ QString InterfaceIcon::compactTrayText(unsigned long bytes )
     // Space is tight, so no space between number and units, and the complete
     // string should be no more than 4 chars.
     if ( bytes < 922 ) // 922B = 0.9K
-        byteString = i18n( "%1B" ).arg( bytes );
+        byteString = i18n( "%1B", bytes );
     else if ( bytes < 10189 ) // < 9.95K
-        byteString = i18n( "%1K" ).arg( QString::number( bytes/1024.0, 'f', 1 ) );
+        byteString = i18n( "%1K", QString::number( bytes/1024.0, 'f', 1 ) );
     else if ( bytes < 1023488 ) // < 999.5
-        byteString = i18n( "%1K" ).arg( QString::number( bytes/1024.0, 'f', 0 ) );
+        byteString = i18n( "%1K", QString::number( bytes/1024.0, 'f', 0 ) );
     else if ( bytes < 10433331 ) // < 9.95M
-        byteString = i18n( "%1M" ).arg( QString::number( bytes/1048576.0, 'f', 1 ) );
+        byteString = i18n( "%1M", QString::number( bytes/1048576.0, 'f', 1 ) );
     else if ( bytes < 1048051712 ) // < 999.5G
-        byteString = i18n( "%1M" ).arg( QString::number( bytes/1048576.0, 'f', 0 ) );
+        byteString = i18n( "%1M", QString::number( bytes/1048576.0, 'f', 0 ) );
     else if ( bytes < 10683731148.0 ) // < 9.95G
         // xgettext: no-c-format
-        byteString = i18n( "%1G" ).arg( QString::number( bytes/1073741824.0, 'f', 1 ) );
+        byteString = i18n( "%1G", QString::number( bytes/1073741824.0, 'f', 1 ) );
     else
         // xgettext: no-c-format
-        byteString = i18n( "%1G" ).arg( QString::number( bytes/1073741824.0, 'f', 0) );
+        byteString = i18n( "%1G", QString::number( bytes/1073741824.0, 'f', 0) );
     return byteString;
 }
 
@@ -315,7 +315,7 @@ void InterfaceIcon::updateTrayStatus()
         KMenu* menu = (KMenu *)mTray->contextMenu();
 
         menu->removeAction( menu->actions().at( 0 ) );
-        menu->addTitle( KIcon( "knemo" ), i18n( "KNemo - " ) + title );
+        menu->addTitle( KIcon( "knemo" ), i18n( "KNemo - %1", title ) );
         menu->addAction( statusAction );
         menu->addAction( plotterAction );
         menu->addAction( configAction );

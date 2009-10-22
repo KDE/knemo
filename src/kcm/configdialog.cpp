@@ -995,7 +995,7 @@ void ConfigDialog::billingStartInputChanged( const QDate& date )
          date > QDate::currentDate() ||
          mCalendar->day( date ) > mMaxDay )
     {
-        KMessageBox::error( this, i18n( "The billing day of the month can be any day from 1 - %1, and the complete date must be a valid, non-future date." ).arg( QString::number( mMaxDay ) ) );
+        KMessageBox::error( this, i18n( "The billing day of the month can be any day from 1 - %1, and the complete date must be a valid, non-future date.", QString::number( mMaxDay ) ) );
         mDlg->billingStartInput->setDate( settings->billingStart );
     }
     else
