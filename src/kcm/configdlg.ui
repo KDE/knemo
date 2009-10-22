@@ -36,7 +36,7 @@
          <item row="0" column="0" colspan="3">
           <widget class="QListWidget" name="listBoxInterfaces">
            <property name="whatsThis">
-            <string>This is the list of icons you wish to monitor. Please use the names understood by the command 'ifconfig'.  For example 'eth0', 'wlan0', or 'ppp0'.</string>
+            <string>This lists the interfaces that you wish to monitor. Please use the names understood by &lt;i&gt;ifconfig&lt;/i&gt; ('eth0', 'wlan0', 'ppp0', etc.), or click &quot;Add all interfaces&quot; below to include all of the interfaces currently found on your system.</string>
            </property>
            <property name="sortingEnabled">
             <bool>true</bool>
@@ -113,9 +113,7 @@
            </property>
            <property name="whatsThis">
             <string>You can enter an alias for the interface.
-It will be used in the tooltip of the system
-tray icon for better differentiation of the
-icons.</string>
+KNemo will use it to differentiate interfaces when it displays tooltips, dialogs, etc.</string>
            </property>
           </widget>
          </item>
@@ -143,9 +141,7 @@ icons.</string>
            <item>
             <widget class="QCheckBox" name="checkBoxDisconnected">
              <property name="whatsThis">
-              <string>When selected the icon for this interface will be
-hidden when the interface is not connected. 
-When reconnected the icon will be shown again.</string>
+              <string>If selected, the icon for this interface will hide when the interface is not connected. When a connection is reestablished, the icon will appear again.</string>
              </property>
              <property name="text">
               <string>Hide icon when not connected</string>
@@ -155,11 +151,7 @@ When reconnected the icon will be shown again.</string>
            <item>
             <widget class="QCheckBox" name="checkBoxUnavailable">
              <property name="whatsThis">
-              <string>When selected the icon for this interface will be
-hidden when the interface does not exist. 
-This is useful for interfaces that are dynamically
-created and destroyed, for example interfaces
-of bluetooth adaptors.</string>
+              <string>When selected, the icon for this interface will hide when the interface does not exist. This is useful for dynamically created interfaces, such as tunnels.</string>
              </property>
              <property name="text">
               <string>Hide icon when not available</string>
@@ -170,9 +162,6 @@ of bluetooth adaptors.</string>
             <layout class="QHBoxLayout">
              <item>
               <widget class="QLabel" name="textLabel1_3_2">
-               <property name="whatsThis">
-                <string>Use this for networks with high noise i.e. many packets coming in and out all the time. Set this value high enough so that KNemo won't show incoming and outgoing traffic all the time.</string>
-               </property>
                <property name="text">
                 <string>Traffic activity threshold:</string>
                </property>
@@ -183,6 +172,9 @@ of bluetooth adaptors.</string>
              </item>
              <item>
               <widget class="KIntSpinBox" name="spinBoxTrafficThreshold">
+               <property name="whatsThis">
+                <string>If you are on a network with a lot of low-level traffic, you can increase this value so the tray icon does not constantly report activity.</string>
+               </property>
                <property name="suffix">
                 <string> packets/s</string>
                </property>
@@ -216,6 +208,9 @@ of bluetooth adaptors.</string>
              </item>
              <item>
               <widget class="QLabel" name="pixmapError">
+               <property name="toolTip">
+                <string>Unavailable</string>
+               </property>
                <property name="wordWrap">
                 <bool>false</bool>
                </property>
@@ -223,6 +218,9 @@ of bluetooth adaptors.</string>
              </item>
              <item>
               <widget class="QLabel" name="pixmapDisconnected">
+               <property name="toolTip">
+                <string>Disconnected</string>
+               </property>
                <property name="wordWrap">
                 <bool>false</bool>
                </property>
@@ -230,13 +228,9 @@ of bluetooth adaptors.</string>
              </item>
              <item>
               <widget class="QLabel" name="pixmapConnected">
-               <property name="wordWrap">
-                <bool>false</bool>
+               <property name="toolTip">
+                <string>Connected</string>
                </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="pixmapIncoming">
                <property name="wordWrap">
                 <bool>false</bool>
                </property>
@@ -244,6 +238,19 @@ of bluetooth adaptors.</string>
              </item>
              <item>
               <widget class="QLabel" name="pixmapOutgoing">
+               <property name="toolTip">
+                <string>Transmitting data</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="pixmapIncoming">
+               <property name="toolTip">
+                <string>Receiving data</string>
+               </property>
                <property name="wordWrap">
                 <bool>false</bool>
                </property>
@@ -251,6 +258,9 @@ of bluetooth adaptors.</string>
              </item>
              <item>
               <widget class="QLabel" name="pixmapTraffic">
+               <property name="toolTip">
+                <string>Transmitting and receiving data</string>
+               </property>
                <property name="wordWrap">
                 <bool>false</bool>
                </property>
@@ -279,7 +289,7 @@ of bluetooth adaptors.</string>
              <item>
               <widget class="QLabel" name="colorIncomingLabel">
                <property name="text">
-                <string>Receive color:</string>
+                <string>Incoming text:</string>
                </property>
               </widget>
              </item>
@@ -309,7 +319,7 @@ of bluetooth adaptors.</string>
              <item>
               <widget class="QLabel" name="colorOutgoingLabel">
                <property name="text">
-                <string>Transmit color:</string>
+                <string>Outgoing text:</string>
                </property>
               </widget>
              </item>
@@ -339,7 +349,7 @@ of bluetooth adaptors.</string>
              <item>
               <widget class="QLabel" name="colorDisabledLabel">
                <property name="text">
-                <string>Disabled color:</string>
+                <string>Disconnected text:</string>
                </property>
               </widget>
              </item>
@@ -386,6 +396,9 @@ of bluetooth adaptors.</string>
              <layout class="QVBoxLayout" name="verticalLayout_4">
               <item>
                <widget class="QCheckBox" name="checkBoxCustomBilling">
+                <property name="whatsThis">
+                 <string>&lt;p&gt;If this is checked, you will have much greater control over how KNemo handles monthly statistics. You can set different start dates and make billing periods span 1 - 6 months.&lt;/p&gt;&lt;p&gt;If you uncheck this option, KNemo will recalculate all billing periods as monthly statistics.&lt;/p&gt;</string>
+                </property>
                 <property name="text">
                  <string>Custom billing periods</string>
                 </property>
@@ -425,7 +438,7 @@ of bluetooth adaptors.</string>
                    <bool>false</bool>
                   </property>
                   <property name="whatsThis">
-                   <string>By default, this shows the start date of the current month / billing period.  If you change the date, KNemo will resync the monthly statistics with that date.</string>
+                   <string>&lt;p&gt;By default, this shows the start date of the current month or billing period. If you change the date, KNemo will recalculate billing periods from that date forward. Any billing periods before that date will remain unmodified.&lt;/p&gt;&lt;p&gt;If you set an erroneous date, just select an earlier good billing date, and KNemo will repair it.&lt;/p&gt;</string>
                   </property>
                  </widget>
                 </item>
@@ -494,6 +507,9 @@ of bluetooth adaptors.</string>
                 </item>
                 <item>
                  <widget class="KDoubleNumInput" name="warnThreshold">
+                  <property name="whatsThis">
+                   <string>&lt;p&gt;When traffic for a month or billing period exceeds this threshold, KNemo will emit a notification. This notification will appear once per session.&lt;/p&gt;&lt;p&gt;If the value is 0, KNemo will not emit a notification.&lt;/p&gt;</string>
+                  </property>
                   <property name="singleStep">
                    <double>0.100000000000000</double>
                   </property>
@@ -530,6 +546,9 @@ of bluetooth adaptors.</string>
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
+                  <property name="whatsThis">
+                   <string>If selected, only incoming traffic applies to the monthly limit</string>
+                  </property>
                   <property name="text">
                    <string>Download traffic only</string>
                   </property>
@@ -559,6 +578,9 @@ of bluetooth adaptors.</string>
                  <widget class="QRadioButton" name="warnRxTx">
                   <property name="enabled">
                    <bool>false</bool>
+                  </property>
+                  <property name="whatsThis">
+                   <string>If selected, both incoming and outgoing traffic apply to the monthly limit</string>
                   </property>
                   <property name="text">
                    <string>Total traffic</string>
@@ -717,8 +739,7 @@ of bluetooth adaptors.</string>
        <item row="4" column="0" colspan="4">
         <widget class="QLabel" name="textLabel3">
          <property name="text">
-          <string>&lt;b&gt;Note: Adding wireless specific information will only show up in the tooltips 
-of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</string>
+          <string>Wireless specific information will only appear in the tooltips of wireless devices</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -741,16 +762,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
          </property>
         </spacer>
        </item>
-       <item row="2" column="1">
-        <widget class="QPushButton" name="pushButtonRemoveToolTip">
-         <property name="toolTip">
-          <string>Remove the selected entry from the list of displayed information</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="1" colspan="2">
         <spacer name="spacer3">
          <property name="orientation">
@@ -770,7 +781,7 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
        <item row="2" column="2">
         <widget class="QPushButton" name="pushButtonAddToolTip">
          <property name="toolTip">
-          <string>Add the selected entry to the list of displayed information.</string>
+          <string>Add the selected entry to the tray icon's tooltip</string>
          </property>
          <property name="text">
           <string/>
@@ -800,7 +811,7 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Display:</string>
+          <string>Active:</string>
          </property>
          <property name="wordWrap">
           <bool>false</bool>
@@ -823,6 +834,16 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
          </property>
         </widget>
        </item>
+       <item row="2" column="1">
+        <widget class="QPushButton" name="pushButtonRemoveToolTip">
+         <property name="toolTip">
+          <string>Remove the selected entry from the tray icon's tooltip</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="misc">
@@ -839,7 +860,7 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
           <item>
            <widget class="QPushButton" name="pushButtonNotifications">
             <property name="text">
-             <string>&amp;Configure Sounds &amp;&amp; Events...</string>
+             <string>Configure Notifications...</string>
             </property>
            </widget>
           </item>
@@ -864,9 +885,6 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
           </item>
           <item>
            <widget class="KIntNumInput" name="numInputPollInterval">
-            <property name="whatsThis">
-             <string>How often should KNemo poll for interface information. Lower number means more CPU load but faster reaction on changes. Larger number means less CPU load but slow reaction on changes.</string>
-            </property>
             <property name="value">
              <number>1</number>
             </property>
@@ -918,6 +936,9 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
           </item>
           <item row="0" column="1">
            <widget class="KIntNumInput" name="numInputSaveInterval">
+            <property name="whatsThis">
+             <string>Save interface statistics every &lt;i&gt;n&lt;/i&gt; seconds. If 0, KNemo will only save statistics when it closes.</string>
+            </property>
             <property name="value">
              <number>60</number>
             </property>
@@ -959,7 +980,11 @@ of wireless devices not in the tooltips of standard interfaces.&lt;/b&gt;</strin
            </widget>
           </item>
           <item row="1" column="1" colspan="2">
-           <widget class="KUrlRequester" name="lineEditStatisticsDir"/>
+           <widget class="KUrlRequester" name="lineEditStatisticsDir">
+            <property name="whatsThis">
+             <string>KNemo will log interface statistics in this directory.</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
