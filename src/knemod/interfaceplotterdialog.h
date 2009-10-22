@@ -68,11 +68,6 @@ private:
     bool mWasShown;
     PlotterSettings mSettings;
     QString mName;
-    QColor mColorVLines;
-    QColor mColorHLines;
-    QColor mColorIncoming;
-    QColor mColorOutgoing;
-    QColor mColorBackground;
     int mOutgoingPos;
     int mIncomingPos;
     KSignalPlotter *mPlotter;

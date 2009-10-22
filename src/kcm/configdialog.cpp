@@ -120,7 +120,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     textTheme.internalName = TEXT_THEME;
     mDlg->comboBoxIconTheme->addItem( textTheme.name, QVariant::fromValue( textTheme ) );
 
-    int index = findIndexFromName( "monitor" );
+    InterfaceSettings s;
+    int index = findIndexFromName( s.iconTheme );
     if ( index < 0 )
         index = findIndexFromName( TEXT_THEME );
     mDlg->comboBoxIconTheme->setCurrentIndex( index );
@@ -254,47 +255,47 @@ void ConfigDialog::load()
     mDlg->listBoxInterfaces->clear();
     KConfig *config = mConfig.data();
 
-    KConfigGroup generalGroup( config, "General" );
-    bool startKNemo = generalGroup.readEntry( "AutoStart", true );
+    KConfigGroup generalGroup( config, confg_general );
+    bool startKNemo = generalGroup.readEntry( conf_autoStart, true );
     mDlg->checkBoxStartKNemo->setChecked( startKNemo );
-    mDlg->numInputPollInterval->setValue( clamp<int>(generalGroup.readEntry( "PollInterval", 1 ), 1, 60 ) );
-    mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( "SaveInterval", 60 ), 0, 300 ) );
-    mDlg->lineEditStatisticsDir->setUrl( generalGroup.readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) ) );
-    mToolTipContent = generalGroup.readEntry( "ToolTipContent", defaultTip );
+    mDlg->numInputPollInterval->setValue( clamp<int>(generalGroup.readEntry( conf_pollInterval, 1 ), 1, 60 ) );
+    mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( conf_saveInterval, 60 ), 0, 300 ) );
+    mDlg->lineEditStatisticsDir->setUrl( generalGroup.readEntry( conf_statisticsDir, KGlobal::dirs()->saveLocation( "data", "knemo/" ) ) );
+    mToolTipContent = generalGroup.readEntry( conf_toolTipContent, defaultTip );
 
-    QStringList list = generalGroup.readEntry( "Interfaces", QStringList() );
+    QStringList list = generalGroup.readEntry( conf_interfaces, QStringList() );
 
     // Get defaults from the struct
     InterfaceSettings s;
     foreach ( QString interface, list )
     {
-        QString group( "Interface_" );
+        QString group( confg_interface );
         group += interface;
         InterfaceSettings* settings = new InterfaceSettings();
         if ( config->hasGroup( group ) )
         {
             KConfigGroup interfaceGroup( config, group );
-            settings->alias = interfaceGroup.readEntry( "Alias" ).trimmed();
-            settings->hideWhenDisconnected = interfaceGroup.readEntry( "HideWhenNotAvailable", s.hideWhenDisconnected );
-            settings->hideWhenUnavailable = interfaceGroup.readEntry( "HideWhenNotExisting", s.hideWhenUnavailable );
-            settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( "TrafficThreshold", s.trafficThreshold ), 0, 1000 );
-            settings->iconTheme = interfaceGroup.readEntry( "IconSet", s.iconTheme );
-            settings->colorIncoming = interfaceGroup.readEntry( "ColorIncoming", s.colorIncoming );
-            settings->colorOutgoing = interfaceGroup.readEntry( "ColorOutgoing", s.colorOutgoing );
+            settings->alias = interfaceGroup.readEntry( conf_alias ).trimmed();
+            settings->hideWhenDisconnected = interfaceGroup.readEntry( conf_hideWhenNotAvail, s.hideWhenDisconnected );
+            settings->hideWhenUnavailable = interfaceGroup.readEntry( conf_hideWhenNotExist, s.hideWhenUnavailable );
+            settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
+            settings->iconTheme = interfaceGroup.readEntry( conf_iconTheme, s.iconTheme );
+            settings->colorIncoming = interfaceGroup.readEntry( conf_colorIncoming, s.colorIncoming );
+            settings->colorOutgoing = interfaceGroup.readEntry( conf_colorOutgoing, s.colorOutgoing );
             KColorScheme scheme(QPalette::Active, KColorScheme::View);
-            settings->colorDisabled = interfaceGroup.readEntry( "ColorDisabled", scheme.foreground( KColorScheme::InactiveText ).color() );
-            settings->colorUnavailable = interfaceGroup.readEntry( "ColorUnavailable", scheme.foreground( KColorScheme::InactiveText ).color() );
-            settings->activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", s.activateStatistics );
-            settings->customBilling = interfaceGroup.readEntry( "CustomBilling", s.customBilling );
-            settings->calendar = interfaceGroup.readEntry( "Calendar", mDefaultCalendarType );
-            settings->billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", s.billingMonths ), 1, 6 );
-            settings->warnThreshold = clamp<double>(interfaceGroup.readEntry( "BillingWarnThreshold", s.warnThreshold ), 0.0, 9999.0 );
-            settings->warnTotalTraffic = interfaceGroup.readEntry( "BillingWarnRxTx", s.warnTotalTraffic );
+            settings->colorDisabled = interfaceGroup.readEntry( conf_colorDisabled, scheme.foreground( KColorScheme::InactiveText ).color() );
+            settings->colorUnavailable = interfaceGroup.readEntry( conf_colorUnavailable, scheme.foreground( KColorScheme::InactiveText ).color() );
+            settings->activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
+            settings->customBilling = interfaceGroup.readEntry( conf_customBilling, s.customBilling );
+            settings->calendar = interfaceGroup.readEntry( conf_calendar, mDefaultCalendarType );
+            settings->billingMonths = clamp<int>(interfaceGroup.readEntry( conf_billingMonths, s.billingMonths ), 1, 6 );
+            settings->warnThreshold = clamp<double>(interfaceGroup.readEntry( conf_billingWarnThresh, s.warnThreshold ), 0.0, 9999.0 );
+            settings->warnTotalTraffic = interfaceGroup.readEntry( conf_billingWarnRxTx, s.warnTotalTraffic );
 
              // If no start date saved, default to first of month.
             mCalendar = KCalendarSystem::create( settings->calendar );
             QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
-            settings->billingStart = interfaceGroup.readEntry( "BillingStart", startDate );
+            settings->billingStart = interfaceGroup.readEntry( conf_billingStart, startDate );
 
             // If date is saved but very old, update it to current period
             QDate currentDate = QDate::currentDate();
@@ -310,17 +311,17 @@ void ConfigDialog::load()
                 }
             }
 
-            settings->customCommands = interfaceGroup.readEntry( "CustomCommands", s.customCommands );
-            int numCommands = interfaceGroup.readEntry( "NumCommands", s.numCommands );
+            settings->customCommands = interfaceGroup.readEntry( conf_customCommands, s.customCommands );
+            int numCommands = interfaceGroup.readEntry( conf_numCommands, s.numCommands );
             for ( int i = 0; i < numCommands; i++ )
             {
                 QString entry;
                 InterfaceCommand cmd;
-                entry = QString( "RunAsRoot%1" ).arg( i + 1 );
+                entry = QString( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
                 cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
-                entry = QString( "Command%1" ).arg( i + 1 );
+                entry = QString( "%1%2" ).arg( conf_command ).arg( i + 1 );
                 cmd.command = interfaceGroup.readEntry( entry );
-                entry = QString( "MenuText%1" ).arg( i + 1 );
+                entry = QString( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
                 cmd.menuText = interfaceGroup.readEntry( entry );
                 settings->commands.append( cmd );
             }
@@ -382,8 +383,8 @@ void ConfigDialog::save()
     {
         if ( !mSettingsMap.contains( delIface ) )
         {
-            config->deleteGroup( "Interface_" + delIface );
-            config->deleteGroup( "Plotter_" + delIface );
+            config->deleteGroup( confg_interface + delIface );
+            config->deleteGroup( confg_plotter + delIface );
         }
     }
 
@@ -391,78 +392,78 @@ void ConfigDialog::save()
     {
         list.append( it );
         InterfaceSettings* settings = mSettingsMap.value( it );
-        KConfigGroup interfaceGroup( config, "Interface_" + it );
+        KConfigGroup interfaceGroup( config, confg_interface + it );
 
         // Preserve settings set by the app before delete
-        QPoint plotterPos = interfaceGroup.readEntry( "PlotterPos", QPoint() );
-        QSize plotterSize = interfaceGroup.readEntry( "PlotterSize", QSize() );
-        QPoint statisticsPos = interfaceGroup.readEntry( "StatisticsPos", QPoint() );
-        QSize statisticsSize = interfaceGroup.readEntry( "StatisticsSize", QSize() );
-        QPoint statusPos = interfaceGroup.readEntry( "StatusPos", QPoint() );
-        QSize statusSize = interfaceGroup.readEntry( "StatusSize", QSize() );
+        QPoint plotterPos = interfaceGroup.readEntry( conf_plotterPos, QPoint() );
+        QSize plotterSize = interfaceGroup.readEntry( conf_plotterSize, QSize() );
+        QPoint statisticsPos = interfaceGroup.readEntry( conf_statisticsPos, QPoint() );
+        QSize statisticsSize = interfaceGroup.readEntry( conf_statisticsSize, QSize() );
+        QPoint statusPos = interfaceGroup.readEntry( conf_statusPos, QPoint() );
+        QSize statusSize = interfaceGroup.readEntry( conf_statusSize, QSize() );
 
         // Make sure we don't get crufty commands left over
         interfaceGroup.deleteGroup();
 
         if ( !plotterPos.isNull() )
-            interfaceGroup.writeEntry( "PlotterPos", plotterPos );
+            interfaceGroup.writeEntry( conf_plotterPos, plotterPos );
         if ( !plotterSize.isEmpty() )
-            interfaceGroup.writeEntry( "PlotterSize", plotterSize );
+            interfaceGroup.writeEntry( conf_plotterSize, plotterSize );
         if ( !statisticsPos.isNull() )
-            interfaceGroup.writeEntry( "StatisticsPos", statisticsPos );
+            interfaceGroup.writeEntry( conf_statisticsPos, statisticsPos );
         if ( !statisticsSize.isEmpty() )
-            interfaceGroup.writeEntry( "StatisticsSize", statisticsSize );
+            interfaceGroup.writeEntry( conf_statisticsSize, statisticsSize );
         if ( !statusPos.isNull() )
-            interfaceGroup.writeEntry( "StatusPos", statusPos );
+            interfaceGroup.writeEntry( conf_statusPos, statusPos );
         if ( !statusSize.isEmpty() )
-            interfaceGroup.writeEntry( "StatusSize", statusSize );
+            interfaceGroup.writeEntry( conf_statusSize, statusSize );
         if ( !settings->alias.trimmed().isEmpty() )
-            interfaceGroup.writeEntry( "Alias", settings->alias );
+            interfaceGroup.writeEntry( conf_alias, settings->alias );
 
-        interfaceGroup.writeEntry( "HideWhenNotAvailable", settings->hideWhenDisconnected );
-        interfaceGroup.writeEntry( "HideWhenNotExisting", settings->hideWhenUnavailable );
-        interfaceGroup.writeEntry( "TrafficThreshold", settings->trafficThreshold );
-        interfaceGroup.writeEntry( "IconSet", settings->iconTheme );
+        interfaceGroup.writeEntry( conf_hideWhenNotAvail, settings->hideWhenDisconnected );
+        interfaceGroup.writeEntry( conf_hideWhenNotExist, settings->hideWhenUnavailable );
+        interfaceGroup.writeEntry( conf_trafficThreshold, settings->trafficThreshold );
+        interfaceGroup.writeEntry( conf_iconTheme, settings->iconTheme );
         if ( settings->iconTheme == TEXT_THEME )
         {
-            interfaceGroup.writeEntry( "ColorIncoming", settings->colorIncoming );
-            interfaceGroup.writeEntry( "ColorOutgoing", settings->colorOutgoing );
-            interfaceGroup.writeEntry( "ColorDisabled", settings->colorDisabled );
-            interfaceGroup.writeEntry( "ColorUnavailable", settings->colorUnavailable );
+            interfaceGroup.writeEntry( conf_colorIncoming, settings->colorIncoming );
+            interfaceGroup.writeEntry( conf_colorOutgoing, settings->colorOutgoing );
+            interfaceGroup.writeEntry( conf_colorDisabled, settings->colorDisabled );
+            interfaceGroup.writeEntry( conf_colorUnavailable, settings->colorUnavailable );
         }
-        interfaceGroup.writeEntry( "ActivateStatistics", settings->activateStatistics );
-        interfaceGroup.writeEntry( "CustomBilling", settings->customBilling );
+        interfaceGroup.writeEntry( conf_activateStatistics, settings->activateStatistics );
+        interfaceGroup.writeEntry( conf_customBilling, settings->customBilling );
         if ( settings->customBilling )
         {
-            interfaceGroup.writeEntry( "BillingStart", mDlg->billingStartInput->date() );
-            interfaceGroup.writeEntry( "BillingMonths", settings->billingMonths );
-            interfaceGroup.writeEntry( "Calendar", settings->calendar );
+            interfaceGroup.writeEntry( conf_billingStart, mDlg->billingStartInput->date() );
+            interfaceGroup.writeEntry( conf_billingMonths, settings->billingMonths );
+            interfaceGroup.writeEntry( conf_calendar, settings->calendar );
         }
-        interfaceGroup.writeEntry( "BillingWarnThreshold", settings->warnThreshold );
-        interfaceGroup.writeEntry( "BillingWarnRxTx", settings->warnTotalTraffic );
+        interfaceGroup.writeEntry( conf_billingWarnThresh, settings->warnThreshold );
+        interfaceGroup.writeEntry( conf_billingWarnRxTx, settings->warnTotalTraffic );
 
-        interfaceGroup.writeEntry( "CustomCommands", settings->customCommands );
-        interfaceGroup.writeEntry( "NumCommands", settings->commands.size() );
+        interfaceGroup.writeEntry( conf_customCommands, settings->customCommands );
+        interfaceGroup.writeEntry( conf_numCommands, settings->commands.size() );
         for ( int i = 0; i < settings->commands.size(); i++ )
         {
             QString entry;
-            entry = QString( "RunAsRoot%1" ).arg( i + 1 );
+            entry = QString( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
             interfaceGroup.writeEntry( entry, settings->commands[i].runAsRoot );
-            entry = QString( "Command%1" ).arg( i + 1 );
+            entry = QString( "%1%2" ).arg( conf_command ).arg( i + 1 );
             interfaceGroup.writeEntry( entry, settings->commands[i].command );
-            entry = QString( "MenuText%1" ).arg( i + 1 );
+            entry = QString( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
             interfaceGroup.writeEntry( entry, settings->commands[i].menuText );
         }
     }
 
-    KConfigGroup generalGroup( config, "General" );
-    generalGroup.writeEntry( "FirstStart", false );
-    generalGroup.writeEntry( "AutoStart", mDlg->checkBoxStartKNemo->isChecked() );
-    generalGroup.writeEntry( "PollInterval", mDlg->numInputPollInterval->value() );
-    generalGroup.writeEntry( "SaveInterval", mDlg->numInputSaveInterval->value() );
-    generalGroup.writeEntry( "StatisticsDir",  mDlg->lineEditStatisticsDir->url().url() );
-    generalGroup.writeEntry( "ToolTipContent", mToolTipContent );
-    generalGroup.writeEntry( "Interfaces", list );
+    KConfigGroup generalGroup( config, confg_general );
+    generalGroup.writeEntry( conf_firstStart, false );
+    generalGroup.writeEntry( conf_autoStart, mDlg->checkBoxStartKNemo->isChecked() );
+    generalGroup.writeEntry( conf_pollInterval, mDlg->numInputPollInterval->value() );
+    generalGroup.writeEntry( conf_saveInterval, mDlg->numInputSaveInterval->value() );
+    generalGroup.writeEntry( conf_statisticsDir,  mDlg->lineEditStatisticsDir->url().url() );
+    generalGroup.writeEntry( conf_toolTipContent, mToolTipContent );
+    generalGroup.writeEntry( conf_interfaces, list );
 
     config->sync();
     QDBusMessage reply = QDBusInterface("org.kde.knemo", "/knemo", "org.kde.knemo").call("reparseConfiguration");
@@ -545,8 +546,8 @@ void ConfigDialog::checkBoxStartKNemoToggled( bool on )
     if ( on )
     {
         KConfig *config = mConfig.data();
-        KConfigGroup generalGroup( config, "General" );
-        if ( generalGroup.readEntry( "FirstStart", true ) )
+        KConfigGroup generalGroup( config, confg_general );
+        if ( generalGroup.readEntry( conf_firstStart, true ) )
         {
             // Populate the dialog with some default values if the user starts
             // KNemo for the very first time.

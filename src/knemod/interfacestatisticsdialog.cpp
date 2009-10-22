@@ -73,17 +73,17 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
 
     // Restore window size and position.
     KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, "Interface_" + mInterface->getName() );
-    if ( interfaceGroup.hasKey( "StatisticsPos" ) )
+    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+    if ( interfaceGroup.hasKey( conf_statisticsPos ) )
     {
-        QPoint p = interfaceGroup.readEntry( "StatisticsPos", QPoint() );
+        QPoint p = interfaceGroup.readEntry( conf_statisticsPos, QPoint() );
         // See comment in event()
         mSetPos = false;
         move( p );
     }
-    if ( interfaceGroup.hasKey( "StatisticsSize" ) )
+    if ( interfaceGroup.hasKey( conf_statisticsSize ) )
     {
-        QSize s = interfaceGroup.readEntry( "StatisticsSize", QSize() );
+        QSize s = interfaceGroup.readEntry( conf_statisticsSize, QSize() );
         resize( s );
     }
     else
@@ -97,9 +97,9 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
 InterfaceStatisticsDialog::~InterfaceStatisticsDialog()
 {
     KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, "Interface_" + mInterface->getName() );
-    interfaceGroup.writeEntry( "StatisticsPos", pos() );
-    interfaceGroup.writeEntry( "StatisticsSize", size() );
+    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+    interfaceGroup.writeEntry( conf_statisticsPos, pos() );
+    interfaceGroup.writeEntry( conf_statisticsSize, size() );
     config->sync();
 }
 

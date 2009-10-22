@@ -91,11 +91,11 @@ void InterfaceTray::slotQuit()
                                                      KGuiItem(i18n("Do Not Start")), KStandardGuiItem::cancel(), "StartAutomatically");
 
     KConfig *config = KGlobal::config().data();
-    KConfigGroup generalGroup( config, "General");
+    KConfigGroup generalGroup( config, confg_general );
     if ( autoStart == KMessageBox::Yes ) {
-        generalGroup.writeEntry("AutoStart", true);
+        generalGroup.writeEntry( conf_autoStart, true );
     } else if ( autoStart == KMessageBox::No) {
-        generalGroup.writeEntry("AutoStart", false);
+        generalGroup.writeEntry( conf_autoStart, false );
     } else  // cancel chosen; don't quit
         return;
     config->sync();

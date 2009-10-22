@@ -132,26 +132,27 @@ void PlotterConfigDialog::save()
 void PlotterConfigDialog::defaults()
 {
     enableButtonApply( true );
+    PlotterSettings s;
     // Default plotter settings
-    ui.spinBoxPixel->setValue( 1 );
-    ui.spinBoxDistance->setValue( 30 );
-    ui.spinBoxFontSize->setValue( 8 );
-    ui.spinBoxMinValue->setValue( 0 );
-    ui.spinBoxMaxValue->setValue( 1 );
-    ui.checkBoxLabels->setChecked( true );
-    ui.checkBoxBottomBar->setChecked( true );
-    ui.checkBoxVLines->setChecked( true );
-    ui.checkBoxHLines->setChecked( true );
-    ui.checkBoxIncoming->setChecked( true );
-    ui.checkBoxOutgoing->setChecked( true );
-    ui.checkBoxAutoDetection->setChecked( true );
-    ui.checkBoxVLinesScroll->setChecked( true );
-    ui.kColorButtonVLines->setColor( 0x04FB1D );
-    ui.kColorButtonHLines->setColor( 0x04FB1D );
-    ui.kColorButtonIncoming->setColor( 0x1889FF );
-    ui.kColorButtonOutgoing->setColor( 0xFF7F08 );
-    ui.kColorButtonBackground->setColor( 0x313031 );
-    ui.spinBoxOpacity->setValue( 20 );
+    ui.spinBoxPixel->setValue( s.pixel );
+    ui.spinBoxDistance->setValue( s.distance );
+    ui.spinBoxFontSize->setValue( s.fontSize );
+    ui.spinBoxMinValue->setValue( s.minimumValue );
+    ui.spinBoxMaxValue->setValue( s.maximumValue );
+    ui.checkBoxLabels->setChecked( s.labels );
+    ui.checkBoxBottomBar->setChecked( s.bottomBar );
+    ui.checkBoxVLines->setChecked( s.verticalLines );
+    ui.checkBoxHLines->setChecked( s.horizontalLines );
+    ui.checkBoxIncoming->setChecked( s.showIncoming );
+    ui.checkBoxOutgoing->setChecked( s.showOutgoing );
+    ui.checkBoxAutoDetection->setChecked( s.automaticDetection );
+    ui.checkBoxVLinesScroll->setChecked( s.verticalLinesScroll );
+    ui.kColorButtonVLines->setColor( s.colorVLines );
+    ui.kColorButtonHLines->setColor( s.colorHLines );
+    ui.kColorButtonIncoming->setColor( s.colorIncoming );
+    ui.kColorButtonOutgoing->setColor( s.colorOutgoing );
+    ui.kColorButtonBackground->setColor( s.colorBackground );
+    ui.spinBoxOpacity->setValue( s.opacity );
 }
 
 void PlotterConfigDialog::changed()

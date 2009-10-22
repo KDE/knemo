@@ -33,28 +33,28 @@
 #include "interface.h"
 #include "interfacestatistics.h"
 
-static const char* const statistics_prefix = "/statistics_";
+static const char statistics_prefix[] = "/statistics_";
 
-static const char* const doc_name     = "statistics";
-static const char* const group_days   = "days";
-static const char* const group_weeks  = "weeks";
-static const char* const group_months = "months";
-static const char* const group_years  = "years";
+static const char doc_name[]     = "statistics";
+static const char group_days[]   = "days";
+static const char group_weeks[]  = "weeks";
+static const char group_months[] = "months";
+static const char group_years[]  = "years";
 
-static const char* const elem_day   = "day";
-static const char* const elem_week  = "week";
-static const char* const elem_month = "month";
-static const char* const elem_year  = "year";
+static const char elem_day[]   = "day";
+static const char elem_week[]  = "week";
+static const char elem_month[] = "month";
+static const char elem_year[]  = "year";
 
-static const char* const attrib_calendar = "calendar";
-static const char* const attrib_span     = "span";
-static const char* const attrib_rx       = "rxBytes";
-static const char* const attrib_tx       = "txBytes";
+static const char attrib_calendar[] = "calendar";
+static const char attrib_span[]     = "span";
+static const char attrib_rx[]       = "rxBytes";
+static const char attrib_tx[]       = "txBytes";
 
 // Needed to upgrade from earlier versions
-static const char* attrib_day   = "day";
-static const char* attrib_month = "month";
-static const char* attrib_year  = "year";
+static const char attrib_day[]   = "day";
+static const char attrib_month[] = "month";
+static const char attrib_year[]  = "year";
 
 static bool statisticsLessThan( const StatisticEntry *s1, const StatisticEntry *s2 )
 {
@@ -526,8 +526,8 @@ void InterfaceStatistics::saveBillingStart()
 {
     mInterface->getSettings().billingStart = mBillingStart;
     KConfig *config = KGlobal::config().data();
-    KConfigGroup interfaceGroup( config, "Interface_" + mInterface->getName() );
-    interfaceGroup.writeEntry( "BillingStart", mBillingStart );
+    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+    interfaceGroup.writeEntry( conf_billingStart, mBillingStart );
     config->sync();
 }
 

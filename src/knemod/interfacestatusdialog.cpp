@@ -78,17 +78,17 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
 
     // Restore window size and position.
     KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, "Interface_" + mInterface->getName() );
-    if ( interfaceGroup.hasKey( "StatusPos" ) )
+    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+    if ( interfaceGroup.hasKey( conf_statusPos ) )
     {
-        QPoint p = interfaceGroup.readEntry( "StatusPos", QPoint() );
+        QPoint p = interfaceGroup.readEntry( conf_statusPos, QPoint() );
         // See comment in event()
         mSetPos = false;
         move( p );
     }
-    if ( interfaceGroup.hasKey( "StatusSize" ) )
+    if ( interfaceGroup.hasKey( conf_statusSize ) )
     {
-        QSize s = interfaceGroup.readEntry( "StatusSize", QSize() );
+        QSize s = interfaceGroup.readEntry( conf_statusSize, QSize() );
         resize( s );
     }
     else
@@ -100,9 +100,9 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
 InterfaceStatusDialog::~InterfaceStatusDialog()
 {
     KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, "Interface_" + mInterface->getName() );
-    interfaceGroup.writeEntry( "StatusPos", pos() );
-    interfaceGroup.writeEntry( "StatusSize", size() );
+    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+    interfaceGroup.writeEntry( conf_statusPos, pos() );
+    interfaceGroup.writeEntry( conf_statusSize, size() );
     config->sync();
 }
 

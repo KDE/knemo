@@ -56,15 +56,69 @@ namespace KNemoIface {
     };
 }
 
-//static const QString NETLOAD_THEME( "netloadtheme" );
-static const QString TEXT_THEME( "texttheme" );
-static const QString SYSTEM_THEME( "systemtheme" );
-static const QString ICON_ERROR( "error" );
-static const QString ICON_OFFLINE( "offline" );
-static const QString ICON_IDLE( "idle" );
-static const QString ICON_RX( "receive" );
-static const QString ICON_TX( "transmit" );
-static const QString ICON_RX_TX( "transmit-receive" );
+//static const char NETLOAD_THEME[] = "netloadtheme";
+static const char TEXT_THEME[] = "texttheme";
+static const char SYSTEM_THEME[] = "systemtheme";
+static const char ICON_ERROR[] = "error";
+static const char ICON_OFFLINE[] = "offline";
+static const char ICON_IDLE[] = "idle";
+static const char ICON_RX[] = "receive";
+static const char ICON_TX[] = "transmit";
+static const char ICON_RX_TX[] = "transmit-receive";
+
+// config groups
+
+static const char confg_general[] = "General";
+static const char confg_interface[] = "Interface_";
+static const char confg_plotter[] = "Plotter_";
+
+static const char conf_firstStart[] = "FirstStart";
+static const char conf_autoStart[] = "AutoStart";
+static const char conf_interfaces[] = "Interfaces";
+
+// interface
+static const char conf_alias[] = "Alias";
+
+// interface icon
+static const char conf_hideWhenNotAvail[] = "HideWhenNotAvailable";
+static const char conf_hideWhenNotExist[] = "HideWhenNotExisting";
+static const char conf_trafficThreshold[] = "TrafficThreshold";
+static const char conf_iconTheme[] = "IconSet";
+static const char conf_colorIncoming[] = "ColorIncoming";
+static const char conf_colorOutgoing[] = "ColorOutgoing";
+static const char conf_colorDisabled[] = "ColorDisabled";
+static const char conf_colorUnavailable[] = "ColorUnavailable";
+
+// interface statistics
+static const char conf_activateStatistics[] = "ActivateStatistics";
+static const char conf_customBilling[] = "CustomBilling";
+static const char conf_calendar[] = "Calendar";
+static const char conf_billingStart[] = "BillingStart";
+static const char conf_billingMonths[] = "BillingMonths";
+static const char conf_billingWarnThresh[] = "BillingWarnThreshold";
+static const char conf_billingWarnRxTx[] = "BillingWarnRxTx";
+
+// interface context menu
+static const char conf_customCommands[] = "CustomCommands";
+static const char conf_numCommands[] = "NumCommands";
+static const char conf_runAsRoot[] = "RunAsRoot";
+static const char conf_command[] = "Command";
+static const char conf_menuText[] = "MenuText";
+
+// tooltip
+static const char conf_toolTipContent[] = "ToolTipContent";
+
+// misc
+static const char conf_pollInterval[] = "PollInterval";
+static const char conf_saveInterval[] = "SaveInterval";
+static const char conf_statisticsDir[] = "StatisticsDir";
+static const char conf_plotterPos[] = "PlotterPos";
+static const char conf_plotterSize[] = "PlotterSize";
+static const char conf_statisticsPos[] = "StatisticsPos";
+static const char conf_statisticsSize[] = "StatisticsSize";
+static const char conf_statusPos[] = "StatusPos";
+static const char conf_statusSize[] = "StatusSize";
+
 
 struct KNemoTheme
 {

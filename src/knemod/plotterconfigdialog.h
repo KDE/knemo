@@ -27,6 +27,28 @@
 
 struct PlotterSettings
 {
+    PlotterSettings()
+      : pixel( 1 ),
+        distance( 30 ),
+        fontSize( 8 ),
+        minimumValue( 0 ),
+        maximumValue( 8 ),
+        labels( true ),
+        bottomBar( true ),
+        showIncoming( true ),
+        showOutgoing( true ),
+        verticalLines( true ),
+        horizontalLines( true ),
+        automaticDetection( true ),
+        verticalLinesScroll( true ),
+        colorVLines( 0x04FB1D ),
+        colorHLines( 0x04FB1D ),
+        colorIncoming( 0x1889FF ),
+        colorOutgoing( 0xFF7F08 ),
+        colorBackground(0x313031 ),
+        opacity( 20 )
+    {}
+
     int pixel;
     int distance;
     int fontSize;

@@ -79,12 +79,12 @@ Interface::~Interface()
 void Interface::configChanged()
 {
     KSharedConfigPtr config = KGlobal::config();
-    QString group( "Interface_" );
+    QString group( confg_interface );
     group += mName;
     KConfigGroup interfaceGroup( config, group );
     InterfaceSettings s;
-    mSettings.alias = interfaceGroup.readEntry( "Alias" ).trimmed();
-    mSettings.iconTheme = interfaceGroup.readEntry( "IconSet", s.iconTheme );
+    mSettings.alias = interfaceGroup.readEntry( conf_alias ).trimmed();
+    mSettings.iconTheme = interfaceGroup.readEntry( conf_iconTheme, s.iconTheme );
     QStringList themeNames;
     QList<KNemoTheme> themes = findThemes();
     // Let's check that it's available
@@ -92,32 +92,32 @@ void Interface::configChanged()
         themeNames << theme.internalName;
     if ( !themeNames.contains( mSettings.iconTheme ) )
         mSettings.iconTheme = TEXT_THEME;
-    mSettings.colorIncoming = interfaceGroup.readEntry( "ColorIncoming", s.colorIncoming );
-    mSettings.colorOutgoing = interfaceGroup.readEntry( "ColorOutgoing", s.colorOutgoing );
+    mSettings.colorIncoming = interfaceGroup.readEntry( conf_colorIncoming, s.colorIncoming );
+    mSettings.colorOutgoing = interfaceGroup.readEntry( conf_colorOutgoing, s.colorOutgoing );
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
-    mSettings.colorDisabled = interfaceGroup.readEntry( "ColorDisabled", scheme.foreground( KColorScheme::InactiveText ).color() );
-    mSettings.colorUnavailable = interfaceGroup.readEntry( "ColorUnavailable", scheme.foreground( KColorScheme::InactiveText ).color() );
-    mSettings.customCommands = interfaceGroup.readEntry( "CustomCommands", s.customCommands );
-    mSettings.hideWhenDisconnected = interfaceGroup.readEntry( "HideWhenNotAvailable", s.hideWhenDisconnected );
-    mSettings.hideWhenUnavailable = interfaceGroup.readEntry( "HideWhenNotExisting", s.hideWhenUnavailable );
-    mSettings.activateStatistics = interfaceGroup.readEntry( "ActivateStatistics", s.activateStatistics );
-    mSettings.trafficThreshold = clamp<int>(interfaceGroup.readEntry( "TrafficThreshold", s.trafficThreshold ), 0, 1000 );
-    mSettings.warnThreshold = clamp<double>(interfaceGroup.readEntry( "BillingWarnThreshold", s.warnThreshold ), 0.0, 9999.0 );
-    mSettings.warnTotalTraffic = interfaceGroup.readEntry( "BillingWarnRxTx", s.warnTotalTraffic );
+    mSettings.colorDisabled = interfaceGroup.readEntry( conf_colorDisabled, scheme.foreground( KColorScheme::InactiveText ).color() );
+    mSettings.colorUnavailable = interfaceGroup.readEntry( conf_colorUnavailable, scheme.foreground( KColorScheme::InactiveText ).color() );
+    mSettings.customCommands = interfaceGroup.readEntry( conf_customCommands, s.customCommands );
+    mSettings.hideWhenDisconnected = interfaceGroup.readEntry( conf_hideWhenNotAvail, s.hideWhenDisconnected );
+    mSettings.hideWhenUnavailable = interfaceGroup.readEntry( conf_hideWhenNotExist, s.hideWhenUnavailable );
+    mSettings.activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
+    mSettings.trafficThreshold = clamp<int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
+    mSettings.warnThreshold = clamp<double>(interfaceGroup.readEntry( conf_billingWarnThresh, s.warnThreshold ), 0.0, 9999.0 );
+    mSettings.warnTotalTraffic = interfaceGroup.readEntry( conf_billingWarnRxTx, s.warnTotalTraffic );
 
     // TODO: Some of the calendars are a bit buggy, so default to Gregorian for now
-    //mSettings.calendar = interfaceGroup.readEntry( "Calendar", KGlobal::locale()->calendarType() );
-    mSettings.calendar = interfaceGroup.readEntry( "Calendar", "gregorian" );
+    //mSettings.calendar = interfaceGroup.readEntry( conf_calendar, KGlobal::locale()->calendarType() );
+    mSettings.calendar = interfaceGroup.readEntry( conf_calendar, "gregorian" );
 
-    mSettings.customBilling = interfaceGroup.readEntry( "CustomBilling", s.customBilling );
+    mSettings.customBilling = interfaceGroup.readEntry( conf_customBilling, s.customBilling );
 
     KCalendarSystem* calendar = KCalendarSystem::create( mSettings.calendar );
     QDate startDate = QDate::currentDate().addDays( 1 - calendar->day( QDate::currentDate() ) );
-    mSettings.billingStart = interfaceGroup.readEntry( "BillingStart", startDate );
+    mSettings.billingStart = interfaceGroup.readEntry( conf_billingStart, startDate );
     // No future start period
     if ( mSettings.billingStart > QDate::currentDate() )
         mSettings.billingStart = startDate;
-    mSettings.billingMonths = clamp<int>(interfaceGroup.readEntry( "BillingMonths", s.billingMonths ), 1, 6 );
+    mSettings.billingMonths = clamp<int>(interfaceGroup.readEntry( conf_billingMonths, s.billingMonths ), 1, 6 );
     if ( mSettings.customBilling == false )
     {
         mSettings.billingMonths = 1;
@@ -126,16 +126,16 @@ void Interface::configChanged()
     mSettings.commands.clear();
     if ( mSettings.customCommands )
     {
-        int numCommands = interfaceGroup.readEntry( "NumCommands", s.numCommands );
+        int numCommands = interfaceGroup.readEntry( conf_numCommands, s.numCommands );
         for ( int i = 0; i < numCommands; i++ )
         {
             QString entry;
             InterfaceCommand cmd;
-            entry = QString( "RunAsRoot%1" ).arg( i + 1 );
+            entry = QString( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
             cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
-            entry = QString( "Command%1" ).arg( i + 1 );
+            entry = QString( "%1%2" ).arg( conf_command ).arg( i + 1 );
             cmd.command = interfaceGroup.readEntry( entry );
-            entry = QString( "MenuText%1" ).arg( i + 1 );
+            entry = QString( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
             cmd.menuText = interfaceGroup.readEntry( entry );
             mSettings.commands.append( cmd );
         }

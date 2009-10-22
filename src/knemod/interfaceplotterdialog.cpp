@@ -33,6 +33,26 @@
 #include "signalplotter.h"
 #include "plotterconfigdialog.h"
 
+static const char plot_pixel[] = "Pixel";
+static const char plot_distance[] = "Distance";
+static const char plot_fontSize[] = "FontSize";
+static const char plot_minimumValue[] = "MinimumValue";
+static const char plot_maximumValue[] = "MaximumValue";
+static const char plot_labels[] = "Labels";
+static const char plot_bottomBar[] = "BottomBar";
+static const char plot_verticalLines[] = "VerticalLines";
+static const char plot_horizontalLines[] = "HorizontalLines";
+static const char plot_showIncoming[] = "ShowIncoming";
+static const char plot_showOutgoing[] = "ShowOutgoing";
+static const char plot_automaticDetection[] = "AutomaticDetection";
+static const char plot_verticalLinesScroll[] = "VerticalLinesScroll";
+static const char plot_colorVLines[] = "ColorVLines";
+static const char plot_colorHLines[] = "ColorHLines";
+static const char plot_colorIncoming[] = "ColorIncoming";
+static const char plot_colorOutgoing[] = "ColorOutgoing";
+static const char plot_colorBackground[] = "ColorBackground";
+static const char plot_opacity[] = "Opacity";
+
 class FancyPlotterLabel : public QWidget
 {
 public:
@@ -64,11 +84,6 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
       mSetPos( true ),
       mWasShown( false ),
       mName( name ),
-      mColorVLines( 0x04FB1D ),
-      mColorHLines( 0x04FB1D ),
-      mColorIncoming( 0x1889FF ),
-      mColorOutgoing( 0xFF7F08 ),
-      mColorBackground( 0x313031 ),
       mOutgoingPos( 0 ),
       mIncomingPos( 0 ),
       mVisibleBeams( NONE )
@@ -111,17 +126,17 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
 
     // Restore window size and position.
     KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, "Interface_" + mName );
-    if ( interfaceGroup.hasKey( "PlotterPos" ) )
+    KConfigGroup interfaceGroup( config, confg_interface + mName );
+    if ( interfaceGroup.hasKey( conf_plotterPos ) )
     {
-        QPoint p = interfaceGroup.readEntry( "PlotterPos", QPoint() );
+        QPoint p = interfaceGroup.readEntry( conf_plotterPos, QPoint() );
         // See comment in event()
         mSetPos = false;
         move( p );
     }
-    if ( interfaceGroup.hasKey( "PlotterSize" ) )
+    if ( interfaceGroup.hasKey( conf_plotterSize ) )
     {
-        QSize s = interfaceGroup.readEntry( "PlotterSize", QSize() );
+        QSize s = interfaceGroup.readEntry( conf_plotterSize, QSize() );
         // A little hack so the plotter's data isn't chopped off the first time
         // the dialog appears
         mPlotter->resize( s );
@@ -141,13 +156,13 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
 InterfacePlotterDialog::~InterfacePlotterDialog()
 {
     KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, "Interface_" + mName );
-    interfaceGroup.writeEntry( "PlotterSize", size() );
+    KConfigGroup interfaceGroup( config, confg_interface + mName );
+    interfaceGroup.writeEntry( conf_plotterSize, size() );
 
     // If the dialog was never shown, then the position
     // will be wrong
     if ( mWasShown )
-        interfaceGroup.writeEntry( "PlotterPos", pos() );
+        interfaceGroup.writeEntry( conf_plotterPos, pos() );
 
     config->sync();
 }
@@ -267,28 +282,29 @@ void InterfacePlotterDialog::loadConfig()
 {
     KSharedConfigPtr config = KGlobal::config();
     // Set the plotter widgets
-    QString group = "Plotter_" + mName;
+    QString group = confg_plotter + mName;
     // Plotter
+    PlotterSettings s;
     KConfigGroup plotterGroup( config, group );
-    mSettings.pixel = clamp<int>(plotterGroup.readEntry( "Pixel", 1 ), 1, 50 );
-    mSettings.distance = clamp<int>(plotterGroup.readEntry( "Distance", 30 ), 10, 120 );
-    mSettings.fontSize = clamp<int>(plotterGroup.readEntry( "FontSize", 8 ), 5, 24 );
-    mSettings.minimumValue = clamp<int>(plotterGroup.readEntry( "MinimumValue", 0 ), 0, 49999 );
-    mSettings.maximumValue = clamp<int>(plotterGroup.readEntry( "MaximumValue", 1 ), 1, 50000 );
-    mSettings.labels = plotterGroup.readEntry( "Labels", true );
-    mSettings.bottomBar = plotterGroup.readEntry( "BottomBar", true );
-    mSettings.showIncoming = plotterGroup.readEntry( "ShowIncoming", true );
-    mSettings.showOutgoing = plotterGroup.readEntry( "ShowOutgoing", true );
-    mSettings.verticalLines = plotterGroup.readEntry( "VerticalLines", true );
-    mSettings.horizontalLines = plotterGroup.readEntry( "HorizontalLines", true );
-    mSettings.automaticDetection = plotterGroup.readEntry( "AutomaticDetection", true );
-    mSettings.verticalLinesScroll = plotterGroup.readEntry( "VerticalLinesScroll", true );
-    mSettings.colorVLines = plotterGroup.readEntry( "ColorVLines", mColorVLines );
-    mSettings.colorHLines = plotterGroup.readEntry( "ColorHLines", mColorHLines );
-    mSettings.colorIncoming = plotterGroup.readEntry( "ColorIncoming", mColorIncoming );
-    mSettings.colorOutgoing = plotterGroup.readEntry( "ColorOutgoing", mColorOutgoing );
-    mSettings.colorBackground = plotterGroup.readEntry( "ColorBackground", mColorBackground );
-    mSettings.opacity = clamp<int>(plotterGroup.readEntry( "Opacity", 20 ), 0, 100 );
+    mSettings.pixel = clamp<int>(plotterGroup.readEntry( plot_pixel, s.pixel ), 1, 50 );
+    mSettings.distance = clamp<int>(plotterGroup.readEntry( plot_distance, s.distance ), 10, 120 );
+    mSettings.fontSize = clamp<int>(plotterGroup.readEntry( plot_fontSize, s.fontSize ), 5, 24 );
+    mSettings.minimumValue = clamp<int>(plotterGroup.readEntry( plot_minimumValue, s.minimumValue ), 0, 49999 );
+    mSettings.maximumValue = clamp<int>(plotterGroup.readEntry( plot_maximumValue, s.maximumValue ), 1, 50000 );
+    mSettings.labels = plotterGroup.readEntry( plot_labels, s.labels );
+    mSettings.bottomBar = plotterGroup.readEntry( plot_bottomBar, s.bottomBar );
+    mSettings.showIncoming = plotterGroup.readEntry( plot_showIncoming, s.showIncoming );
+    mSettings.showOutgoing = plotterGroup.readEntry( plot_showOutgoing, s.showOutgoing );
+    mSettings.verticalLines = plotterGroup.readEntry( plot_verticalLines, s.verticalLines );
+    mSettings.horizontalLines = plotterGroup.readEntry( plot_horizontalLines, s.horizontalLines );
+    mSettings.automaticDetection = plotterGroup.readEntry( plot_automaticDetection, s.automaticDetection );
+    mSettings.verticalLinesScroll = plotterGroup.readEntry( plot_verticalLinesScroll, s.verticalLinesScroll );
+    mSettings.colorVLines = plotterGroup.readEntry( plot_colorVLines, s.colorVLines );
+    mSettings.colorHLines = plotterGroup.readEntry( plot_colorHLines, s.colorHLines );
+    mSettings.colorIncoming = plotterGroup.readEntry( plot_colorIncoming, s.colorIncoming );
+    mSettings.colorOutgoing = plotterGroup.readEntry( plot_colorOutgoing, s.colorOutgoing );
+    mSettings.colorBackground = plotterGroup.readEntry( plot_colorBackground, s.colorBackground );
+    mSettings.opacity = clamp<int>(plotterGroup.readEntry( plot_opacity, s.opacity ), 0, 100 );
     configChanged();
 }
 
@@ -296,28 +312,28 @@ void InterfacePlotterDialog::saveConfig()
 {
     KSharedConfigPtr config = KGlobal::config();
     // Set the plotter widgets
-    QString group = "Plotter_" + mName;
+    QString group = confg_plotter + mName;
     // Plotter
     KConfigGroup plotterGroup( config, group );
-    plotterGroup.writeEntry( "Pixel", mSettings.pixel );
-    plotterGroup.writeEntry( "Distance", mSettings.distance );
-    plotterGroup.writeEntry( "FontSize", mSettings.fontSize );
-    plotterGroup.writeEntry( "MinimumValue", mSettings.minimumValue );
-    plotterGroup.writeEntry( "MaximumValue", mSettings.maximumValue );
-    plotterGroup.writeEntry( "Labels", mSettings.labels );
-    plotterGroup.writeEntry( "BottomBar", mSettings.bottomBar );
-    plotterGroup.writeEntry( "VerticalLines", mSettings.verticalLines );
-    plotterGroup.writeEntry( "HorizontalLines", mSettings.horizontalLines );
-    plotterGroup.writeEntry( "ShowIncoming", mSettings.showIncoming );
-    plotterGroup.writeEntry( "ShowOutgoing", mSettings.showOutgoing );
-    plotterGroup.writeEntry( "AutomaticDetection", mSettings.automaticDetection );
-    plotterGroup.writeEntry( "VerticalLinesScroll", mSettings.verticalLinesScroll );
-    plotterGroup.writeEntry( "ColorVLines", mSettings.colorVLines );
-    plotterGroup.writeEntry( "ColorHLines", mSettings.colorHLines );
-    plotterGroup.writeEntry( "ColorIncoming", mSettings.colorIncoming );
-    plotterGroup.writeEntry( "ColorOutgoing", mSettings.colorOutgoing );
-    plotterGroup.writeEntry( "ColorBackground", mSettings.colorBackground );
-    plotterGroup.writeEntry( "Opacity", mSettings.opacity );
+    plotterGroup.writeEntry( plot_pixel, mSettings.pixel );
+    plotterGroup.writeEntry( plot_distance, mSettings.distance );
+    plotterGroup.writeEntry( plot_fontSize, mSettings.fontSize );
+    plotterGroup.writeEntry( plot_minimumValue, mSettings.minimumValue );
+    plotterGroup.writeEntry( plot_maximumValue, mSettings.maximumValue );
+    plotterGroup.writeEntry( plot_labels, mSettings.labels );
+    plotterGroup.writeEntry( plot_bottomBar, mSettings.bottomBar );
+    plotterGroup.writeEntry( plot_verticalLines, mSettings.verticalLines );
+    plotterGroup.writeEntry( plot_horizontalLines, mSettings.horizontalLines );
+    plotterGroup.writeEntry( plot_showIncoming, mSettings.showIncoming );
+    plotterGroup.writeEntry( plot_showOutgoing, mSettings.showOutgoing );
+    plotterGroup.writeEntry( plot_automaticDetection, mSettings.automaticDetection );
+    plotterGroup.writeEntry( plot_verticalLinesScroll, mSettings.verticalLinesScroll );
+    plotterGroup.writeEntry( plot_colorVLines, mSettings.colorVLines );
+    plotterGroup.writeEntry( plot_colorHLines, mSettings.colorHLines );
+    plotterGroup.writeEntry( plot_colorIncoming, mSettings.colorIncoming );
+    plotterGroup.writeEntry( plot_colorOutgoing, mSettings.colorOutgoing );
+    plotterGroup.writeEntry( plot_colorBackground, mSettings.colorBackground );
+    plotterGroup.writeEntry( plot_opacity, mSettings.opacity );
     config->sync();
     configChanged();
 }

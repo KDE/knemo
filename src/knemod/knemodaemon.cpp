@@ -74,16 +74,16 @@ void KNemoDaemon::readConfig()
     config->reparseConfiguration();
 
     // General
-    KConfigGroup generalGroup( config, "General" );
-    mGeneralData.pollInterval = clamp<int>(generalGroup.readEntry( "PollInterval", 1 ), 1, 60 );
-    mGeneralData.saveInterval = clamp<int>(generalGroup.readEntry( "SaveInterval", 60 ), 0, 300 );
-    mGeneralData.statisticsDir = generalGroup.readEntry( "StatisticsDir", KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
-    mGeneralData.toolTipContent = generalGroup.readEntry( "ToolTipContent", defaultTip );
+    KConfigGroup generalGroup( config, confg_general );
+    mGeneralData.pollInterval = clamp<int>(generalGroup.readEntry( conf_pollInterval, 1 ), 1, 60 );
+    mGeneralData.saveInterval = clamp<int>(generalGroup.readEntry( conf_saveInterval, 60 ), 0, 300 );
+    mGeneralData.statisticsDir = generalGroup.readEntry( conf_statisticsDir, KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
+    mGeneralData.toolTipContent = generalGroup.readEntry( conf_toolTipContent, defaultTip );
     // If we already have an Interfaces key--even if its empty--then we
     // shouldn't try to set up a default interface
-    if ( generalGroup.hasKey( "Interfaces" ) )
+    if ( generalGroup.hasKey( conf_interfaces ) )
         mHaveInterfaces = true;
-    QStringList interfaceList = generalGroup.readEntry( "Interfaces", QStringList() );
+    QStringList interfaceList = generalGroup.readEntry( conf_interfaces, QStringList() );
 
     // Remove interfaces that are no longer monitored
     foreach ( QString key, mInterfaceHash.keys() )
