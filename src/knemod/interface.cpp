@@ -206,8 +206,6 @@ void Interface::processUpdate()
             mStatistics->addOutgoingData( mBackendData->outgoingBytes );
     }
 
-    backend->updatePackets( mName );
-
     if ( mState & KNemoIface::Connected &&
          mPreviousState < KNemoIface::Connected )
     {

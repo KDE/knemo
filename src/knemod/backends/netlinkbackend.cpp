@@ -196,6 +196,8 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
     data->status = KNemoIface::UnknownState;
     data->incomingBytes = 0;
     data->outgoingBytes = 0;
+    data->prevRxPackets = data->rxPackets;
+    data->prevTxPackets = data->txPackets;
     data->addrData.clear();
     data->ip4DefaultGateway = ip4DefGw;
     data->ip6DefaultGateway = ip6DefGw;

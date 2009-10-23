@@ -82,6 +82,8 @@ void BSDBackend::update()
         interface->status = KNemoIface::UnknownState;
         interface->incomingBytes = 0;
         interface->outgoingBytes = 0;
+        interface->prevRxPackets = interface->rxPackets;
+        interface->prevTxPackets = interface->txPackets;
         interface->addrData.clear();
         interface->ip4DefaultGateway = ip4DefGw;
         interface->ip6DefaultGateway = ip6DefGw;
