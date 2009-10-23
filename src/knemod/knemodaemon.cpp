@@ -93,6 +93,14 @@ void KNemoDaemon::readConfig()
             Interface *interface = mInterfaceHash.take( key );
             delete interface;
             backend->remove( key );
+
+            // If knemo is running while config removes an interface to monitor,
+            // it will keep the interface and plotter groups. Delete them here.
+            KConfigGroup interfaceGroup( config, QString( confg_interface + key ) );
+            KConfigGroup plotterGroup( config, QString( confg_plotter + key ) );
+            interfaceGroup.deleteGroup();
+            plotterGroup.deleteGroup();
+            config->sync();
         }
     }
 
