@@ -2,6 +2,7 @@
 Name=Monitor
 Name[da]=Monitor
 Name[en_GB]=Monitor
+Name[gl]=Vixilante
 Name[nl]=Monitor
 Name[pt]=Monitor
 Name[sv]=Bildskärm
@@ -10,6 +11,7 @@ Name[x-test]=xxMonitorxx
 Comment=KNemo monitor icon theme
 Comment[da]=KNemo ikontema til monitor
 Comment[en_GB]=KNemo monitor icon theme
+Comment[gl]=Tema de iconas do vixilante do KNemo
 Comment[nl]=KNemo monitor-pictogramthema
 Comment[pt]=Tema de ícones do monitor do KNemo
 Comment[sv]=Knemo bildskärmsikontema

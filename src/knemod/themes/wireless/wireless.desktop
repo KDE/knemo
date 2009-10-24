@@ -2,6 +2,7 @@
 Name=Wireless
 Name[da]=Trådløst
 Name[en_GB]=Wireless
+Name[gl]=Sen fíos
 Name[nl]=Draadloos
 Name[pt]=Sem-Fios
 Name[sv]=Trådlöst
@@ -10,6 +11,7 @@ Name[x-test]=xxWirelessxx
 Comment=KNemo wireless icon theme
 Comment[da]=KNemo ikontema til trådløst
 Comment[en_GB]=KNemo wireless icon theme
+Comment[gl]=Tema de iconas sen fíos do KNemo
 Comment[nl]=KNemo draadloos-pictogramthema
 Comment[pt]=Tema de ícones sem-fios do KNemo
 Comment[sv]=Knemo trådlöst ikontema
