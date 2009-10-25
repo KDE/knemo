@@ -550,6 +550,15 @@ void KSignalPlotter::paintEvent( QPaintEvent* event)
     drawWidget(&p, QRect(0,0,w, h), false);
 }
 
+void KSignalPlotter::hideEvent( QHideEvent* )
+{
+#ifdef USE_QIMAGE
+  mScrollableImage = QImage();
+#else
+  mScrollableImage = QPixmap();
+#endif
+}
+
 void KSignalPlotter::drawWidget(QPainter *p, QRect boundingBox, bool onlyDrawPlotter)
 {
   if(boundingBox.height() <= 2 || boundingBox.width() <= 2 ) return;

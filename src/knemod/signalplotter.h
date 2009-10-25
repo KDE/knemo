@@ -306,6 +306,7 @@ class KSignalPlotter : public QWidget
   protected:
     virtual void resizeEvent( QResizeEvent* );
     virtual void paintEvent( QPaintEvent* );
+    virtual void hideEvent( QHideEvent* );
 
     void drawWidget(QPainter *p, QRect boundingBox, bool onlyDrawPlotter);
     void drawBackground(QPainter *p, const QRect & boundingBox);
