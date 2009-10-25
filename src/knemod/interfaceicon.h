@@ -85,12 +85,6 @@ private slots:
     void menuTriggered( QAction * );
 
     /*
-     * Given a string, return a general font with a point size that fits the
-     * tray icon
-     */
-    QFont setIconFont( const QString& );
-
-    /*
      * Returns a string with a compact transfer rate
      * This should not be more than 4 chars, including the units
      */

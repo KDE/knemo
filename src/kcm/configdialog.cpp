@@ -24,7 +24,6 @@
 #include <KCalendarSystem>
 #include <KColorScheme>
 #include <KGenericFactory>
-#include <KGlobalSettings>
 #include <KInputDialog>
 #include <KMessageBox>
 #include <KNotifyConfigWidget>
@@ -788,49 +787,27 @@ void ConfigDialog::aliasChanged( const QString& text )
  *                                        *
  ******************************************/
 
-QFont ConfigDialog::setIconFont( QString text )
-{
-    QFont f = KGlobalSettings::generalFont();
-    float pointSize = f.pointSizeF();
-    QFontMetrics fm( f );
-    int w = fm.width( text );
-    if ( w > 22 )
-    {
-        pointSize *= float( 22 ) / float( w );
-        f.setPointSizeF( pointSize );
-    }
-
-    fm = QFontMetrics( f );
-    // Don't want decender()...space too tight
-    // +1 for base line +1 for space between lines
-    int h = fm.ascent() + 2;
-    if ( h > 11 )
-    {
-        pointSize *= float( 11 ) / float( h );
-        f.setPointSizeF( pointSize );
-    }
-    return f;
-}
-
 QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, int status )
 {
     QPixmap sampleIcon( 22, 22 );
     sampleIcon.fill( Qt::transparent );
+    QRect topRect( 0, 0, 22, 11 );
+    QRect bottomRect( 0, 11, 22, 11 );
     QPainter p( &sampleIcon );
     p.setBrush( Qt::NoBrush );
     p.setOpacity( 1.0 );
-    p.setFont( setIconFont( incomingText ) );
+    p.setFont( setIconFont( incomingText, 22 ) );
     if ( status >= KNemoIface::Connected )
         p.setPen( mDlg->colorIncoming->color() );
     else if ( status == KNemoIface::Available )
         p.setPen( mDlg->colorDisabled->color() );
     else
         p.setPen( mDlg->colorUnavailable->color() );
-    p.drawText( sampleIcon.rect(), Qt::AlignTop | Qt::AlignRight, incomingText );
-    p.setFont( setIconFont( outgoingText ) );
+    p.drawText( topRect, Qt::AlignCenter | Qt::AlignRight, incomingText );
+    p.setFont( setIconFont( outgoingText, 22 ) );
     if ( status >= KNemoIface::Connected )
         p.setPen( mDlg->colorOutgoing->color() );
-    p.drawText( sampleIcon.rect(), Qt::AlignBottom | Qt::AlignRight, outgoingText );
+    p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, outgoingText );
     return sampleIcon;
 }
 

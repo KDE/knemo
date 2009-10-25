@@ -28,6 +28,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <net/if.h>
+#include <QFontMetrics>
+#include <KGlobalSettings>
 #include <KSharedConfig>
 #include <KSharedConfigPtr>
 #include <KStandardDirs>
@@ -252,4 +254,40 @@ QList<KNemoTheme> findThemes()
         iconThemes << theme;
     }
     return iconThemes;
+}
+
+QFont setIconFont( const QString& text, int iconWidth )
+{
+    // Is there a better way to do this?
+    QFont f = KGlobalSettings::generalFont();
+    qreal pointSize = f.pointSizeF();
+    QFontMetricsF fm( f );
+    qreal w = fm.width( text );
+    if ( w > iconWidth )
+    {
+        pointSize *= qreal( iconWidth ) / w;
+        f.setPointSizeF( pointSize );
+        fm = QFontMetricsF( f );
+        while ( fm.width( text ) > iconWidth )
+        {
+            pointSize -= 0.5;
+            f.setPointSizeF( pointSize );
+            fm = QFontMetricsF( f );
+        }
+    }
+
+    // Don't want decender()...space too tight
+    if ( fm.ascent() > iconWidth/2.0 )
+    {
+        pointSize *=  iconWidth / 2.0 / fm.ascent();
+        f.setPointSizeF( pointSize );
+        fm = QFontMetricsF( f );
+        while ( fm.ascent() > iconWidth/2.0 )
+        {
+            pointSize -= 0.5;
+            f.setPointSizeF( pointSize );
+            fm = QFontMetricsF( f );
+        }
+    }
+    return f;
 }

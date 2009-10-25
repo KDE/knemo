@@ -44,4 +44,10 @@ QString getDefaultRoute( int afType, QString * defaultGateway = NULL, void * dat
 
 QList<KNemoTheme> findThemes();
 
+/*
+ * Given a string and tray icon width, return a font size that fits the text
+ * in the tray.
+ */
+QFont setIconFont( const QString& text, int iconWidth );
+
 #endif

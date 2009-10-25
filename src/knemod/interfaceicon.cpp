@@ -26,7 +26,6 @@
 #include <KActionCollection>
 #include <KColorScheme>
 #include <KConfigGroup>
-#include <KGlobalSettings>
 #include <KHelpMenu>
 #include <KIcon>
 #include <KLocale>
@@ -35,6 +34,7 @@
 #include <KStandardDirs>
 
 #include "data.h"
+#include "utils.h"
 #include "interface.h"
 #include "knemodaemon.h"
 #include "interfaceicon.h"
@@ -131,42 +131,6 @@ void InterfaceIcon::updateIconImage( int status )
 #endif
 }
 
-QFont InterfaceIcon::setIconFont( const QString& text )
-{
-    // Is there a better way to do this?
-    QFont f = KGlobalSettings::generalFont();
-    qreal pointSize = f.pointSizeF();
-    QFontMetricsF fm( f );
-    qreal w = fm.width( text );
-    if ( w > iconWidth )
-    {
-        pointSize *= qreal( iconWidth ) / w;
-        f.setPointSizeF( pointSize );
-        fm = QFontMetrics( f );
-        while ( fm.width( text ) > iconWidth )
-        {
-            pointSize -= 0.5;
-            f.setPointSizeF( pointSize );
-            fm = QFontMetrics( f );
-        }
-    }
-
-    // Don't want decender()...space too tight
-    if ( fm.ascent() > iconWidth/2.0 )
-    {
-        pointSize *=  iconWidth / 2.0 / fm.ascent();
-        f.setPointSizeF( pointSize );
-        fm = QFontMetrics( f );
-        while ( fm.ascent() > iconWidth/2.0 )
-        {
-            pointSize -= 0.5;
-            f.setPointSizeF( pointSize );
-            fm = QFontMetrics( f );
-        }
-    }
-    return f;
-}
-
 QString InterfaceIcon::compactTrayText(unsigned long bytes )
 {
     QString byteString;
@@ -228,7 +192,7 @@ void InterfaceIcon::updateIconText( bool doUpdate )
     p.setOpacity( 1.0 );
 
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
-    p.setFont( setIconFont( textIncoming ) );
+    p.setFont( setIconFont( textIncoming, iconWidth ) );
     if ( data->status & KNemoIface::Connected )
         p.setPen( mInterface->getSettings().colorIncoming );
     else if ( data->status == KNemoIface::Available )
@@ -237,7 +201,7 @@ void InterfaceIcon::updateIconText( bool doUpdate )
         p.setPen( mInterface->getSettings().colorUnavailable );
     p.drawText( topRect, Qt::AlignCenter | Qt::AlignRight, textIncoming );
 
-    p.setFont( setIconFont( textOutgoing ) );
+    p.setFont( setIconFont( textOutgoing, iconWidth ) );
     if ( data->status & KNemoIface::Connected )
         p.setPen( mInterface->getSettings().colorOutgoing );
     p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, textOutgoing );
