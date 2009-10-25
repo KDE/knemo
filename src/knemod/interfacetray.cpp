@@ -65,12 +65,17 @@ InterfaceTray::~InterfaceTray()
 
 void InterfaceTray::updateToolTip()
 {
+    QString currentTip;
 #ifdef USE_KNOTIFICATIONITEM
     QString title = mInterface->getSettings().alias;
     if ( title.isEmpty() )
         title = mInterface->getName();
-    setToolTipTitle( i18n( "KNemo - " ) + title );
-    setToolTipSubTitle( toolTipData() );
+    title = i18n( "KNemo - %1", title );
+    if ( toolTipTitle() != title )
+        setToolTipTitle( title );
+    currentTip = toolTipData();
+    if ( currentTip != toolTipSubTitle() )
+        setToolTipSubTitle( currentTip );
 #else
     QPoint pos = QCursor::pos();
     /* If a tooltip is already visible and the global cursor position is in
@@ -78,7 +83,9 @@ void InterfaceTray::updateToolTip()
     if ( !QToolTip::text().isEmpty() && geometry().contains( pos ) )
     {
         /* Sure.  Update its text in case any data changed. */
-        setToolTip( toolTipData() );
+        currentTip = toolTipData();
+        if ( currentTip != toolTip() )
+            setToolTip( currentTip );
         QToolTip::showText( pos, toolTip() );
     }
 #endif
