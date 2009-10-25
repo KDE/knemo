@@ -21,7 +21,7 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-
+#include <time.h>
 #include "data.h"
 #include "global.h"
 #include "interfaceicon.h"
