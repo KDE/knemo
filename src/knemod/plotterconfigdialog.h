@@ -28,24 +28,24 @@
 struct PlotterSettings
 {
     PlotterSettings()
-      : pixel( 1 ),
+      : pixel( 6 ),
         distance( 30 ),
         fontSize( 8 ),
         minimumValue( 0 ),
-        maximumValue( 8 ),
+        maximumValue( 0 ),
         labels( true ),
         bottomBar( true ),
         showIncoming( true ),
         showOutgoing( true ),
-        verticalLines( true ),
+        verticalLines( false ),
         horizontalLines( true ),
         automaticDetection( true ),
-        verticalLinesScroll( true ),
-        colorVLines( 0x04FB1D ),
-        colorHLines( 0x04FB1D ),
+        verticalLinesScroll( false ),
+        colorVLines( 0x888888 ),
+        colorHLines( 0x888888 ),
         colorIncoming( 0x1889FF ),
         colorOutgoing( 0xFF7F08 ),
-        colorBackground(0x313031 ),
+        colorBackground(0xFFFFFF ),
         opacity( 20 )
     {}
 

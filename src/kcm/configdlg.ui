@@ -28,7 +28,7 @@
      </property>
      <widget class="QWidget" name="interfaces">
       <attribute name="title">
-       <string>&amp;Interfaces</string>
+       <string>Interfaces</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0" rowspan="4">
@@ -645,7 +645,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
            <item row="0" column="0" colspan="2">
             <widget class="QCheckBox" name="checkBoxCustom">
              <property name="text">
-              <string>&amp;Display custom entries in context menu</string>
+              <string>Display custom entries in context menu</string>
              </property>
             </widget>
            </item>
@@ -763,7 +763,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
      </widget>
      <widget class="QWidget" name="tooltip">
       <attribute name="title">
-       <string>&amp;ToolTip</string>
+       <string>ToolTip</string>
       </attribute>
       <layout class="QGridLayout">
        <item row="4" column="0" colspan="4">
@@ -878,13 +878,13 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
      </widget>
      <widget class="QWidget" name="misc">
       <attribute name="title">
-       <string>&amp;Misc</string>
+       <string>Misc</string>
       </attribute>
       <layout class="QVBoxLayout">
        <item>
         <widget class="QGroupBox" name="groupBox6_2">
          <property name="title">
-          <string>&amp;Notifications</string>
+          <string>Notifications</string>
          </property>
          <layout class="QVBoxLayout">
           <item>

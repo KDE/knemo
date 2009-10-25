@@ -286,7 +286,7 @@ void InterfacePlotterDialog::loadConfig()
     mSettings.distance = clamp<int>(plotterGroup.readEntry( plot_distance, s.distance ), 10, 120 );
     mSettings.fontSize = clamp<int>(plotterGroup.readEntry( plot_fontSize, s.fontSize ), 5, 24 );
     mSettings.minimumValue = clamp<int>(plotterGroup.readEntry( plot_minimumValue, s.minimumValue ), 0, 49999 );
-    mSettings.maximumValue = clamp<int>(plotterGroup.readEntry( plot_maximumValue, s.maximumValue ), 1, 50000 );
+    mSettings.maximumValue = clamp<int>(plotterGroup.readEntry( plot_maximumValue, s.maximumValue ), 0, 50000 );
     mSettings.labels = plotterGroup.readEntry( plot_labels, s.labels );
     mSettings.bottomBar = plotterGroup.readEntry( plot_bottomBar, s.bottomBar );
     mSettings.showIncoming = plotterGroup.readEntry( plot_showIncoming, s.showIncoming );
