@@ -131,26 +131,38 @@ void InterfaceIcon::updateIconImage( int status )
 #endif
 }
 
-QFont InterfaceIcon::setIconFont( QString text )
+QFont InterfaceIcon::setIconFont( const QString& text )
 {
+    // Is there a better way to do this?
     QFont f = KGlobalSettings::generalFont();
-    float pointSize = f.pointSizeF();
-    QFontMetrics fm( f );
-    int w = fm.width( text );
+    qreal pointSize = f.pointSizeF();
+    QFontMetricsF fm( f );
+    qreal w = fm.width( text );
     if ( w > iconWidth )
     {
-        pointSize *= float( iconWidth ) / float( w );
+        pointSize *= qreal( iconWidth ) / w;
         f.setPointSizeF( pointSize );
+        fm = QFontMetrics( f );
+        while ( fm.width( text ) > iconWidth )
+        {
+            pointSize -= 0.5;
+            f.setPointSizeF( pointSize );
+            fm = QFontMetrics( f );
+        }
     }
 
-    fm = QFontMetrics( f );
     // Don't want decender()...space too tight
-    // +1 for base line +1 for space between lines
-    int h = fm.ascent() + 2;
-    if ( h > iconWidth/2 )
+    if ( fm.ascent() > iconWidth/2.0 )
     {
-        pointSize *= float( iconWidth/2 ) / float( h );
+        pointSize *=  iconWidth / 2.0 / fm.ascent();
         f.setPointSizeF( pointSize );
+        fm = QFontMetrics( f );
+        while ( fm.ascent() > iconWidth/2.0 )
+        {
+            pointSize -= 0.5;
+            f.setPointSizeF( pointSize );
+            fm = QFontMetrics( f );
+        }
     }
     return f;
 }
@@ -208,25 +220,27 @@ void InterfaceIcon::updateIconText( bool doUpdate )
         return;
 
     QPixmap textIcon(iconWidth, iconWidth);
+    QRect topRect( 0, 0, iconWidth, iconWidth/2 );
+    QRect bottomRect( 0, iconWidth/2, iconWidth, iconWidth/2 );
     textIcon.fill( Qt::transparent );
     QPainter p( &textIcon );
     p.setBrush( Qt::NoBrush );
     p.setOpacity( 1.0 );
 
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
-    p.setFont( setIconFont( byteText ) );
+    p.setFont( setIconFont( textIncoming ) );
     if ( data->status & KNemoIface::Connected )
         p.setPen( mInterface->getSettings().colorIncoming );
     else if ( data->status == KNemoIface::Available )
         p.setPen( mInterface->getSettings().colorDisabled );
     else
         p.setPen( mInterface->getSettings().colorUnavailable );
-    p.drawText( textIcon.rect(), Qt::AlignTop | Qt::AlignRight, textIncoming );
+    p.drawText( topRect, Qt::AlignCenter | Qt::AlignRight, textIncoming );
 
-    p.setFont( setIconFont( byteText ) );
+    p.setFont( setIconFont( textOutgoing ) );
     if ( data->status & KNemoIface::Connected )
         p.setPen( mInterface->getSettings().colorOutgoing );
-    p.drawText( textIcon.rect(), Qt::AlignBottom | Qt::AlignRight, textOutgoing );
+    p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, textOutgoing );
 #ifdef USE_KNOTIFICATIONITEM
     mTray->setIconByPixmap( textIcon );
 #else

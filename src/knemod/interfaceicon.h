@@ -88,7 +88,7 @@ private slots:
      * Given a string, return a general font with a point size that fits the
      * tray icon
      */
-    QFont setIconFont( QString );
+    QFont setIconFont( const QString& );
 
     /*
      * Returns a string with a compact transfer rate
