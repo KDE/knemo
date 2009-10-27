@@ -26,7 +26,6 @@
 #include "global.h"
 #include "interfaceicon.h"
 
-class QTimer;
 class InterfacePlotterDialog;
 class InterfaceStatistics;
 class InterfaceStatusDialog;
@@ -66,11 +65,6 @@ public:
         return mPreviousState;
     }
 
-    time_t getUptime()
-    {
-        return mUptime;
-    }
-
     QString getUptimeString()
     {
         return mUptimeString;
@@ -99,6 +93,16 @@ public:
     InterfaceStatistics* getStatistics()
     {
         return mStatistics;
+    }
+
+    unsigned long getRxRate()
+    {
+        return mRxRate;
+    }
+
+    unsigned long getTxRate()
+    {
+        return mTxRate;
     }
 
     /**
@@ -135,21 +139,6 @@ public slots:
 
 private slots:
     /**
-     * Start the uptimer when the interface is connected
-     */
-    void setStartTime();
-
-    /**
-     * Update the signal plotter with new data
-     */
-    void updatePlotter();
-
-    /**
-     * Update the tooltip and status dialog
-     */
-    void updateDetails();
-
-    /**
      * Emit a notification when monthly traffic exceeds a threshold
      */
     void warnMonthlyTraffic( quint64 );
@@ -172,13 +161,20 @@ private:
      */
     void activateOrHide( QWidget* widget, bool onlyActivate = false );
 
+    void updateTime();
+
+    void resetUptime();
+
     KNemoIface::Type mType;
+
     int mState;
     int mPreviousState;
     QString mName;
-    QTimer* mPlotterTimer;
+    qreal mRealSec;
     time_t mUptime;
     QString mUptimeString;
+    unsigned long mRxRate;
+    unsigned long mTxRate;
     InterfaceIcon mIcon;
     InterfaceSettings mSettings;
     InterfaceStatistics* mStatistics;

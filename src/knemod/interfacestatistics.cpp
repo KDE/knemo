@@ -319,6 +319,9 @@ void InterfaceStatistics::configChanged()
 
 void InterfaceStatistics::addIncomingData( unsigned long data )
 {
+    if ( data == 0 )
+        return;
+
     checkCurrentEntry();
 
     mCurrentDay->rxBytes += data;
@@ -349,6 +352,9 @@ void InterfaceStatistics::addIncomingData( unsigned long data )
 
 void InterfaceStatistics::addOutgoingData( unsigned long data )
 {
+    if ( data == 0 )
+        return;
+
     checkCurrentEntry();
 
     mCurrentDay->txBytes += data;

@@ -143,33 +143,14 @@ void InterfaceStatusDialog::updateDialog()
     // connection tab
     ui.textLabelInterface->setText( mInterface->getName() );
     ui.textLabelAlias->setText( settings.alias );
+    ui.textLabelUptime->setText( mInterface->getUptimeString() );
+
     if ( data->status > KNemoIface::Available )
-    {
         ui.textLabelStatus->setText( i18n( "Connected" ) );
-        time_t upsecs = mInterface->getUptime();
-        time_t updays = upsecs / 86400;
-
-        QString uptime = i18np("1 day, ","%1 days, ",updays);
-
-        upsecs -= 86400 * updays; // we only want the seconds of today
-        int hrs = upsecs / 3600;
-        int mins = ( upsecs - hrs * 3600 ) / 60;
-        int secs = upsecs - hrs * 3600 - mins * 60;
-        QString time;
-        time.sprintf( "%02d:%02d:%02d", hrs, mins, secs );
-        uptime += time;
-        ui.textLabelUptime->setText( uptime );
-    }
     else if ( data->status > KNemoIface::Unavailable )
-    {
         ui.textLabelStatus->setText( i18n( "Disconnected" ) );
-        ui.textLabelUptime->setText( "00:00:00" );
-    }
     else
-    {
         ui.textLabelStatus->setText( i18n( "Unavailable" ) );
-        ui.textLabelUptime->setText( "00:00:00" );
-    }
 
     if ( data->interfaceType == KNemoIface::Ethernet )
     {
@@ -285,10 +266,8 @@ void InterfaceStatusDialog::updateDialog()
         ui.textLabelPacketsReceived->setText( QString::number( data->rxPackets ) );
         ui.textLabelBytesSend->setText( data->txString );
         ui.textLabelBytesReceived->setText( data->rxString );
-        unsigned long bytesPerSecond = data->outgoingBytes / mInterface->getGeneralData().pollInterval;
-        ui.textLabelSpeedSend->setText( KIO::convertSize( bytesPerSecond  ) + i18n( "/s" ) );
-        bytesPerSecond = data->incomingBytes / mInterface->getGeneralData().pollInterval;
-        ui.textLabelSpeedReceived->setText( KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) );
+        ui.textLabelSpeedSend->setText( KIO::convertSize( mInterface->getTxRate()  ) + i18n( "/s" ) );
+        ui.textLabelSpeedReceived->setText( KIO::convertSize( mInterface->getRxRate() ) + i18n( "/s" ) );
 
         if ( data->isWireless )
         {

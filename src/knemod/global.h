@@ -34,7 +34,7 @@
 struct GeneralData
 {
     int toolTipContent;
-    int pollInterval;
+    double pollInterval;
     int saveInterval;
     KUrl statisticsDir;
 };

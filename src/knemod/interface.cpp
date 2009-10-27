@@ -18,7 +18,7 @@
    Boston, MA 02110-1301, USA.
 */
 
-#include <QTimer>
+#include <math.h>
 
 #include <KCalendarSystem>
 #include <KColorScheme>
@@ -42,7 +42,11 @@ Interface::Interface( const QString &ifname,
       mState( KNemoIface::UnknownState ),
       mPreviousState( KNemoIface::UnknownState ),
       mName( ifname ),
-      mPlotterTimer( 0 ),
+      mRealSec( 0.0 ),
+      mUptime( 0 ),
+      mUptimeString( "00:00:00" ),
+      mRxRate( 0 ),
+      mTxRate( 0 ),
       mIcon( this ),
       mStatistics( 0 ),
       mStatusDialog( 0 ),
@@ -52,10 +56,7 @@ Interface::Interface( const QString &ifname,
       mGeneralData( generalData )
 {
     mPlotterDialog = new InterfacePlotterDialog( mName );
-    mPlotterTimer = new QTimer();
 
-    connect( mPlotterTimer, SIGNAL( timeout() ),
-             this, SLOT( updatePlotter() ) );
     connect( &mIcon, SIGNAL( statisticsSelected() ),
              this, SLOT( showStatisticsDialog() ) );
 }
@@ -64,11 +65,6 @@ Interface::~Interface()
 {
     delete mStatusDialog;
     delete mPlotterDialog;
-    if ( mPlotterTimer != 0 )
-    {
-        mPlotterTimer->stop();
-        delete mPlotterTimer;
-    }
     if ( mStatistics != 0 )
     {
         // this will also delete a possibly open statistics dialog
@@ -146,15 +142,8 @@ void Interface::configChanged()
     {
         mState = mBackendData->status;
         mPreviousState = mState;
-        if ( mState & KNemoIface::Connected )
-            setStartTime();
     }
     mIcon.configChanged();
-
-    /*if ( mPlotterDialog != 0L )
-    {
-        mPlotterDialog->configChanged();
-    }*/
 
     if ( mStatistics != 0 )
     {
@@ -184,6 +173,9 @@ void Interface::processUpdate()
     int trafficThreshold = mSettings.trafficThreshold;
     mState = mBackendData->status;
 
+    mRxRate = mBackendData->incomingBytes / mGeneralData.pollInterval;
+    mTxRate = mBackendData->outgoingBytes / mGeneralData.pollInterval;
+
     QString title = mSettings.alias;
     if ( title.isEmpty() )
         title = mName;
@@ -195,30 +187,27 @@ void Interface::processUpdate()
             mState |= KNemoIface::RxTraffic;
         if ( ( mBackendData->txPackets - mBackendData->prevTxPackets ) > (unsigned int) trafficThreshold )
             mState |= KNemoIface::TxTraffic;
-    }
 
-    if ( mStatistics != 0 )
-    {
-        // update the statistics
-        if ( mBackendData->incomingBytes > 0 )
+        if ( mStatistics )
+        {
             mStatistics->addIncomingData( mBackendData->incomingBytes );
-        if ( mBackendData->outgoingBytes > 0 )
             mStatistics->addOutgoingData( mBackendData->outgoingBytes );
-    }
+        }
 
-    if ( mState & KNemoIface::Connected &&
-         mPreviousState < KNemoIface::Connected )
-    {
-        setStartTime();
-        QString connectedStr;
-        if ( mBackendData->isWireless )
-            connectedStr = i18n( "%1: Connected to %2", title, mBackendData->essid );
-        else
-            connectedStr = i18n( "%1: Connected", title );
-        if ( mPreviousState != KNemoIface::UnknownState )
-            KNotification::event( "connected", connectedStr );
-        if ( mStatusDialog )
-            mStatusDialog->enableNetworkGroups();
+        updateTime();
+
+        if ( mPreviousState < KNemoIface::Connected )
+        {
+            QString connectedStr;
+            if ( mBackendData->isWireless )
+                connectedStr = i18n( "%1: Connected to %2", title, mBackendData->essid );
+            else
+                connectedStr = i18n( "%1: Connected", title );
+            if ( mPreviousState != KNemoIface::UnknownState )
+                KNotification::event( "connected", connectedStr );
+            if ( mStatusDialog )
+                mStatusDialog->enableNetworkGroups();
+        }
     }
     else if ( mState == KNemoIface::Available )
     {
@@ -229,6 +218,7 @@ void Interface::processUpdate()
                 mStatusDialog->disableNetworkGroups();
             if ( mType == KNemoIface::PPP )
                 backend->clearTraffic( mName );
+            resetUptime();
         }
         else if ( mPreviousState < KNemoIface::Available )
         {
@@ -244,21 +234,27 @@ void Interface::processUpdate()
             mStatusDialog->disableNetworkGroups();
         if ( mType == KNemoIface::PPP )
             backend->clearTraffic( mName );
+        resetUptime();
     }
 
     if ( mPreviousState != mState )
         mIcon.updateTrayStatus();
 
-    // The tooltip and status dialog always get updated
-    updateDetails();
+    if ( mPlotterDialog )
+        mPlotterDialog->updatePlotter( mRxRate / 1024.0, mTxRate / 1024.0 );
+
+    mIcon.updateToolTip();
+    if ( mStatusDialog )
+        mStatusDialog->updateDialog();
 }
 
-void Interface::setStartTime()
+void Interface::resetUptime()
 {
     mUptime = 0;
+    mRealSec = 0.0;
     mUptimeString = "00:00:00";
-    if ( !mPlotterTimer->isActive() )
-        mPlotterTimer->start( 1000 );
+    mRxRate = 0;
+    mTxRate = 0;
 }
 
 void Interface::showStatusDialog( bool fromContextMenu )
@@ -283,8 +279,6 @@ void Interface::showSignalPlotter( bool fromContextMenu )
 {
     // Toggle the signal plotter.
     activateOrHide( mPlotterDialog, fromContextMenu );
-    if ( mPlotterDialog->isVisible() && !mPlotterTimer->isActive() )
-        mPlotterTimer->start( 1000 );
 }
 
 void Interface::showStatisticsDialog()
@@ -324,40 +318,26 @@ void Interface::showStatisticsDialog()
         mStatisticsDialog->show();
 }
 
-void Interface::updateDetails()
+void Interface::updateTime()
 {
-    mUptime += mGeneralData.pollInterval;
-    QString uptime;
-    if ( mBackendData->status & KNemoIface::Connected )
-    {
-        time_t upsecs = mUptime;
-        time_t updays = upsecs / 86400;
+    mRealSec += mGeneralData.pollInterval;
+    if ( mRealSec < 1.0 )
+        return;
 
-        uptime = i18np("1 day, ","%1 days, ",updays);
+    mUptime += trunc( mRealSec );
+    mRealSec -= trunc( mRealSec );
 
-        upsecs -= 86400 * updays; // we only want the seconds of today
-        int hrs = upsecs / 3600;
-        int mins = ( upsecs - hrs * 3600 ) / 60;
-        int secs = upsecs - hrs * 3600 - mins * 60;
-        QString time;
-        time.sprintf( "%02d:%02d:%02d", hrs, mins, secs );
-        uptime += time;
-    }
-    mUptimeString = uptime;
+    time_t updays = mUptime / 86400;
 
-    mIcon.updateToolTip();
-    if ( mStatusDialog )
-        mStatusDialog->updateDialog();
-}
+    mUptimeString = i18np("1 day, ","%1 days, ",updays);
 
-void Interface::updatePlotter()
-{
-    if ( mPlotterDialog )
-    {
-        double outgoingBytes = mBackendData->outgoingBytes / 1024.0 / (double) mGeneralData.pollInterval;
-        double incomingBytes = mBackendData->incomingBytes / 1024.0 / (double) mGeneralData.pollInterval;
-        mPlotterDialog->updatePlotter( incomingBytes, outgoingBytes );
-    }
+    mUptime -= 86400 * updays; // we only want the seconds of today
+    int hrs = mUptime / 3600;
+    int mins = ( mUptime - hrs * 3600 ) / 60;
+    int secs = mUptime - hrs * 3600 - mins * 60;
+    QString time;
+    time.sprintf( "%02d:%02d:%02d", hrs, mins, secs );
+    mUptimeString += time;
 }
 
 void Interface::startStatistics()

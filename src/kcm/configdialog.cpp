@@ -106,6 +106,9 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
         index = findIndexFromName( TEXT_THEME );
     mDlg->comboBoxIconTheme->setCurrentIndex( index );
 
+    for ( size_t i = 0; i < sizeof(pollIntervals)/sizeof(double); i++ )
+        mDlg->comboBoxPoll->addItem( i18n( "%1 sec", pollIntervals[i] ), pollIntervals[i] );
+
     mDlg->pushButtonNew->setIcon( SmallIcon( "list-add" ) );
     mDlg->pushButtonAll->setIcon( SmallIcon( "document-new" ) );
     mDlg->pushButtonDelete->setIcon( SmallIcon( "list-remove" ) );
@@ -201,7 +204,7 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     // Misc
     connect( mDlg->pushButtonNotifications, SIGNAL( clicked() ),
              this, SLOT( buttonNotificationsSelected() ) );
-    connect( mDlg->numInputPollInterval, SIGNAL( valueChanged( int ) ),
+    connect( mDlg->comboBoxPoll, SIGNAL( currentIndexChanged( int ) ),
              this, SLOT( changed() ) );
     connect( mDlg->numInputSaveInterval, SIGNAL( valueChanged( int ) ),
              this, SLOT( changed() ) );
@@ -238,7 +241,11 @@ void ConfigDialog::load()
     KConfigGroup generalGroup( config, confg_general );
     bool startKNemo = generalGroup.readEntry( conf_autoStart, true );
     mDlg->checkBoxStartKNemo->setChecked( startKNemo );
-    mDlg->numInputPollInterval->setValue( clamp<int>(generalGroup.readEntry( conf_pollInterval, 1 ), 1, 60 ) );
+    double pollVal = clamp<double>(generalGroup.readEntry( conf_pollInterval, 1.0 ), 0.1, 2.0 );
+    pollVal = validatePoll( pollVal );
+    int index = mDlg->comboBoxPoll->findData( pollVal );
+    if ( index >= 0 )
+        mDlg->comboBoxPoll->setCurrentIndex( index );
     mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( conf_saveInterval, 60 ), 0, 300 ) );
     mDlg->lineEditStatisticsDir->setUrl( generalGroup.readEntry( conf_statisticsDir, KGlobal::dirs()->saveLocation( "data", "knemo/" ) ) );
     mToolTipContent = generalGroup.readEntry( conf_toolTipContent, defaultTip );
@@ -439,7 +446,7 @@ void ConfigDialog::save()
     KConfigGroup generalGroup( config, confg_general );
     generalGroup.writeEntry( conf_firstStart, false );
     generalGroup.writeEntry( conf_autoStart, mDlg->checkBoxStartKNemo->isChecked() );
-    generalGroup.writeEntry( conf_pollInterval, mDlg->numInputPollInterval->value() );
+    generalGroup.writeEntry( conf_pollInterval, mDlg->comboBoxPoll->itemData( mDlg->comboBoxPoll->currentIndex() ).value<double>() );
     generalGroup.writeEntry( conf_saveInterval, mDlg->numInputSaveInterval->value() );
     generalGroup.writeEntry( conf_statisticsDir,  mDlg->lineEditStatisticsDir->url().url() );
     generalGroup.writeEntry( conf_toolTipContent, mToolTipContent );
@@ -510,7 +517,9 @@ void ConfigDialog::defaults()
     }
 
     // Default misc settings
-    mDlg->numInputPollInterval->setValue( 1 );
+    int index = mDlg->comboBoxPoll->findData( 1.0 );
+    if ( index >= 0 )
+        mDlg->comboBoxPoll->setCurrentIndex( index );
     mDlg->numInputSaveInterval->setValue( 60 );
     mDlg->lineEditStatisticsDir->setUrl( KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
 

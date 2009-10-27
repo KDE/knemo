@@ -50,4 +50,6 @@ QList<KNemoTheme> findThemes();
  */
 QFont setIconFont( const QString& text, int iconWidth );
 
+double validatePoll( double val );
+
 #endif

@@ -914,18 +914,9 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
            </widget>
           </item>
           <item>
-           <widget class="KIntNumInput" name="numInputPollInterval">
-            <property name="value">
-             <number>1</number>
-            </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>60</number>
-            </property>
-            <property name="suffix">
-             <string>s</string>
+           <widget class="QComboBox" name="comboBoxPoll">
+            <property name="whatsThis">
+             <string>Set how often KNemo polls interfaces for information. A lower value will speed up reaction to changes, but it will also increase CPU load.</string>
             </property>
            </widget>
           </item>
@@ -1106,7 +1097,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
   <tabstop>pushButtonAddToolTip</tabstop>
   <tabstop>listBoxDisplay</tabstop>
   <tabstop>pushButtonNotifications</tabstop>
-  <tabstop>numInputPollInterval</tabstop>
+  <tabstop>comboBoxPoll</tabstop>
   <tabstop>numInputSaveInterval</tabstop>
   <tabstop>lineEditStatisticsDir</tabstop>
  </tabstops>

@@ -277,6 +277,8 @@ enum ToolTipEnums
     ENCRYPTION       = 0x00800000
 };
 
-const static int defaultTip = INTERFACE | STATUS | IP_ADDRESS | ESSID | LINK_QUALITY | DOWNLOAD_SPEED | UPLOAD_SPEED;
+static const int defaultTip = INTERFACE | STATUS | IP_ADDRESS | ESSID | LINK_QUALITY | DOWNLOAD_SPEED | UPLOAD_SPEED;
+
+static const double pollIntervals[] = { 0.1, 0.2, 0.25, 0.5, 1.0, 2.0 };
 
 #endif // DATA_H

@@ -243,13 +243,11 @@ QString InterfaceTray::toolTipData()
             tipData += leftTags + i18n( "Bytes Sent" ) + centerTags + data->txString + rightTags;
         if ( toolTipContent & DOWNLOAD_SPEED )
         {
-            unsigned long bytesPerSecond = data->incomingBytes / mInterface->getGeneralData().pollInterval;
-            tipData += leftTags + i18n( "Download Speed" ) + centerTags + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + rightTags;
+            tipData += leftTags + i18n( "Download Speed" ) + centerTags + KIO::convertSize( mInterface->getRxRate() ) + i18n( "/s" ) + rightTags;
         }
         if ( toolTipContent & UPLOAD_SPEED )
         {
-            unsigned long bytesPerSecond = data->outgoingBytes / mInterface->getGeneralData().pollInterval;
-            tipData += leftTags + i18n( "Upload Speed" ) + centerTags + KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) + rightTags;
+            tipData += leftTags + i18n( "Upload Speed" ) + centerTags + KIO::convertSize( mInterface->getTxRate() ) + i18n( "/s" ) + rightTags;
         }
     }
 

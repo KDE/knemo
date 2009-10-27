@@ -159,15 +159,13 @@ void InterfaceIcon::updateIconText( bool doUpdate )
 {
     const BackendData * data = mInterface->getData();
 
-    unsigned long bytesPerSecond = data->incomingBytes / mInterface->getGeneralData().pollInterval;
-    QString byteText = compactTrayText( bytesPerSecond );
+    QString byteText = compactTrayText( mInterface->getRxRate() );
     if ( byteText != textIncoming )
     {
         doUpdate = true;
         textIncoming = byteText;
     }
-    bytesPerSecond = data->outgoingBytes / mInterface->getGeneralData().pollInterval;
-    byteText = compactTrayText( bytesPerSecond );
+    byteText = compactTrayText( mInterface->getTxRate() );
     if ( byteText != textOutgoing )
     {
         doUpdate = true;

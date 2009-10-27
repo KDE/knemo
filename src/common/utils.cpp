@@ -291,3 +291,17 @@ QFont setIconFont( const QString& text, int iconWidth )
     }
     return f;
 }
+
+double validatePoll( double val )
+{
+    int siz = sizeof(pollIntervals)/sizeof(double);
+    for ( int i = 1; i < siz; i++ )
+    {
+        if ( val < pollIntervals[i] )
+        {
+            val = pollIntervals[i-1];
+            return val;
+        }
+    }
+    return 1.0;
+}

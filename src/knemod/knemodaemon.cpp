@@ -75,7 +75,8 @@ void KNemoDaemon::readConfig()
 
     // General
     KConfigGroup generalGroup( config, confg_general );
-    mGeneralData.pollInterval = clamp<int>(generalGroup.readEntry( conf_pollInterval, 1 ), 1, 60 );
+    mGeneralData.pollInterval = clamp<double>(generalGroup.readEntry( conf_pollInterval, 1.0 ), 0.1, 2.0 );
+    mGeneralData.pollInterval = validatePoll( mGeneralData.pollInterval );
     mGeneralData.saveInterval = clamp<int>(generalGroup.readEntry( conf_saveInterval, 60 ), 0, 300 );
     mGeneralData.statisticsDir = generalGroup.readEntry( conf_statisticsDir, KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
     mGeneralData.toolTipContent = generalGroup.readEntry( conf_toolTipContent, defaultTip );
