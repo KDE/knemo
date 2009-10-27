@@ -176,7 +176,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                 <string>If you are on a network with a lot of low-level traffic, you can increase this value so the tray icon does not constantly report activity.</string>
                </property>
                <property name="suffix">
-                <string> packets/s</string>
+                <string> packets/sec</string>
                </property>
                <property name="maximum">
                 <number>1000</number>
@@ -970,7 +970,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
              <number>300</number>
             </property>
             <property name="suffix">
-             <string>s</string>
+             <string> sec</string>
             </property>
            </widget>
           </item>
