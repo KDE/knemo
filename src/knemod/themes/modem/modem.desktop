@@ -2,6 +2,7 @@
 Name=Modem
 Name[da]=Modem
 Name[en_GB]=Modem
+Name[et]=Modem
 Name[gl]=Módem
 Name[nl]=Modem
 Name[pt]=Modem
@@ -11,6 +12,7 @@ Name[x-test]=xxModemxx
 Comment=KNemo modem icon theme
 Comment[da]=KNemo ikontema til modem
 Comment[en_GB]=KNemo modem icon theme
+Comment[et]=KNemo modemi ikooniteema
 Comment[gl]=Tema de iconas de módem do KNemo
 Comment[nl]=KNemo modem-pictogramthema
 Comment[pt]=Tema de ícones de modem do KNemo

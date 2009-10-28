@@ -2,6 +2,7 @@
 Name=Network
 Name[da]=Netværk
 Name[en_GB]=Network
+Name[et]=Võrk
 Name[gl]=Rede
 Name[nl]=Netwerk
 Name[pt]=Rede
@@ -11,6 +12,7 @@ Name[x-test]=xxNetworkxx
 Comment=KNemo Network icon theme
 Comment[da]=KNemo ikontema til netværk
 Comment[en_GB]=KNemo Network icon theme
+Comment[et]=KNemo võrgu ikooniteema
 Comment[gl]=Tema de iconas Rede do KNemo
 Comment[nl]=KNemo Network-pictogramthema
 Comment[pt]=Tema de ícones de Rede do KNemo
