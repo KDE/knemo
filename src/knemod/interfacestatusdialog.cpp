@@ -50,30 +50,17 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     ui.textLabelAddrLabel->hide();
 #endif
 
-    connect( ui.comboBoxIP, SIGNAL( activated(int) ), this, SLOT( updateDialog() ) );
+    connect( ui.comboBoxIP, SIGNAL( currentIndexChanged(int) ), this, SLOT( updateDialog() ) );
 
     updateDialog();
     const BackendData * data = mInterface->getData();
     if ( !data )
         return;
-    if ( data->status & KNemoIface::Connected )
-    {
-        enableNetworkGroups();
-    }
-    else
-    {
-        disableNetworkGroups();
-    }
     if ( !data->isWireless )
     {
         QWidget* wirelessTab = ui.tabWidget->widget( 2 );
         ui.tabWidget->removeTab( 2 );
         delete wirelessTab;
-    }
-
-    if ( !interface->getSettings().activateStatistics )
-    {
-        setStatisticsGroupEnabled( false );
     }
 
     // Restore window size and position.
@@ -125,11 +112,6 @@ bool InterfaceStatusDialog::event( QEvent *e )
     return KDialog::event( e );
 }
 
-void InterfaceStatusDialog::setStatisticsGroupEnabled( bool enabled )
-{
-    ui.groupBoxStatistics->setEnabled( enabled );
-}
-
 void InterfaceStatusDialog::updateDialog()
 {
     if ( isHidden() )
@@ -152,6 +134,33 @@ void InterfaceStatusDialog::updateDialog()
     else
         ui.textLabelStatus->setText( i18n( "Unavailable" ) );
 
+    ui.groupBoxStatistics->setEnabled( mInterface->getSettings().activateStatistics );
+
+    if ( data->status & KNemoIface::Available )
+    {
+        doAvailable( data );
+        if ( data->status & KNemoIface::Up )
+        {
+            doUp( data );
+            if ( data->status & KNemoIface::Connected )
+                doConnected( data );
+        }
+    }
+
+    if ( data->status < KNemoIface::Connected )
+    {
+        doDisconnected( data );
+        if ( data->status < KNemoIface::Up )
+        {
+            doDown();
+            if ( data->status < KNemoIface::Available )
+                doUnavailable();
+        }
+    }
+}
+
+void InterfaceStatusDialog::doAvailable( const BackendData* data )
+{
     if ( data->interfaceType == KNemoIface::Ethernet )
     {
         ui.macText->setText( data->hwAddress );
@@ -166,164 +175,146 @@ void InterfaceStatusDialog::updateDialog()
         ui.macText->hide();
     }
 
-    if ( data->status & KNemoIface::Up )
+    ui.textLabelPacketsSend->setText( QString::number( data->txPackets ) );
+    ui.textLabelPacketsReceived->setText( QString::number( data->rxPackets ) );
+    ui.textLabelBytesSend->setText( data->txString );
+    ui.textLabelBytesReceived->setText( data->rxString );
+    unsigned long bytesPerSecond = data->outgoingBytes / mInterface->getGeneralData().pollInterval;
+    ui.textLabelSpeedSend->setText( KIO::convertSize( bytesPerSecond  ) + i18n( "/s" ) );
+    bytesPerSecond = data->incomingBytes / mInterface->getGeneralData().pollInterval;
+    ui.textLabelSpeedReceived->setText( KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) );
+}
+
+void InterfaceStatusDialog::doConnected( const BackendData *data )
+{
+    ui.groupBoxCurrentConnection->setEnabled( true );
+    if ( data->isWireless )
     {
-        // ip tab
-
-        // Simpler to just clear and re-insert items in the combo box.
-        // But then if we're selecting, the highlighted item would get
-        // cleared each poll period.
-        int i = 0;
-        QStringList keys = data->addrData.keys();
-        while ( i < ui.comboBoxIP->count() )
+        // wireless tab
+        ui.textLabelESSID->setText( data->essid );
+        ui.textLabelAccessPoint->setText( data->accessPoint );
+        ui.textLabelNickName->setText( data->nickName );
+        ui.textLabelMode->setText( data->mode );
+        ui.textLabelFreqChannel->setText( data->frequency + " [" + data->channel + "]" );
+        ui.textLabelBitRate->setText( data->bitRate );
+        ui.textLabelLinkQuality->setText( data->linkQuality );
+        if ( data->isEncrypted == true )
         {
-            if ( keys.contains( ui.comboBoxIP->itemText( i ) ) )
-                i++;
-            else
-                ui.comboBoxIP->removeItem( i );
+            ui.textLabelEncryption->setText( i18n( "active" ) );
         }
-        QFont f = KGlobalSettings::generalFont();
-        QFontMetrics fm( f );
-        int w = 0;
-        int keyCounter = 0;
-        foreach( QString key, keys )
-        {
-            // Combo box preserves order in map
-            if ( ui.comboBoxIP->findText( key ) < 0 )
-                ui.comboBoxIP->insertItem( keyCounter, key );
-            keyCounter++;
-            if ( fm.width( key ) > w )
-                w = fm.width( key );
-        }
-        ui.comboBoxIP->setMinimumWidth( w + 35 );
-
-        AddrData addrData = data->addrData.value( ui.comboBoxIP->currentText() );
-
-#ifdef __linux__
-        if ( addrData.label.isEmpty() )
-            ui.textLabelAddrLabel->clear();
         else
-            ui.textLabelAddrLabel->setText( addrData.label );
-#endif
-
-        if ( ui.comboBoxIP->count() > 0 )
         {
-            QString scope;
-            switch ( addrData.scope )
-            {
-                case RT_SCOPE_UNIVERSE:
-                    scope = i18n( "global" );
-                    break;
-                case RT_SCOPE_SITE:
-                    scope = i18n( "site" );
-                    break;
-                case RT_SCOPE_LINK:
-                    scope = i18n( "link" );
-                    break;
-                case RT_SCOPE_HOST:
-                    scope = i18n( "host" );
-                    break;
-                case RT_SCOPE_NOWHERE:
-                    scope = i18n( "none" );
-                    break;
-            }
-
-            scope += addrData.ipv6Flags;
-            ui.textLabelScope->setText( scope );
-
-            if ( data->interfaceType == KNemoIface::Ethernet )
-            {
-                if ( addrData.scope != RT_SCOPE_HOST )
-                {
-                    if ( addrData.afType == AF_INET )
-                        ui.gatewayText->setText( data->ip4DefaultGateway );
-                    else
-                    ui.gatewayText->setText( data->ip6DefaultGateway );
-                    ui.gatewayLabel->show();
-                    ui.gatewayText->show();
-                }
-                else
-                {
-                    ui.gatewayLabel->hide();
-                    ui.gatewayText->hide();
-                }
-            }
-
-            ui.broadcastLabel->setText( i18n( "Broadcast Address:" ) );
-            if ( addrData.scope != RT_SCOPE_HOST )
-            {
-                ui.broadcastText->setText( addrData.broadcastAddress );
-                if ( addrData.hasPeer )
-                    ui.broadcastLabel->setText( i18n( "PtP Address:" ) );
-                ui.broadcastLabel->show();
-                ui.broadcastText->show();
-            }
-            else
-            {
-                ui.broadcastLabel->hide();
-                ui.broadcastText->hide();
-            }
-        }
-
-        // traffic tab
-        ui.textLabelPacketsSend->setText( QString::number( data->txPackets ) );
-        ui.textLabelPacketsReceived->setText( QString::number( data->rxPackets ) );
-        ui.textLabelBytesSend->setText( data->txString );
-        ui.textLabelBytesReceived->setText( data->rxString );
-        ui.textLabelSpeedSend->setText( KIO::convertSize( mInterface->getTxRate()  ) + i18n( "/s" ) );
-        ui.textLabelSpeedReceived->setText( KIO::convertSize( mInterface->getRxRate() ) + i18n( "/s" ) );
-
-        if ( data->isWireless )
-        {
-            // wireless tab
-            ui.textLabelESSID->setText( data->essid );
-            ui.textLabelAccessPoint->setText( data->accessPoint );
-            ui.textLabelNickName->setText( data->nickName );
-            ui.textLabelMode->setText( data->mode );
-            ui.textLabelFreqChannel->setText( data->frequency + " [" + data->channel + "]" );
-            ui.textLabelBitRate->setText( data->bitRate );
-            ui.textLabelLinkQuality->setText( data->linkQuality );
-            if ( data->isEncrypted == true )
-            {
-                ui.textLabelEncryption->setText( i18n( "active" ) );
-            }
-            else
-            {
-                ui.textLabelEncryption->setText( i18n( "off" ) );
-            }
+            ui.textLabelEncryption->setText( i18n( "off" ) );
         }
     }
 }
 
-void InterfaceStatusDialog::enableNetworkGroups()
+void InterfaceStatusDialog::doUp( const BackendData *data )
 {
-    ui.groupBoxIP->setEnabled( true );
-    ui.groupBoxCurrentConnection->setEnabled( true );
+    // ip tab
+
+    // Simpler to just clear and re-insert items in the combo box.
+    // But then if we're selecting, the highlighted item would get
+    // cleared each poll period.
+    int i = 0;
+    QStringList keys = data->addrData.keys();
+    while ( i < ui.comboBoxIP->count() )
+    {
+        if ( keys.contains( ui.comboBoxIP->itemText( i ) ) )
+            i++;
+        else
+            ui.comboBoxIP->removeItem( i );
+    }
+    QFont f = KGlobalSettings::generalFont();
+    QFontMetrics fm( f );
+    int w = 0;
+    int keyCounter = 0;
+    foreach( QString key, keys )
+    {
+        // Combo box preserves order in map
+        if ( ui.comboBoxIP->findText( key ) < 0 )
+            ui.comboBoxIP->insertItem( keyCounter, key );
+        keyCounter++;
+        if ( fm.width( key ) > w )
+            w = fm.width( key );
+    }
+    ui.comboBoxIP->setMinimumWidth( w + 35 );
+
+    AddrData addrData = data->addrData.value( ui.comboBoxIP->currentText() );
+
+#ifdef __linux__
+    if ( addrData.label.isEmpty() )
+        ui.textLabelAddrLabel->clear();
+    else
+        ui.textLabelAddrLabel->setText( addrData.label );
+#endif
+
+    if ( ui.comboBoxIP->count() > 0 )
+    {
+        QString scope;
+        switch ( addrData.scope )
+        {
+            case RT_SCOPE_UNIVERSE:
+                scope = i18n( "global" );
+                break;
+            case RT_SCOPE_SITE:
+                scope = i18n( "site" );
+                break;
+            case RT_SCOPE_LINK:
+                scope = i18n( "link" );
+                break;
+            case RT_SCOPE_HOST:
+                scope = i18n( "host" );
+                break;
+            case RT_SCOPE_NOWHERE:
+                scope = i18n( "none" );
+                break;
+        }
+        scope += addrData.ipv6Flags;
+        ui.textLabelScope->setText( scope );
+
+        if ( data->interfaceType == KNemoIface::Ethernet )
+        {
+            if ( addrData.scope != RT_SCOPE_HOST )
+            {
+                if ( addrData.afType == AF_INET )
+                    ui.gatewayText->setText( data->ip4DefaultGateway );
+                else
+                    ui.gatewayText->setText( data->ip6DefaultGateway );
+                ui.gatewayLabel->show();
+                ui.gatewayText->show();
+            }
+            else
+            {
+                ui.gatewayLabel->hide();
+                ui.gatewayText->hide();
+            }
+        }
+
+        ui.broadcastLabel->setText( i18n( "Broadcast Address:" ) );
+        if ( addrData.scope != RT_SCOPE_HOST )
+        {
+            ui.broadcastText->setText( addrData.broadcastAddress );
+            if ( addrData.hasPeer )
+                ui.broadcastLabel->setText( i18n( "PtP Address:" ) );
+            ui.broadcastLabel->show();
+            ui.broadcastText->show();
+        }
+        else
+        {
+            ui.broadcastLabel->hide();
+            ui.broadcastText->hide();
+        }
+    }
+    ui.groupBoxIP->setEnabled( (ui.comboBoxIP->count() > 0) );
+
+    // traffic tab
 }
 
-void InterfaceStatusDialog::disableNetworkGroups()
+void InterfaceStatusDialog::doDisconnected( const BackendData *data )
 {
-    ui.groupBoxIP->setEnabled( false );
     ui.groupBoxCurrentConnection->setEnabled( false );
-
-    // clear IP group
-    ui.comboBoxIP->clear();
-    ui.textLabelAddrLabel->setText( QString::null );
-    ui.textLabelScope->setText( QString::null );
-    ui.broadcastText->setText( QString::null );
-    ui.gatewayText->setText( QString::null );
-    ui.macText->setText( QString::null );
-
-    // clear current connection group
-    ui.textLabelPacketsSend->setText( QString::null );
-    ui.textLabelPacketsReceived->setText( QString::null );
-    ui.textLabelBytesSend->setText( QString::null );
-    ui.textLabelBytesReceived->setText( QString::null );
-    ui.textLabelSpeedSend->setText( QString::null );
-    ui.textLabelSpeedReceived->setText( QString::null );
-
-    // clear wireless tab
-    if ( mInterface->getData()->isWireless )
+    if ( data->isWireless )
     {
         ui.textLabelESSID->setText( QString::null );
         ui.textLabelAccessPoint->setText( QString::null );
@@ -334,6 +325,30 @@ void InterfaceStatusDialog::disableNetworkGroups()
         ui.textLabelLinkQuality->setText( QString::null );
         ui.textLabelEncryption->setText( QString::null );
     }
+}
+
+void InterfaceStatusDialog::doDown()
+{
+    // clear IP group
+    ui.groupBoxIP->setEnabled( false );
+    ui.comboBoxIP->clear();
+    ui.textLabelAddrLabel->setText( QString::null );
+    ui.textLabelScope->setText( QString::null );
+    ui.broadcastText->setText( QString::null );
+    ui.gatewayText->setText( QString::null );
+}
+
+void InterfaceStatusDialog::doUnavailable()
+{
+    ui.macText->setText( QString::null );
+
+    // clear current connection group
+    ui.textLabelPacketsSend->setText( QString::null );
+    ui.textLabelPacketsReceived->setText( QString::null );
+    ui.textLabelBytesSend->setText( QString::null );
+    ui.textLabelBytesReceived->setText( QString::null );
+    ui.textLabelSpeedSend->setText( QString::null );
+    ui.textLabelSpeedReceived->setText( QString::null );
 }
 
 void InterfaceStatusDialog::statisticsChanged()

@@ -160,11 +160,6 @@ void Interface::configChanged()
         // user turned off statistics
         stopStatistics();
     }
-
-    if ( mStatusDialog )
-    {
-        mStatusDialog->setStatisticsGroupEnabled( mSettings.activateStatistics );
-    }
 }
 
 void Interface::processUpdate()
@@ -205,8 +200,6 @@ void Interface::processUpdate()
                 connectedStr = i18n( "%1 is connected", title );
             if ( mPreviousState != KNemoIface::UnknownState )
                 KNotification::event( "connected", connectedStr );
-            if ( mStatusDialog )
-                mStatusDialog->enableNetworkGroups();
         }
     }
     else if ( mState & KNemoIface::Available )
@@ -214,8 +207,6 @@ void Interface::processUpdate()
         if ( mPreviousState & KNemoIface::Connected )
         {
             KNotification::event( "disconnected", i18n( "%1 has disconnected", title ) );
-            if ( mStatusDialog )
-                mStatusDialog->disableNetworkGroups();
             if ( mType == KNemoIface::PPP )
                 backend->clearTraffic( mName );
             resetUptime();
@@ -230,8 +221,6 @@ void Interface::processUpdate()
               mPreviousState > KNemoIface::Unavailable )
     {
         KNotification::event( "unavailable", i18n( "%1 is unavailable", title ) );
-        if ( mStatusDialog )
-            mStatusDialog->disableNetworkGroups();
         if ( mType == KNemoIface::PPP )
             backend->clearTraffic( mName );
         resetUptime();

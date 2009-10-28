@@ -50,20 +50,7 @@ public:
      */
     virtual ~InterfaceStatusDialog();
 
-    /**
-     * Enable or disable the statistics group when the user turned statistics on or off.
-     */
-    void setStatisticsGroupEnabled( bool enabled );
-
 public slots:
-    /**
-     * Enable the network groups when the interface is connected
-     */
-    void enableNetworkGroups();
-    /**
-     * Disable the network groups when the interface is not connected
-     */
-    void disableNetworkGroups();
     /**
      * Update the statistics tab when data changed
      */
@@ -74,6 +61,14 @@ protected:
     bool event( QEvent *e );
 
 private:
+    void doAvailable( const BackendData* data );
+    void doConnected( const BackendData *data );
+    void doUp( const BackendData *data );
+    void doDisconnected( const BackendData *data );
+    void doDown();
+    void doUnavailable();
+
+
     Ui::InterfaceStatusDlg ui;
     bool mSetPos;
 
