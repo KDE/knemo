@@ -1193,7 +1193,7 @@ void ConfigDialog::setupToolTipMap()
     mToolTips.insert( ALIAS, i18n( "Alias" ) );
 #endif
     mToolTips.insert( STATUS, i18n( "Status" ) );
-    mToolTips.insert( UPTIME, i18n( "Uptime" ) );
+    mToolTips.insert( UPTIME, i18n( "Connection Time" ) );
     mToolTips.insert( IP_ADDRESS, i18n( "IP Address" ) );
     mToolTips.insert( SCOPE, i18n( "Scope & Flags" ) );
     mToolTips.insert( HW_ADDRESS, i18n( "MAC Address" ) );

@@ -296,10 +296,19 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
                 QString addrKey;
                 AddrData addrVal;
 
-                if ( ifa->ifa_flags && IFF_UP )
-                    data->status |= KNemoIface::Connected;
+                if ( ifa->ifa_flags & IFF_UP )
+                    data->status |= KNemoIface::Up;
 
                 addrKey = getAddr( ifa, addrVal );
+
+                // I don't think a link-local address should count as "connected" to
+                // a network.  Yell if I'm wrong
+                if ( ifa->ifa_flags & IFF_RUNNING &&
+                     addrVal.scope != RT_SCOPE_LINK &&
+                     addrVal.scope != RT_SCOPE_NOWHERE )
+                {
+                    data->status |= KNemoIface::Connected;
+                }
 
                 if ( !addrKey.isEmpty() )
                     data->addrData.insert( addrKey, addrVal );

@@ -236,7 +236,7 @@
        <item row="4" column="0">
         <widget class="QLabel" name="textLabel3">
          <property name="text">
-          <string>Uptime:</string>
+          <string>Connection Time:</string>
          </property>
          <property name="wordWrap">
           <bool>false</bool>
@@ -276,7 +276,7 @@
        <item>
         <widget class="QGroupBox" name="groupBoxCurrentConnection">
          <property name="title">
-          <string>Current connection</string>
+          <string>Interface Traffic</string>
          </property>
          <layout class="QGridLayout" name="_4">
           <item row="0" column="2">

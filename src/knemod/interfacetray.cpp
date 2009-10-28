@@ -176,19 +176,23 @@ QString InterfaceTray::toolTipData()
     if ( toolTipContent & STATUS )
     {
         tipData += leftTags + i18n( "Status" ) + centerTags;
-        if ( data->status > KNemoIface::Available )
+        if ( data->status & KNemoIface::Connected )
             tipData += i18n( "Connected" );
-        else if ( data->status > KNemoIface::Unavailable )
+        else if ( data->status & KNemoIface::Available )
             tipData += i18n( "Disconnected" );
         else
             tipData += i18n( "Unavailable" );
         tipData += rightTags;
     }
 
-    if ( data->status > KNemoIface::Available )
+    if ( data->status & KNemoIface::Connected &&
+         toolTipContent & UPTIME )
     {
-        if ( toolTipContent & UPTIME )
-            tipData += leftTags + i18n( "Uptime" ) + centerTags + mInterface->getUptimeString() + rightTags ;
+            tipData += leftTags + i18n( "Connection time" ) + centerTags + mInterface->getUptimeString() + rightTags ;
+    }
+
+    if ( data->status & KNemoIface::Up )
+    {
         QStringList keys = data->addrData.keys();
         QString ip4Tip;
         QString ip6Tip;
@@ -230,9 +234,13 @@ QString InterfaceTray::toolTipData()
                 if ( !data->ip6DefaultGateway.isEmpty() )
                     tipData += leftTags + i18n( "IPv6 Default Gateway" ) + centerTags + data->ip6DefaultGateway + rightTags;
             }
-            if ( toolTipContent & HW_ADDRESS )
-                tipData += leftTags + i18n( "MAC Address" ) + centerTags + data->hwAddress + rightTags;
         }
+    }
+
+    if ( data->status & KNemoIface::Available )
+    {
+        if ( toolTipContent & HW_ADDRESS )
+            tipData += leftTags + i18n( "MAC Address" ) + centerTags + data->hwAddress + rightTags;
         if ( toolTipContent & RX_PACKETS )
             tipData += leftTags + i18n( "Packets Received" ) + centerTags + QString::number( data->rxPackets ) + rightTags;
         if ( toolTipContent & TX_PACKETS )
@@ -241,17 +249,17 @@ QString InterfaceTray::toolTipData()
             tipData += leftTags + i18n( "Bytes Received" ) + centerTags + data->rxString + rightTags;
         if ( toolTipContent & TX_BYTES )
             tipData += leftTags + i18n( "Bytes Sent" ) + centerTags + data->txString + rightTags;
-        if ( toolTipContent & DOWNLOAD_SPEED )
-        {
-            tipData += leftTags + i18n( "Download Speed" ) + centerTags + KIO::convertSize( mInterface->getRxRate() ) + i18n( "/s" ) + rightTags;
-        }
-        if ( toolTipContent & UPLOAD_SPEED )
-        {
-            tipData += leftTags + i18n( "Upload Speed" ) + centerTags + KIO::convertSize( mInterface->getTxRate() ) + i18n( "/s" ) + rightTags;
-        }
     }
 
-    if ( data->status > KNemoIface::Available && data->isWireless )
+    if ( data->status & KNemoIface::Connected )
+    {
+        if ( toolTipContent & DOWNLOAD_SPEED )
+            tipData += leftTags + i18n( "Download Speed" ) + centerTags + KIO::convertSize( mInterface->getRxRate() ) + i18n( "/s" ) + rightTags;
+        if ( toolTipContent & UPLOAD_SPEED )
+            tipData += leftTags + i18n( "Upload Speed" ) + centerTags + KIO::convertSize( mInterface->getTxRate() ) + i18n( "/s" ) + rightTags;
+    }
+
+    if ( data->status & KNemoIface::Connected && data->isWireless )
     {
         if ( toolTipContent & ESSID )
             tipData += leftTags + i18n( "ESSID" ) + centerTags + data->essid + rightTags;

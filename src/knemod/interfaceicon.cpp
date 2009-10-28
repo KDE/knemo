@@ -99,12 +99,8 @@ void InterfaceIcon::updateIconImage( int status )
         iconName = "knemo-" + mInterface->getSettings().iconTheme + "-";
 
     // Now set the correct icon depending on the status of the interface.
-    if ( status == KNemoIface::Available )
-    {
-        iconName += ICON_OFFLINE;
-    }
-    else if ( ( status & KNemoIface::RxTraffic ) &&
-              ( status & KNemoIface::TxTraffic ) )
+    if ( ( status & KNemoIface::RxTraffic ) &&
+         ( status & KNemoIface::TxTraffic ) )
     {
         iconName += ICON_RX_TX;
     }
@@ -119,6 +115,10 @@ void InterfaceIcon::updateIconImage( int status )
     else if ( status & KNemoIface::Connected )
     {
         iconName += ICON_IDLE;
+    }
+    else if ( status & KNemoIface::Available )
+    {
+        iconName += ICON_OFFLINE;
     }
     else
     {
@@ -193,7 +193,7 @@ void InterfaceIcon::updateIconText( bool doUpdate )
     p.setFont( setIconFont( textIncoming, iconWidth ) );
     if ( data->status & KNemoIface::Connected )
         p.setPen( mInterface->getSettings().colorIncoming );
-    else if ( data->status == KNemoIface::Available )
+    else if ( data->status & KNemoIface::Available )
         p.setPen( mInterface->getSettings().colorDisabled );
     else
         p.setPen( mInterface->getSettings().colorUnavailable );
@@ -284,8 +284,8 @@ void InterfaceIcon::updateTrayStatus()
      *   and the other option is not selected
      */
     else if ( mTray == 0L &&
-              ( currentStatus > KNemoIface::Available ||
-                ( currentStatus == KNemoIface::Available && !hideWhenDisconnected ) ||
+              ( currentStatus & KNemoIface::Connected ||
+                ( currentStatus & KNemoIface::Available && !hideWhenDisconnected ) ||
                 ( !hideWhenUnavailable && !hideWhenDisconnected ) ) )
     {
         mTray = new InterfaceTray( mInterface, ifaceName );

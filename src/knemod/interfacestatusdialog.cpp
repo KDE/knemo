@@ -56,7 +56,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     const BackendData * data = mInterface->getData();
     if ( !data )
         return;
-    if ( data->status > KNemoIface::Available )
+    if ( data->status & KNemoIface::Connected )
     {
         enableNetworkGroups();
     }
@@ -145,9 +145,9 @@ void InterfaceStatusDialog::updateDialog()
     ui.textLabelAlias->setText( settings.alias );
     ui.textLabelUptime->setText( mInterface->getUptimeString() );
 
-    if ( data->status > KNemoIface::Available )
+    if ( data->status & KNemoIface::Connected )
         ui.textLabelStatus->setText( i18n( "Connected" ) );
-    else if ( data->status > KNemoIface::Unavailable )
+    else if ( data->status & KNemoIface::Available )
         ui.textLabelStatus->setText( i18n( "Disconnected" ) );
     else
         ui.textLabelStatus->setText( i18n( "Unavailable" ) );
@@ -166,7 +166,7 @@ void InterfaceStatusDialog::updateDialog()
         ui.macText->hide();
     }
 
-    if ( data->status > KNemoIface::Available )
+    if ( data->status & KNemoIface::Up )
     {
         // ip tab
 
@@ -206,59 +206,63 @@ void InterfaceStatusDialog::updateDialog()
             ui.textLabelAddrLabel->setText( addrData.label );
 #endif
 
-        QString scope;
-        switch ( addrData.scope )
+        if ( ui.comboBoxIP->count() > 0 )
         {
-            case RT_SCOPE_UNIVERSE:
-                scope = i18n( "global" );
-                break;
-            case RT_SCOPE_SITE:
-                scope = i18n( "site" );
-                break;
-            case RT_SCOPE_LINK:
-                scope = i18n( "link" );
-                break;
-            case RT_SCOPE_HOST:
-                scope = i18n( "host" );
-                break;
-            case RT_SCOPE_NOWHERE:
-                scope = i18n( "none" );
-                break;
-        }
-        scope += addrData.ipv6Flags;
-        ui.textLabelScope->setText( scope );
+            QString scope;
+            switch ( addrData.scope )
+            {
+                case RT_SCOPE_UNIVERSE:
+                    scope = i18n( "global" );
+                    break;
+                case RT_SCOPE_SITE:
+                    scope = i18n( "site" );
+                    break;
+                case RT_SCOPE_LINK:
+                    scope = i18n( "link" );
+                    break;
+                case RT_SCOPE_HOST:
+                    scope = i18n( "host" );
+                    break;
+                case RT_SCOPE_NOWHERE:
+                    scope = i18n( "none" );
+                    break;
+            }
 
-        if ( data->interfaceType == KNemoIface::Ethernet )
-        {
+            scope += addrData.ipv6Flags;
+            ui.textLabelScope->setText( scope );
+
+            if ( data->interfaceType == KNemoIface::Ethernet )
+            {
+                if ( addrData.scope != RT_SCOPE_HOST )
+                {
+                    if ( addrData.afType == AF_INET )
+                        ui.gatewayText->setText( data->ip4DefaultGateway );
+                    else
+                    ui.gatewayText->setText( data->ip6DefaultGateway );
+                    ui.gatewayLabel->show();
+                    ui.gatewayText->show();
+                }
+                else
+                {
+                    ui.gatewayLabel->hide();
+                    ui.gatewayText->hide();
+                }
+            }
+
+            ui.broadcastLabel->setText( i18n( "Broadcast Address:" ) );
             if ( addrData.scope != RT_SCOPE_HOST )
             {
-                if ( addrData.afType == AF_INET )
-                    ui.gatewayText->setText( data->ip4DefaultGateway );
-                else
-                    ui.gatewayText->setText( data->ip6DefaultGateway );
-                ui.gatewayLabel->show();
-                ui.gatewayText->show();
+                ui.broadcastText->setText( addrData.broadcastAddress );
+                if ( addrData.hasPeer )
+                    ui.broadcastLabel->setText( i18n( "PtP Address:" ) );
+                ui.broadcastLabel->show();
+                ui.broadcastText->show();
             }
             else
             {
-                ui.gatewayLabel->hide();
-                ui.gatewayText->hide();
+                ui.broadcastLabel->hide();
+                ui.broadcastText->hide();
             }
-        }
-
-        ui.broadcastLabel->setText( i18n( "Broadcast Address:" ) );
-        if ( addrData.scope != RT_SCOPE_HOST )
-        {
-            ui.broadcastText->setText( addrData.broadcastAddress );
-            if ( addrData.hasPeer )
-                ui.broadcastLabel->setText( i18n( "PtP Address:" ) );
-            ui.broadcastLabel->show();
-            ui.broadcastText->show();
-        }
-        else
-        {
-            ui.broadcastLabel->hide();
-            ui.broadcastText->hide();
         }
 
         // traffic tab

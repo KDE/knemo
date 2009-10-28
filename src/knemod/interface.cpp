@@ -200,20 +200,20 @@ void Interface::processUpdate()
         {
             QString connectedStr;
             if ( mBackendData->isWireless )
-                connectedStr = i18n( "%1: Connected to %2", title, mBackendData->essid );
+                connectedStr = i18n( "%1 is connected to %2", title, mBackendData->essid );
             else
-                connectedStr = i18n( "%1: Connected", title );
+                connectedStr = i18n( "%1 is connected", title );
             if ( mPreviousState != KNemoIface::UnknownState )
                 KNotification::event( "connected", connectedStr );
             if ( mStatusDialog )
                 mStatusDialog->enableNetworkGroups();
         }
     }
-    else if ( mState == KNemoIface::Available )
+    else if ( mState & KNemoIface::Available )
     {
-        if ( mPreviousState > KNemoIface::Available )
+        if ( mPreviousState & KNemoIface::Connected )
         {
-            KNotification::event( "disconnected", i18n( "%1: Disconnected", title ) );
+            KNotification::event( "disconnected", i18n( "%1 has disconnected", title ) );
             if ( mStatusDialog )
                 mStatusDialog->disableNetworkGroups();
             if ( mType == KNemoIface::PPP )
@@ -223,13 +223,13 @@ void Interface::processUpdate()
         else if ( mPreviousState < KNemoIface::Available )
         {
             if ( mPreviousState != KNemoIface::UnknownState )
-                KNotification::event( "available", i18n( "%1: Available", title ) );
+                KNotification::event( "available", i18n( "%1 is available", title ) );
         }
     }
     else if ( mState == KNemoIface::Unavailable &&
               mPreviousState > KNemoIface::Unavailable )
     {
-        KNotification::event( "unavailable", i18n( "%1: Unavailable", title ) );
+        KNotification::event( "unavailable", i18n( "%1 is unavailable", title ) );
         if ( mStatusDialog )
             mStatusDialog->disableNetworkGroups();
         if ( mType == KNemoIface::PPP )

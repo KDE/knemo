@@ -50,9 +50,10 @@ namespace KNemoIface {
         UnknownState =  0,
         Unavailable  =  1,
         Available    =  2,
-        Connected    =  4,
-        RxTraffic    =  8,
-        TxTraffic    = 16
+        Up           =  4,
+        Connected    =  8,
+        RxTraffic    = 16,
+        TxTraffic    = 32
     };
 }
 

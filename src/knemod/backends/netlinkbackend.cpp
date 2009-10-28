@@ -118,7 +118,7 @@ BackendBase* NetlinkBackend::createInstance()
     return new NetlinkBackend();
 }
 
-void NetlinkBackend::updateAddresses( BackendData *data )
+void NetlinkBackend::updateAddresses( struct rtnl_link* link, BackendData *data )
 {
     struct rtnl_addr * rtaddr;
     for ( rtaddr = reinterpret_cast<struct rtnl_addr *>(nl_cache_get_first( addrCache ));
@@ -129,7 +129,6 @@ void NetlinkBackend::updateAddresses( BackendData *data )
         if ( data->index != rtnl_addr_get_ifindex( rtaddr ) )
             continue;
 
-        data->status |= KNemoIface::Connected;
         struct nl_addr * addr = rtnl_addr_get_local( rtaddr );
         char buf[ 128 ];
         QString addrKey;
@@ -138,6 +137,15 @@ void NetlinkBackend::updateAddresses( BackendData *data )
         addrVal.afType = rtnl_addr_get_family( rtaddr );
         addrVal.label = rtnl_addr_get_label( rtaddr );
         addrVal.scope = rtnl_addr_get_scope( rtaddr );
+
+        // I don't think a link-local address should count as "connected" to
+        // a network.  Yell if I'm wrong.
+        if ( rtnl_link_get_flags( link ) & IFF_RUNNING &&
+             addrVal.scope != RT_SCOPE_LINK &&
+             addrVal.scope != RT_SCOPE_NOWHERE )
+        {
+            data->status |= KNemoIface::Connected;
+        }
 
         nl_addr2str( addr, buf, sizeof( buf ) );
         addrKey = buf;
@@ -210,11 +218,14 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
         char mac[ 20 ];
         memset( mac, 0, sizeof( mac ) );
 
-        if ( rtnl_link_get_flags( link ) & IFF_POINTOPOINT )
+        unsigned int flags = rtnl_link_get_flags( link );
+        if ( flags & IFF_POINTOPOINT )
             data->interfaceType = KNemoIface::PPP;
         else
             data->interfaceType = KNemoIface::Ethernet;
         data->status = KNemoIface::Available;
+        if ( flags & IFF_UP )
+            data->status |= KNemoIface::Up;
 
         // hw address
         struct nl_addr * addr = rtnl_link_get_addr( link );
@@ -233,7 +244,7 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
         data->rxString = KIO::convertSize( data->rxBytes );
         data->txString = KIO::convertSize( data->txBytes );
 
-        updateAddresses( data );
+        updateAddresses( link, data );
 
         rtnl_link_put( link );
     }
