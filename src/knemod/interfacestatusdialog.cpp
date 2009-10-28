@@ -129,8 +129,10 @@ void InterfaceStatusDialog::updateDialog()
 
     if ( data->status & KNemoIface::Connected )
         ui.textLabelStatus->setText( i18n( "Connected" ) );
+    else if ( data->status & KNemoIface::Up )
+        ui.textLabelStatus->setText( i18n( "Up" ) );
     else if ( data->status & KNemoIface::Available )
-        ui.textLabelStatus->setText( i18n( "Disconnected" ) );
+        ui.textLabelStatus->setText( i18n( "Down" ) );
     else
         ui.textLabelStatus->setText( i18n( "Unavailable" ) );
 

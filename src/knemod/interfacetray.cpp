@@ -178,8 +178,10 @@ QString InterfaceTray::toolTipData()
         tipData += leftTags + i18n( "Status" ) + centerTags;
         if ( data->status & KNemoIface::Connected )
             tipData += i18n( "Connected" );
+        else if ( data->status & KNemoIface::Up )
+            tipData += i18n( "Up" );
         else if ( data->status & KNemoIface::Available )
-            tipData += i18n( "Disconnected" );
+            tipData += i18n( "Down" );
         else
             tipData += i18n( "Unavailable" );
         tipData += rightTags;
