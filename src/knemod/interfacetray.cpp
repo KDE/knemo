@@ -38,7 +38,11 @@
 #include <QHelpEvent>
 
 #ifdef USE_KNOTIFICATIONITEM
-InterfaceTray::InterfaceTray( Interface* interface, const QString &id, QWidget* parent ) : KNotificationItem( id, parent )
+ #if KDE_VERSION >= KDE_MAKE_VERSION(4, 3, 73)
+  InterfaceTray::InterfaceTray( Interface* interface, const QString &id, QWidget* parent ) : KNotificationItem( id, parent )
+ #else
+  InterfaceTray::InterfaceTray( Interface* interface, const QString &id, QWidget* parent ) : KStatusNotifierItem( id, parent )
+ #endif
 #else
 InterfaceTray::InterfaceTray( Interface* interface, const QString &, QWidget* parent ) : KSystemTrayIcon( parent )
 #endif

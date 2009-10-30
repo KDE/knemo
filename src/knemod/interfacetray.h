@@ -25,10 +25,14 @@
 #include <kdeversion.h>
 
 #ifdef USE_KNOTIFICATIONITEM
-  #if KDE_VERSION >= KDE_MAKE_VERSION(4, 3, 66)
-    #include <knotificationitem.h>
+  #if KDE_VERSION >= KDE_MAKE_VERSION(4, 3, 73)
+    #include <kstatusnotifieritem.h>
   #else
-    #include <knotificationitem-1/knotificationitem.h>
+    #if KDE_VERSION >= KDE_MAKE_VERSION(4, 3, 66)
+        #include <knotificationitem.h>
+    #else
+        #include <knotificationitem-1/knotificationitem.h>
+    #endif
   #endif
 #else
   #include <KSystemTrayIcon>
@@ -42,7 +46,11 @@
 using namespace Experimental;
 #endif
 
-class InterfaceTray : public KNotificationItem
+ #if KDE_VERSION >= KDE_MAKE_VERSION(4, 3, 73)
+   class InterfaceTray : public KNotificationItem
+ #else
+   class InterfaceTray : public KStatusNotifierItem
+ #endif
 #else
 class InterfaceTray : public KSystemTrayIcon
 #endif
