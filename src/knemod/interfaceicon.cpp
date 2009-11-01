@@ -68,8 +68,7 @@ InterfaceIcon::InterfaceIcon( Interface* interface )
 
 InterfaceIcon::~InterfaceIcon()
 {
-    if ( mTray != 0L )
-        delete mTray;
+    delete mTray;
 }
 
 void InterfaceIcon::configChanged()
