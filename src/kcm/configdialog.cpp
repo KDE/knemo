@@ -968,7 +968,7 @@ void ConfigDialog::billingStartInputChanged( const QDate& date )
     else
     {
         settings->billingStart = date;
-        changed( true );
+        if (!mLock) changed( true );
     }
 }
 
@@ -979,6 +979,7 @@ void ConfigDialog::billingMonthsInputChanged( int value )
         return;
 
     settings->billingMonths = value;
+    if (!mLock) changed( true );
 }
 
 void ConfigDialog::warnThresholdChanged( double val )
