@@ -109,7 +109,7 @@ static const char conf_menuText[] = "MenuText";
 // tooltip
 static const char conf_toolTipContent[] = "ToolTipContent";
 
-// misc
+// general
 static const char conf_pollInterval[] = "PollInterval";
 static const char conf_saveInterval[] = "SaveInterval";
 static const char conf_statisticsDir[] = "StatisticsDir";

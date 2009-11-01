@@ -201,7 +201,7 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     connect( mDlg->pushButtonRemoveToolTip, SIGNAL( clicked() ),
              this, SLOT( buttonRemoveToolTipSelected() ) );
 
-    // Misc
+    // General
     connect( mDlg->pushButtonNotifications, SIGNAL( clicked() ),
              this, SLOT( buttonNotificationsSelected() ) );
     connect( mDlg->comboBoxPoll, SIGNAL( currentIndexChanged( int ) ),
@@ -516,7 +516,7 @@ void ConfigDialog::defaults()
         mDlg->ifaceTab->setEnabled( true );
     }
 
-    // Default misc settings
+    // Default general settings
     int index = mDlg->comboBoxPoll->findData( 1.0 );
     if ( index >= 0 )
         mDlg->comboBoxPoll->setCurrentIndex( index );
@@ -1295,7 +1295,7 @@ void ConfigDialog::buttonRemoveToolTipSelected()
 
 /******************************************
  *                                        *
- * Misc tab                               *
+ * General tab                            *
  *                                        *
  ******************************************/
 

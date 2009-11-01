@@ -876,9 +876,9 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="misc">
+     <widget class="QWidget" name="general">
       <attribute name="title">
-       <string>Misc</string>
+       <string>General</string>
       </attribute>
       <layout class="QVBoxLayout">
        <item>
