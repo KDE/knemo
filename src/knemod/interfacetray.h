@@ -26,34 +26,25 @@
 
 #ifdef USE_KNOTIFICATIONITEM
   #if KDE_VERSION >= KDE_MAKE_VERSION(4, 3, 73)
+    #define PARENT_ICON_CLASS KStatusNotifierItem
     #include <kstatusnotifieritem.h>
   #else
+    #define PARENT_ICON_CLASS KNotificationItem
     #if KDE_VERSION >= KDE_MAKE_VERSION(4, 3, 66)
         #include <knotificationitem.h>
     #else
         #include <knotificationitem-1/knotificationitem.h>
+        using namespace Experimental;
     #endif
   #endif
 #else
+  #define PARENT_ICON_CLASS KSystemTrayIcon
   #include <KSystemTrayIcon>
 #endif
 
 #include "interface.h"
 
-#ifdef USE_KNOTIFICATIONITEM
-
-#if KDE_VERSION < KDE_MAKE_VERSION(4, 3, 66)
-using namespace Experimental;
-#endif
-
- #if KDE_VERSION >= KDE_MAKE_VERSION(4, 3, 73)
-   class InterfaceTray : public KNotificationItem
- #else
-   class InterfaceTray : public KStatusNotifierItem
- #endif
-#else
-class InterfaceTray : public KSystemTrayIcon
-#endif
+class InterfaceTray : public PARENT_ICON_CLASS
 {
     Q_OBJECT
 public:
