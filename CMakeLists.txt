@@ -24,6 +24,8 @@ elseif ( ${KDE_VERSION} VERSION_GREATER "4.2.84" AND USE_KNOTIFICATIONITEM )
     find_package(LibKNotificationItem-1 REQUIRED)
     macro_log_feature(LIBKNOTIFICATIONITEM-1_FOUND "LibKNotificationItem-1" "An experimental library" "svn://anonsvn.kde.org/home/kde/trunk/KDE/kdelibs/experimental" TRUE "" "LibKNotificationItem-1 is an unfinished library which is required by knemo.")
     set ( USE_KNOTIFICATIONITEM 1 )
+else ( ${KDE_VERSION} VERSION_GREATER "4.3.66" AND USE_KNOTIFICATIONITEM )
+    set( USE_KNOTIFICATIONITEM 0 )
 endif ( ${KDE_VERSION} VERSION_GREATER "4.3.66" AND USE_KNOTIFICATIONITEM )
 
 if ( NOT LIBNL_LIBRARY )

@@ -17,6 +17,7 @@ Options:
   -b, --build-directory BUILDDIR  build the package in BUILDDIR [./build]
   -n, --new-trayicon              compile the tray icon as a KNotificationItem
                                   instead of the usual KSystemTrayIcon
+                                  This only applies to KDE >= 4.3
   -h, --help                      display this help and exit
 EOF
 }
