@@ -76,7 +76,7 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
         QDate nextStart = getNextMonthStart( mBillingStart );
         if ( mBillingStart.daysTo( nextStart ) != mMonthStatistics.at( mMonthStatistics.count() -1 )->span
              || mBillingStart != mMonthStatistics.at( mMonthStatistics.count() - 1 )->date )
-            rebuildStats( QDate( mBillingStart ), Month );
+            rebuildStats( mBillingStart, Month );
     }
     initStatistics();
     mSaveTimer = new QTimer();
@@ -97,7 +97,8 @@ InterfaceStatistics::~InterfaceStatistics()
         saveBillingStart();
 }
 
-void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDomElement& parentItem, int group, QList<StatisticEntry *>& statistics )
+void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDomElement& parentItem,
+                                          enum GroupType group, QList<StatisticEntry *>& statistics )
 {
     QString groupName;
 
@@ -175,8 +176,10 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                                       1,
                                       1 );
 
-                        // If calendar has changed then this will be recalculated elsewhere
                         entry->span = element.attribute( attrib_span ).toInt();
+                        // Old format had no span, so daysInYear using gregorian
+                        if ( entry->span == 0 )
+                            entry->span = entry->date.daysInYear();
                         break;
                 }
                 if ( entry->date.isValid() )
@@ -228,7 +231,11 @@ void InterfaceStatistics::loadStatistics()
         // Let's do a backup before a significant rebuild
         file.copy( dir.path() + statistics_prefix + mInterface->getName() +
                    QString( "_%1.bak" ).arg( QDateTime::currentDateTime().toString( "yyyy-MM-dd-hhmmss" ) ) );
-        rebuildStats( mDayStatistics.first()->date, Week | Year );
+        rebuildStats( mDayStatistics.first()->date, Week );
+    }
+    if ( inCal->calendarType() != mCalendar->calendarType() )
+    {
+        rebuildStats( mDayStatistics.first()->date, Year );
     }
     if ( mAllMonths == false && mInterface->getSettings().customBilling == false )
     {
@@ -236,7 +243,8 @@ void InterfaceStatistics::loadStatistics()
     }
 }
 
-void InterfaceStatistics::buildStatsGroup( QDomDocument& doc, int group, const QList<StatisticEntry *>& statistics )
+void InterfaceStatistics::buildStatsGroup( QDomDocument& doc, enum GroupType group,
+                                           const QList<StatisticEntry *>& statistics )
 {
     QString groupName;
     QString elementName;
@@ -311,8 +319,7 @@ void InterfaceStatistics::configChanged()
     mBillingStart = mInterface->getSettings().billingStart;
     if ( mAllMonths == false && mInterface->getSettings().customBilling == false )
         mBillingStart = mMonthStatistics.first()->date.addDays( 1 - mCalendar->day( mMonthStatistics.first()->date ) );
-    // rebuildStats modifies mBillingStart, so copy first.
-    rebuildStats( QDate( mBillingStart ), Month );
+    rebuildStats( mBillingStart, Month );
 
     mAllMonths = true;
     foreach ( StatisticEntry *entry, mMonthStatistics )
@@ -442,8 +449,9 @@ StatisticEntry * InterfaceStatistics::genNewWeek( const QDate &date )
     return week;
 }
 
-QDate InterfaceStatistics::getNextMonthStart( QDate nextMonthStart )
+QDate InterfaceStatistics::getNextMonthStart( const QDate &startDate )
 {
+    QDate nextMonthStart( startDate );
     int length = mInterface->getSettings().billingMonths;
     for ( int i = 0; i < length; i++ )
     {
@@ -465,15 +473,15 @@ QDate InterfaceStatistics::getNextMonthStart( QDate nextMonthStart )
     return nextMonthStart;
 }
 
-StatisticEntry * InterfaceStatistics::genNewMonth( const QDate &date, QDate recalcDate )
+StatisticEntry * InterfaceStatistics::genNewMonth( const QDate &date, QDate endDate )
 {
     StatisticEntry *month = new StatisticEntry();
 
     // Partial month.  Very little to do.
-    if ( recalcDate.isValid() )
+    if ( endDate.isValid() )
     {
         month->date = date;
-        month->span = date.daysTo( recalcDate );
+        month->span = date.daysTo( endDate );
         return month;
     }
 
@@ -555,7 +563,9 @@ void InterfaceStatistics::updateCurrentYear( const QDate &currentDate )
     emit yearStatisticsChanged();
 }
 
-QDate InterfaceStatistics::setRebuildDate( QList<StatisticEntry *>& statistics, const QDate &recalcDate, int group )
+QDate InterfaceStatistics::setRebuildDate( QList<StatisticEntry *>& statistics,
+                                           const QDate &recalcDate,
+                                           enum GroupType group )
 {
     QDate returnDate = recalcDate;
 
@@ -577,7 +587,7 @@ QDate InterfaceStatistics::setRebuildDate( QList<StatisticEntry *>& statistics, 
     // now take care of instances when we're going earlier than the first recorded stats.
 
     // force full rebuild on months
-    if ( group & Month &&
+    if ( group == Month &&
          mAllMonths == false &&
          mInterface->getSettings().customBilling == false
        )
@@ -590,13 +600,13 @@ QDate InterfaceStatistics::setRebuildDate( QList<StatisticEntry *>& statistics, 
         returnDate = returnDate.addDays( 1 - mCalendar->day( returnDate ) );
     }
 
-    if ( group & Week )
+    if ( group == Week )
     {
         returnDate = returnDate.addDays( 1 - mCalendar->dayOfWeek( returnDate ) );
         while ( returnDate > recalcDate )
             returnDate = returnDate.addDays( -mCalendar->daysInWeek( returnDate ) );
     }
-    else if ( group & Year )
+    else if ( group == Year )
     {
         returnDate = returnDate.addDays( 1 - mCalendar->dayOfYear( returnDate ) );
         while ( returnDate > recalcDate )
@@ -606,8 +616,9 @@ QDate InterfaceStatistics::setRebuildDate( QList<StatisticEntry *>& statistics, 
     return returnDate;
 }
 
-void InterfaceStatistics::rebuildStats( const QDate &recalcDate, int group )
+void InterfaceStatistics::rebuildStats( const QDate &date, int groups )
 {
+    QDate recalcDate( date );
     bool partial = false;
     StatisticEntry* weekEntry = 0;
     StatisticEntry* monthEntry = 0;
@@ -620,12 +631,12 @@ void InterfaceStatistics::rebuildStats( const QDate &recalcDate, int group )
     QList<QDate> s;
     s.append( recalcDate );
 
-    if ( group & Week )
+    if ( groups & Week )
     {
         weekStart = setRebuildDate( mWeekStatistics, recalcDate, Week );
         s.append( weekStart );
     }
-    if ( group & Month )
+    if ( groups & Month )
     {
         monthStart = setRebuildDate( mMonthStatistics, recalcDate, Month );
         // force an old date
@@ -634,7 +645,7 @@ void InterfaceStatistics::rebuildStats( const QDate &recalcDate, int group )
             partial = true;
         s.append( monthStart );
     }
-    if ( group & Year )
+    if ( groups & Year )
     {
         yearStart = setRebuildDate( mYearStatistics, recalcDate, Year );
         s.append( yearStart );
@@ -651,7 +662,7 @@ void InterfaceStatistics::rebuildStats( const QDate &recalcDate, int group )
         if ( day->date < walkbackDate )
             continue;
 
-        if ( group & Week && day->date >= weekStart )
+        if ( groups & Week && day->date >= weekStart )
         {
             if ( !weekEntry || mCalendar->weekNumber( weekEntry->date ) != mCalendar->weekNumber( day->date ) ||
                  weekEntry->date.addDays( mCalendar->daysInWeek( weekEntry->date ) ) <= day->date )
@@ -664,7 +675,7 @@ void InterfaceStatistics::rebuildStats( const QDate &recalcDate, int group )
             weekEntry->txBytes += day->txBytes;
         }
 
-        if ( group & Month && day->date >= monthStart )
+        if ( groups & Month && day->date >= monthStart )
         {
             if ( !monthEntry || day->date >= monthEntry->date.addDays( monthEntry->span ) )
             {
@@ -683,7 +694,7 @@ void InterfaceStatistics::rebuildStats( const QDate &recalcDate, int group )
             monthEntry->rxBytes += day->rxBytes;
             monthEntry->txBytes += day->txBytes;
         }
-        if ( group & Year && day->date >= yearStart )
+        if ( groups & Year && day->date >= yearStart )
         {
             if ( !yearEntry || mCalendar->year( yearEntry->date ) != mCalendar->year( day->date ) )
             {

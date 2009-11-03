@@ -123,44 +123,83 @@ private:
      * Make sure the current entry corresponds with the current date
      */
     void checkCurrentEntry();
+
     /**
      * Load the statistics from a xml file
      */
     void loadStatistics();
+
+    /**
+     * Take nodes from the xml file and convert them into StatisticEntries,
+     * using the calendar system cal
+     */
+    void loadStatsGroup( const KCalendarSystem * cal, const QDomElement& root,
+                         enum GroupType group, QList<StatisticEntry *>& statistics );
+
     /**
      * Fill the statistics with a current entry
      */
     void initStatistics();
+
     /**
-     * Check if the current day is in the day statistics. If found set
-     * mCurrentDay to the found entry else create a new one.
+     * Check if the current (day|week|month|year) is in the statistics. If
+     * found set mCurrent(Day|Week|Month|Year) to the found entry, otherwise
+     * create a new one.
      */
     void updateCurrentDay( const QDate & );
+    void updateCurrentWeek( const QDate & );
+    void updateCurrentMonth( const QDate & );
+    void updateCurrentYear( const QDate & );
+
     /**
-     * Check if the current week is in the week statistics. If found set
-     * mCurrentWeek to the found entry else create a new one.
+     * Given a date, generate a StatisticEntry that contains it
      */
     StatisticEntry * genNewWeek( const QDate & );
-    StatisticEntry * genNewMonth( const QDate &, QDate = QDate() );
     StatisticEntry * genNewYear( const QDate & );
-    void updateCurrentWeek( const QDate & );
+
     /**
-     * Check if the current month is in the month statistics. If found set
-     * mCurrentMonth to the found entry else create a new one.
+     * Given a date, generate a StatisticEntry that contains it
+     *
+     * If the second date is valid, then we create a partial month entry that
+     * spans the two dates. This happens when someone splits a month while
+     * creating a custom billing period.
      */
-    void updateCurrentMonth( const QDate & );
+    StatisticEntry * genNewMonth( const QDate &, QDate = QDate() );
+
     /**
-     * Check if the current year is in the year statistics. If found set
-     * mCurrentYear to the found entry else create a new one.
+     * Sometimes we need to set a rebuild date earlier than requested, so
+     * given a list of statistics and a recalc date, find an actual rebuild
+     * date
      */
-    void updateCurrentYear( const QDate & );
-    QDate setRebuildDate( QList<StatisticEntry *>& statistics, const QDate &recalcDate, int group );
-    QDate getNextMonthStart( QDate );
-    void rebuildStats( const QDate &recalcDate, int group );
+    QDate setRebuildDate( QList<StatisticEntry *>& statistics,
+                          const QDate &recalcDate, enum GroupType group );
+
+    /**
+     * Given period's start date, return the next period's start date
+     */
+    QDate getNextMonthStart( const QDate& );
+
+    /**
+     * Rebuild staistics for the groups at least as far back as recalcDate
+     */
+    void rebuildStats( const QDate &recalcDate, int groups );
+
+    /**
+     * Append a StatisticEntry to the list
+     */
     StatisticEntry* appendStats( QList<StatisticEntry *>& statistics, StatisticEntry* entry );
+
+    /**
+     * If we're using custom billing periods, save the current billing start
+     * date in the config
+     */
     void saveBillingStart();
-    void loadStatsGroup( const KCalendarSystem * cal, const QDomElement& root, int group, QList<StatisticEntry *>& statistics );
-    void buildStatsGroup( QDomDocument& doc, int group, const QList<StatisticEntry *>& statistics );
+
+    /**
+     * Convert StatisticEntries to QDomElements so we can save the xml file
+     */
+    void buildStatsGroup( QDomDocument& doc, enum GroupType group,
+                          const QList<StatisticEntry *>& statistics );
 
     QTimer* mSaveTimer;
     Interface* mInterface;
