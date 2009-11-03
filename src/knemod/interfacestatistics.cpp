@@ -473,6 +473,24 @@ QDate InterfaceStatistics::getNextMonthStart( const QDate &startDate )
     return nextMonthStart;
 }
 
+bool InterfaceStatistics::checkValidSpan( const StatisticEntry& entry )
+{
+    if ( !mDayStatistics.count() )
+        return false;
+
+    QDate endDate = entry.date.addDays( entry.span );
+    for ( int i = mDayStatistics.size() - 1; i >= 0; --i )
+    {
+        // No others will be valid after this; stop early
+        if ( mDayStatistics.at( i )->date < entry.date )
+            return false;
+        if ( mDayStatistics.at( i )->date < endDate &&
+             mDayStatistics.at( i )->date >= entry.date )
+            return true;
+    }
+    return false;
+}
+
 StatisticEntry * InterfaceStatistics::genNewMonth( const QDate &date, QDate endDate )
 {
     StatisticEntry *month = new StatisticEntry();
@@ -482,20 +500,28 @@ StatisticEntry * InterfaceStatistics::genNewMonth( const QDate &date, QDate endD
     {
         month->date = date;
         month->span = date.daysTo( endDate );
-        return month;
+        if ( checkValidSpan( *month ) )
+        {
+            return month;
+        }
+        else
+        {
+            // partial month contains no daily stats, so advance start date
+            // and get a new period below
+            mBillingStart = date.addDays( month->span );
+        }
     }
 
     // Given a calendar day and a billing period start date, find a
     // billing period that the day belongs in.
-    month->date = mBillingStart;
-    QDate nextMonthStart = month->date;
-    while ( nextMonthStart <= date )
+    QDate nextMonthStart = mBillingStart;
+    do
     {
         month->date = nextMonthStart;
-        nextMonthStart = getNextMonthStart( nextMonthStart );
-    }
+        nextMonthStart = getNextMonthStart( month->date );
+        month->span = month->date.daysTo( nextMonthStart );
+    } while ( nextMonthStart <= date || !checkValidSpan( *month ) );
 
-    month->span = month->date.daysTo( nextMonthStart );
     mBillingStart = month->date;
 
     return month;
@@ -573,8 +599,10 @@ QDate InterfaceStatistics::setRebuildDate( QList<StatisticEntry *>& statistics,
     // entry's start date + span > returnDate
     for ( int i = statistics.size() - 1; i >= 0; --i )
     {
-        if ( statistics.at( i )->date.addDays( statistics.at( i )->span ) > returnDate ||
-             statistics.at( i )->span < 1 )
+        if ( statistics.at( i )->date.addDays( statistics.at( i )->span ) > mDayStatistics.first()->date &&
+             ( statistics.at( i )->date.addDays( statistics.at( i )->span ) > returnDate ||
+               statistics.at( i )->span < 1 )
+           )
         {
             if ( returnDate > statistics.at( i )->date )
                 returnDate = statistics.at( i )->date;
@@ -585,20 +613,6 @@ QDate InterfaceStatistics::setRebuildDate( QList<StatisticEntry *>& statistics,
     }
 
     // now take care of instances when we're going earlier than the first recorded stats.
-
-    // force full rebuild on months
-    if ( group == Month &&
-         mAllMonths == false &&
-         mInterface->getSettings().customBilling == false
-       )
-    {
-        if ( statistics.size() > 0 )
-        {
-            returnDate = returnDate.addDays( 1 - mCalendar->day( statistics.at( 0 )->date ) );
-            statistics.clear();
-        }
-        returnDate = returnDate.addDays( 1 - mCalendar->day( returnDate ) );
-    }
 
     if ( group == Week )
     {

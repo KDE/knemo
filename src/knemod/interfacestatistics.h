@@ -163,6 +163,10 @@ private:
      * If the second date is valid, then we create a partial month entry that
      * spans the two dates. This happens when someone splits a month while
      * creating a custom billing period.
+     *
+     * If the generated entry spans a period that does not have any daily
+     * statistics, then we create the next latest one that does.  This prevents
+     * orphan monthly entries when using custom billing periods.
      */
     StatisticEntry * genNewMonth( const QDate &, QDate = QDate() );
 
@@ -178,6 +182,12 @@ private:
      * Given period's start date, return the next period's start date
      */
     QDate getNextMonthStart( const QDate& );
+
+    /**
+     * Return true if the entry spans a period that contains at least one day
+     * in mDayStatistics, else false
+     */
+    bool checkValidSpan( const StatisticEntry& entry );
 
     /**
      * Rebuild staistics for the groups at least as far back as recalcDate
