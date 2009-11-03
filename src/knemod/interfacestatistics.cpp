@@ -224,9 +224,16 @@ void InterfaceStatistics::loadStatistics()
     // Discrepency: rebuild week and year based on calendar type in settings
     if ( root.attribute( attrib_calendar ).isEmpty() ||
          inCal->calendarType() != mCalendar->calendarType() )
+    {
+        // Let's do a backup before a significant rebuild
+        file.copy( dir.path() + statistics_prefix + mInterface->getName() +
+                   QString( "_%1.bak" ).arg( QDateTime::currentDateTime().toString( "yyyy-MM-dd-hhmmss" ) ) );
         rebuildStats( mDayStatistics.first()->date, Week | Year );
+    }
     if ( mAllMonths == false && mInterface->getSettings().customBilling == false )
+    {
         rebuildStats( mMonthStatistics.first()->date, Month );
+    }
 }
 
 void InterfaceStatistics::buildStatsGroup( QDomDocument& doc, int group, const QList<StatisticEntry *>& statistics )
