@@ -1,40 +1,40 @@
 KNemo - the KDE Network Monitor
- 
+
 KNemo offers a network monitor similar to the one found in Windows.
-For every network interface it displays an icon in the systray. 
- 
-Features of version 0.5.1 include:
- * support for ethernet (including wireless) and ppp connections
- * the icon shows incoming/outgoing traffic
- * hiding of icon when the interface is not available
- * hiding of icon when the interface does not exist (useful for interfaces that 
-   are dynamically created and and removed)
- * automatic detection of wireless extensions for ethernet interfaces
- * left-clicking on an icon displays a status dialog with information about the
-   selected interface (2nd click hides dialog)
- * middle-clicking on an icon displays a traffic plotter that was taken from 
-   KSysGuard (2nd click hides dialog)
- * configuration via context menu or control center module (Internet & Network/
-   Network Monitor)
- * customizable dynamic tooltip for quick access to often needed information
- * custom entries in the context menu. Useful to start/stop/restart interfaces 
-   or to configure them using external tools.
- * automatic detection of available interfaces (click on 'Default' in the 
-   configuration dialog and KNemo will look under /proc/net/dev for interfaces)
- * support for notifications via sound and passive popups
- * KNemo counts the number of transfered bytes and does not depend on the output
-   of 'ifconfig' for the total number of transfered bytes. This way  KNemo can 
-   even display a hugh amount of traffic while 'ifconfig' has an overflow at 4GB.
- * support for different iconsets for every interface
- * support for daily, monthly and yearly statistics
- * configurable update interval for interface information
- * support for different backends to gather information
- * support for user-supplied icon sets
-   You can drop your own custom icon sets in $KDEHOME/share/apps/knemo and they
-   will magically appear in the config dialog the next time you run it. A
-   complete icon set contains the following 22x22 png files:
-     [iconset name]_connected.png
-     [iconset name]_disconnected.png
-     [iconset name]_incoming.png
-     [iconset name]_outgoing.png
-     [iconset name]_traffic.png
+For every network interface it displays an icon in the systray.
+
+It also does a whole lot more:
+
+ * Supports a variety of interface and connection types
+   - ethernet, wireless, and ppp connections
+   - IPv4 and IPv6 addresses
+   - multiple addresses per interface
+
+ * Supports optional traffic statistics
+   - logs daily, weekly, monthly, yearly statistics
+   - monthly statistics can act as billing periods; a billing period can start
+     on an arbitrary day and can span 1-6 months
+
+ * Provides detailed information about an interface
+   - tray icon displays incoming/outgoing traffic
+   - customizable dynamic tray tooltip provides quick access to info
+   - left clicking the tray icon presents a status dialog
+   - traffic plotter dialog modelled after the plotter in KDE's System Monitor
+
+ * Supports notifications
+   - can notify when an interface connects/disconnects from a network, becomes
+     available/unavailable, or when monthly traffic exceeds a threshold
+
+ * Supports tray icon themes
+   - themes modeled after the network status icons in the freedesktop.org icon
+     naming specification
+
+ * Allows further flexibility
+   - tray icons can always be visible or can be hidden when an interface
+     becomes disconnected or unavailable
+   - tray icon context menu supports custom menu entries that can run arbitrary
+     commands
+   - automatically detects available interfaces; by default it monitors only
+     the default route interface
+   - supports update intervals from 0.1 to 2 seconds
+   - configurable via the tray icon's context menu or KDE System Settings
