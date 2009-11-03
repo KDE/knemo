@@ -540,7 +540,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                   <property name="whatsThis">
                    <string>&lt;p&gt;When traffic for a month or billing period exceeds this threshold, KNemo will emit a notification. This notification will appear once per session.&lt;/p&gt;&lt;p&gt;If the value is 0, KNemo will not emit a notification.&lt;/p&gt;</string>
                   </property>
-                  <property name="singleStep">
+                  <property name="singleStep" stdset="0">
                    <double>0.100000000000000</double>
                   </property>
                   <property name="suffix">
