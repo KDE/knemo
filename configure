@@ -2,6 +2,7 @@
 
 BUILD_DIR="build"
 INSTALL_PREFIX="/usr/local"
+NEWTRAY=false
 
 usage ()
 {
@@ -14,6 +15,8 @@ Usage: ./configure [OPTION]...
 Options:
   -p, --prefix PREFIX             install files in PREFIX [/usr/local]
   -b, --build-directory BUILDDIR  build the package in BUILDDIR [./build]
+  -n, --new-trayicon              compile the tray icon as a KNotificationItem
+                                  instead of the usual KSystemTrayIcon
   -h, --help                      display this help and exit
 EOF
 }
@@ -21,10 +24,10 @@ EOF
 GETOPTEST=`getopt --version`
 case "$GETOPTEST" in
 getopt*) # GNU getopt
-	ARGS=`getopt -n configure -l prefix:,build-directory:,help p:b:h "$@"`
+	ARGS=`getopt -n configure -l prefix:,build-directory:,new-trayicon,help p:b:nh "$@"`
 	;;
 *) # POSIX getopt ?
-	ARGS=`getopt p:b:h "$@"`
+	ARGS=`getopt p:b:nh "$@"`
 	;;
 esac
 
@@ -45,6 +48,10 @@ while [ $# -gt 0 ]; do
 	-b|--build-directory)
 		BUILD_DIR="$2"
 		shift 2
+		;;
+	-n|--new-trayicon)
+		NEWTRAY=true
+		shift 1
 		;;
 	-h|--help)
 		usage
@@ -72,6 +79,7 @@ fi
 
 cmake "$SOURCE_DIR" \
 	-DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
+	-DUSE_KNOTIFICATIONITEM=$NEWTRAY \
 	-DCMAKE_SKIP_RPATH=ON \
 	-DKDE4_USE_ALWAYS_FULL_RPATH=false \
 	-DCMAKE_BUILD_TYPE=Release
