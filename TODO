@@ -1,3 +1,4 @@
- * show two dynamic bars with the current netload instead of an icon
- * configurable month periods for the statistics dialog; this might make
-   sense for people whose billing cycles don't fall on the first of the month
+ * A netload icon theme: two dynamic bars showing rx/tx rate
+ * BSD wireless support
+ * Always calculate 2 beams in the plotter but only show those that are checked
+ * Add option for alternate calendar systems
