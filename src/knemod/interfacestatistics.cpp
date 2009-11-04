@@ -137,7 +137,7 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                 switch ( group )
                 {
                     case Day:
-                        cal->setYMD( entry->date,
+                        cal->setDate( entry->date,
                                       element.attribute( attrib_year ).toInt(),
                                       element.attribute( attrib_month ).toInt(),
                                       element.attribute( attrib_day ).toInt() );
@@ -145,7 +145,7 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                         entry->span = 1;
                         break;
                     case Week:
-                        cal->setYMD( entry->date,
+                        cal->setDate( entry->date,
                                       element.attribute( attrib_year ).toInt(),
                                       element.attribute( attrib_month ).toInt(),
                                       element.attribute( attrib_day ).toInt() );
@@ -157,7 +157,7 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                         if ( element.hasAttribute( attrib_day ) )
                             day = element.attribute( attrib_day ).toInt();
 
-                        cal->setYMD( entry->date,
+                        cal->setDate( entry->date,
                                       element.attribute( attrib_year ).toInt(),
                                       element.attribute( attrib_month ).toInt(),
                                       day );
@@ -171,7 +171,7 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                             mAllMonths = false;
                         break;
                     case Year:
-                        cal->setYMD( entry->date,
+                        cal->setDate( entry->date,
                                       element.attribute( attrib_year ).toInt(),
                                       1,
                                       1 );
@@ -456,7 +456,7 @@ QDate InterfaceStatistics::getNextMonthStart( const QDate &startDate )
     for ( int i = 0; i < length; i++ )
     {
         QDate refDay;
-        mCalendar->setYMD( refDay, mCalendar->year( nextMonthStart ), mCalendar->month( nextMonthStart ), 1 );
+        mCalendar->setDate( refDay, mCalendar->year( nextMonthStart ), mCalendar->month( nextMonthStart ), 1 );
         refDay = refDay.addDays( mCalendar->daysInMonth( refDay ) );
 
         nextMonthStart = nextMonthStart.addDays( mCalendar->daysInMonth( nextMonthStart ) );
