@@ -1,3 +1,25 @@
+Version 0.6.0
+ * backend changes:
+   - added IPv6 support
+   - sysfs and nettools backends replaced with a netlink backend on Linux and
+     a more general backend for BSD (currently only tested on FreeBSD).
+     Note: BSD backend currently lacks wireless support.
+   - polling periods can range from 0.1 to 2 seconds
+   - added notifications for when an interface becomes available/unavailable
+ * statistics changes:
+   - added weekly statistics
+   - monthly statistics can act like "billing periods".  Billing periods can
+     start on an arbitrary day and can span 1-6 months.
+   - optional notification if a billing period's traffic exceeds a threshold
+ * ui changes:
+   - improved icon theming modeled after the network status icons in the
+     freedesktop.org icon naming spec
+   - added a text icon theme that reports upload/download speeds in the tray
+   - status dialog supports multiple IP addresses per interface
+   - redesigned config dialog; should reduce information overload
+   - plotter properties are saved per interface and accessible by right
+     clicking a plotter
+
 Version 0.5.2:
  * fix config dialog so it preserves new position and size settings
  * events work again
