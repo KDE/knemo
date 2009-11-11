@@ -805,7 +805,11 @@ QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, int 
     QPainter p( &sampleIcon );
     p.setBrush( Qt::NoBrush );
     p.setOpacity( 1.0 );
-    p.setFont( setIconFont( incomingText, 22 ) );
+    QFont rxFont = setIconFont( incomingText, 22 );
+    QFont txFont = setIconFont( outgoingText, 22 );
+    if ( rxFont.pointSizeF() > txFont.pointSizeF() )
+        rxFont.setPointSizeF( txFont.pointSizeF() );
+    p.setFont( rxFont );
     if ( status >= KNemoIface::Connected )
         p.setPen( mDlg->colorIncoming->color() );
     else if ( status == KNemoIface::Available )
@@ -813,7 +817,7 @@ QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, int 
     else
         p.setPen( mDlg->colorUnavailable->color() );
     p.drawText( topRect, Qt::AlignCenter | Qt::AlignRight, incomingText );
-    p.setFont( setIconFont( outgoingText, 22 ) );
+    p.setFont( rxFont );
     if ( status >= KNemoIface::Connected )
         p.setPen( mDlg->colorOutgoing->color() );
     p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, outgoingText );
@@ -860,11 +864,11 @@ void ConfigDialog::iconThemeChanged( int set )
     if ( curTheme.internalName == TEXT_THEME )
     {
         settings->iconTheme = TEXT_THEME;
-        mDlg->pixmapError->setPixmap( textIcon( "0B", "0B", KNemoIface::Unavailable ) );
-        mDlg->pixmapDisconnected->setPixmap( textIcon( "0B", "0B", KNemoIface::Available ) );
-        mDlg->pixmapConnected->setPixmap( textIcon( "0B", "0B", KNemoIface::Connected ) );
-        mDlg->pixmapIncoming->setPixmap( textIcon( "123K", "0B", KNemoIface::Connected ) );
-        mDlg->pixmapOutgoing->setPixmap( textIcon( "0B", "12K", KNemoIface::Connected ) );
+        mDlg->pixmapError->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Unavailable ) );
+        mDlg->pixmapDisconnected->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Available ) );
+        mDlg->pixmapConnected->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Connected ) );
+        mDlg->pixmapIncoming->setPixmap( textIcon( "123K", "0.0K", KNemoIface::Connected ) );
+        mDlg->pixmapOutgoing->setPixmap( textIcon( "0.0K", "12K", KNemoIface::Connected ) );
         mDlg->pixmapTraffic->setPixmap( textIcon( "123K", "12K", KNemoIface::Connected ) );
         mDlg->colorIncoming->show();
         mDlg->colorIncomingLabel->show();

@@ -135,9 +135,11 @@ QString InterfaceIcon::compactTrayText(unsigned long bytes )
     QString byteString;
     // Space is tight, so no space between number and units, and the complete
     // string should be no more than 4 chars.
+    /* Visually confusing to display bytes
     if ( bytes < 922 ) // 922B = 0.9K
         byteString = i18n( "%1B", bytes );
-    else if ( bytes < 10189 ) // < 9.95K
+    */
+    if ( bytes < 10189 ) // < 9.95K
         byteString = i18n( "%1K", QString::number( bytes/1024.0, 'f', 1 ) );
     else if ( bytes < 1023488 ) // < 999.5
         byteString = i18n( "%1K", QString::number( bytes/1024.0, 'f', 0 ) );
@@ -189,7 +191,14 @@ void InterfaceIcon::updateIconText( bool doUpdate )
     p.setOpacity( 1.0 );
 
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
-    p.setFont( setIconFont( textIncoming, iconWidth ) );
+
+    // rxFont and txFont should be the same size per poll period
+    QFont rxFont = setIconFont( textIncoming, iconWidth );
+    QFont txFont = setIconFont( textOutgoing, iconWidth );
+    if ( rxFont.pointSizeF() > txFont.pointSizeF() )
+        rxFont.setPointSizeF( txFont.pointSizeF() );
+
+    p.setFont( rxFont );
     if ( data->status & KNemoIface::Connected )
         p.setPen( mInterface->getSettings().colorIncoming );
     else if ( data->status & KNemoIface::Available )
@@ -198,7 +207,7 @@ void InterfaceIcon::updateIconText( bool doUpdate )
         p.setPen( mInterface->getSettings().colorUnavailable );
     p.drawText( topRect, Qt::AlignCenter | Qt::AlignRight, textIncoming );
 
-    p.setFont( setIconFont( textOutgoing, iconWidth ) );
+    p.setFont( rxFont );
     if ( data->status & KNemoIface::Connected )
         p.setPen( mInterface->getSettings().colorOutgoing );
     p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, textOutgoing );
