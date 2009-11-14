@@ -51,6 +51,7 @@ InterfaceTray::InterfaceTray( Interface* interface, const QString &id, QWidget* 
     setStatus(Active);
     connect(this, SIGNAL(secondaryActivateRequested(QPoint)), this, SLOT(togglePlotter()));
 #else
+    Q_UNUSED( id );
     connect( this, SIGNAL( activated( QSystemTrayIcon::ActivationReason ) ),
              this, SLOT( iconActivated( QSystemTrayIcon::ActivationReason ) ) );
 #endif
