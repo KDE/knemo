@@ -151,16 +151,16 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
 
 InterfacePlotterDialog::~InterfacePlotterDialog()
 {
-    KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, confg_interface + mName );
-    interfaceGroup.writeEntry( conf_plotterSize, size() );
-
-    // If the dialog was never shown, then the position
-    // will be wrong
     if ( mWasShown )
+    {
+        // If the dialog was never shown, then the position
+        // will be wrong
+        KConfig *config = mConfig.data();
+        KConfigGroup interfaceGroup( config, confg_interface + mName );
+        interfaceGroup.writeEntry( conf_plotterSize, size() );
         interfaceGroup.writeEntry( conf_plotterPos, pos() );
-
-    config->sync();
+        config->sync();
+    }
 }
 
 bool InterfacePlotterDialog::event( QEvent *e )

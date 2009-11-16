@@ -70,6 +70,7 @@ private:
 
 
     Ui::InterfaceStatusDlg ui;
+    bool mWasShown;
     bool mSetPos;
 
     KSharedConfigPtr mConfig;

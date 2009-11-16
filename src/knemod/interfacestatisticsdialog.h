@@ -73,6 +73,7 @@ private:
                       bool fullRebuild, int group );
 
     Ui::InterfaceStatisticsDlg ui;
+    bool mWasShown;
     bool mSetPos;
     bool mIsMonths;
     KSharedConfigPtr mConfig;

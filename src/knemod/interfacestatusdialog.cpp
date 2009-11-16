@@ -35,6 +35,7 @@
 
 InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* parent )
     : KDialog( parent ),
+      mWasShown( false ),
       mSetPos( true ),
       mConfig( KGlobal::config() ),
       mInterface( interface )
@@ -86,11 +87,14 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
 
 InterfaceStatusDialog::~InterfaceStatusDialog()
 {
-    KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
-    interfaceGroup.writeEntry( conf_statusPos, pos() );
-    interfaceGroup.writeEntry( conf_statusSize, size() );
-    config->sync();
+    if ( mWasShown )
+    {
+        KConfig *config = mConfig.data();
+        KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+        interfaceGroup.writeEntry( conf_statusPos, pos() );
+        interfaceGroup.writeEntry( conf_statusSize, size() );
+        config->sync();
+    }
 }
 
 bool InterfaceStatusDialog::event( QEvent *e )
@@ -107,7 +111,10 @@ bool InterfaceStatusDialog::event( QEvent *e )
         }
     }
     else if ( e->type() == QEvent::Show )
+    {
+        mWasShown = true;
         updateDialog();
+    }
 
     return KDialog::event( e );
 }

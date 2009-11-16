@@ -36,6 +36,7 @@
 
 InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWidget* parent )
     : KDialog( parent ),
+      mWasShown( false ),
       mSetPos( true ),
       mIsMonths( true ),
       mConfig( KGlobal::config() ),
@@ -94,11 +95,14 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
 
 InterfaceStatisticsDialog::~InterfaceStatisticsDialog()
 {
-    KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
-    interfaceGroup.writeEntry( conf_statisticsPos, pos() );
-    interfaceGroup.writeEntry( conf_statisticsSize, size() );
-    config->sync();
+    if ( mWasShown )
+    {
+        KConfig *config = mConfig.data();
+        KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+        interfaceGroup.writeEntry( conf_statisticsPos, pos() );
+        interfaceGroup.writeEntry( conf_statisticsSize, size() );
+        config->sync();
+    }
 }
 
 bool InterfaceStatisticsDialog::event( QEvent *e )
@@ -114,6 +118,8 @@ bool InterfaceStatisticsDialog::event( QEvent *e )
             move( pos() );
         }
     }
+    if ( e->type() == QEvent::Show )
+        mWasShown = true;
 
     return KDialog::event( e );
 }
