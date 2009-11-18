@@ -97,7 +97,7 @@ void Interface::configChanged()
     mSettings.hideWhenDisconnected = interfaceGroup.readEntry( conf_hideWhenNotAvail, s.hideWhenDisconnected );
     mSettings.hideWhenUnavailable = interfaceGroup.readEntry( conf_hideWhenNotExist, s.hideWhenUnavailable );
     mSettings.activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
-    mSettings.trafficThreshold = clamp<int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
+    mSettings.trafficThreshold = clamp<unsigned int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
     mSettings.warnThreshold = clamp<double>(interfaceGroup.readEntry( conf_billingWarnThresh, s.warnThreshold ), 0.0, 9999.0 );
     mSettings.warnTotalTraffic = interfaceGroup.readEntry( conf_billingWarnRxTx, s.warnTotalTraffic );
 
@@ -165,7 +165,7 @@ void Interface::configChanged()
 void Interface::processUpdate()
 {
     mPreviousState = mState;
-    int trafficThreshold = mSettings.trafficThreshold;
+    unsigned int trafficThreshold = mSettings.trafficThreshold;
     mState = mBackendData->status;
 
     mRxRate = mBackendData->incomingBytes / mGeneralData.pollInterval;
@@ -178,9 +178,9 @@ void Interface::processUpdate()
     if ( mState & KNemoIface::Connected )
     {
         // the interface is connected, look for traffic
-        if ( ( mBackendData->rxPackets - mBackendData->prevRxPackets ) > (unsigned int) trafficThreshold )
+        if ( ( mBackendData->rxPackets - mBackendData->prevRxPackets ) > trafficThreshold )
             mState |= KNemoIface::RxTraffic;
-        if ( ( mBackendData->txPackets - mBackendData->prevTxPackets ) > (unsigned int) trafficThreshold )
+        if ( ( mBackendData->txPackets - mBackendData->prevTxPackets ) > trafficThreshold )
             mState |= KNemoIface::TxTraffic;
 
         if ( mStatistics )

@@ -71,7 +71,7 @@ private:
     int mOutgoingPos;
     int mIncomingPos;
     KSignalPlotter *mPlotter;
-    VisibleBeams mVisibleBeams;
+    int mVisibleBeams;
     FancyPlotterLabel *mReceivedLabel;
     FancyPlotterLabel *mSentLabel;
     QBoxLayout *mLabelLayout;

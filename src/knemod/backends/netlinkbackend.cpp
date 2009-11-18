@@ -285,7 +285,7 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, BackendD
             {
                 if ( freq < KILO )
                 {
-                    channel = iw_channel_to_freq( (int) freq, &freq, &range );
+                    channel = iw_channel_to_freq( static_cast<int>(freq), &freq, &range );
                 }
                 else
                 {
@@ -299,7 +299,7 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, BackendD
 
         char essid[IW_ESSID_MAX_SIZE + 1];
         memset( essid, 0, IW_ESSID_MAX_SIZE + 1 );
-        wrq.u.essid.pointer = (caddr_t) essid;
+        wrq.u.essid.pointer = static_cast<caddr_t>(essid);
         wrq.u.essid.length = IW_ESSID_MAX_SIZE + 1;
         wrq.u.essid.flags = 0;
         if ( iw_get_ext( fd, ifName.toLatin1(), SIOCGIWESSID, &wrq ) >= 0 )
@@ -324,7 +324,7 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, BackendD
             data->accessPoint.clear();
 
         memset( essid, 0, IW_ESSID_MAX_SIZE + 1 );
-        wrq.u.essid.pointer = (caddr_t) essid;
+        wrq.u.essid.pointer = static_cast<caddr_t>(essid);
         wrq.u.essid.length = IW_ESSID_MAX_SIZE + 1;
         wrq.u.essid.flags = 0;
         if ( iw_get_ext( fd, ifName.toLatin1(), SIOCGIWNICKN, &wrq ) >= 0 )

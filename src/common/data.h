@@ -224,7 +224,7 @@ struct InterfaceSettings
     QColor colorDisabled;
     QColor colorUnavailable;
     int numCommands;
-    int trafficThreshold;
+    unsigned int trafficThreshold;
     double warnThreshold;
     bool warnTotalTraffic;
     bool hideWhenUnavailable;

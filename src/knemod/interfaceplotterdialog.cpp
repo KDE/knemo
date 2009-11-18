@@ -360,11 +360,11 @@ void InterfacePlotterDialog::configChanged()
     mPlotter->setFillOpacity( mSettings.opacity * 255 / 100.0 + 0.5 );
 
     // add or remove beams according to user settings
-    VisibleBeams nextVisibleBeams = NONE;
+    int nextVisibleBeams = NONE;
     if ( mSettings.showOutgoing )
-        nextVisibleBeams = (VisibleBeams) ( nextVisibleBeams | OUTGOING_TRAFFIC );
+        nextVisibleBeams = nextVisibleBeams | OUTGOING_TRAFFIC;
     if ( mSettings.showIncoming )
-        nextVisibleBeams = (VisibleBeams) ( nextVisibleBeams | INCOMING_TRAFFIC );
+        nextVisibleBeams = nextVisibleBeams | INCOMING_TRAFFIC;
 
     mSentLabel->setLabel( i18n( "%1 Sent Data", mName ), mSettings.colorOutgoing, mIndicatorSymbol);
     mReceivedLabel->setLabel( i18n( "%1 Received Data", mName ), mSettings.colorIncoming, mIndicatorSymbol);

@@ -230,7 +230,7 @@ void InterfaceIcon::updateToolTip()
 void InterfaceIcon::updateMenu()
 {
     // Remove all old entries.
-    KMenu* menu = (KMenu*)mTray->contextMenu();
+    KMenu* menu = static_cast<KMenu*>(mTray->contextMenu());
     QList<QAction *> actions = menu->actions();
     foreach ( QAction* action, commandActions->actions() )
         menu->removeAction( action );
@@ -297,7 +297,7 @@ void InterfaceIcon::updateTrayStatus()
                 ( !hideWhenUnavailable && !hideWhenDisconnected ) ) )
     {
         mTray = new InterfaceTray( mInterface, ifaceName );
-        KMenu* menu = (KMenu *)mTray->contextMenu();
+        KMenu* menu = static_cast<KMenu*>(mTray->contextMenu());
 
         menu->removeAction( menu->actions().at( 0 ) );
         menu->addTitle( KIcon( "knemo" ), i18n( "KNemo - %1", title ) );

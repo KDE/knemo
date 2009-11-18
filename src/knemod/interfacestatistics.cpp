@@ -129,8 +129,8 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
             if ( !element.isNull() )
             {
                 StatisticEntry* entry = new StatisticEntry();
-                entry->rxBytes = (quint64) element.attribute( attrib_rx ).toDouble();
-                entry->txBytes = (quint64) element.attribute( attrib_tx ).toDouble();
+                entry->rxBytes = element.attribute( attrib_rx ).toULongLong();
+                entry->txBytes = element.attribute( attrib_tx ).toULongLong();
 
                 // The following attributes are particular to each statistic category
                 int day = 1;
@@ -275,8 +275,8 @@ void InterfaceStatistics::buildStatsGroup( QDomDocument& doc, enum GroupType gro
         element.setAttribute( attrib_year, mCalendar->year( entry->date ) );
         if ( group > Day )
             element.setAttribute( attrib_span, entry->span );
-        element.setAttribute( attrib_rx, (double) entry->rxBytes );
-        element.setAttribute( attrib_tx, (double) entry->txBytes );
+        element.setAttribute( attrib_rx, entry->rxBytes );
+        element.setAttribute( attrib_tx, entry->txBytes );
         elements.appendChild( element );
     }
     QDomElement statElement = doc.elementsByTagName( doc_name ).at( 0 ).toElement();
