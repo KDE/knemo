@@ -79,10 +79,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
       mConfigDlg( 0 ),
       mSetPos( true ),
       mWasShown( false ),
-      mName( name ),
-      mOutgoingPos( 0 ),
-      mIncomingPos( 0 ),
-      mVisibleBeams( NONE )
+      mName( name )
 {
     setCaption( mName + " " + i18n( "Traffic" ) );
     setButtons( Close );
@@ -100,6 +97,8 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     mPlotter->setThinFrame( true );
     mPlotter->setShowAxis( true );
     int axisTextWidth = fontMetrics().width(i18nc("Largest axis title", "99999 XXXX"));
+    mPlotter->addBeam( Qt::black );
+    mPlotter->addBeam( Qt::black );
     mPlotter->setMaxAxisTextWidth( axisTextWidth );
     layout->addWidget(mPlotter);
 
@@ -236,41 +235,15 @@ void InterfacePlotterDialog::configFinished()
 void InterfacePlotterDialog::updatePlotter( const double incomingBytes, const double outgoingBytes )
 {
     QList<double> trafficList;
-    switch ( mVisibleBeams )
-    {
-    case BOTH:
-        if ( mIncomingPos == 1 )
-        {
-            trafficList.append( outgoingBytes );
-            trafficList.append( incomingBytes );
-        }
-        else
-        {
-            trafficList.append( incomingBytes );
-            trafficList.append( outgoingBytes );
-        }
-        mPlotter->addSample( trafficList );
-        break;
-    case INCOMING_TRAFFIC:
-        trafficList.append( incomingBytes );
-        mPlotter->addSample( trafficList );
-        break;
-    case OUTGOING_TRAFFIC:
-        trafficList.append( outgoingBytes );
-        mPlotter->addSample( trafficList );
-        break;
-    case NONE:
-        break;
-    }
+    // Keep these in order
+    trafficList.append( outgoingBytes );
+    trafficList.append( incomingBytes );
+    mPlotter->addSample( trafficList );
 
-    if ( mPlotter->numBeams() > 0 )
+    for ( int beamId = 0; beamId < mPlotter->numBeams(); beamId++ )
     {
-        for ( int beamId = 0; beamId < mPlotter->numBeams(); beamId++ )
-        {
-            QString lastValue = mPlotter->lastValueAsString(beamId);
-            static_cast<FancyPlotterLabel *>((static_cast<QWidgetItem *>(mLabelLayout->itemAt(beamId)))->widget())->value->setText(lastValue);
-
-        }
+        QString lastValue = mPlotter->lastValueAsString(beamId);
+        static_cast<FancyPlotterLabel *>((static_cast<QWidgetItem *>(mLabelLayout->itemAt(beamId)))->widget())->value->setText(lastValue);
     }
 }
 
@@ -360,133 +333,31 @@ void InterfacePlotterDialog::configChanged()
     mPlotter->setFillOpacity( mSettings.opacity * 255 / 100.0 + 0.5 );
 
     // add or remove beams according to user settings
-    int nextVisibleBeams = NONE;
+    int visibleBeams = KSignalPlotter::NONE;
     if ( mSettings.showOutgoing )
-        nextVisibleBeams = nextVisibleBeams | OUTGOING_TRAFFIC;
+        visibleBeams |= KSignalPlotter::OUTGOING_TRAFFIC;
     if ( mSettings.showIncoming )
-        nextVisibleBeams = nextVisibleBeams | INCOMING_TRAFFIC;
+        visibleBeams |= KSignalPlotter::INCOMING_TRAFFIC;
 
     mSentLabel->setLabel( i18n( "%1 Sent Data", mName ), mSettings.colorOutgoing, mIndicatorSymbol);
     mReceivedLabel->setLabel( i18n( "%1 Received Data", mName ), mSettings.colorIncoming, mIndicatorSymbol);
 
-    switch( mVisibleBeams )
-    {
-    case NONE:
-        if ( nextVisibleBeams == BOTH )
-        {
-            mOutgoingPos = 0;
-            mPlotter->addBeam( mSettings.colorOutgoing );
-
-            mIncomingPos = 1;
-            mPlotter->addBeam( mSettings.colorIncoming );
-        }
-        else if ( nextVisibleBeams == OUTGOING_TRAFFIC )
-        {
-            mOutgoingPos = 0;
-            mPlotter->addBeam( mSettings.colorOutgoing );
-        }
-        else if ( nextVisibleBeams == INCOMING_TRAFFIC )
-        {
-            mIncomingPos = 0;
-            mPlotter->addBeam( mSettings.colorIncoming );
-        }
-        break;
-    case INCOMING_TRAFFIC:
-        if ( nextVisibleBeams == BOTH )
-        {
-            mOutgoingPos = 1;
-            mPlotter->addBeam( mSettings.colorOutgoing );
-            mPlotter->setBeamColor( mIncomingPos, mSettings.colorIncoming );
-        }
-        else if ( nextVisibleBeams == OUTGOING_TRAFFIC )
-        {
-            mPlotter->removeBeam( mIncomingPos );
-            mOutgoingPos = 0;
-            mPlotter->addBeam( mSettings.colorOutgoing );
-        }
-        else if ( nextVisibleBeams == INCOMING_TRAFFIC )
-        {
-            mPlotter->setBeamColor( mIncomingPos, mSettings.colorIncoming );
-        }
-        else if ( nextVisibleBeams == NONE )
-        {
-            mPlotter->removeBeam( mIncomingPos );
-        }
-        break;
-    case OUTGOING_TRAFFIC:
-        if ( nextVisibleBeams == BOTH )
-        {
-            mIncomingPos = 1;
-            mPlotter->addBeam( mSettings.colorIncoming );
-            mPlotter->setBeamColor( mOutgoingPos, mSettings.colorOutgoing );
-        }
-        else if ( nextVisibleBeams == INCOMING_TRAFFIC )
-        {
-            mPlotter->removeBeam( mOutgoingPos );
-            mIncomingPos = 0;
-            mPlotter->addBeam( mSettings.colorIncoming );
-        }
-        else if ( nextVisibleBeams == OUTGOING_TRAFFIC )
-        {
-            mPlotter->setBeamColor( mOutgoingPos, mSettings.colorOutgoing );
-        }
-        else if ( nextVisibleBeams == NONE )
-        {
-            mPlotter->removeBeam( mOutgoingPos );
-        }
-        break;
-    case BOTH:
-        if ( nextVisibleBeams == BOTH )
-        {
-            mPlotter->setBeamColor( mIncomingPos, mSettings.colorIncoming );
-            mPlotter->setBeamColor( mOutgoingPos, mSettings.colorOutgoing );
-        }
-        else if ( nextVisibleBeams == OUTGOING_TRAFFIC )
-        {
-            mOutgoingPos = 0;
-            mPlotter->removeBeam( mIncomingPos );
-            mPlotter->setBeamColor( mOutgoingPos, mSettings.colorOutgoing );
-        }
-        else if ( nextVisibleBeams == INCOMING_TRAFFIC )
-        {
-            mIncomingPos = 0;
-            mPlotter->removeBeam( mOutgoingPos );
-            mPlotter->setBeamColor( mIncomingPos, mSettings.colorIncoming );
-        }
-        else if ( nextVisibleBeams == NONE )
-        {
-            mPlotter->removeBeam( 0 );
-            mPlotter->removeBeam( 0 );
-        }
-        break;
-    }
+    mPlotter->setBeamColor( KSignalPlotter::INCOMING_BEAM, mSettings.colorIncoming );
+    mPlotter->setBeamColor( KSignalPlotter::OUTGOING_BEAM, mSettings.colorOutgoing );
+    mPlotter->setVisibleBeams( visibleBeams );
 
     if ( mSettings.bottomBar )
-        switch ( nextVisibleBeams )
-        {
-            case BOTH:
-                mSentLabel->show();
-                mReceivedLabel->show();
-                break;
-            case OUTGOING_TRAFFIC:
-                mSentLabel->show();
-                mReceivedLabel->hide();
-                break;
-            case INCOMING_TRAFFIC:
-                mSentLabel->hide();
-                mReceivedLabel->show();
-                break;
-            case NONE:
-                mSentLabel->hide();
-                mReceivedLabel->hide();
-                break;
-        }
-    else
     {
-        mSentLabel->hide();
-        mReceivedLabel->hide();
+        if ( visibleBeams & KSignalPlotter::INCOMING_TRAFFIC )
+            mReceivedLabel->show();
+        else
+            mReceivedLabel->hide();
+
+        if ( visibleBeams & KSignalPlotter::OUTGOING_TRAFFIC )
+            mSentLabel->show();
+        else
+            mSentLabel->hide();
     }
-    mVisibleBeams = nextVisibleBeams;
 }
 
 #include "interfaceplotterdialog.moc"

@@ -54,13 +54,6 @@ private:
     void loadConfig();
     void configChanged();
     void configPlotter();
-    enum VisibleBeams
-    {
-        NONE = 0,
-        INCOMING_TRAFFIC = 1,
-        OUTGOING_TRAFFIC = 2,
-        BOTH = 3
-    };
 
     KSharedConfigPtr mConfig;
     PlotterConfigDialog *mConfigDlg;
@@ -68,10 +61,7 @@ private:
     bool mWasShown;
     PlotterSettings mSettings;
     QString mName;
-    int mOutgoingPos;
-    int mIncomingPos;
     KSignalPlotter *mPlotter;
-    int mVisibleBeams;
     FancyPlotterLabel *mReceivedLabel;
     FancyPlotterLabel *mSentLabel;
     QBoxLayout *mLabelLayout;

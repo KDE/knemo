@@ -84,6 +84,8 @@ KSignalPlotter::KSignalPlotter( QWidget *parent)
   mFillOpacity = 20;
   mRescaleTime = 0;
   mUnit = "KiB/s";
+
+  mVisibleBeams = NONE;
 }
 
 KSignalPlotter::~KSignalPlotter()
@@ -97,6 +99,10 @@ void KSignalPlotter::setUnit(const QString &unit) {
   mUnit= unit;
 }
 
+void KSignalPlotter::setVisibleBeams( int beams )
+{
+    mVisibleBeams = beams;
+}
 
 void KSignalPlotter::addBeam( const QColor &color )
 {
@@ -832,6 +838,13 @@ void KSignalPlotter::drawBeam(QPainter *p, const QRect &boundingBox, int horizon
   float y1 = 0;
   float y2 = 0;
   for (int j =  qMin(datapoints.size(), mBeamColors.size())-1; j >=0 ; --j) {
+    if ( (j == INCOMING_BEAM && ! (mVisibleBeams & INCOMING_TRAFFIC) ) ||
+         (j == OUTGOING_BEAM && ! (mVisibleBeams & OUTGOING_TRAFFIC) )
+       )
+    {
+        continue;
+    }
+
     if(!mStackBeams)
       y0 = y1 = y2 = 0;
     y0 += boundingBox.bottom() - (datapoints[j] - mNiceMinValue)*scaleFac;

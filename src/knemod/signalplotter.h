@@ -96,6 +96,24 @@ class KSignalPlotter : public QWidget
     KSignalPlotter( QWidget *parent = 0);
     ~KSignalPlotter();
 
+    enum VisibleBeams
+    {
+        NONE = 0,
+        INCOMING_TRAFFIC = 1,
+        OUTGOING_TRAFFIC = 2,
+        BOTH = 3
+    };
+    enum Beams
+    {
+        OUTGOING_BEAM = 0,
+        INCOMING_BEAM = 1
+    };
+
+    /** Set which beams are visible.  All beams are tracked whether visible
+     *  or not.
+     */
+    void setVisibleBeams( int );
+
     /** Add a new line to the graph plotter, with the specified color.
      *  Note that the order you add the beams in must be the same order that
      *  the beam data is given in. (Unless you reorder the beams)
@@ -385,6 +403,8 @@ class KSignalPlotter : public QWidget
     QRect mPlottingArea; /// The area in which the beams are drawn.  Saved to make update() more efficient
 
     bool mSmoothGraph; /// Whether to smooth the graph by averaging using the formula (value*2 + last_value)/3.
+
+    int mVisibleBeams;
 };
 
 #endif

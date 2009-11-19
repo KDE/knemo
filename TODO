@@ -1,4 +1,3 @@
  * A netload icon theme: two dynamic bars showing rx/tx rate
  * BSD wireless support
- * Always calculate 2 beams in the plotter but only show those that are checked
  * Add option for alternate calendar systems
