@@ -68,6 +68,12 @@ InterfaceIcon::InterfaceIcon( Interface* interface )
 
 InterfaceIcon::~InterfaceIcon()
 {
+    // Prevent the "Destroyed while process is still running" message
+    foreach( KProcess* process, processList )
+    {
+        process->kill();
+        process->waitForFinished( 2000 );
+    }
     delete mTray;
 }
 
@@ -341,16 +347,21 @@ void InterfaceIcon::menuTriggered( QAction *action )
         return;
 
     InterfaceCommand command = action->data().value<InterfaceCommand>();
-    KProcess process;
+    KProcess *process = new KProcess( this );
     if ( command.runAsRoot )
-    {
-        process << KStandardDirs::findExe("kdesu");
-        process << command.command;
-    }
+        *process << KStandardDirs::findExe("kdesu") << command.command;
     else
-        process << "/bin/sh" << "-c" << command.command;
+        process->setShellCommand( command.command );
 
-    process.startDetached();
+    processList << process;
+    connect( process, SIGNAL( finished( int, QProcess::ExitStatus ) ), this, SLOT( processFinished() ) );
+    process->start();
+}
+
+void InterfaceIcon::processFinished()
+{
+    processList.removeAll( static_cast<KProcess*>(sender()) );
+    static_cast<KProcess*>(sender())->deleteLater();
 }
 
 void InterfaceIcon::showStatistics()

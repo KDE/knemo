@@ -25,6 +25,7 @@ class Interface;
 class InterfaceTray;
 class KAction;
 class KActionCollection;
+class KProcess;
 class QAction;
 
 /**
@@ -85,6 +86,11 @@ private slots:
     void menuTriggered( QAction * );
 
     /*
+     * Called when a custom command finishes
+     */
+    void processFinished();
+
+    /*
      * Returns a string with a compact transfer rate
      * This should not be more than 4 chars, including the units
      */
@@ -105,6 +111,7 @@ private:
     Interface* mInterface;
     // the real tray icon
     InterfaceTray* mTray;
+    QList<KProcess*> processList;
     KActionCollection* commandActions;
     KAction* statusAction;
     KAction* plotterAction;
