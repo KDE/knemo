@@ -44,6 +44,7 @@ static const char elem_month[] = "month";
 static const char elem_year[]  = "year";
 
 static const char attrib_calendar[] = "calendar";
+static const char attrib_version[]  = "version";
 static const char attrib_span[]     = "span";
 static const char attrib_rx[]       = "rxBytes";
 static const char attrib_tx[]       = "txBytes";
@@ -288,6 +289,7 @@ void InterfaceStatistics::saveStatistics()
     QDomDocument doc( doc_name );
     QDomElement docElement = doc.createElement( doc_name );
     docElement.setAttribute( attrib_calendar, mCalendar->calendarType() );
+    docElement.setAttribute( attrib_version, "1.1" );
     doc.appendChild( docElement );
 
     buildStatsGroup( doc, Day, mDayStatistics );
