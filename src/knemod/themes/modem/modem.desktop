@@ -1,11 +1,13 @@
 [Desktop Entry]
 Name=Modem
+Name[cs]=Modem
 Name[da]=Modem
 Name[de]=Modem
 Name[en_GB]=Modem
 Name[eo]=Modem
 Name[et]=Modem
 Name[gl]=Módem
+Name[nb]=Modem
 Name[nl]=Modem
 Name[pt]=Modem
 Name[sv]=Modem
@@ -17,6 +19,7 @@ Comment[da]=KNemo ikontema til modem
 Comment[en_GB]=KNemo modem icon theme
 Comment[et]=KNemo modemi ikooniteema
 Comment[gl]=Tema de iconas de módem do KNemo
+Comment[nb]=KNemo tema for modemikon
 Comment[nl]=KNemo modem-pictogramthema
 Comment[pt]=Tema de ícones de modem do KNemo
 Comment[sv]=Knemo modemikontema

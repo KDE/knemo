@@ -1,11 +1,13 @@
 [Desktop Entry]
 Name=Wireless
+Name[cs]=Bezdrátové
 Name[da]=Trådløst
 Name[de]=Drahtlose Verbindung
 Name[en_GB]=Wireless
 Name[eo]=Sendrata reto
 Name[et]=Juhtmeta
 Name[gl]=Sen fíos
+Name[nb]=Trådløs
 Name[nl]=Draadloos
 Name[pt]=Sem-Fios
 Name[sv]=Trådlöst
@@ -17,6 +19,7 @@ Comment[da]=KNemo ikontema til trådløst
 Comment[en_GB]=KNemo wireless icon theme
 Comment[et]=KNemo juhtmeta side ikooniteema
 Comment[gl]=Tema de iconas sen fíos do KNemo
+Comment[nb]=KNemo tema for trådløs
 Comment[nl]=KNemo draadloos-pictogramthema
 Comment[pt]=Tema de ícones sem-fios do KNemo
 Comment[sv]=Knemo trådlöst ikontema
