@@ -283,7 +283,7 @@ void NetlinkBackend::updateWirelessData( int fd, const QString& ifName, BackendD
             double freq = iw_freq2float( &( wrq.u.freq ) );
             if( has_range )
             {
-                if ( freq < KILO )
+                if ( freq < 1e3 )
                 {
                     channel = iw_channel_to_freq( static_cast<int>(freq), &freq, &range );
                 }
@@ -445,7 +445,7 @@ realloc:
                 switch ( iwe.cmd )
                 {
                     case SIOCGIWAP:
-                        if ( data->accessPoint == iw_saether_ntop( &iwe.u.ap_addr, reinterpret_cast<char *>(buffer) ) )
+                        if ( data->accessPoint == iw_sawap_ntop( &iwe.u.ap_addr, reinterpret_cast<char *>(buffer) ) )
                             foundAP = true;
                         break;
                     case SIOCGIWENCODE:
