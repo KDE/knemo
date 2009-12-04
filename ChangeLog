@@ -6,6 +6,7 @@ Version 0.6.0
      Note: BSD backend currently lacks wireless support.
    - polling periods can range from 0.1 to 2 seconds
    - added notifications for when an interface becomes available/unavailable
+   - kill custom commands that are still running when KNemo closes
  * statistics changes:
    - added weekly statistics
    - monthly statistics can act like "billing periods".  Billing periods can
