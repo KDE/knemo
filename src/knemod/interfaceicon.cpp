@@ -136,6 +136,39 @@ void InterfaceIcon::updateIconImage( int status )
 #endif
 }
 
+QColor InterfaceIcon::calcColor( unsigned long rate, const QColor& low, const QColor& high, int hival )
+{
+    const BackendData * data = mInterface->getData();
+
+    if ( data->status & KNemoIface::Connected )
+    {
+        if ( ! mInterface->getSettings().dynamicColor )
+            return low;
+    }
+    else if ( data->status & KNemoIface::Available )
+        return mInterface->getSettings().colorDisabled;
+    else if ( data->status & KNemoIface::Unavailable )
+        return mInterface->getSettings().colorUnavailable;
+
+    int lowH, lowS, lowV;
+    int hiH, hiS, hiV;
+    int difH, difS, difV;
+
+    low.getHsv( &lowH, &lowS, &lowV );
+    high.getHsv( &hiH, &hiS, &hiV );
+
+    difH = hiH - lowH;
+    difS = hiS - lowS;
+    difV = hiV - lowV;
+
+    qreal percentage = static_cast<qreal>(rate)/hival;
+    if ( percentage > 1.0 )
+        percentage = 1.0;
+    QColor retcolor;
+    retcolor.setHsv( lowH + ( percentage*difH ), lowS + ( percentage*difS), lowV + (percentage*difV ) );
+    return retcolor;
+}
+
 QString InterfaceIcon::compactTrayText(unsigned long bytes )
 {
     QString byteString;
@@ -164,8 +197,21 @@ QString InterfaceIcon::compactTrayText(unsigned long bytes )
 
 void InterfaceIcon::updateIconText( bool doUpdate )
 {
-    const BackendData * data = mInterface->getData();
+    // Has color changed?
+    QColor rxColor = calcColor( mInterface->getRxRate(), mInterface->getSettings().colorIncoming, mInterface->getSettings().colorIncomingMax, mInterface->getSettings().inMaxRate );
+    QColor txColor = calcColor( mInterface->getTxRate(), mInterface->getSettings().colorOutgoing, mInterface->getSettings().colorOutgoingMax, mInterface->getSettings().outMaxRate );
+    if ( rxColor != colorIncoming )
+    {
+        doUpdate = true;
+        colorIncoming = rxColor;
+    }
+    if ( rxColor != colorOutgoing )
+    {
+        doUpdate = true;
+        colorOutgoing = txColor;
+    }
 
+    // Has text changed?
     QString byteText = compactTrayText( mInterface->getRxRate() );
     if ( byteText != textIncoming )
     {
@@ -178,12 +224,6 @@ void InterfaceIcon::updateIconText( bool doUpdate )
         doUpdate = true;
         textOutgoing = byteText;
     }
-    int state = mInterface->getState();
-    int prevState = mInterface->getPreviousState();
-    // Need to change color, though text not changed
-    if ( ( state >= KNemoIface::Connected && prevState <  KNemoIface::Connected ) ||
-         ( state <  KNemoIface::Connected && prevState >= KNemoIface::Connected ) )
-        doUpdate = true;
 
     if ( !doUpdate )
         return;
@@ -205,17 +245,11 @@ void InterfaceIcon::updateIconText( bool doUpdate )
         rxFont.setPointSizeF( txFont.pointSizeF() );
 
     p.setFont( rxFont );
-    if ( data->status & KNemoIface::Connected )
-        p.setPen( mInterface->getSettings().colorIncoming );
-    else if ( data->status & KNemoIface::Available )
-        p.setPen( mInterface->getSettings().colorDisabled );
-    else
-        p.setPen( mInterface->getSettings().colorUnavailable );
+    p.setPen( rxColor );
     p.drawText( topRect, Qt::AlignCenter | Qt::AlignRight, textIncoming );
 
     p.setFont( rxFont );
-    if ( data->status & KNemoIface::Connected )
-        p.setPen( mInterface->getSettings().colorOutgoing );
+    p.setPen( txColor );
     p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, textOutgoing );
 #ifdef USE_KNOTIFICATIONITEM
     mTray->setIconByPixmap( textIcon );
@@ -317,7 +351,7 @@ void InterfaceIcon::updateTrayStatus()
                  this, SLOT( menuTriggered( QAction * ) ) );
 
         if ( mInterface->getSettings().iconTheme == TEXT_THEME )
-            updateIconText( true );
+            updateIconText();
         else
             updateIconImage( mInterface->getState() );
         updateMenu();

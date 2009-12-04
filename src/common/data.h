@@ -89,6 +89,11 @@ static const char conf_colorIncoming[] = "ColorIncoming";
 static const char conf_colorOutgoing[] = "ColorOutgoing";
 static const char conf_colorDisabled[] = "ColorDisabled";
 static const char conf_colorUnavailable[] = "ColorUnavailable";
+static const char conf_dynamicColor[] = "DynamicColor";
+static const char conf_colorIncomingMax[] = "ColorIncomingMax";
+static const char conf_colorOutgoingMax[] = "ColorOutgoingMax";
+static const char conf_inMaxRate[] = "InMaxRate";
+static const char conf_outMaxRate[] = "OutMaxRate";
 
 // interface statistics
 static const char conf_activateStatistics[] = "ActivateStatistics";
@@ -205,6 +210,11 @@ struct InterfaceSettings
         colorOutgoing( 0xFF7F08 ),
         colorDisabled( 0x888786 ),
         colorUnavailable( 0x888786 ),
+        dynamicColor( false ),
+        colorIncomingMax( 0x96FFFF ),
+        colorOutgoingMax( 0xFFC868 ),
+        inMaxRate( 4 ),
+        outMaxRate( 4 ),
         numCommands( 0 ),
         trafficThreshold( 0 ),
         warnThreshold( 0.0 ),
@@ -221,6 +231,11 @@ struct InterfaceSettings
     QColor colorOutgoing;
     QColor colorDisabled;
     QColor colorUnavailable;
+    bool dynamicColor;
+    QColor colorIncomingMax;
+    QColor colorOutgoingMax;
+    unsigned int inMaxRate;
+    unsigned int outMaxRate;
     int numCommands;
     unsigned int trafficThreshold;
     double warnThreshold;

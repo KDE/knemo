@@ -106,6 +106,7 @@ private:
      */
     void updateIconImage( int status );
 
+    QColor calcColor( unsigned long val, const QColor& low, const QColor& high, int hival );
     void updateIconText( bool doUpdate = false );
     // the interface this icon belongs to
     Interface* mInterface;
@@ -119,6 +120,8 @@ private:
     KAction* configAction;
     QString textIncoming;
     QString textOutgoing;
+    QColor colorIncoming;
+    QColor colorOutgoing;
     int iconWidth;
 };
 

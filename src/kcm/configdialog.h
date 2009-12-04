@@ -83,6 +83,7 @@ private slots:
     void checkBoxStartKNemoToggled( bool on );
     void spinBoxTrafficValueChanged( int value );
     void colorButtonChanged();
+    void advancedButtonClicked();
     void listViewCommandsSelectionChanged( QTreeWidgetItem *current, QTreeWidgetItem *previous );
     void listViewCommandsChanged( QTreeWidgetItem* item, int column );
     void moveTips( QListWidget *from, QListWidget *to );

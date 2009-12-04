@@ -32,6 +32,7 @@
 #include "ui_configdlg.h"
 #include "config-knemo.h"
 #include "configdialog.h"
+#include "themeconfig.h"
 #include "utils.h"
 
 #include <math.h>
@@ -164,6 +165,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( colorButtonChanged() ) );
     connect( mDlg->colorUnavailable, SIGNAL( changed( const QColor& ) ),
              this, SLOT( colorButtonChanged() ) );
+    connect( mDlg->advancedButton, SIGNAL( clicked() ),
+             this, SLOT( advancedButtonClicked() ) );
 
     // Interface - Statistics
     connect( mDlg->checkBoxStatistics, SIGNAL( toggled( bool ) ),
@@ -270,6 +273,11 @@ void ConfigDialog::load()
             KColorScheme scheme(QPalette::Active, KColorScheme::View);
             settings->colorDisabled = interfaceGroup.readEntry( conf_colorDisabled, scheme.foreground( KColorScheme::InactiveText ).color() );
             settings->colorUnavailable = interfaceGroup.readEntry( conf_colorUnavailable, scheme.foreground( KColorScheme::InactiveText ).color() );
+            settings->dynamicColor = interfaceGroup.readEntry( conf_dynamicColor, s.dynamicColor );
+            settings->colorIncomingMax = interfaceGroup.readEntry( conf_colorIncomingMax, s.colorIncomingMax );
+            settings->colorOutgoingMax = interfaceGroup.readEntry( conf_colorOutgoingMax, s.colorOutgoingMax );
+            settings->inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate );
+            settings->outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate );
             settings->activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
             settings->customBilling = interfaceGroup.readEntry( conf_customBilling, s.customBilling );
             settings->calendar = interfaceGroup.readEntry( conf_calendar, mDefaultCalendarType );
@@ -414,6 +422,14 @@ void ConfigDialog::save()
             interfaceGroup.writeEntry( conf_colorOutgoing, settings->colorOutgoing );
             interfaceGroup.writeEntry( conf_colorDisabled, settings->colorDisabled );
             interfaceGroup.writeEntry( conf_colorUnavailable, settings->colorUnavailable );
+            interfaceGroup.writeEntry( conf_dynamicColor, settings->dynamicColor );
+            if ( settings->dynamicColor )
+            {
+                interfaceGroup.writeEntry( conf_colorIncomingMax, settings->colorIncomingMax );
+                interfaceGroup.writeEntry( conf_colorOutgoingMax, settings->colorOutgoingMax );
+                interfaceGroup.writeEntry( conf_inMaxRate, settings->inMaxRate );
+                interfaceGroup.writeEntry( conf_outMaxRate, settings->outMaxRate );
+            }
         }
         interfaceGroup.writeEntry( conf_activateStatistics, settings->activateStatistics );
         interfaceGroup.writeEntry( conf_customBilling, settings->customBilling );
@@ -884,6 +900,7 @@ void ConfigDialog::iconThemeChanged( int set )
         mDlg->colorDisabledLabel->show();
         mDlg->colorUnavailable->show();
         mDlg->colorUnavailableLabel->show();
+        mDlg->advancedButton->show();
     }
     else
     {
@@ -907,6 +924,7 @@ void ConfigDialog::iconThemeChanged( int set )
         mDlg->colorDisabledLabel->hide();
         mDlg->colorUnavailable->hide();
         mDlg->colorUnavailableLabel->hide();
+        mDlg->advancedButton->hide();
     }
     if (!mLock) changed( true );
 }
@@ -930,6 +948,26 @@ void ConfigDialog::colorButtonChanged()
     if ( curTheme.internalName == TEXT_THEME )
         iconThemeChanged( mDlg->comboBoxIconTheme->currentIndex() );
     if ( !mLock) changed( true );
+}
+
+void ConfigDialog::advancedButtonClicked()
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
+    ThemeConfig t( *settings );
+    if ( t.exec() )
+    {
+        InterfaceSettings s = t.getSettings();
+        settings->dynamicColor = s.dynamicColor;
+        settings->colorIncomingMax = s.colorIncomingMax;
+        settings->colorOutgoingMax = s.colorOutgoingMax;
+        settings->inMaxRate = s.inMaxRate;
+        settings->outMaxRate = s.outMaxRate;
+
+        changed( true );
+    }
 }
 
 
