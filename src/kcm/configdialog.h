@@ -72,8 +72,7 @@ private slots:
     void interfaceSelected( int row );
     void aliasChanged( const QString& text );
     void iconThemeChanged( int set );
-    void checkBoxDisconnectedToggled( bool on );
-    void checkBoxUnavailableToggled( bool on );
+    void comboHidingChanged( int val );
     void checkBoxStatisticsToggled( bool on );
     void checkBoxCustomBillingToggled( bool on );
     void warnThresholdChanged( double val );
@@ -81,7 +80,6 @@ private slots:
     void billingStartInputChanged( const QDate& );
     void billingMonthsInputChanged( int value );
     void checkBoxStartKNemoToggled( bool on );
-    void spinBoxTrafficValueChanged( int value );
     void colorButtonChanged();
     void advancedButtonClicked();
     void listViewCommandsSelectionChanged( QTreeWidgetItem *current, QTreeWidgetItem *previous );

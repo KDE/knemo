@@ -34,6 +34,8 @@ ThemeConfig::ThemeConfig( const InterfaceSettings s ) : KDialog(),
         mDlg.maxRateGroup->hide();
     }
 
+    mDlg.spinBoxTrafficThreshold->setValue( settings.trafficThreshold );
+
     mDlg.txMaxRate->setValue( settings.outMaxRate );
     mDlg.rxMaxRate->setValue( settings.inMaxRate );
 
@@ -52,6 +54,8 @@ void ThemeConfig::setDefaults()
 {
     InterfaceSettings s;
 
+    mDlg.spinBoxTrafficThreshold->setValue( s.trafficThreshold );
+
     mDlg.txMaxRate->setValue( s.outMaxRate );
     mDlg.rxMaxRate->setValue( s.inMaxRate );
 
@@ -69,8 +73,11 @@ void ThemeConfig::updateRateGroup()
         mDlg.maxRateGroup->setEnabled( false );
 }
 
+
 InterfaceSettings ThemeConfig::getSettings()
 {
+    settings.trafficThreshold = mDlg.spinBoxTrafficThreshold->value();
+
     settings.outMaxRate = mDlg.txMaxRate->value();
     settings.inMaxRate = mDlg.rxMaxRate->value();
 

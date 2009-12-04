@@ -125,14 +125,7 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     mDlg->pushButtonAddToolTip->setIcon( SmallIcon( "arrow-right" ) );
     mDlg->pushButtonRemoveToolTip->setIcon( SmallIcon( "arrow-left" ) );
 
-    mDlg->colorIncomingLabel->hide();
-    mDlg->colorIncoming->hide();
-    mDlg->colorOutgoingLabel->hide();
-    mDlg->colorOutgoing->hide();
-    mDlg->colorDisabledLabel->hide();
-    mDlg->colorDisabled->hide();
-    mDlg->colorUnavailable->hide();
-    mDlg->colorUnavailable->hide();
+    mDlg->themeColorBox->setEnabled( false );
 
     //mDlg->listViewCommands->setSorting( -1 );
 
@@ -154,12 +147,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( aliasChanged( const QString& ) ) );
 
     // Interface - Icon Appearance
-    connect( mDlg->checkBoxDisconnected, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxDisconnectedToggled ( bool ) ) );
-    connect( mDlg->checkBoxUnavailable, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxUnavailableToggled ( bool ) ) );
-    connect( mDlg->spinBoxTrafficThreshold, SIGNAL( valueChanged( int ) ),
-             this, SLOT( spinBoxTrafficValueChanged ( int ) ) );
+    connect( mDlg->comboHiding, SIGNAL( activated( int ) ),
+             this, SLOT( comboHidingChanged( int ) ) );
     connect( mDlg->comboBoxIconTheme, SIGNAL( activated( int ) ),
              this, SLOT( iconThemeChanged( int ) ) );
     connect( mDlg->colorIncoming, SIGNAL( changed( const QColor& ) ),
@@ -619,8 +608,14 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     mDlg->colorOutgoing->setColor( settings->colorOutgoing );
     mDlg->colorDisabled->setColor( settings->colorDisabled );
     mDlg->colorUnavailable->setColor( settings->colorUnavailable );
-    mDlg->checkBoxDisconnected->setChecked( settings->hideWhenDisconnected );
-    mDlg->checkBoxUnavailable->setChecked( settings->hideWhenUnavailable );
+    if ( settings->hideWhenDisconnected )
+        index = 1;
+    else if ( settings->hideWhenUnavailable )
+        index = 2;
+    else
+        index = 0;
+    mDlg->comboHiding->setCurrentIndex( index );
+    comboHidingChanged( index );
     mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
     mDlg->warnThreshold->setValue( settings->warnThreshold );
     if ( settings->warnTotalTraffic )
@@ -648,7 +643,6 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     }
     setMaxDay();
     mDlg->billingStartInput->setDate( settings->billingStart );
-    mDlg->spinBoxTrafficThreshold->setValue( settings->trafficThreshold );
 
     mDlg->listViewCommands->clear();
     QList<QTreeWidgetItem *>items;
@@ -930,33 +924,28 @@ QPixmap ConfigDialog::barIcon( int status )
     return barIcon;
 }
 
-void ConfigDialog::checkBoxDisconnectedToggled( bool on )
+void ConfigDialog::comboHidingChanged( int val )
 {
     InterfaceSettings* settings = getItemSettings();
     if ( !settings )
         return;
 
-    settings->hideWhenDisconnected = on;
-    if (!mLock) changed( true );
-}
+    switch ( val )
+    {
+        case 0:
+            settings->hideWhenDisconnected = false;
+            settings->hideWhenUnavailable = false;
+            break;
+        case 1:
+            settings->hideWhenDisconnected = true;
+            settings->hideWhenUnavailable = true;
+            break;
+        case 2:
+            settings->hideWhenDisconnected = false;
+            settings->hideWhenUnavailable = true;
+            break;
+    }
 
-void ConfigDialog::checkBoxUnavailableToggled( bool on )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    settings->hideWhenUnavailable = on;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::spinBoxTrafficValueChanged( int value )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    settings->trafficThreshold = value;
     if (!mLock) changed( true );
 }
 
@@ -991,15 +980,7 @@ void ConfigDialog::iconThemeChanged( int set )
             mDlg->pixmapTraffic->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::RxTraffic | KNemoIface::TxTraffic ) );
         }
 
-        mDlg->colorIncoming->show();
-        mDlg->colorIncomingLabel->show();
-        mDlg->colorOutgoing->show();
-        mDlg->colorOutgoingLabel->show();
-        mDlg->colorDisabled->show();
-        mDlg->colorDisabledLabel->show();
-        mDlg->colorUnavailable->show();
-        mDlg->colorUnavailableLabel->show();
-        mDlg->advancedButton->show();
+        mDlg->themeColorBox->setEnabled( true );
     }
     else
     {
@@ -1015,15 +996,7 @@ void ConfigDialog::iconThemeChanged( int set )
         mDlg->pixmapIncoming->setPixmap( KIcon( iconName + ICON_RX ).pixmap( 22 ) );
         mDlg->pixmapOutgoing->setPixmap( KIcon( iconName + ICON_TX ).pixmap( 22 ) );
         mDlg->pixmapTraffic->setPixmap( KIcon( iconName + ICON_RX_TX ).pixmap( 22 ) );
-        mDlg->colorIncoming->hide();
-        mDlg->colorIncomingLabel->hide();
-        mDlg->colorOutgoing->hide();
-        mDlg->colorOutgoingLabel->hide();
-        mDlg->colorDisabled->hide();
-        mDlg->colorDisabledLabel->hide();
-        mDlg->colorUnavailable->hide();
-        mDlg->colorUnavailableLabel->hide();
-        mDlg->advancedButton->hide();
+        mDlg->themeColorBox->setEnabled( false );
     }
     if (!mLock) changed( true );
 }
@@ -1060,7 +1033,6 @@ void ConfigDialog::advancedButtonClicked()
     if ( t.exec() )
     {
         InterfaceSettings s = t.getSettings();
-
         settings->dynamicColor = s.dynamicColor;
         settings->colorIncomingMax = s.colorIncomingMax;
         settings->colorOutgoingMax = s.colorOutgoingMax;

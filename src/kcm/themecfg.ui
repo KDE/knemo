@@ -6,11 +6,44 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>328</width>
-    <height>286</height>
+    <width>415</width>
+    <height>308</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Traffic</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Traffic activity threshold:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="KIntSpinBox" name="spinBoxTrafficThreshold">
+          <property name="whatsThis">
+           <string>If you are on a network with a lot of low-level traffic, you can increase this value so the tray icon does not constantly report activity.</string>
+          </property>
+          <property name="suffix">
+           <string> packets/sec</string>
+          </property>
+          <property name="maximum">
+           <number>1000</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item>
     <widget class="QGroupBox" name="rateGroup">
      <property name="title">
@@ -23,7 +56,7 @@
          <string>If this is checked, the Netload bar graphs will use a constant scale based on the maximum rates below.  If unchecked, the bar graphs will change scale according to recent traffic rates.</string>
         </property>
         <property name="text">
-         <string>Always scale icon bar graph to max rate</string>
+         <string>Always scale bar graphs to max visual rate</string>
         </property>
        </widget>
       </item>
@@ -33,83 +66,9 @@
          <string>If checked, the transmit and receive colors will change according to the traffic rate.  As the traffic rate increases, the color will change from the default color, to the max rate color.</string>
         </property>
         <property name="text">
-         <string>Change color according to max rate</string>
+         <string>Change color according to max visual rate</string>
         </property>
        </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Incoming max rate color:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="KColorButton" name="colorIncomingMax">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Outgoing max rate color:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="KColorButton" name="colorOutgoingMax">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </item>
      </layout>
     </widget>
@@ -128,7 +87,7 @@
         <item>
          <widget class="QLabel" name="inMaxText">
           <property name="text">
-           <string>Incoming rate:</string>
+           <string>Incoming traffic:</string>
           </property>
          </widget>
         </item>
@@ -151,6 +110,23 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Color:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="KColorButton" name="colorIncomingMax">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -158,7 +134,7 @@
         <item>
          <widget class="QLabel" name="outMaxText">
           <property name="text">
-           <string>Outgoing rate:</string>
+           <string>Outgoing traffic:</string>
           </property>
          </widget>
         </item>
@@ -178,6 +154,23 @@
           </property>
           <property name="value">
            <number>4</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Color:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="KColorButton" name="colorOutgoingMax">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -214,12 +207,13 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>spinBoxTrafficThreshold</tabstop>
   <tabstop>checkBarScale</tabstop>
   <tabstop>checkDynColor</tabstop>
-  <tabstop>colorIncomingMax</tabstop>
-  <tabstop>colorOutgoingMax</tabstop>
   <tabstop>rxMaxRate</tabstop>
+  <tabstop>colorIncomingMax</tabstop>
   <tabstop>txMaxRate</tabstop>
+  <tabstop>colorOutgoingMax</tabstop>
  </tabstops>
  <resources/>
  <connections>
