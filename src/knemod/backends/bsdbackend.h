@@ -24,6 +24,9 @@
 #include <QStringList>
 
 #include "backendbase.h"
+#include <sys/types.h>
+#include <net/if.h>
+#include <net80211/ieee80211_ioctl.h>
 
 /**
  * This backend uses getifaddrs() and friends.
@@ -48,14 +51,21 @@ public:
     virtual QString getDefaultRouteIface( int afInet );
 
 private:
+    int s;
     void updateInterfaceData( const QString& ifName, BackendData* data );
-    void updateWirelessData( int fd, const QString& ifName, BackendData* data );
+    void updateWirelessData( const QString& ifName, BackendData* data );
     QString formattedAddr( struct sockaddr * addr );
     QString getAddr( struct ifaddrs *ifa, AddrData& addrData );
     int getSubnet( struct ifaddrs *ifa );
     struct ifaddrs *ifaddr;
     QHash<QByteArray, QStringList>ipv6Hash;
     QStringList mProcIfInet6;
+
+    int get80211( const QString &ifName, int type, void *data, int len );
+    int get80211len( const QString &ifName, int type, void *data, int len, int *plen);
+    int get80211id( const QString &ifName, int ix, void *data, size_t len, int *plen, int mesh );
+    int get80211val( const QString &ifName, int type, int *val );
+    enum ieee80211_opmode get80211opmode( const QString &ifName );
 };
 
 #endif // BSDBACKEND_H

@@ -1217,7 +1217,9 @@ void ConfigDialog::setupToolTipMap()
     mToolTips.insert( BIT_RATE, i18n( "Bit Rate" ) );
     mToolTips.insert( ACCESS_POINT, i18n( "Access Point" ) );
     mToolTips.insert( LINK_QUALITY, i18n( "Link Quality" ) );
+#ifndef __linux__
     mToolTips.insert( NICK_NAME, i18n( "Nickname" ) );
+#endif
     mToolTips.insert( ENCRYPTION, i18n( "Encryption" ) );
 }
 

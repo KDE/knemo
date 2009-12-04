@@ -1,6 +1,20 @@
 /* This file is part of KNemo
    Copyright (C) 2009 John Stamp <jstamp@users.sourceforge.net>
 
+   Portions adapted from ifieee80211.c:
+
+     Copyright 2001 The Aerospace Corporation.  All rights reserved.
+
+     Redistribution and use in source and binary forms, with or without
+     modification, are permitted provided that the following conditions
+     are met:
+     1. Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+     3. The name of The Aerospace Corporation may not be used to endorse or
+        promote products derived from this software.
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -24,8 +38,10 @@
 #include <ifaddrs.h>
 #include <netdb.h>
 #include <net/ethernet.h>
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <net/if.h>
+#include <net/if_media.h>
 #include <netinet/in.h>
 
 #include <net/if_dl.h>
@@ -43,10 +59,13 @@
 
 BSDBackend::BSDBackend()
 {
+    s = socket( AF_INET, SOCK_DGRAM, 0 );
 }
 
 BSDBackend::~BSDBackend()
 {
+    if ( s >= 0 )
+        close( s );
 }
 
 BackendBase* BSDBackend::createInstance()
@@ -90,6 +109,17 @@ void BSDBackend::update()
         interface->interfaceType = KNemoIface::Ethernet;
 
         updateInterfaceData( key, interface );
+
+        if ( s >= 0 )
+        {
+            char essidData[ 32 ];
+            int len;
+            if ( get80211id( key, -1, essidData, sizeof( essidData ), &len, 0 ) >= 0 )
+            {
+                interface->isWireless = true;
+                updateWirelessData( key, interface );
+            }
+        }
     }
 
     freeifaddrs( ifaddr );
@@ -284,7 +314,7 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
                 memset( macstr, 0, sizeof(macstr) );
                 const struct sockaddr_dl* sdl = reinterpret_cast<struct sockaddr_dl*>(ifa->ifa_addr);
                 if ( sdl->sdl_type == IFT_ETHER && sdl->sdl_alen == ETHER_ADDR_LEN )
-                     memcpy(macBuffer, LLADDR(sdl), 6);
+                     memcpy( macBuffer, LLADDR( sdl ), 6 );
                 snprintf( macstr, sizeof(macstr), "%02x:%02x:%02x:%02x:%02x:%02x",
                           macBuffer[0], macBuffer[1], macBuffer[2],
                           macBuffer[3], macBuffer[4], macBuffer[5] );
@@ -319,7 +349,223 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
         data->status = KNemoIface::Unavailable;
 }
 
-void BSDBackend::updateWirelessData( int fd, const QString& ifName, BackendData* data )
+void BSDBackend::updateWirelessData( const QString& ifName, BackendData* data )
 {
-    // TODO
+    /* TODO?
+       data->bitRate;
+       data->nickName;
+    */
+
+    struct ieee80211_channel curchan;
+    if ( get80211( ifName, IEEE80211_IOC_CURCHAN, &curchan, sizeof( curchan ) ) >= 0 )
+    {
+        if ( curchan.ic_freq >= 1000 )
+        {
+            qreal trFreq;
+            trFreq = curchan.ic_freq/1000.0;
+            data->frequency = i18n( "%1 GHz", trFreq );
+        }
+        else
+            data->frequency = i18n( "%1 MHz", curchan.ic_freq );
+        data->channel = QString::number( curchan.ic_ieee );
+    }
+
+    int val;
+    char essiddat[ 32 ];
+    data->essid.clear();
+    if ( get80211val( ifName, IEEE80211_IOC_NUMSSIDS, &val ) >= 0 )
+    {
+        if ( val > 0 )
+        {
+            for ( int i = 0; i < val; i++ )
+            {
+                int len;
+                if ( get80211id( ifName, i, essiddat, sizeof( essiddat ), &len, 0 ) >= 0 && len > 0 )
+                {
+                    data->essid = QByteArray( essiddat, len );
+                    break;
+                }
+            }
+        }
+    }
+
+    if ( get80211( ifName, IEEE80211_IOC_BSSID, essiddat, IEEE80211_ADDR_LEN ) >= 0 )
+        data->accessPoint = ether_ntoa( reinterpret_cast<struct ether_addr *>(essiddat) );
+
+    if ( data->accessPoint != data->prevAccessPoint )
+    {
+        /* Reset encryption status for new access point */
+        data->isEncrypted = false;
+        data->prevAccessPoint = data->accessPoint;
+    }
+
+    if ( get80211val( ifName, IEEE80211_IOC_AUTHMODE, &val) >= 0 )
+    {
+        if ( val == IEEE80211_AUTH_WPA )
+            data->isEncrypted = true;
+    }
+    else if ( get80211val( ifName, IEEE80211_IOC_WEP, &val ) >= 0 && val != IEEE80211_WEP_NOSUP )
+    {
+        if ( val == IEEE80211_WEP_ON )
+            data->isEncrypted = true;
+    }
+
+    enum ieee80211_opmode opmode = get80211opmode( ifName );
+    switch ( opmode )
+    {
+        case IEEE80211_M_AHDEMO:
+            data->mode = i18n( "Ad-Hoc Demo" );
+            break;
+        case IEEE80211_M_IBSS:
+            data->mode = i18n( "Ad-Hoc" );
+            break;
+        case IEEE80211_M_HOSTAP:
+            data->mode = i18n( "Host AP" );
+            break;
+        case IEEE80211_M_MONITOR:
+            data->mode = i18n( "Monitor" );
+            break;
+        case IEEE80211_M_MBSS:
+            data->mode = i18n( "Mesh" );
+            break;
+        case IEEE80211_M_STA:
+            data->mode = i18n( "Managed" );
+    }
+
+    const uint8_t *cp;
+    int len;
+
+    union
+    {
+        struct ieee80211req_sta_req req;
+        uint8_t buf[ 24 * 1024 ];
+    } u;
+
+    /* broadcast address =>'s get all stations */
+    memset( u.req.is_u.macaddr, 0xff, IEEE80211_ADDR_LEN );
+    if ( opmode == IEEE80211_M_STA )
+    {
+        /*
+         * Get information about the associated AP.
+         */
+        get80211( ifName, IEEE80211_IOC_BSSID, u.req.is_u.macaddr, IEEE80211_ADDR_LEN );
+    }
+
+    if ( get80211len( ifName, IEEE80211_IOC_STA_INFO, &u, sizeof( u ), &len ) >= 0 &&
+         len >= sizeof( struct ieee80211req_sta_info )
+       )
+    {
+        /*
+         * See http://www.ces.clemson.edu/linux/nm-ipw2200.shtml
+         */
+        int perfect = 20;
+        int worst = 85;
+        int rssi = u.req.info->isi_rssi;
+        int qual = ( 100 * (perfect - worst) * (perfect - worst) - (perfect - rssi) *
+                     (15 * (perfect - worst) + 62 * (perfect - rssi) ) ) /
+                   ( (perfect - worst) * (perfect - worst) );
+        data->linkQuality = QString( "%1%" ).arg( qual );
+
+        int maxRate = -1;
+        for ( int i = 0; i < u.req.info->isi_nrates; i++)
+        {
+            int rate = u.req.info->isi_rates[ i ] & IEEE80211_RATE_VAL;
+            if ( rate > maxRate )
+                maxRate = rate;
+        }
+        if ( maxRate >= 0 )
+            data->bitRate = i18n( "%1 Mbps", maxRate / 2 );
+    }
 }
+
+int BSDBackend::get80211( const QString &ifName, int type, void *data, int len )
+{
+    struct ieee80211req ireq;
+
+    memset( &ireq, 0, sizeof( ireq ) );
+    strncpy( ireq.i_name, ifName.toLatin1(), sizeof( ireq.i_name ) );
+    ireq.i_type = type;
+    ireq.i_data = data;
+    ireq.i_len = len;
+    return ioctl( s, SIOCG80211, &ireq );
+}
+
+int BSDBackend::get80211len( const QString &ifName, int type, void *data, int len, int *plen)
+{
+    struct ieee80211req ireq;
+
+    memset( &ireq, 0, sizeof( ireq ) );
+    strncpy( ireq.i_name, ifName.toLatin1(), sizeof( ireq.i_name ) );
+    ireq.i_type = type;
+    ireq.i_len = len;
+    if ( ireq.i_len == len )
+    {
+        ireq.i_data = data;
+        if ( ioctl( s, SIOCG80211, &ireq ) < 0 )
+            return -1;
+        *plen = ireq.i_len;
+    }
+    return 0;
+}
+
+int BSDBackend::get80211id( const QString &ifName, int ix, void *data, size_t len, int *plen, int mesh )
+{
+    struct ieee80211req ireq;
+
+    memset( &ireq, 0, sizeof( ireq ) );
+    strncpy( ireq.i_name, ifName.toLatin1(), sizeof( ireq.i_name ) );
+    ireq.i_type = mesh ? IEEE80211_IOC_MESH_ID : IEEE80211_IOC_SSID;
+    ireq.i_val = ix;
+    ireq.i_data = data;
+    ireq.i_len = len;
+
+    if ( ioctl( s, SIOCG80211, &ireq ) < 0 )
+        return -1;
+
+    *plen = ireq.i_len;
+    return 0;
+}
+
+int BSDBackend::get80211val( const QString &ifName, int type, int *val )
+{
+    struct ieee80211req ireq;
+
+    memset( &ireq, 0, sizeof( ireq ) );
+    strncpy( ireq.i_name, ifName.toLatin1(), sizeof( ireq.i_name ) );
+    ireq.i_type = type;
+
+    if ( ioctl( s, SIOCG80211, &ireq ) < 0 )
+        return -1;
+
+    *val = ireq.i_val;
+    return 0;
+}
+
+enum ieee80211_opmode BSDBackend::get80211opmode( const QString &ifName )
+{
+    struct ifmediareq ifmr;
+
+    memset( &ifmr, 0, sizeof( ifmr ) );
+    strncpy( ifmr.ifm_name, ifName.toLatin1(), sizeof( ifmr.ifm_name ) );
+
+    if ( ioctl( s, SIOCGIFMEDIA, &ifmr ) >= 0 )
+    {
+        if ( ifmr.ifm_current & IFM_IEEE80211_ADHOC )
+        {
+            if ( ifmr.ifm_current & IFM_FLAG0 )
+                return IEEE80211_M_AHDEMO;
+            else
+                return IEEE80211_M_IBSS;
+        }
+        if ( ifmr.ifm_current & IFM_IEEE80211_HOSTAP )
+            return IEEE80211_M_HOSTAP;
+        if ( ifmr.ifm_current & IFM_IEEE80211_MONITOR )
+            return IEEE80211_M_MONITOR;
+        if ( ifmr.ifm_current & IFM_IEEE80211_MBSS )
+            return IEEE80211_M_MBSS;
+    }
+    return IEEE80211_M_STA;
+}
+
+
+

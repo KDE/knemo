@@ -45,10 +45,12 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
 
     ui.setupUi( mainWidget() );
 
-    // FreeBSD doesn't have address labels, so hide by default
+    // FreeBSD doesn't have these
 #ifndef __linux__
     ui.addrLabel->hide();
     ui.textLabelAddrLabel->hide();
+    ui.textLabelNickNameL->hide();
+    ui.textLabelNickName->hide();
 #endif
 
     connect( ui.comboBoxIP, SIGNAL( currentIndexChanged(int) ), this, SLOT( updateDialog() ) );

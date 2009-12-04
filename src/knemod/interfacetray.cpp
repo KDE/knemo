@@ -277,8 +277,10 @@ QString InterfaceTray::toolTipData()
             tipData += leftTags + i18n( "Access Point" ) + centerTags + data->accessPoint + rightTags;
         if ( toolTipContent & LINK_QUALITY )
             tipData += leftTags + i18n( "Link Quality" ) + centerTags + data->linkQuality + rightTags;
+#ifdef __linux__
         if ( toolTipContent & NICK_NAME )
             tipData += leftTags + i18n( "Nickname" ) + centerTags + data->nickName + rightTags;
+#endif
         if ( toolTipContent & ENCRYPTION )
         {
             QString encryption = i18n( "Encryption" );
