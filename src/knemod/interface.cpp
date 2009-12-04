@@ -86,6 +86,7 @@ void Interface::configChanged()
     // Let's check that it's available
     foreach( KNemoTheme theme, themes )
         themeNames << theme.internalName;
+    themeNames << NETLOAD_THEME;
     if ( !themeNames.contains( mSettings.iconTheme ) )
         mSettings.iconTheme = TEXT_THEME;
     mSettings.colorIncoming = interfaceGroup.readEntry( conf_colorIncoming, s.colorIncoming );
@@ -96,6 +97,7 @@ void Interface::configChanged()
     mSettings.dynamicColor = interfaceGroup.readEntry( conf_dynamicColor, s.dynamicColor );
     mSettings.colorIncomingMax = interfaceGroup.readEntry( conf_colorIncomingMax, s.colorIncomingMax );
     mSettings.colorOutgoingMax = interfaceGroup.readEntry( conf_colorOutgoingMax, s.colorOutgoingMax );
+    mSettings.barScale = interfaceGroup.readEntry( conf_barScale, s.barScale );
     mSettings.inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate )*1024;
     mSettings.outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate )*1024;
     mSettings.hideWhenDisconnected = interfaceGroup.readEntry( conf_hideWhenNotAvail, s.hideWhenDisconnected );

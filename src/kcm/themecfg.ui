@@ -6,21 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>353</width>
-    <height>155</height>
+    <width>328</width>
+    <height>286</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="rateGroup">
      <property name="title">
-      <string>Colors</string>
+      <string>Traffic Rate Visualization</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QCheckBox" name="checkBarScale">
+        <property name="whatsThis">
+         <string>If this is checked, the Netload bar graphs will use a constant scale based on the maximum rates below.  If unchecked, the bar graphs will change scale according to recent traffic rates.</string>
+        </property>
+        <property name="text">
+         <string>Always scale icon bar graph to max rate</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QCheckBox" name="checkDynColor">
+        <property name="whatsThis">
+         <string>If checked, the transmit and receive colors will change according to the traffic rate.  As the traffic rate increases, the color will change from the default color, to the max rate color.</string>
+        </property>
         <property name="text">
-         <string>Change color according to traffic rate</string>
+         <string>Change color according to max rate</string>
         </property>
        </widget>
       </item>
@@ -48,31 +61,12 @@
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>Transmit max:</string>
+           <string>Incoming max rate color:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="KIntNumInput" name="txMaxColor">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="value">
-           <number>4</number>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>1048576</number>
-          </property>
-          <property name="suffix">
-           <string> KiB/sec</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="KColorButton" name="colorOutgoingMax">
+         <widget class="KColorButton" name="colorIncomingMax">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -104,17 +98,47 @@
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>Receive max:</string>
+           <string>Outgoing max rate color:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="KIntNumInput" name="rxMaxColor">
+         <widget class="KColorButton" name="colorOutgoingMax">
           <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="value">
-           <number>4</number>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="maxRateGroup">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Max Visual Rate</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="inMaxText">
+          <property name="text">
+           <string>Incoming rate:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="KIntSpinBox" name="rxMaxRate">
+          <property name="whatsThis">
+           <string>&lt;p&gt;The maximum incoming rate for this connection.&lt;/p&gt;&lt;p&gt;This does &lt;b&gt;not&lt;/b&gt; affect the actual traffic rate, only how KNemo displays it.&lt;/p&gt;</string>
+          </property>
+          <property name="suffix">
+           <string> KiB/sec</string>
           </property>
           <property name="minimum">
            <number>1</number>
@@ -122,15 +146,38 @@
           <property name="maximum">
            <number>1048576</number>
           </property>
-          <property name="suffix">
-           <string> Kib/sec</string>
+          <property name="value">
+           <number>4</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="outMaxText">
+          <property name="text">
+           <string>Outgoing rate:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="KColorButton" name="colorIncomingMax">
-          <property name="enabled">
-           <bool>false</bool>
+         <widget class="KIntSpinBox" name="txMaxRate">
+          <property name="whatsThis">
+           <string>&lt;p&gt;The maximum outgoing rate for this connection?&lt;/p&gt;&lt;p&gt;This does &lt;b&gt;not&lt;/b&gt; affect the actual traffic rate, only how KNemo displays it.&lt;/p&gt;</string>
+          </property>
+          <property name="suffix">
+           <string> KiB/sec</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>1048576</number>
+          </property>
+          <property name="value">
+           <number>4</number>
           </property>
          </widget>
         </item>
@@ -156,20 +203,23 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>KIntSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>knuminput.h</header>
+  </customwidget>
+  <customwidget>
    <class>KColorButton</class>
    <extends>QPushButton</extends>
    <header>kcolorbutton.h</header>
   </customwidget>
-  <customwidget>
-   <class>KIntNumInput</class>
-   <extends>QWidget</extends>
-   <header>knuminput.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>checkBarScale</tabstop>
   <tabstop>checkDynColor</tabstop>
-  <tabstop>colorOutgoingMax</tabstop>
   <tabstop>colorIncomingMax</tabstop>
+  <tabstop>colorOutgoingMax</tabstop>
+  <tabstop>rxMaxRate</tabstop>
+  <tabstop>txMaxRate</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -180,44 +230,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>136</x>
-     <y>171</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>90</x>
-     <y>192</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkDynColor</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>txMaxColor</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>190</x>
+     <x>175</x>
      <y>172</y>
     </hint>
     <hint type="destinationlabel">
-     <x>194</x>
-     <y>192</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkDynColor</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>colorOutgoingMax</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>280</x>
-     <y>172</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>297</x>
-     <y>192</y>
+     <x>204</x>
+     <y>201</y>
     </hint>
    </hints>
   </connection>
@@ -228,28 +246,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>97</x>
-     <y>171</y>
+     <x>136</x>
+     <y>172</y>
     </hint>
     <hint type="destinationlabel">
-     <x>97</x>
-     <y>241</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkDynColor</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>rxMaxColor</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>172</x>
-     <y>171</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>177</x>
-     <y>232</y>
+     <x>206</x>
+     <y>231</y>
     </hint>
    </hints>
   </connection>
@@ -260,12 +262,28 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>266</x>
+     <x>319</x>
      <y>172</y>
     </hint>
     <hint type="destinationlabel">
-     <x>282</x>
-     <y>238</y>
+     <x>335</x>
+     <y>201</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkDynColor</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>colorOutgoingMax</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>305</x>
+     <y>172</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>335</x>
+     <y>231</y>
     </hint>
    </hints>
   </connection>

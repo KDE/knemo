@@ -25,36 +25,59 @@ ThemeConfig::ThemeConfig( const InterfaceSettings s ) : KDialog(),
     mDlg.setupUi( mainWidget() );
     setButtons( KDialog::Default | KDialog::Ok | KDialog::Cancel );
 
+    if ( settings.iconTheme != NETLOAD_THEME )
+        mDlg.checkBarScale->hide();
+    if ( settings.iconTheme != NETLOAD_THEME &&
+         settings.iconTheme != TEXT_THEME )
+    {
+        mDlg.rateGroup->hide();
+        mDlg.maxRateGroup->hide();
+    }
+
+    mDlg.txMaxRate->setValue( settings.outMaxRate );
+    mDlg.rxMaxRate->setValue( settings.inMaxRate );
+
+    mDlg.checkBarScale->setChecked( settings.barScale );
     mDlg.checkDynColor->setChecked( settings.dynamicColor );
     mDlg.colorIncomingMax->setColor( settings.colorIncomingMax );
     mDlg.colorOutgoingMax->setColor( settings.colorOutgoingMax );
-    mDlg.txMaxColor->setValue( settings.outMaxRate );
-    mDlg.rxMaxColor->setValue( settings.inMaxRate );
+    updateRateGroup();
 
-    enableButtonApply( false );
     connect( this, SIGNAL( defaultClicked() ), SLOT( setDefaults() ) );
+    connect( mDlg.checkBarScale, SIGNAL( toggled( bool ) ), SLOT( updateRateGroup() ) );
+    connect( mDlg.checkDynColor, SIGNAL( toggled( bool ) ), SLOT( updateRateGroup() ) );
 }
 
 void ThemeConfig::setDefaults()
 {
     InterfaceSettings s;
 
+    mDlg.txMaxRate->setValue( s.outMaxRate );
+    mDlg.rxMaxRate->setValue( s.inMaxRate );
+
+    mDlg.checkBarScale->setChecked( s.barScale );
     mDlg.checkDynColor->setChecked( s.dynamicColor );
     mDlg.colorIncomingMax->setColor( s.colorIncomingMax );
     mDlg.colorOutgoingMax->setColor( s.colorOutgoingMax );
-    mDlg.txMaxColor->setValue( s.outMaxRate );
-    mDlg.rxMaxColor->setValue( s.inMaxRate );
+}
 
-    enableButtonApply( true );
+void ThemeConfig::updateRateGroup()
+{
+    if ( mDlg.checkBarScale->isChecked() || mDlg.checkDynColor->isChecked() )
+        mDlg.maxRateGroup->setEnabled( true );
+    else
+        mDlg.maxRateGroup->setEnabled( false );
 }
 
 InterfaceSettings ThemeConfig::getSettings()
 {
+    settings.outMaxRate = mDlg.txMaxRate->value();
+    settings.inMaxRate = mDlg.rxMaxRate->value();
+
+    settings.barScale = mDlg.checkBarScale->isChecked();
     settings.dynamicColor = mDlg.checkDynColor->isChecked();
     settings.colorIncomingMax = mDlg.colorIncomingMax->color();
     settings.colorOutgoingMax = mDlg.colorOutgoingMax->color();
-    settings.outMaxRate = mDlg.txMaxColor->value();
-    settings.inMaxRate = mDlg.rxMaxColor->value();
 
     return settings;
 }

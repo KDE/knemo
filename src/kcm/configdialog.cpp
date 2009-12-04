@@ -100,6 +100,11 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     textTheme.comment = i18n( "KNemo theme that shows text of upload/download speed" );
     textTheme.internalName = TEXT_THEME;
     mDlg->comboBoxIconTheme->addItem( textTheme.name, QVariant::fromValue( textTheme ) );
+    KNemoTheme netloadTheme;
+    netloadTheme.name = i18n( "Netload" );
+    netloadTheme.comment = i18n( "KNemo theme that shows bars of upload/download speed" );
+    netloadTheme.internalName = NETLOAD_THEME;
+    mDlg->comboBoxIconTheme->addItem( netloadTheme.name, QVariant::fromValue( netloadTheme ) );
 
     InterfaceSettings s;
     int index = findIndexFromName( s.iconTheme );
@@ -276,6 +281,7 @@ void ConfigDialog::load()
             settings->dynamicColor = interfaceGroup.readEntry( conf_dynamicColor, s.dynamicColor );
             settings->colorIncomingMax = interfaceGroup.readEntry( conf_colorIncomingMax, s.colorIncomingMax );
             settings->colorOutgoingMax = interfaceGroup.readEntry( conf_colorOutgoingMax, s.colorOutgoingMax );
+            settings->barScale = interfaceGroup.readEntry( conf_barScale, s.barScale );
             settings->inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate );
             settings->outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate );
             settings->activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
@@ -416,19 +422,25 @@ void ConfigDialog::save()
         interfaceGroup.writeEntry( conf_hideWhenNotExist, settings->hideWhenUnavailable );
         interfaceGroup.writeEntry( conf_trafficThreshold, settings->trafficThreshold );
         interfaceGroup.writeEntry( conf_iconTheme, settings->iconTheme );
-        if ( settings->iconTheme == TEXT_THEME )
+        if ( settings->iconTheme == TEXT_THEME ||
+             settings->iconTheme == NETLOAD_THEME
+           )
         {
             interfaceGroup.writeEntry( conf_colorIncoming, settings->colorIncoming );
             interfaceGroup.writeEntry( conf_colorOutgoing, settings->colorOutgoing );
             interfaceGroup.writeEntry( conf_colorDisabled, settings->colorDisabled );
             interfaceGroup.writeEntry( conf_colorUnavailable, settings->colorUnavailable );
             interfaceGroup.writeEntry( conf_dynamicColor, settings->dynamicColor );
+            interfaceGroup.writeEntry( conf_inMaxRate, settings->inMaxRate );
+            interfaceGroup.writeEntry( conf_outMaxRate, settings->outMaxRate );
             if ( settings->dynamicColor )
             {
                 interfaceGroup.writeEntry( conf_colorIncomingMax, settings->colorIncomingMax );
                 interfaceGroup.writeEntry( conf_colorOutgoingMax, settings->colorOutgoingMax );
-                interfaceGroup.writeEntry( conf_inMaxRate, settings->inMaxRate );
-                interfaceGroup.writeEntry( conf_outMaxRate, settings->outMaxRate );
+            }
+            if ( settings->iconTheme == NETLOAD_THEME )
+            {
+                interfaceGroup.writeEntry( conf_barScale, settings->barScale );
             }
         }
         interfaceGroup.writeEntry( conf_activateStatistics, settings->activateStatistics );
@@ -846,6 +858,78 @@ QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, int 
     return sampleIcon;
 }
 
+QPixmap ConfigDialog::barIcon( int status )
+{
+    int barIncoming = 0;
+    int barOutgoing = 0;
+    QPixmap barIcon( 22, 22 );
+    barIcon.fill( Qt::transparent );
+    QPainter p( &barIcon );
+
+    QLinearGradient inGrad( 12, 0, 19, 0 );
+    QLinearGradient topInGrad( 12, 0, 19, 0 );
+    QLinearGradient outGrad( 3, 0, 10, 0 );
+    QLinearGradient topOutGrad( 3, 0, 10, 0 );
+
+    QColor topColor = mDlg->colorUnavailable->color();
+    QColor topColorD = mDlg->colorUnavailable->color().darker();
+    topColor.setAlpha( 128 );
+    topColorD.setAlpha( 128 );
+    topInGrad.setColorAt(0, topColorD);
+    topInGrad.setColorAt(1, topColor );
+    topOutGrad.setColorAt(0, topColorD);
+    topOutGrad.setColorAt(1, topColor );
+
+    if ( status & KNemoIface::Connected )
+    {
+        inGrad.setColorAt(0, mDlg->colorIncoming->color() );
+        inGrad.setColorAt(1, mDlg->colorIncoming->color().darker() );
+        outGrad.setColorAt(0, mDlg->colorOutgoing->color() );
+        outGrad.setColorAt(1, mDlg->colorOutgoing->color().darker() );
+    }
+    else if ( status & KNemoIface::Available )
+    {
+        inGrad.setColorAt(0, mDlg->colorDisabled->color());
+        inGrad.setColorAt(1, mDlg->colorDisabled->color().darker() );
+        outGrad.setColorAt(0, mDlg->colorDisabled->color() );
+        outGrad.setColorAt(1, mDlg->colorDisabled->color().darker() );
+    }
+    else
+    {
+        inGrad.setColorAt(0, mDlg->colorUnavailable->color() );
+        inGrad.setColorAt(1, mDlg->colorUnavailable->color().darker() );
+        outGrad.setColorAt(0, mDlg->colorUnavailable->color() );
+        outGrad.setColorAt(1, mDlg->colorUnavailable->color().darker() );
+    }
+    if ( status & KNemoIface::Available || status & KNemoIface::Unavailable )
+    {
+        barIncoming = 22;
+        barOutgoing = 22;
+    }
+    if ( status & KNemoIface::RxTraffic )
+        barIncoming = 17;
+    if ( status & KNemoIface::TxTraffic )
+        barOutgoing = 17;
+
+    int top = 22 - barOutgoing;
+    QRect topLeftRect( 3, 0, 7, top );
+    QRect leftRect( 3, top, 7, 22 );
+    top = 22 - barIncoming;
+    QRect topRightRect( 12, 0, 7, top );
+    QRect rightRect( 12, top, 7, 22 );
+
+    QBrush brush( inGrad );
+    p.setBrush( brush );
+    p.fillRect( rightRect, inGrad );
+    brush = QBrush( topInGrad );
+    p.fillRect( topRightRect, topInGrad );
+    brush = QBrush( outGrad );
+    p.fillRect( leftRect, outGrad );
+    brush = QBrush( topOutGrad );
+    p.fillRect( topLeftRect, topOutGrad );
+    return barIcon;
+}
+
 void ConfigDialog::checkBoxDisconnectedToggled( bool on )
 {
     InterfaceSettings* settings = getItemSettings();
@@ -883,15 +967,30 @@ void ConfigDialog::iconThemeChanged( int set )
         return;
 
     KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
-    if ( curTheme.internalName == TEXT_THEME )
+    if ( curTheme.internalName == TEXT_THEME ||
+         curTheme.internalName == NETLOAD_THEME )
     {
-        settings->iconTheme = TEXT_THEME;
-        mDlg->pixmapError->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Unavailable ) );
-        mDlg->pixmapDisconnected->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Available ) );
-        mDlg->pixmapConnected->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Connected ) );
-        mDlg->pixmapIncoming->setPixmap( textIcon( "123K", "0.0K", KNemoIface::Connected ) );
-        mDlg->pixmapOutgoing->setPixmap( textIcon( "0.0K", "12K", KNemoIface::Connected ) );
-        mDlg->pixmapTraffic->setPixmap( textIcon( "123K", "12K", KNemoIface::Connected ) );
+        if ( curTheme.internalName == TEXT_THEME )
+        {
+            settings->iconTheme = TEXT_THEME;
+            mDlg->pixmapError->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Unavailable ) );
+            mDlg->pixmapDisconnected->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Available ) );
+            mDlg->pixmapConnected->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Connected ) );
+            mDlg->pixmapIncoming->setPixmap( textIcon( "123K", "0.0K", KNemoIface::Connected ) );
+            mDlg->pixmapOutgoing->setPixmap( textIcon( "0.0K", "12K", KNemoIface::Connected ) );
+            mDlg->pixmapTraffic->setPixmap( textIcon( "123K", "12K", KNemoIface::Connected ) );
+        }
+        else
+        {
+            settings->iconTheme = NETLOAD_THEME;
+            mDlg->pixmapError->setPixmap( barIcon( KNemoIface::Unavailable ) );
+            mDlg->pixmapDisconnected->setPixmap( barIcon( KNemoIface::Available ) );
+            mDlg->pixmapConnected->setPixmap( barIcon( KNemoIface::Connected ) );
+            mDlg->pixmapIncoming->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::RxTraffic ) );
+            mDlg->pixmapOutgoing->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::TxTraffic ) );
+            mDlg->pixmapTraffic->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::RxTraffic | KNemoIface::TxTraffic ) );
+        }
+
         mDlg->colorIncoming->show();
         mDlg->colorIncomingLabel->show();
         mDlg->colorOutgoing->show();
@@ -945,7 +1044,8 @@ void ConfigDialog::colorButtonChanged()
         settings->colorUnavailable = mDlg->colorUnavailable->color();
 
     KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
-    if ( curTheme.internalName == TEXT_THEME )
+    if ( curTheme.internalName == TEXT_THEME ||
+         curTheme.internalName == NETLOAD_THEME )
         iconThemeChanged( mDlg->comboBoxIconTheme->currentIndex() );
     if ( !mLock) changed( true );
 }
@@ -960,9 +1060,12 @@ void ConfigDialog::advancedButtonClicked()
     if ( t.exec() )
     {
         InterfaceSettings s = t.getSettings();
+
         settings->dynamicColor = s.dynamicColor;
         settings->colorIncomingMax = s.colorIncomingMax;
         settings->colorOutgoingMax = s.colorOutgoingMax;
+
+        settings->barScale = s.barScale;
         settings->inMaxRate = s.inMaxRate;
         settings->outMaxRate = s.outMaxRate;
 

@@ -57,7 +57,7 @@ namespace KNemoIface {
     };
 }
 
-//static const char NETLOAD_THEME[] = "netloadtheme";
+static const char NETLOAD_THEME[] = "netloadtheme";
 static const char TEXT_THEME[] = "texttheme";
 static const char SYSTEM_THEME[] = "systemtheme";
 static const char ICON_ERROR[] = "error";
@@ -92,6 +92,7 @@ static const char conf_colorUnavailable[] = "ColorUnavailable";
 static const char conf_dynamicColor[] = "DynamicColor";
 static const char conf_colorIncomingMax[] = "ColorIncomingMax";
 static const char conf_colorOutgoingMax[] = "ColorOutgoingMax";
+static const char conf_barScale[] = "BarScale";
 static const char conf_inMaxRate[] = "InMaxRate";
 static const char conf_outMaxRate[] = "OutMaxRate";
 
@@ -213,6 +214,7 @@ struct InterfaceSettings
         dynamicColor( false ),
         colorIncomingMax( 0x96FFFF ),
         colorOutgoingMax( 0xFFC868 ),
+        barScale( false ),
         inMaxRate( 4 ),
         outMaxRate( 4 ),
         numCommands( 0 ),
@@ -234,6 +236,7 @@ struct InterfaceSettings
     bool dynamicColor;
     QColor colorIncomingMax;
     QColor colorOutgoingMax;
+    bool barScale;
     unsigned int inMaxRate;
     unsigned int outMaxRate;
     int numCommands;

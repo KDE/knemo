@@ -32,6 +32,7 @@ public:
     InterfaceSettings getSettings();
 private slots:
     void setDefaults();
+    void updateRateGroup();
 private:
     Ui::ThemeCfg mDlg;
     InterfaceSettings settings;

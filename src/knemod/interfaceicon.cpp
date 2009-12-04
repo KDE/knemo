@@ -40,12 +40,18 @@
 #include "interfaceicon.h"
 #include "interfacetray.h"
 
+#define MINIMAL_MAX 1024
+#define SHRINK_MAX 0.75
+#define HISTSIZE_STORE 0.5
+
 Q_DECLARE_METATYPE(InterfaceCommand)
 
 InterfaceIcon::InterfaceIcon( Interface* interface )
     : QObject(),
       mInterface( interface ),
-      mTray( 0L )
+      mTray( 0L ),
+      barIncoming( 0 ),
+      barOutgoing( 0 )
 {
     commandActions = new KActionCollection( this );
     statusAction = new KAction( i18n( "Show &Status Dialog" ), this );
@@ -82,6 +88,25 @@ void InterfaceIcon::configChanged()
     KConfigGroup cg( KGlobal::mainComponent().config(), "System Tray" );
     iconWidth = cg.readEntry( "systrayIconWidth", 22 );
 
+    barWidth = iconWidth/3;
+    int margins = iconWidth - (barWidth*2);
+    midMargin = margins/3;
+    int rightMargin = (margins - midMargin)/2;
+    leftMargin = margins-midMargin - rightMargin;
+    midMargin = leftMargin + barWidth+ midMargin;
+    histSize = HISTSIZE_STORE/mInterface->getGeneralData().pollInterval;
+    if ( histSize < 2 )
+        histSize = 2;
+
+    for ( int i=0; i < histSize; i++ )
+    {
+        inHist.append( 0 );
+        outHist.append( 0 );
+    }
+
+    inMaxRate = mInterface->getSettings().inMaxRate;
+    outMaxRate = mInterface->getSettings().outMaxRate;
+
     updateTrayStatus();
 
     if ( mTray != 0L )
@@ -89,6 +114,8 @@ void InterfaceIcon::configChanged()
         updateMenu();
         if ( mInterface->getSettings().iconTheme == TEXT_THEME )
              updateIconText( true );
+        else if ( mInterface->getSettings().iconTheme == NETLOAD_THEME )
+             updateBars( true );
     }
 }
 
@@ -136,7 +163,40 @@ void InterfaceIcon::updateIconImage( int status )
 #endif
 }
 
-QColor InterfaceIcon::calcColor( unsigned long rate, const QColor& low, const QColor& high, int hival )
+int InterfaceIcon::calcHeight( QList<unsigned long>& hist, unsigned int& net_max )
+{
+    unsigned long histcalculate = 0;
+    unsigned long rate = 0;
+
+    foreach( unsigned long j, hist )
+    {
+        histcalculate += j;
+    }
+    rate = histcalculate / histSize;
+
+    /* update maximum */
+    if ( !mInterface->getSettings().barScale )
+    {
+        QList<unsigned long>sortedMax( hist );
+        qSort( sortedMax );
+        unsigned long max = sortedMax.last();
+        if( rate > net_max )
+        {
+            net_max = rate;
+        }
+        else if( max < net_max * SHRINK_MAX
+                && net_max * SHRINK_MAX >= MINIMAL_MAX )
+        {
+            net_max *= SHRINK_MAX;
+        }
+    }
+    qreal ratio = static_cast<double>(rate)/net_max;
+    if ( ratio > 1.0 )
+        ratio = 1.0;
+    return ratio*iconWidth;
+}
+
+QColor InterfaceIcon::calcColor( QList<unsigned long>& hist, const QColor& low, const QColor& high, int hival )
 {
     const BackendData * data = mInterface->getData();
 
@@ -149,6 +209,19 @@ QColor InterfaceIcon::calcColor( unsigned long rate, const QColor& low, const QC
         return mInterface->getSettings().colorDisabled;
     else if ( data->status & KNemoIface::Unavailable )
         return mInterface->getSettings().colorUnavailable;
+
+    unsigned long histcalculate = 0;
+    unsigned long rate = 0;
+    if ( mInterface->getSettings().iconTheme == NETLOAD_THEME )
+    {
+        foreach( unsigned long j, hist )
+        {
+            histcalculate += j;
+        }
+        rate = histcalculate / histSize;
+    }
+    else
+        rate = hist[0];
 
     int lowH, lowS, lowV;
     int hiH, hiS, hiV;
@@ -167,6 +240,88 @@ QColor InterfaceIcon::calcColor( unsigned long rate, const QColor& low, const QC
     QColor retcolor;
     retcolor.setHsv( lowH + ( percentage*difH ), lowS + ( percentage*difS), lowV + (percentage*difV ) );
     return retcolor;
+}
+
+void InterfaceIcon::updateBars( bool doUpdate )
+{
+    // Has color changed?
+    QColor rxColor = calcColor( inHist, mInterface->getSettings().colorIncoming, mInterface->getSettings().colorIncomingMax, mInterface->getSettings().inMaxRate );
+    QColor txColor = calcColor( outHist, mInterface->getSettings().colorOutgoing, mInterface->getSettings().colorOutgoingMax, mInterface->getSettings().outMaxRate );
+    if ( rxColor != colorIncoming )
+    {
+        doUpdate = true;
+        colorIncoming = rxColor;
+    }
+    if ( txColor != colorOutgoing )
+    {
+        doUpdate = true;
+        colorOutgoing = txColor;
+    }
+
+    // Has height changed?
+    int rateIn = calcHeight( inHist, inMaxRate );
+    int rateOut = calcHeight( outHist, outMaxRate );
+    if ( rateIn != barIncoming )
+    {
+        doUpdate = true;
+        barIncoming = rateIn;
+    }
+    if ( rateOut != barOutgoing )
+    {
+        doUpdate = true;
+        barOutgoing = rateOut;
+    }
+
+    if ( !doUpdate )
+        return;
+
+    QPixmap barIcon(iconWidth, iconWidth);
+
+    QLinearGradient inGrad( midMargin, 0, midMargin+barWidth, 0 );
+    QLinearGradient topInGrad( midMargin, 0, midMargin+barWidth, 0 );
+    QLinearGradient outGrad( leftMargin, 0, leftMargin+barWidth, 0 );
+    QLinearGradient topOutGrad( leftMargin, 0, leftMargin+barWidth, 0 );
+
+    int top = iconWidth - barOutgoing;
+
+    QRect topLeftRect( leftMargin, 0, barWidth, top );
+    QRect leftRect( leftMargin, top, barWidth, iconWidth );
+    top = iconWidth - barIncoming;
+    QRect topRightRect( midMargin, 0, barWidth, top );
+    QRect rightRect( midMargin, top, barWidth, iconWidth );
+
+    barIcon.fill( Qt::transparent );
+    QPainter p( &barIcon );
+    p.setOpacity( 1.0 );
+
+    QColor topColor = mInterface->getSettings().colorUnavailable;
+    QColor topColorD = mInterface->getSettings().colorUnavailable.darker();
+    topColor.setAlpha( 128 );
+    topColorD.setAlpha( 128 );
+    topInGrad.setColorAt(0, topColorD);
+    topInGrad.setColorAt(1, topColor );
+    topOutGrad.setColorAt(0, topColorD);
+    topOutGrad.setColorAt(1, topColor );
+
+    inGrad.setColorAt(0, rxColor );
+    inGrad.setColorAt(1, rxColor.darker() );
+    outGrad.setColorAt(0, txColor );
+    outGrad.setColorAt(1, txColor.darker() );
+
+    QBrush brush( inGrad );
+    p.setBrush( brush );
+    p.fillRect( rightRect, inGrad );
+    brush = QBrush( topInGrad );
+    p.fillRect( topRightRect, topInGrad );
+    brush = QBrush( outGrad );
+    p.fillRect( leftRect, outGrad );
+    brush = QBrush( topOutGrad );
+    p.fillRect( topLeftRect, topOutGrad );
+#ifdef USE_KNOTIFICATIONITEM
+    mTray->setIconByPixmap( textIcon );
+#else
+    mTray->setIcon( barIcon );
+#endif
 }
 
 QString InterfaceIcon::compactTrayText(unsigned long bytes )
@@ -198,8 +353,8 @@ QString InterfaceIcon::compactTrayText(unsigned long bytes )
 void InterfaceIcon::updateIconText( bool doUpdate )
 {
     // Has color changed?
-    QColor rxColor = calcColor( mInterface->getRxRate(), mInterface->getSettings().colorIncoming, mInterface->getSettings().colorIncomingMax, mInterface->getSettings().inMaxRate );
-    QColor txColor = calcColor( mInterface->getTxRate(), mInterface->getSettings().colorOutgoing, mInterface->getSettings().colorOutgoingMax, mInterface->getSettings().outMaxRate );
+    QColor rxColor = calcColor( inHist, mInterface->getSettings().colorIncoming, mInterface->getSettings().colorIncomingMax, mInterface->getSettings().inMaxRate );
+    QColor txColor = calcColor( outHist, mInterface->getSettings().colorOutgoing, mInterface->getSettings().colorOutgoingMax, mInterface->getSettings().outMaxRate );
     if ( rxColor != colorIncoming )
     {
         doUpdate = true;
@@ -262,8 +417,19 @@ void InterfaceIcon::updateToolTip()
 {
     if ( mTray == 0L )
         return;
+    inHist.prepend( mInterface->getRxRate() );
+    outHist.prepend( mInterface->getTxRate() );
+    while ( inHist.count() > histSize )
+    {
+        inHist.removeLast();
+        outHist.removeLast();
+    }
+
+
     if ( mInterface->getSettings().iconTheme == TEXT_THEME )
         updateIconText();
+    else if ( mInterface->getSettings().iconTheme == NETLOAD_THEME )
+        updateBars();
     mTray->updateToolTip();
 }
 
@@ -352,6 +518,8 @@ void InterfaceIcon::updateTrayStatus()
 
         if ( mInterface->getSettings().iconTheme == TEXT_THEME )
             updateIconText();
+        else if ( mInterface->getSettings().iconTheme == NETLOAD_THEME )
+            updateBars();
         else
             updateIconImage( mInterface->getState() );
         updateMenu();
@@ -361,7 +529,8 @@ void InterfaceIcon::updateTrayStatus()
     }
     else if ( mTray != 0L )
     {
-        if ( mInterface->getSettings().iconTheme != TEXT_THEME )
+        if ( mInterface->getSettings().iconTheme != TEXT_THEME &&
+             mInterface->getSettings().iconTheme != NETLOAD_THEME )
             updateIconImage( mInterface->getState() );
     }
 }

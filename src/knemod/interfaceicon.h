@@ -106,7 +106,9 @@ private:
      */
     void updateIconImage( int status );
 
-    QColor calcColor( unsigned long val, const QColor& low, const QColor& high, int hival );
+    QColor calcColor( QList<unsigned long>& hist, const QColor& low, const QColor& high, int hival );
+    int calcHeight( QList<unsigned long>& hist, unsigned int& net_max );
+    void updateBars( bool doUpdate = false );
     void updateIconText( bool doUpdate = false );
     // the interface this icon belongs to
     Interface* mInterface;
@@ -123,6 +125,16 @@ private:
     QColor colorIncoming;
     QColor colorOutgoing;
     int iconWidth;
+    int histSize;
+    int barIncoming;
+    int barOutgoing;
+    int barWidth;
+    int leftMargin;
+    int midMargin;
+    QList<unsigned long>inHist;
+    QList<unsigned long>outHist;
+    unsigned int inMaxRate;
+    unsigned int outMaxRate;
 };
 
 #endif // INTERFACEICON_H
