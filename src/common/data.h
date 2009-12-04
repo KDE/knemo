@@ -100,7 +100,6 @@ static const char conf_billingWarnThresh[] = "BillingWarnThreshold";
 static const char conf_billingWarnRxTx[] = "BillingWarnRxTx";
 
 // interface context menu
-static const char conf_customCommands[] = "CustomCommands";
 static const char conf_numCommands[] = "NumCommands";
 static const char conf_runAsRoot[] = "RunAsRoot";
 static const char conf_command[] = "Command";
@@ -214,8 +213,7 @@ struct InterfaceSettings
         hideWhenDisconnected( false ),
         activateStatistics( false ),
         customBilling( false ),
-        billingMonths( 1 ),
-        customCommands( false )
+        billingMonths( 1 )
     {}
 
     QString iconTheme;
@@ -234,7 +232,6 @@ struct InterfaceSettings
     QDate billingStart;
     int billingMonths;
     QString calendar;
-    bool customCommands;
     QString alias;
     QList<InterfaceCommand> commands;
 };

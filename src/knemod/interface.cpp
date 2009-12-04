@@ -93,7 +93,6 @@ void Interface::configChanged()
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
     mSettings.colorDisabled = interfaceGroup.readEntry( conf_colorDisabled, scheme.foreground( KColorScheme::InactiveText ).color() );
     mSettings.colorUnavailable = interfaceGroup.readEntry( conf_colorUnavailable, scheme.foreground( KColorScheme::InactiveText ).color() );
-    mSettings.customCommands = interfaceGroup.readEntry( conf_customCommands, s.customCommands );
     mSettings.hideWhenDisconnected = interfaceGroup.readEntry( conf_hideWhenNotAvail, s.hideWhenDisconnected );
     mSettings.hideWhenUnavailable = interfaceGroup.readEntry( conf_hideWhenNotExist, s.hideWhenUnavailable );
     mSettings.activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
@@ -120,21 +119,18 @@ void Interface::configChanged()
         mSettings.billingStart = mSettings.billingStart.addDays( 1 - calendar->day( mSettings.billingStart ) );
     }
     mSettings.commands.clear();
-    if ( mSettings.customCommands )
+    int numCommands = interfaceGroup.readEntry( conf_numCommands, s.numCommands );
+    for ( int i = 0; i < numCommands; i++ )
     {
-        int numCommands = interfaceGroup.readEntry( conf_numCommands, s.numCommands );
-        for ( int i = 0; i < numCommands; i++ )
-        {
-            QString entry;
-            InterfaceCommand cmd;
-            entry = QString( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
-            cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
-            entry = QString( "%1%2" ).arg( conf_command ).arg( i + 1 );
-            cmd.command = interfaceGroup.readEntry( entry );
-            entry = QString( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
-            cmd.menuText = interfaceGroup.readEntry( entry );
-            mSettings.commands.append( cmd );
-        }
+        QString entry;
+        InterfaceCommand cmd;
+        entry = QString( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
+        cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
+        entry = QString( "%1%2" ).arg( conf_command ).arg( i + 1 );
+        cmd.command = interfaceGroup.readEntry( entry );
+        entry = QString( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
+        cmd.menuText = interfaceGroup.readEntry( entry );
+        mSettings.commands.append( cmd );
     }
 
     // This prevents needless regeneration of icon when first shown in tray

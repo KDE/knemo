@@ -245,7 +245,7 @@ void InterfaceIcon::updateMenu()
     InterfaceSettings& settings = mInterface->getSettings();
 
     // If the user wants custom commands, add them.
-    if ( settings.customCommands )
+    if ( settings.commands.size() > 0 )
     {
         int i = 0;
         foreach ( InterfaceCommand command, settings.commands )

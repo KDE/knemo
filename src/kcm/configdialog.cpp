@@ -180,8 +180,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( warnRxTxToggled ( bool ) ) );
 
     // Interface - Context Menu
-    connect( mDlg->checkBoxCustom, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxCustomToggled ( bool ) ) );
     connect( mDlg->listViewCommands, SIGNAL( currentItemChanged( QTreeWidgetItem*, QTreeWidgetItem* ) ),
              this, SLOT( listViewCommandsSelectionChanged( QTreeWidgetItem*, QTreeWidgetItem* ) ) );
     connect( mDlg->listViewCommands, SIGNAL( itemChanged( QTreeWidgetItem*, int ) ),
@@ -298,7 +296,6 @@ void ConfigDialog::load()
                 }
             }
 
-            settings->customCommands = interfaceGroup.readEntry( conf_customCommands, s.customCommands );
             int numCommands = interfaceGroup.readEntry( conf_numCommands, s.numCommands );
             for ( int i = 0; i < numCommands; i++ )
             {
@@ -429,7 +426,6 @@ void ConfigDialog::save()
         interfaceGroup.writeEntry( conf_billingWarnThresh, settings->warnThreshold );
         interfaceGroup.writeEntry( conf_billingWarnRxTx, settings->warnTotalTraffic );
 
-        interfaceGroup.writeEntry( conf_customCommands, settings->customCommands );
         interfaceGroup.writeEntry( conf_numCommands, settings->commands.size() );
         for ( int i = 0; i < settings->commands.size(); i++ )
         {
@@ -595,7 +591,6 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     mDlg->colorOutgoing->setColor( settings->colorOutgoing );
     mDlg->colorDisabled->setColor( settings->colorDisabled );
     mDlg->colorUnavailable->setColor( settings->colorUnavailable );
-    mDlg->checkBoxCustom->setChecked( settings->customCommands );
     mDlg->checkBoxDisconnected->setChecked( settings->hideWhenDisconnected );
     mDlg->checkBoxUnavailable->setChecked( settings->hideWhenUnavailable );
     mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
@@ -641,7 +636,18 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
         item->setText( 2, command.command );
         items << item;
     }
-    mDlg->listViewCommands->addTopLevelItems( items );
+    if ( items.count() > 0 )
+    {
+        mDlg->listViewCommands->addTopLevelItems( items );
+        mDlg->listViewCommands->setCurrentItem( items[0] );
+        mDlg->pushButtonRemoveCommand->setEnabled( true );
+        setUpDownButtons( items[0] );
+    }
+    else
+    {
+        mDlg->pushButtonRemoveCommand->setEnabled( false );
+        setUpDownButtons( NULL );
+    }
     mLock = false;
 }
 
@@ -1017,24 +1023,6 @@ void ConfigDialog::warnRxTxToggled( bool on )
  *                                        *
  ******************************************/
 
-void ConfigDialog::checkBoxCustomToggled( bool on )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    settings->customCommands = on;
-    if ( on )
-    {
-        if ( mDlg->listViewCommands->currentItem() )
-            mDlg->pushButtonRemoveCommand->setEnabled( true );
-    }
-    else
-        mDlg->pushButtonRemoveCommand->setEnabled( false );
-
-    if (!mLock) changed( true );
-}
-
 void ConfigDialog::buttonAddCommandSelected()
 {
     InterfaceSettings* settings = getItemSettings();
@@ -1051,6 +1039,7 @@ void ConfigDialog::buttonAddCommandSelected()
     item->setCheckState( 0, Qt::Unchecked );
     item->setFlags( item->flags() | Qt::ItemIsEditable );
     mDlg->listViewCommands->addTopLevelItem( item );
+    mDlg->listViewCommands->setCurrentItem( item );
 
     if (!mLock) changed( true );
 }
@@ -1085,6 +1074,26 @@ void ConfigDialog::buttonRemoveCommandSelected()
     if (!mLock) changed( true );
 }
 
+void ConfigDialog::setUpDownButtons( QTreeWidgetItem* item )
+{
+    if ( !item )
+    {
+        mDlg->pushButtonUp->setEnabled( false );
+        mDlg->pushButtonDown->setEnabled( false );
+        return;
+    }
+
+    if (mDlg->listViewCommands->indexOfTopLevelItem( item ) == 0 )
+        mDlg->pushButtonUp->setEnabled( false );
+    else
+        mDlg->pushButtonUp->setEnabled( true );
+
+    if (mDlg->listViewCommands->indexOfTopLevelItem( item ) == mDlg->listViewCommands->topLevelItemCount() - 1 )
+        mDlg->pushButtonDown->setEnabled( false );
+    else
+        mDlg->pushButtonDown->setEnabled( true );
+}
+
 void ConfigDialog::buttonCommandUpSelected()
 {
     InterfaceSettings* settings = getItemSettings();
@@ -1102,6 +1111,7 @@ void ConfigDialog::buttonCommandUpSelected()
     mDlg->listViewCommands->takeTopLevelItem( index );
     mDlg->listViewCommands->insertTopLevelItem( index - 1, item );
     mDlg->listViewCommands->setCurrentItem( item );
+    setUpDownButtons( item );
 
     QList<InterfaceCommand> cmds;
     QTreeWidgetItemIterator i( mDlg->listViewCommands );
@@ -1136,6 +1146,7 @@ void ConfigDialog::buttonCommandDownSelected()
     mDlg->listViewCommands->takeTopLevelItem( index );
     mDlg->listViewCommands->insertTopLevelItem( index + 1, item );
     mDlg->listViewCommands->setCurrentItem( item );
+    setUpDownButtons( item );
 
     QList<InterfaceCommand> cmds;
     QTreeWidgetItemIterator i( mDlg->listViewCommands );
@@ -1156,6 +1167,7 @@ void ConfigDialog::buttonCommandDownSelected()
 void ConfigDialog::listViewCommandsSelectionChanged( QTreeWidgetItem* item, QTreeWidgetItem* )
 {
     mDlg->pushButtonRemoveCommand->setEnabled( item != NULL );
+    setUpDownButtons( item );
 }
 
 void ConfigDialog::listViewCommandsChanged( QTreeWidgetItem* item, int column )

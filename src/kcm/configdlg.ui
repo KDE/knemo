@@ -642,20 +642,10 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
            <string>Context Menu</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_4">
-           <item row="0" column="0" colspan="2">
-            <widget class="QCheckBox" name="checkBoxCustom">
-             <property name="text">
-              <string>Display custom entries in context menu</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
+           <item row="0" column="0">
             <widget class="QTreeWidget" name="listViewCommands">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
              <property name="whatsThis">
-              <string>In this area you can add the custom entries for your context menu: &lt;ol&gt;&lt;li&gt;check &lt;b&gt;Display custom entries in context menu&lt;/b&gt;;&lt;/li&gt;&lt;li&gt;push on the &lt;b&gt;Add&lt;/b&gt; button to add a new entry in the list;&lt;/li&gt;&lt;li&gt;edit the entry by double clicking in column &lt;b&gt;Menu text&lt;/b&gt; and &lt;b&gt;Command&lt;/b&gt;;&lt;/li&gt;&lt;li&gt;start from step 2 for every new entry&lt;/li&gt;.&lt;/ol&gt;If you need to execute the command as root user check the corresponding &lt;b&gt;Root&lt;/b&gt; check box.</string>
+              <string>In this area you can add the custom entries for your context menu: &lt;ol&gt;&lt;li&gt;push on the &lt;b&gt;Add&lt;/b&gt; button to add a new entry in the list;&lt;/li&gt;&lt;li&gt;edit the entry by double clicking in column &lt;b&gt;Menu text&lt;/b&gt; and &lt;b&gt;Command&lt;/b&gt;.&lt;/li&gt;&lt;/ol&gt;If you need to execute the command as root user check the corresponding &lt;b&gt;Root&lt;/b&gt; check box.</string>
              </property>
              <property name="rootIsDecorated">
               <bool>false</bool>
@@ -683,13 +673,10 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
              </column>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="0" column="1">
             <layout class="QVBoxLayout">
              <item>
               <widget class="QPushButton" name="pushButtonAddCommand">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
                <property name="toolTip">
                 <string>Add a new entry</string>
                </property>
@@ -703,9 +690,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
              </item>
              <item>
               <widget class="QPushButton" name="pushButtonRemoveCommand">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
                <property name="toolTip">
                 <string>Remove the selected entry</string>
                </property>
@@ -1086,7 +1070,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
   <tabstop>warnThreshold</tabstop>
   <tabstop>warnRx</tabstop>
   <tabstop>warnRxTx</tabstop>
-  <tabstop>checkBoxCustom</tabstop>
   <tabstop>listViewCommands</tabstop>
   <tabstop>pushButtonAddCommand</tabstop>
   <tabstop>pushButtonRemoveCommand</tabstop>
@@ -1129,38 +1112,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
     <hint type="destinationlabel">
      <x>353</x>
      <y>164</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxCustom</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>listViewCommands</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>349</x>
-     <y>141</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>301</x>
-     <y>154</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxCustom</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>pushButtonAddCommand</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>349</x>
-     <y>141</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>405</x>
-     <y>175</y>
     </hint>
    </hints>
   </connection>

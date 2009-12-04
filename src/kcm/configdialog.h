@@ -63,6 +63,7 @@ private slots:
     void buttonDeleteSelected();
     void buttonAddCommandSelected();
     void buttonRemoveCommandSelected();
+    void setUpDownButtons( QTreeWidgetItem* item );
     void buttonCommandUpSelected();
     void buttonCommandDownSelected();
     void buttonAddToolTipSelected();
@@ -81,7 +82,6 @@ private slots:
     void billingMonthsInputChanged( int value );
     void checkBoxStartKNemoToggled( bool on );
     void spinBoxTrafficValueChanged( int value );
-    void checkBoxCustomToggled( bool on );
     void colorButtonChanged();
     void listViewCommandsSelectionChanged( QTreeWidgetItem *current, QTreeWidgetItem *previous );
     void listViewCommandsChanged( QTreeWidgetItem* item, int column );
