@@ -475,6 +475,9 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                 </item>
                 <item>
                  <widget class="QLabel" name="billingStartLabel">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string>Billing start date:</string>
                   </property>
@@ -482,6 +485,9 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                 </item>
                 <item>
                  <widget class="KDateEdit" name="billingStartInput">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="whatsThis">
                    <string>&lt;p&gt;By default, this shows the start date of the current month or billing period. If you change the date, KNemo will recalculate billing periods from that date forward. Any billing periods before that date will remain unmodified.&lt;/p&gt;&lt;p&gt;If you set an erroneous date, just select an earlier good billing date, and KNemo will repair it.&lt;/p&gt;</string>
                   </property>
@@ -509,6 +515,9 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                 </item>
                 <item>
                  <widget class="QLabel" name="label">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string>Months per billing period:</string>
                   </property>
@@ -516,6 +525,9 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                 </item>
                 <item>
                  <widget class="KIntNumInput" name="billingMonthsInput">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -585,6 +597,9 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                 </item>
                 <item>
                  <widget class="QRadioButton" name="warnRx">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="whatsThis">
                    <string>If selected, only incoming traffic applies to the monthly limit</string>
                   </property>
@@ -615,6 +630,9 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                 </item>
                 <item>
                  <widget class="QRadioButton" name="warnRxTx">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="whatsThis">
                    <string>If selected, both incoming and outgoing traffic apply to the monthly limit</string>
                   </property>
