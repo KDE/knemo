@@ -423,8 +423,6 @@ void ConfigDialog::save()
             interfaceGroup.writeEntry( conf_colorDisabled, settings->colorDisabled );
             interfaceGroup.writeEntry( conf_colorUnavailable, settings->colorUnavailable );
             interfaceGroup.writeEntry( conf_dynamicColor, settings->dynamicColor );
-            interfaceGroup.writeEntry( conf_inMaxRate, settings->inMaxRate );
-            interfaceGroup.writeEntry( conf_outMaxRate, settings->outMaxRate );
             if ( settings->dynamicColor )
             {
                 interfaceGroup.writeEntry( conf_colorIncomingMax, settings->colorIncomingMax );
@@ -433,6 +431,13 @@ void ConfigDialog::save()
             if ( settings->iconTheme == NETLOAD_THEME )
             {
                 interfaceGroup.writeEntry( conf_barScale, settings->barScale );
+            }
+            if ( settings->dynamicColor ||
+                 ( settings->iconTheme == NETLOAD_THEME && settings->barScale )
+               )
+            {
+                interfaceGroup.writeEntry( conf_inMaxRate, settings->inMaxRate );
+                interfaceGroup.writeEntry( conf_outMaxRate, settings->outMaxRate );
             }
         }
         interfaceGroup.writeEntry( conf_activateStatistics, settings->activateStatistics );
