@@ -1112,6 +1112,10 @@ void ConfigDialog::warnThresholdChanged( double val )
         return;
 
     settings->warnThreshold = round(val*10.0)/10.0;
+    // If single stepping through values and we go back to 0.0,
+    // we might not get the specialValueText
+    if ( val != settings->warnThreshold )
+        mDlg->warnThreshold->setValue( settings->warnThreshold );
     bool enable = settings->warnThreshold > 0.0;
     mDlg->warnRx->setEnabled( enable );
     mDlg->warnRxTx->setEnabled( enable );
