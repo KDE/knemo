@@ -96,7 +96,7 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     // status/network-* icons.
     //mDlg->comboBoxIconTheme->addItem( systemTheme.name, QVariant::fromValue( systemTheme ) );
     KNemoTheme textTheme;
-    textTheme.name = i18n( "Text Icon" );
+    textTheme.name = i18n( "Text" );
     textTheme.comment = i18n( "KNemo theme that shows text of upload/download speed" );
     textTheme.internalName = TEXT_THEME;
     mDlg->comboBoxIconTheme->addItem( textTheme.name, QVariant::fromValue( textTheme ) );

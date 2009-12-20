@@ -220,7 +220,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                  <item>
                   <widget class="QLabel" name="pixmapIncoming">
                    <property name="toolTip">
-                    <string>Receiving data</string>
+                    <string>Incoming traffic</string>
                    </property>
                    <property name="wordWrap">
                     <bool>false</bool>
@@ -230,7 +230,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                  <item>
                   <widget class="QLabel" name="pixmapOutgoing">
                    <property name="toolTip">
-                    <string>Transmitting data</string>
+                    <string>Outgoing traffic</string>
                    </property>
                    <property name="wordWrap">
                     <bool>false</bool>
@@ -240,7 +240,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                  <item>
                   <widget class="QLabel" name="pixmapTraffic">
                    <property name="toolTip">
-                    <string>Transmitting and receiving data</string>
+                    <string>Incoming and outgoing traffic</string>
                    </property>
                    <property name="wordWrap">
                     <bool>false</bool>
@@ -562,13 +562,16 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                 <item>
                  <widget class="KDoubleNumInput" name="warnThreshold">
                   <property name="whatsThis">
-                   <string>&lt;p&gt;When traffic for a month or billing period exceeds this threshold, KNemo will emit a notification. This notification will appear once per session.&lt;/p&gt;&lt;p&gt;If the value is 0, KNemo will not emit a notification.&lt;/p&gt;</string>
+                   <string>When traffic for a month or billing period exceeds this limit, KNemo will emit a notification. The notification will appear once per session.</string>
                   </property>
                   <property name="singleStep" stdset="0">
                    <double>0.100000000000000</double>
                   </property>
                   <property name="suffix">
-                   <string>GiB</string>
+                   <string> GiB</string>
+                  </property>
+                  <property name="specialValueText">
+                   <string>No limit</string>
                   </property>
                   <property name="decimals">
                    <number>1</number>
@@ -604,7 +607,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                    <string>If selected, only incoming traffic applies to the monthly limit</string>
                   </property>
                   <property name="text">
-                   <string>Download traffic only</string>
+                   <string>Incoming traffic only</string>
                   </property>
                  </widget>
                 </item>
@@ -956,7 +959,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
           <item row="0" column="0">
            <widget class="QLabel" name="textLabel1_6">
             <property name="text">
-             <string>Save statistics every</string>
+             <string>Autosave interval:</string>
             </property>
             <property name="wordWrap">
              <bool>false</bool>
@@ -979,6 +982,9 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
             </property>
             <property name="suffix">
              <string> sec</string>
+            </property>
+            <property name="specialValueText">
+             <string>At shutdown</string>
             </property>
            </widget>
           </item>
