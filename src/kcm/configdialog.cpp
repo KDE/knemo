@@ -92,19 +92,22 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     systemTheme.name = i18n( "System Theme" );
     systemTheme.comment = i18n( "Use the current icon theme's network status icons" );
     systemTheme.internalName = SYSTEM_THEME;
-    // Leave this out for now.  Looks like none of the KDE icon themes provide
-    // status/network-* icons.
-    //mDlg->comboBoxIconTheme->addItem( systemTheme.name, QVariant::fromValue( systemTheme ) );
+
     KNemoTheme textTheme;
     textTheme.name = i18n( "Text" );
     textTheme.comment = i18n( "KNemo theme that shows text of upload/download speed" );
     textTheme.internalName = TEXT_THEME;
-    mDlg->comboBoxIconTheme->addItem( textTheme.name, QVariant::fromValue( textTheme ) );
+
     KNemoTheme netloadTheme;
     netloadTheme.name = i18n( "Netload" );
     netloadTheme.comment = i18n( "KNemo theme that shows bars of upload/download speed" );
     netloadTheme.internalName = NETLOAD_THEME;
+
+    // Leave this out for now.  Looks like none of the KDE icon themes provide
+    // status/network-* icons.
+    //mDlg->comboBoxIconTheme->addItem( systemTheme.name, QVariant::fromValue( systemTheme ) );
     mDlg->comboBoxIconTheme->addItem( netloadTheme.name, QVariant::fromValue( netloadTheme ) );
+    mDlg->comboBoxIconTheme->addItem( textTheme.name, QVariant::fromValue( textTheme ) );
 
     InterfaceSettings s;
     int index = findIndexFromName( s.iconTheme );

@@ -51,22 +51,22 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QCheckBox" name="checkBarScale">
-        <property name="whatsThis">
-         <string>If this is checked, the Netload bar graphs will use a constant scale based on the maximum rates below.  If unchecked, the bar graphs will change scale according to recent traffic rates.</string>
-        </property>
-        <property name="text">
-         <string>Always scale bar graphs to max visual rate</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="checkDynColor">
         <property name="whatsThis">
          <string>If checked, the transmit and receive colors will change according to the traffic rate.  As the traffic rate increases, the color will change from the default color, to the max rate color.</string>
         </property>
         <property name="text">
          <string>Change color according to max visual rate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBarScale">
+        <property name="whatsThis">
+         <string>If this is checked, the Netload bar graphs will use a constant scale based on the maximum rates below.  If unchecked, the bar graphs will change scale according to recent traffic rates.</string>
+        </property>
+        <property name="text">
+         <string>Always scale bar graphs to max visual rate</string>
         </property>
        </widget>
       </item>
