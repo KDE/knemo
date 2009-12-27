@@ -672,7 +672,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
            <item row="0" column="0">
             <widget class="QTreeWidget" name="listViewCommands">
              <property name="whatsThis">
-              <string>In this area you can add the custom entries for your context menu: &lt;ol&gt;&lt;li&gt;push on the &lt;b&gt;Add&lt;/b&gt; button to add a new entry in the list;&lt;/li&gt;&lt;li&gt;edit the entry by double clicking in column &lt;b&gt;Menu text&lt;/b&gt; and &lt;b&gt;Command&lt;/b&gt;.&lt;/li&gt;&lt;/ol&gt;If you need to execute the command as root user check the corresponding &lt;b&gt;Root&lt;/b&gt; check box.</string>
+              <string>In this area you can add the custom entries for your context menu: &lt;ol&gt;&lt;li&gt;push the &lt;b&gt;Add&lt;/b&gt; button to add a new entry in the list;&lt;/li&gt;&lt;li&gt;edit the entry by double clicking in the &lt;b&gt;Menu text&lt;/b&gt; and &lt;b&gt;Command&lt;/b&gt; columns.&lt;/li&gt;&lt;/ol&gt;If you need to execute the command as root user check the corresponding &lt;b&gt;Root&lt;/b&gt; check box.</string>
              </property>
              <property name="rootIsDecorated">
               <bool>false</bool>

@@ -95,12 +95,12 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
 
     KNemoTheme textTheme;
     textTheme.name = i18n( "Text" );
-    textTheme.comment = i18n( "KNemo theme that shows text of upload/download speed" );
+    textTheme.comment = i18n( "KNemo theme that shows the upload/download speed as text" );
     textTheme.internalName = TEXT_THEME;
 
     KNemoTheme netloadTheme;
     netloadTheme.name = i18n( "Netload" );
-    netloadTheme.comment = i18n( "KNemo theme that shows bars of upload/download speed" );
+    netloadTheme.comment = i18n( "KNemo theme that shows the upload/download speed as bar graphs" );
     netloadTheme.internalName = NETLOAD_THEME;
 
     // Leave this out for now.  Looks like none of the KDE icon themes provide
