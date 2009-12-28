@@ -46,7 +46,7 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
     KGlobal::locale()->setCalendar( mInterface->getSettings().calendar );
 
     mCalendar = KCalendarSystem::create( mInterface->getSettings().calendar );
-    setCaption( interface->getName() + " " + i18n( "Statistics" ) );
+    setCaption( i18n( "%1 Statistics", interface->getName() ) );
     setButtons( Reset | Close );
 
     ui.setupUi( mainWidget() );

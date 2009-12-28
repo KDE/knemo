@@ -81,7 +81,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
       mWasShown( false ),
       mName( name )
 {
-    setCaption( mName + " " + i18n( "Traffic" ) );
+    setCaption( i18n( "%1 Traffic", mName ) );
     setButtons( Close );
     setContextMenuPolicy( Qt::DefaultContextMenu );
 
