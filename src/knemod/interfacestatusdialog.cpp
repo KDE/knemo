@@ -40,7 +40,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
       mConfig( KGlobal::config() ),
       mInterface( interface )
 {
-    setCaption( interface->getName() + " " + i18n( "Interface Status" ) );
+    setCaption( i18n( "%1 Interface Status", interface->getName() ) );
     setButtons( Close );
 
     ui.setupUi( mainWidget() );
