@@ -151,27 +151,23 @@ void InterfaceStatisticsDialog::updateEntry( const StatisticEntry* entry,
 void InterfaceStatisticsDialog::updateModel( const QList<StatisticEntry *>& statistics,
         QStandardItemModel* model, QTableView * view, bool fullRebuild, int group )
 {
-    QList<QString> vheaders;
-
     if ( fullRebuild )
     {
         model->removeRows( 0, model->rowCount() );
         mIsMonths = true;
     }
 
-    int bottom = model->rowCount() - 1;
-    bottom = bottom < 0 ? 0: bottom;
-    for ( int i = bottom; i < statistics.count(); i++ )
+    for ( int i = model->rowCount(); i < statistics.count(); i++ )
     {
         StatisticEntry * entry = statistics.at( i );
         QString tempHeader;
         switch (group)
         {
             case InterfaceStatistics::Day:
-                vheaders << mCalendar->formatDate( entry->date, KLocale::ShortDate );
+                tempHeader = mCalendar->formatDate( entry->date, KLocale::ShortDate );
                 break;
             case InterfaceStatistics::Week:
-                vheaders << mCalendar->formatDate( entry->date, KLocale::ShortDate );
+                tempHeader = mCalendar->formatDate( entry->date, KLocale::ShortDate );
                 break;
             case InterfaceStatistics::Month:
                 // Format for simple period
@@ -193,10 +189,9 @@ void InterfaceStatisticsDialog::updateModel( const QList<StatisticEntry *>& stat
                         .arg( mCalendar->monthName( endDate, KCalendarSystem::ShortName ) )
                         .arg( mCalendar->year( endDate ) );
                 }
-                vheaders << tempHeader;
                 break;
             case InterfaceStatistics::Year:
-                vheaders << QString::number( mCalendar->year( entry->date ) );
+                tempHeader = QString::number( mCalendar->year( entry->date ) );
         }
         QStandardItem *tx = new QStandardItem( KIO::convertSize( entry->txBytes ) );
         QStandardItem *rx = new QStandardItem( KIO::convertSize( entry->rxBytes ) );
@@ -204,9 +199,9 @@ void InterfaceStatisticsDialog::updateModel( const QList<StatisticEntry *>& stat
         QList<QStandardItem *> row;
         row << tx << rx << total;
         model->appendRow( row );
+        QStandardItem *vHeader = new QStandardItem( tempHeader );
+        model->setVerticalHeaderItem( model->rowCount() - 1, vHeader );
     }
-
-    model->setVerticalHeaderLabels( vheaders );
 
     if ( mIsMonths )
         ui.tabWidget->setTabText( ui.tabWidget->indexOf(ui.monthly), i18n( "Months", 0 ) );
