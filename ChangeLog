@@ -1,3 +1,10 @@
+Version 0.6.1
+ * support for reading wireless info on FreeBSD
+ * add a netload icon theme (bar graphs)
+ * text and netload themes can change color depending on traffic load
+ * more cleanup of the config dialog
+ * fixed appending stats in the statistics dialog
+
 Version 0.6.0
  * backend changes:
    - added IPv6 support
