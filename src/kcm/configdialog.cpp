@@ -532,8 +532,8 @@ void ConfigDialog::defaults()
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
         mDlg->pushButtonDelete->setEnabled( true );
-        mDlg->aliasLabel->setEnabled( false );
-        mDlg->lineEditAlias->setEnabled( false );
+        mDlg->aliasLabel->setEnabled( true );
+        mDlg->lineEditAlias->setEnabled( true );
         mDlg->ifaceTab->setEnabled( true );
     }
 
