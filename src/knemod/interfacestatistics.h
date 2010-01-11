@@ -101,11 +101,6 @@ signals:
 
 public slots:
     /**
-     * Save the statistics to a xml file
-     * (slot so it can be triggered by a timer signal)
-     */
-    void saveStatistics();
-    /**
      * Add incoming data to the current day, week, month and year
      */
     void addIncomingData( unsigned long data );
@@ -117,6 +112,9 @@ public slots:
      * Clear all statistics
      */
     void clearStatistics();
+
+private slots:
+    void saveStatistics();
 
 private:
     /**

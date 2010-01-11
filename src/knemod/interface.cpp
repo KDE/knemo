@@ -65,11 +65,8 @@ Interface::~Interface()
 {
     delete mStatusDialog;
     delete mPlotterDialog;
-    if ( mStatistics != 0 )
-    {
-        // this will also delete a possibly open statistics dialog
-        stopStatistics();
-    }
+    delete mStatisticsDialog;
+    delete mStatistics;
 }
 
 void Interface::configChanged()
@@ -350,8 +347,6 @@ void Interface::stopStatistics()
     // this will close an open statistics dialog
     delete mStatisticsDialog;
     mStatisticsDialog = 0;
-
-    mStatistics->saveStatistics();
 
     delete mStatistics;
     mStatistics = 0;

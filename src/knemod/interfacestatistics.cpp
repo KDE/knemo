@@ -20,12 +20,13 @@
 
 #include <QDomNode>
 #include <QFile>
-#include <QTextStream>
 #include <QTimer>
 
 #include <KCalendarSystem>
 #include <KConfigGroup>
 #include <KGlobal>
+
+#include <unistd.h>
 
 #include "interface.h"
 #include "interfacestatistics.h"
@@ -82,12 +83,19 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
     initStatistics();
     mSaveTimer = new QTimer();
     connect( mSaveTimer, SIGNAL( timeout() ), this, SLOT( saveStatistics() ) );
+    if ( mInterface->getGeneralData().saveInterval > 0 )
+    {
+        mSaveTimer->setInterval( mInterface->getGeneralData().saveInterval * 1000 );
+        mSaveTimer->start();
+    }
 }
 
 InterfaceStatistics::~InterfaceStatistics()
 {
     mSaveTimer->stop();
     delete mSaveTimer;
+
+    saveStatistics();
 
     mDayStatistics.clear();
     mWeekStatistics.clear();
@@ -300,13 +308,14 @@ void InterfaceStatistics::saveStatistics()
     KUrl dir( mInterface->getGeneralData().statisticsDir );
     if ( !dir.isLocalFile() )
         return;
-    QFile file( dir.path() + statistics_prefix + mInterface->getName() );
-    if ( !file.open( QIODevice::WriteOnly ) )
-        return;
 
-    QTextStream stream( &file );
-    stream << doc.toString();
-    file.close();
+    QFile file( dir.path() + statistics_prefix + mInterface->getName() );
+    if ( file.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+    {
+        file.write( doc.toByteArray() );
+        fsync( file.handle() );
+        file.close();
+    }
 }
 
 void InterfaceStatistics::configChanged()
@@ -314,7 +323,10 @@ void InterfaceStatistics::configChanged()
     // restart the timer with the new value
     mSaveTimer->stop();
     if ( mInterface->getGeneralData().saveInterval > 0 )
+    {
         mSaveTimer->setInterval( mInterface->getGeneralData().saveInterval * 1000 );
+        mSaveTimer->start();
+    }
 
     mWarningDone = false;
     // force a new ref day for billing periods
