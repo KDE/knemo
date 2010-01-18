@@ -4,6 +4,7 @@ Version 0.6.1
  * text and netload themes can change color depending on traffic load
  * more cleanup of the config dialog
  * fixed appending stats in the statistics dialog
+ * fix bug that prevented periodic statistics saving, and use fsync()
 
 Version 0.6.0
  * backend changes:
