@@ -21,58 +21,44 @@
 #include <QStandardItemModel>
 
 #include <kio/global.h>
-#include <KCalendarSystem>
 #include <KMessageBox>
+#include <QSortFilterProxyModel>
 
 #include "data.h"
 #include "interface.h"
 #include "interfacestatistics.h"
 #include "interfacestatisticsdialog.h"
 
-/*
- * I assume that the last entry in each table is also the current. This will fail
- * if we walk back in time, so better not play with the system date...
- */
 
 InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWidget* parent )
     : KDialog( parent ),
       mWasShown( false ),
       mSetPos( true ),
-      mIsMonths( true ),
       mConfig( KGlobal::config() ),
       mInterface( interface )
 {
-    // TODO: Test for a KDE release that contains SVN commit 1013534
-    KGlobal::locale()->setCalendar( mInterface->getSettings().calendar );
-
-    mCalendar = KCalendarSystem::create( mInterface->getSettings().calendar );
     setCaption( i18n( "%1 Statistics", interface->getName() ) );
     setButtons( Reset | Close );
 
     ui.setupUi( mainWidget() );
+    mStateKeys.insert( ui.tableDaily, conf_dayState );
+    mStateKeys.insert( ui.tableWeekly, conf_weekState );
+    mStateKeys.insert( ui.tableMonthly, conf_monthState );
+    mStateKeys.insert( ui.tableYearly, conf_yearState );
 
-    dailyModel = new QStandardItemModel( this );
-    weeklyModel = new QStandardItemModel( this );
-    monthlyModel = new QStandardItemModel( this );
-    yearlyModel = new QStandardItemModel( this );
+    configChanged();
 
-    ui.tableDaily->setModel( dailyModel );
-    ui.tableWeekly->setModel( weeklyModel );
-    ui.tableMonthly->setModel( monthlyModel );
-    ui.tableYearly->setModel( yearlyModel );
+    KConfig *config = mConfig.data();
+    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
 
-    QStringList headerList;
-    headerList << i18n( "Sent" ) << i18n( "Received" ) << i18n( "Total" );
-    dailyModel->setHorizontalHeaderLabels( headerList );
-    weeklyModel->setHorizontalHeaderLabels( headerList );
-    monthlyModel->setHorizontalHeaderLabels( headerList );
-    yearlyModel->setHorizontalHeaderLabels( headerList );
+    InterfaceStatistics *stat = mInterface->getStatistics();
+    setupTable( &interfaceGroup, ui.tableDaily,   stat->getStatistics( StatisticsModel::Day ) );
+    setupTable( &interfaceGroup, ui.tableWeekly,  stat->getStatistics( StatisticsModel::Week ) );
+    setupTable( &interfaceGroup, ui.tableMonthly, stat->getStatistics( StatisticsModel::Month ) );
+    setupTable( &interfaceGroup, ui.tableYearly,  stat->getStatistics( StatisticsModel::Year ) );
 
     connect( this, SIGNAL( resetClicked() ), SLOT( confirmReset() ) );
 
-    // Restore window size and position.
-    KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
     if ( interfaceGroup.hasKey( conf_statisticsPos ) )
     {
         QPoint p = interfaceGroup.readEntry( conf_statisticsPos, QPoint() );
@@ -99,10 +85,48 @@ InterfaceStatisticsDialog::~InterfaceStatisticsDialog()
     {
         KConfig *config = mConfig.data();
         KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+
         interfaceGroup.writeEntry( conf_statisticsPos, pos() );
         interfaceGroup.writeEntry( conf_statisticsSize, size() );
+
+        QHashIterator<QTableView*, QString> i( mStateKeys );
+        while ( i.hasNext() )
+        {
+            i.next();
+            interfaceGroup.writeEntry( i.value(), i.key()->horizontalHeader()->saveState() );
+        }
+
         config->sync();
     }
+}
+
+void InterfaceStatisticsDialog::configChanged()
+{
+    if ( mInterface->getSettings().customBilling )
+        ui.tabWidget->setTabText( ui.tabWidget->indexOf(ui.monthly), i18n( "Billing Periods", 0 ) );
+    else
+        ui.tabWidget->setTabText( ui.tabWidget->indexOf(ui.monthly), i18n( "Months", 0 ) );
+}
+
+void InterfaceStatisticsDialog::setupTable( KConfigGroup* group, QTableView *view, StatisticsModel *model )
+{
+    QSortFilterProxyModel *proxy = new QSortFilterProxyModel( view );
+    proxy->setSourceModel( model );
+    proxy->setSortRole( StatisticsModel::DataRole );
+    view->setModel( proxy );
+    view->sortByColumn( 0, Qt::AscendingOrder );
+
+    QModelIndex sourceIndex = proxy->sourceModel()->index( proxy->rowCount() - 1, 0 );
+    view->selectionModel()->setCurrentIndex( proxy->mapFromSource( sourceIndex ), QItemSelectionModel::NoUpdate );
+
+    connect( model, SIGNAL( itemChanged( QStandardItem * ) ), view->viewport(), SLOT( update() ) );
+    connect( proxy, SIGNAL( rowsInserted( const QModelIndex&, int, int ) ), this, SLOT( setCurrentSel() ) );
+
+    QByteArray state = group->readEntry( mStateKeys.value( view ), QByteArray() );
+    if ( state.isNull() )
+        view->resizeColumnsToContents();
+    else
+        view->horizontalHeader()->restoreState( state );
 }
 
 bool InterfaceStatisticsDialog::event( QEvent *e )
@@ -118,8 +142,13 @@ bool InterfaceStatisticsDialog::event( QEvent *e )
             move( pos() );
         }
     }
-    if ( e->type() == QEvent::Show )
+    if ( e->type() == QEvent::Show && !mWasShown )
+    {
         mWasShown = true;
+        // Set this here!  For some reason the QTableView in the first tab
+        // will become ridiculously wide if we set this earlier.
+        ui.tableDaily->horizontalHeader()->setStretchLastSection( true );
+    }
 
     return KDialog::event( e );
 }
@@ -127,129 +156,17 @@ bool InterfaceStatisticsDialog::event( QEvent *e )
 void InterfaceStatisticsDialog::confirmReset()
 {
     if ( KMessageBox::questionYesNo( this, i18n( "Do you want to reset all statistics?" ) ) == KMessageBox::Yes )
-    {
-        dailyModel->removeRows( 0, dailyModel->rowCount() );
-        weeklyModel->removeRows( 0, weeklyModel->rowCount() );
-        monthlyModel->removeRows( 0, monthlyModel->rowCount() );
-        yearlyModel->removeRows( 0, yearlyModel->rowCount() );
         emit clearStatistics();
-    }
 }
 
-void InterfaceStatisticsDialog::updateEntry( const StatisticEntry* entry,
-        QStandardItemModel* model )
+void InterfaceStatisticsDialog::setCurrentSel()
 {
-    int lastRow = model->rowCount() - 1;
-    if ( lastRow > -1 )
-    {
-        model->item( lastRow, 0 )->setText( KIO::convertSize( entry->txBytes ) );
-        model->item( lastRow, 1 )->setText( KIO::convertSize( entry->rxBytes ) );
-        model->item( lastRow, 2 )->setText( KIO::convertSize( entry->rxBytes + entry->txBytes ) );
-    }
+    QSortFilterProxyModel *proxy = static_cast<QSortFilterProxyModel*>( sender() );
+    QTableView *tv = static_cast<QTableView*>( sender()->parent() );
+    QModelIndex sourceIndex = proxy->sourceModel()->index( proxy->rowCount() - 1, 0 );
+
+    tv->selectionModel()->setCurrentIndex( proxy->mapFromSource( sourceIndex ), QItemSelectionModel::NoUpdate );
 }
 
-void InterfaceStatisticsDialog::updateModel( const QList<StatisticEntry *>& statistics,
-        QStandardItemModel* model, QTableView * view, bool fullRebuild, int group )
-{
-    if ( fullRebuild )
-    {
-        model->removeRows( 0, model->rowCount() );
-        mIsMonths = true;
-    }
-
-    for ( int i = model->rowCount(); i < statistics.count(); i++ )
-    {
-        StatisticEntry * entry = statistics.at( i );
-        QString tempHeader;
-        switch (group)
-        {
-            case InterfaceStatistics::Day:
-                tempHeader = mCalendar->formatDate( entry->date, KLocale::ShortDate );
-                break;
-            case InterfaceStatistics::Week:
-                tempHeader = mCalendar->formatDate( entry->date, KLocale::ShortDate );
-                break;
-            case InterfaceStatistics::Month:
-                // Format for simple period
-                // Starts on the first of the month, lasts exactly one month
-                if ( mCalendar->day( entry->date ) == 1 &&
-                     entry->span == mCalendar->daysInMonth( entry->date ) )
-                    tempHeader = QString( "%1 %2" )
-                        .arg( mCalendar->monthName( entry->date, KCalendarSystem::ShortName ) )
-                        .arg( mCalendar->year( entry->date ) );
-                // Format for complex period
-                else
-                {
-                    mIsMonths = false;
-                    QDate endDate = entry->date.addDays( entry->span - 1 );
-                    tempHeader = QString( "%1 %2 - %4 %5 %6" )
-                        .arg( mCalendar->day( entry->date ) )
-                        .arg( mCalendar->monthName( entry->date, KCalendarSystem::ShortName ) )
-                        .arg( mCalendar->day( endDate ) )
-                        .arg( mCalendar->monthName( endDate, KCalendarSystem::ShortName ) )
-                        .arg( mCalendar->year( endDate ) );
-                }
-                break;
-            case InterfaceStatistics::Year:
-                tempHeader = QString::number( mCalendar->year( entry->date ) );
-        }
-        QStandardItem *tx = new QStandardItem( KIO::convertSize( entry->txBytes ) );
-        QStandardItem *rx = new QStandardItem( KIO::convertSize( entry->rxBytes ) );
-        QStandardItem *total = new QStandardItem( KIO::convertSize( entry->rxBytes + entry->txBytes ) );
-        QList<QStandardItem *> row;
-        row << tx << rx << total;
-        model->appendRow( row );
-        QStandardItem *vHeader = new QStandardItem( tempHeader );
-        model->setVerticalHeaderItem( model->rowCount() - 1, vHeader );
-    }
-
-    if ( mIsMonths )
-        ui.tabWidget->setTabText( ui.tabWidget->indexOf(ui.monthly), i18n( "Months", 0 ) );
-    else
-        ui.tabWidget->setTabText( ui.tabWidget->indexOf(ui.monthly), i18n( "Billing Periods", 0 ) );
-
-    if ( model->rowCount() > 0 )
-    {
-        QModelIndex scrollIndex = model->item( model->rowCount() - 1, 0 )->index();
-        view->selectionModel()->setCurrentIndex( scrollIndex, QItemSelectionModel::NoUpdate );
-    }
-    view->verticalHeader()->setResizeMode( QHeaderView::ResizeToContents );
-}
-
-void InterfaceStatisticsDialog::updateDays()
-{
-    updateModel( mInterface->getStatistics()->getDayStatistics(),
-                 dailyModel, ui.tableDaily, false,
-                 InterfaceStatistics::Day );
-}
-
-void InterfaceStatisticsDialog::updateWeeks()
-{
-    updateModel( mInterface->getStatistics()->getWeekStatistics(),
-                 weeklyModel, ui.tableWeekly, false,
-                 InterfaceStatistics::Week );
-}
-
-void InterfaceStatisticsDialog::updateMonths( bool forceFullUpdate )
-{
-    updateModel( mInterface->getStatistics()->getMonthStatistics(),
-                 monthlyModel, ui.tableMonthly, forceFullUpdate,
-                 InterfaceStatistics::Month );
-}
-
-void InterfaceStatisticsDialog::updateYears()
-{
-    updateModel( mInterface->getStatistics()->getYearStatistics(),
-                 yearlyModel, ui.tableYearly, false,
-                 InterfaceStatistics::Year );
-}
-
-void InterfaceStatisticsDialog::updateCurrentEntry()
-{
-    updateEntry( mInterface->getStatistics()->getCurrentDay(), dailyModel );
-    updateEntry( mInterface->getStatistics()->getCurrentWeek(), weeklyModel );
-    updateEntry( mInterface->getStatistics()->getCurrentMonth(), monthlyModel );
-    updateEntry( mInterface->getStatistics()->getCurrentYear(), yearlyModel );
-}
 
 #include "interfacestatisticsdialog.moc"

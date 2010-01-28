@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>InterfaceStatisticsDlg</class>
- <widget class="QWidget" name="InterfaceStatisticsDlg" >
-  <property name="geometry" >
+ <widget class="QWidget" name="InterfaceStatisticsDlg">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,64 +10,97 @@
     <height>343</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" >
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
-    <widget class="QTabWidget" name="tabWidget" >
-     <property name="currentIndex" >
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="daily" >
-      <attribute name="title" >
+     <widget class="QWidget" name="daily">
+      <attribute name="title">
        <string>Days</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout" >
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QTableView" name="tableDaily" >
-         <property name="editTriggers" >
+        <widget class="QTableView" name="tableDaily">
+         <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="weekly" >
-      <attribute name="title" >
+     <widget class="QWidget" name="weekly">
+      <attribute name="title">
        <string>Weeks</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5" >
+      <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
-        <widget class="QTableView" name="tableWeekly" >
-         <property name="editTriggers" >
+        <widget class="QTableView" name="tableWeekly">
+         <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="monthly" >
-      <attribute name="title" >
+     <widget class="QWidget" name="monthly">
+      <attribute name="title">
        <string>Months</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2" >
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QTableView" name="tableMonthly" >
-         <property name="editTriggers" >
+        <widget class="QTableView" name="tableMonthly">
+         <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="yearly" >
-      <attribute name="title" >
+     <widget class="QWidget" name="yearly">
+      <attribute name="title">
        <string>Years</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3" >
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QTableView" name="tableYearly" >
-         <property name="editTriggers" >
+        <widget class="QTableView" name="tableYearly">
+         <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
         </widget>
        </item>
       </layout>

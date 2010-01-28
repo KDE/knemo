@@ -55,39 +55,26 @@ static const char attrib_day[]   = "day";
 static const char attrib_month[] = "month";
 static const char attrib_year[]  = "year";
 
-static bool statisticsLessThan( const StatisticEntry *s1, const StatisticEntry *s2 )
-{
-    if ( s1->date < s2->date )
-        return true;
-    else
-        return false;
-}
-
 
 InterfaceStatistics::InterfaceStatistics( Interface* interface )
     : QObject(),
+      mSaveTimer( new QTimer() ),
       mInterface( interface ),
-      mWarningDone( false ),
-      mAllMonths( true ),
-      mBillingStart( mInterface->getSettings().billingStart ),
-      mCalendar( KCalendarSystem::create( mInterface->getSettings().calendar ) )
+      mAllMonths( true )
 {
-    loadStatistics();
-    if ( mMonthStatistics.count() )
-    {
-        QDate nextStart = getNextMonthStart( mBillingStart );
-        if ( mBillingStart.daysTo( nextStart ) != mMonthStatistics.at( mMonthStatistics.count() -1 )->span
-             || mBillingStart != mMonthStatistics.at( mMonthStatistics.count() - 1 )->date )
-            rebuildStats( mBillingStart, Month );
-    }
-    initStatistics();
-    mSaveTimer = new QTimer();
+    StatisticsModel * s = new StatisticsModel( StatisticsModel::Day, group_days, elem_day );
+    mModels.insert( StatisticsModel::Day, s );
+    s = new StatisticsModel( StatisticsModel::Week, group_weeks, elem_week );
+    mModels.insert( StatisticsModel::Week, s );
+    s = new StatisticsModel( StatisticsModel::Month, group_months, elem_month );
+    mModels.insert( StatisticsModel::Month, s );
+    s = new StatisticsModel( StatisticsModel::Year, group_years, elem_year );
+    mModels.insert( StatisticsModel::Year, s );
+
     connect( mSaveTimer, SIGNAL( timeout() ), this, SLOT( saveStatistics() ) );
-    if ( mInterface->getGeneralData().saveInterval > 0 )
-    {
-        mSaveTimer->setInterval( mInterface->getGeneralData().saveInterval * 1000 );
-        mSaveTimer->start();
-    }
+
+    loadConfig();
+    loadStatistics();
 }
 
 InterfaceStatistics::~InterfaceStatistics()
@@ -97,38 +84,53 @@ InterfaceStatistics::~InterfaceStatistics()
 
     saveStatistics();
 
-    mDayStatistics.clear();
-    mWeekStatistics.clear();
-    mMonthStatistics.clear();
-    mYearStatistics.clear();
-
     if ( mInterface->getSettings().customBilling )
-        saveBillingStart();
+    {
+        mInterface->getSettings().billingStart = mBillingStart;
+        KConfig *config = KGlobal::config().data();
+        KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+        interfaceGroup.writeEntry( conf_billingStart, mBillingStart );
+        config->sync();
+    }
+}
+
+void InterfaceStatistics::clearStatistics()
+{
+    foreach( StatisticsModel * s, mModels )
+        s->clearRows();
+    emit currentEntryChanged();
+}
+
+void InterfaceStatistics::loadConfig()
+{
+    mCalendar = KCalendarSystem::create( mInterface->getSettings().calendar );
+    // TODO: Test for a KDE release that contains SVN commit 1013534
+    KGlobal::locale()->setCalendar( mCalendar->calendarType() );
+    foreach( StatisticsModel * s, mModels )
+        s->setCalendar( mCalendar );
+
+    mWarningDone = false;
+    mBillingStart = mInterface->getSettings().billingStart;
+
+    if ( mInterface->getGeneralData().saveInterval > 0 )
+    {
+        mSaveTimer->setInterval( mInterface->getGeneralData().saveInterval * 1000 );
+        mSaveTimer->start();
+    }
+}
+
+void InterfaceStatistics::configChanged()
+{
+    mSaveTimer->stop();
+    QString oldType = mCalendar->calendarType();
+    loadConfig();
+    checkRebuild( oldType );
 }
 
 void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDomElement& parentItem,
-                                          enum GroupType group, QList<StatisticEntry *>& statistics )
+                                          StatisticsModel* statistics )
 {
-    QString groupName;
-
-    switch ( group )
-    {
-        case Day:
-            groupName = group_days;
-            break;
-        case Week:
-            groupName = group_weeks;
-            break;
-        case Month:
-            groupName = group_months;
-            mAllMonths = true;
-            break;
-        case Year:
-            groupName = group_years;
-            break;
-    }
-
-    QDomNode n = parentItem.namedItem( groupName );
+    QDomNode n = parentItem.namedItem( statistics->group() );
     if ( !n.isNull() )
     {
         QDomNode node = n.firstChild();
@@ -137,69 +139,68 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
             QDomElement element = node.toElement();
             if ( !element.isNull() )
             {
-                StatisticEntry* entry = new StatisticEntry();
-                entry->rxBytes = element.attribute( attrib_rx ).toULongLong();
-                entry->txBytes = element.attribute( attrib_tx ).toULongLong();
-
                 // The following attributes are particular to each statistic category
-                int day = 1;
-                switch ( group )
+                QDate date;
+
+                int year = element.attribute( attrib_year ).toInt();
+                int month = element.attribute( attrib_month, "1" ).toInt();
+                int day = element.attribute( attrib_day, "1" ).toInt();
+                cal->setDate( date, year, month, day );
+
+                if ( date.isValid() )
                 {
-                    case Day:
-                        cal->setDate( entry->date,
-                                      element.attribute( attrib_year ).toInt(),
-                                      element.attribute( attrib_month ).toInt(),
-                                      element.attribute( attrib_day ).toInt() );
+                    int days = element.attribute( attrib_span ).toInt();
+                    switch ( statistics->type() )
+                    {
+                        case StatisticsModel::Month:
+                            // Old format had no span, so daysInMonth using gregorian
+                            if ( days == 0 )
+                                days = date.daysInMonth();
+                            if ( cal->day( date ) != 1 ||
+                                 days != cal->daysInMonth( date ) )
+                                mAllMonths = false;
+                            break;
+                        case StatisticsModel::Year:
+                            // Old format had no span, so daysInYear using gregorian
+                            if ( days == 0 )
+                                days = date.daysInYear();
+                            break;
+                        case StatisticsModel::Day:
+                            days = 1;
+                        default:
+                            ;;
+                    }
 
-                        entry->span = 1;
-                        break;
-                    case Week:
-                        cal->setDate( entry->date,
-                                      element.attribute( attrib_year ).toInt(),
-                                      element.attribute( attrib_month ).toInt(),
-                                      element.attribute( attrib_day ).toInt() );
-
-                        // If calendar has changed then this will be recalculated elsewhere
-                        entry->span = element.attribute( attrib_span ).toInt();
-                        break;
-                    case Month:
-                        if ( element.hasAttribute( attrib_day ) )
-                            day = element.attribute( attrib_day ).toInt();
-
-                        cal->setDate( entry->date,
-                                      element.attribute( attrib_year ).toInt(),
-                                      element.attribute( attrib_month ).toInt(),
-                                      day );
-
-                        entry->span = element.attribute( attrib_span ).toInt();
-                        // Old format had no span, so daysInMonth using gregorian
-                        if ( entry->span == 0 )
-                            entry->span = entry->date.daysInMonth();
-                        if ( cal->day( entry->date ) != 1 ||
-                             entry->span != cal->daysInMonth( entry->date ) )
-                            mAllMonths = false;
-                        break;
-                    case Year:
-                        cal->setDate( entry->date,
-                                      element.attribute( attrib_year ).toInt(),
-                                      1,
-                                      1 );
-
-                        entry->span = element.attribute( attrib_span ).toInt();
-                        // Old format had no span, so daysInYear using gregorian
-                        if ( entry->span == 0 )
-                            entry->span = entry->date.daysInYear();
-                        break;
+                    statistics->appendStats( date, days,
+                            element.attribute( attrib_rx ).toULongLong(),
+                            element.attribute( attrib_tx ).toULongLong() );
                 }
-                if ( entry->date.isValid() )
-                    statistics.append( entry );
-                else
-                    delete entry;
             }
             node = node.nextSibling();
         }
-        qSort( statistics.begin(), statistics.end(), statisticsLessThan );
     }
+}
+
+void InterfaceStatistics::saveStatsGroup( QDomDocument& doc, const StatisticsModel* statistics )
+{
+    QString groupName;
+    QString elementName;
+    QDomElement elements = doc.createElement( statistics->group() );
+    for ( int i = 0; i < statistics->rowCount(); ++i )
+    {
+        QDomElement element = doc.createElement( statistics->elem() );
+        QDate date = statistics->date( i );
+        element.setAttribute( attrib_day, mCalendar->day( date ) );
+        element.setAttribute( attrib_month, mCalendar->month( date ) );
+        element.setAttribute( attrib_year, mCalendar->year( date ) );
+        if ( statistics->type() > StatisticsModel::Day )
+            element.setAttribute( attrib_span, statistics->days( i ) );
+        element.setAttribute( attrib_rx, statistics->rxBytes( i ) );
+        element.setAttribute( attrib_tx, statistics->txBytes( i ) );
+        elements.appendChild( element );
+    }
+    QDomElement statElement = doc.elementsByTagName( doc_name ).at( 0 ).toElement();
+    statElement.appendChild( elements );
 }
 
 void InterfaceStatistics::loadStatistics()
@@ -219,77 +220,14 @@ void InterfaceStatistics::loadStatistics()
     }
     file.close();
 
-    mDayStatistics.clear();
-    mWeekStatistics.clear();
-    mMonthStatistics.clear();
-    mYearStatistics.clear();
-
     QDomElement root = doc.documentElement();
 
     // If unknown or empty calendar it will default to gregorian
     KCalendarSystem *inCal = KCalendarSystem::create( root.attribute( attrib_calendar ) );
-    loadStatsGroup( inCal, root, Day, mDayStatistics );
-    loadStatsGroup( inCal, root, Week, mWeekStatistics );
-    loadStatsGroup( inCal, root, Month, mMonthStatistics );
-    loadStatsGroup( inCal, root, Year, mYearStatistics );
+    foreach( StatisticsModel * s, mModels )
+        loadStatsGroup( inCal, root, s );
 
-    // Discrepency: rebuild week and year based on calendar type in settings
-    if ( root.attribute( attrib_calendar ).isEmpty() ||
-         inCal->calendarType() != mCalendar->calendarType() )
-    {
-        // Let's do a backup before a significant rebuild
-        file.copy( dir.path() + statistics_prefix + mInterface->getName() +
-                   QString( "_%1.bak" ).arg( QDateTime::currentDateTime().toString( "yyyy-MM-dd-hhmmss" ) ) );
-        rebuildStats( mDayStatistics.first()->date, Week );
-    }
-    if ( inCal->calendarType() != mCalendar->calendarType() )
-    {
-        rebuildStats( mDayStatistics.first()->date, Year );
-    }
-    if ( mAllMonths == false && mInterface->getSettings().customBilling == false )
-    {
-        rebuildStats( mMonthStatistics.first()->date, Month );
-    }
-}
-
-void InterfaceStatistics::buildStatsGroup( QDomDocument& doc, enum GroupType group,
-                                           const QList<StatisticEntry *>& statistics )
-{
-    QString groupName;
-    QString elementName;
-    switch ( group )
-    {
-        case Day:
-            groupName = group_days;
-            elementName = elem_day;
-            break;
-        case Week:
-            groupName = group_weeks;
-            elementName = elem_week;
-            break;
-        case Month:
-            groupName = group_months;
-            elementName = elem_month;
-            break;
-        case Year:
-            groupName = group_years;
-            elementName = elem_year;
-    }
-    QDomElement elements = doc.createElement( groupName );
-    foreach( StatisticEntry *entry, statistics )
-    {
-        QDomElement element = doc.createElement( elementName );
-        element.setAttribute( attrib_day, mCalendar->day( entry->date ) );
-        element.setAttribute( attrib_month, mCalendar->month( entry->date ) );
-        element.setAttribute( attrib_year, mCalendar->year( entry->date ) );
-        if ( group > Day )
-            element.setAttribute( attrib_span, entry->span );
-        element.setAttribute( attrib_rx, entry->rxBytes );
-        element.setAttribute( attrib_tx, entry->txBytes );
-        elements.appendChild( element );
-    }
-    QDomElement statElement = doc.elementsByTagName( doc_name ).at( 0 ).toElement();
-    statElement.appendChild( elements );
+    checkRebuild( inCal->calendarType() );
 }
 
 void InterfaceStatistics::saveStatistics()
@@ -300,10 +238,8 @@ void InterfaceStatistics::saveStatistics()
     docElement.setAttribute( attrib_version, "1.1" );
     doc.appendChild( docElement );
 
-    buildStatsGroup( doc, Day, mDayStatistics );
-    buildStatsGroup( doc, Week, mWeekStatistics );
-    buildStatsGroup( doc, Month, mMonthStatistics );
-    buildStatsGroup( doc, Year, mYearStatistics );
+    foreach( StatisticsModel * s, mModels )
+        saveStatsGroup( doc, s );
 
     KUrl dir( mInterface->getGeneralData().statisticsDir );
     if ( !dir.isLocalFile() )
@@ -318,323 +254,44 @@ void InterfaceStatistics::saveStatistics()
     }
 }
 
-void InterfaceStatistics::configChanged()
-{
-    // restart the timer with the new value
-    mSaveTimer->stop();
-    if ( mInterface->getGeneralData().saveInterval > 0 )
-    {
-        mSaveTimer->setInterval( mInterface->getGeneralData().saveInterval * 1000 );
-        mSaveTimer->start();
-    }
-
-    mWarningDone = false;
-    // force a new ref day for billing periods
-    mBillingStart = mInterface->getSettings().billingStart;
-    if ( mAllMonths == false && mInterface->getSettings().customBilling == false )
-        mBillingStart = mMonthStatistics.first()->date.addDays( 1 - mCalendar->day( mMonthStatistics.first()->date ) );
-    rebuildStats( mBillingStart, Month );
-
-    mAllMonths = true;
-    foreach ( StatisticEntry *entry, mMonthStatistics )
-    {
-        if ( mCalendar->day( entry->date ) != 1 ||
-             entry->span != mCalendar->daysInMonth( entry->date ) )
-            mAllMonths = false;
-    }
-    emit monthStatisticsChanged( true );
-}
-
-void InterfaceStatistics::addIncomingData( unsigned long data )
-{
-    if ( data == 0 )
-        return;
-
-    checkCurrentEntry();
-
-    mCurrentDay->rxBytes += data;
-    mCurrentWeek->rxBytes += data;
-    mCurrentMonth->rxBytes += data;
-    mCurrentYear->rxBytes += data;
-
-    // Only warn once per interface per session
-    if ( !mWarningDone && mInterface->getSettings().warnThreshold > 0.0 )
-    {
-        quint64 thresholdBytes = mInterface->getSettings().warnThreshold * 1073741824;
-        if ( mInterface->getSettings().warnTotalTraffic )
-        {
-            if ( mCurrentMonth->rxBytes + mCurrentMonth->txBytes >= thresholdBytes )
-            {
-                mWarningDone = true;
-                emit warnMonthlyTraffic( mCurrentMonth->rxBytes + mCurrentMonth->txBytes );
-            }
-        }
-        else if ( mCurrentMonth->rxBytes >= thresholdBytes )
-        {
-            mWarningDone = true;
-            emit warnMonthlyTraffic( mCurrentMonth->rxBytes );
-        }
-    }
-    emit currentEntryChanged();
-}
-
-void InterfaceStatistics::addOutgoingData( unsigned long data )
-{
-    if ( data == 0 )
-        return;
-
-    checkCurrentEntry();
-
-    mCurrentDay->txBytes += data;
-    mCurrentWeek->txBytes += data;
-    mCurrentMonth->txBytes += data;
-    mCurrentYear->txBytes += data;
-
-    emit currentEntryChanged();
-}
-
-void InterfaceStatistics::clearStatistics()
-{
-    QDate currentDate = QDate::currentDate();
-
-    mDayStatistics.clear();
-    mWeekStatistics.clear();
-    mMonthStatistics.clear();
-    mYearStatistics.clear();
-    updateCurrentDay( currentDate );
-    updateCurrentWeek( currentDate );
-    updateCurrentMonth( currentDate );
-    updateCurrentYear( currentDate );
-}
-
-void InterfaceStatistics::checkCurrentEntry()
-{
-    QDate currentDate = QDate::currentDate();
-
-    if ( mCurrentDay->date != currentDate )
-    {
-        updateCurrentDay( currentDate );
-
-        if ( mCalendar->weekNumber( mCurrentWeek->date ) != mCalendar->weekNumber( currentDate ) ||
-             mCurrentWeek->date.addDays( mCalendar->daysInWeek( mCurrentWeek->date ) ) <= currentDate )
-            updateCurrentWeek( currentDate );
-
-        if ( mCurrentMonth->date.addDays( mCurrentMonth->span ) <= currentDate )
-            updateCurrentMonth( currentDate );
-
-        if ( mCalendar->year( mCurrentYear->date ) != mCalendar->year( currentDate ) )
-            updateCurrentYear( currentDate );
-    }
-}
-
-void InterfaceStatistics::initStatistics()
-{
-    QDate currentDate = QDate::currentDate();
-
-    updateCurrentDay( currentDate );
-    updateCurrentWeek( currentDate );
-    updateCurrentMonth( currentDate );
-    updateCurrentYear( currentDate );
-
-    emit currentEntryChanged();
-}
-
-void InterfaceStatistics::updateCurrentDay( const QDate &currentDate )
-{
-    foreach ( mCurrentDay, mDayStatistics )
-    {
-        if ( mCurrentDay->date == currentDate )
-            return;
-    }
-
-    mCurrentDay = new StatisticEntry();
-    mCurrentDay->date = currentDate;
-    mDayStatistics.append( mCurrentDay );
-    emit dayStatisticsChanged();
-}
-
-StatisticEntry * InterfaceStatistics::genNewWeek( const QDate &date )
-{
-    StatisticEntry *week = new StatisticEntry();
-    int dow = mCalendar->dayOfWeek( date );
-    // ISO8601: week always starts on a Monday
-    week->date = date.addDays( 1 - dow );
-    week->span = mCalendar->daysInWeek( week->date );
-    return week;
-}
-
-QDate InterfaceStatistics::getNextMonthStart( const QDate &startDate )
-{
-    QDate nextMonthStart( startDate );
-    int length = mInterface->getSettings().billingMonths;
-    for ( int i = 0; i < length; i++ )
-    {
-        QDate refDay;
-        mCalendar->setDate( refDay, mCalendar->year( nextMonthStart ), mCalendar->month( nextMonthStart ), 1 );
-        refDay = refDay.addDays( mCalendar->daysInMonth( refDay ) );
-
-        nextMonthStart = nextMonthStart.addDays( mCalendar->daysInMonth( nextMonthStart ) );
-
-        // Ensure we don't get weird spans like jan31->mar2
-        // Instead, days will drift to a value that all months can handle.
-        // Test for problematic dates in config module!
-        if ( mCalendar->day( mBillingStart ) > 1 )
-        {
-            while ( mCalendar->month( nextMonthStart ) != mCalendar->month( refDay ) )
-                nextMonthStart = nextMonthStart.addDays( -1 );
-        }
-    }
-    return nextMonthStart;
-}
-
-bool InterfaceStatistics::checkValidSpan( const StatisticEntry& entry )
-{
-    if ( !mDayStatistics.count() )
-        return false;
-
-    QDate endDate = entry.date.addDays( entry.span );
-    for ( int i = mDayStatistics.size() - 1; i >= 0; --i )
-    {
-        // No others will be valid after this; stop early
-        if ( mDayStatistics.at( i )->date < entry.date )
-            return false;
-        if ( mDayStatistics.at( i )->date < endDate &&
-             mDayStatistics.at( i )->date >= entry.date )
-            return true;
-    }
-    return false;
-}
-
-StatisticEntry * InterfaceStatistics::genNewMonth( const QDate &date, QDate endDate )
-{
-    StatisticEntry *month = new StatisticEntry();
-
-    // Partial month.  Very little to do.
-    if ( endDate.isValid() )
-    {
-        month->date = date;
-        month->span = date.daysTo( endDate );
-        if ( checkValidSpan( *month ) )
-        {
-            return month;
-        }
-        else
-        {
-            // partial month contains no daily stats, so advance start date
-            // and get a new period below
-            mBillingStart = date.addDays( month->span );
-        }
-    }
-
-    // Given a calendar day and a billing period start date, find a
-    // billing period that the day belongs in.
-    QDate nextMonthStart = mBillingStart;
-    do
-    {
-        month->date = nextMonthStart;
-        nextMonthStart = getNextMonthStart( month->date );
-        month->span = month->date.daysTo( nextMonthStart );
-    } while ( nextMonthStart <= date || !checkValidSpan( *month ) );
-
-    mBillingStart = month->date;
-
-    return month;
-}
-
-StatisticEntry * InterfaceStatistics::genNewYear( const QDate &date )
-{
-    StatisticEntry *year = new StatisticEntry();
-    int doy = mCalendar->dayOfYear( date );
-    year->date = date.addDays( 1 - doy );
-    year->span = mCalendar->daysInYear( year->date );
-    return year;
-}
-
-void InterfaceStatistics::updateCurrentWeek( const QDate &currentDate )
-{
-    if ( mWeekStatistics.count() )
-    {
-        mCurrentWeek = mWeekStatistics.last();
-        if ( mCurrentWeek->date.addDays( mCurrentWeek->span ) > currentDate )
-            return;
-    }
-
-    mCurrentWeek = genNewWeek( currentDate );
-
-    mWeekStatistics.append( mCurrentWeek );
-    emit weekStatisticsChanged();
-}
-
-void InterfaceStatistics::updateCurrentMonth( const QDate &currentDate )
-{
-    if ( mMonthStatistics.count() )
-    {
-        mCurrentMonth = mMonthStatistics.last();
-        if ( mCurrentMonth->date.addDays( mCurrentMonth->span ) > currentDate )
-            return;
-    }
-
-    mCurrentMonth = genNewMonth( currentDate );
-    mMonthStatistics.append( mCurrentMonth );
-
-    emit monthStatisticsChanged( false );
-}
-
-void InterfaceStatistics::saveBillingStart()
-{
-    mInterface->getSettings().billingStart = mBillingStart;
-    KConfig *config = KGlobal::config().data();
-    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
-    interfaceGroup.writeEntry( conf_billingStart, mBillingStart );
-    config->sync();
-}
-
-void InterfaceStatistics::updateCurrentYear( const QDate &currentDate )
-{
-    if ( mYearStatistics.count() )
-    {
-        mCurrentYear = mYearStatistics.last();
-        if ( mCurrentYear->date.addDays( mCurrentYear->span ) > currentDate )
-            return;
-    }
-
-    mCurrentYear = genNewYear( currentDate );
-    mYearStatistics.append( mCurrentYear );
-    emit yearStatisticsChanged();
-}
-
-QDate InterfaceStatistics::setRebuildDate( QList<StatisticEntry *>& statistics,
-                                           const QDate &recalcDate,
-                                           enum GroupType group )
+/**
+ * Given a model with statistics of a certain unit (year, month, week, etc.)
+ * and a requested rebuild date, how far back to we actually need to go
+ * to accuratly rebuild statistics from the daily stats.
+ */
+QDate InterfaceStatistics::setRebuildDate( StatisticsModel* statistics,
+                                           const QDate &recalcDate )
 {
     QDate returnDate = recalcDate;
+    if ( statistics->type() <= StatisticsModel::Day )
+        return returnDate;
 
     // Keep removing entries and rolling back returnDate while
-    // entry's start date + span > returnDate
-    for ( int i = statistics.size() - 1; i >= 0; --i )
+    // entry's start date + days > returnDate
+    for ( int i = statistics->rowCount() - 1; i >= 0; --i )
     {
-        if ( statistics.at( i )->date.addDays( statistics.at( i )->span ) > mDayStatistics.first()->date &&
-             ( statistics.at( i )->date.addDays( statistics.at( i )->span ) > returnDate ||
-               statistics.at( i )->span < 1 )
+        int days = statistics->days( i );
+        QDate date = statistics->date( i ).addDays( days );
+        if ( date > mModels.value( StatisticsModel::Day )->date( 0 ) &&
+             ( date > returnDate || days < 1 )
            )
         {
-            if ( returnDate > statistics.at( i )->date )
-                returnDate = statistics.at( i )->date;
-            statistics.removeAt( i );
+            if ( returnDate > statistics->date( i ) )
+                returnDate = statistics->date( i );
+            statistics->removeRow( i );
         }
         else
             break;
     }
 
     // now take care of instances when we're going earlier than the first recorded stats.
-
-    if ( group == Week )
+    if ( statistics->type() == StatisticsModel::Week )
     {
         returnDate = returnDate.addDays( 1 - mCalendar->dayOfWeek( returnDate ) );
         while ( returnDate > recalcDate )
             returnDate = returnDate.addDays( -mCalendar->daysInWeek( returnDate ) );
     }
-    else if ( group == Year )
+    else if ( statistics->type() == StatisticsModel::Year )
     {
         returnDate = returnDate.addDays( 1 - mCalendar->dayOfYear( returnDate ) );
         while ( returnDate > recalcDate )
@@ -644,13 +301,17 @@ QDate InterfaceStatistics::setRebuildDate( QList<StatisticEntry *>& statistics,
     return returnDate;
 }
 
-void InterfaceStatistics::rebuildStats( const QDate &date, int groups )
+void InterfaceStatistics::amendStats( int i, StatisticsModel* model )
+{
+    StatisticsModel *days = mModels.value( StatisticsModel::Day );
+    model->addRxBytes( days->rxBytes( i ) );
+    model->addTxBytes( days->txBytes( i ) );
+}
+
+void InterfaceStatistics::doRebuild( const QDate &date, int groups )
 {
     QDate recalcDate( date );
     bool partial = false;
-    StatisticEntry* weekEntry = 0;
-    StatisticEntry* monthEntry = 0;
-    StatisticEntry* yearEntry = 0;
     QDate weekStart;
     QDate monthStart;
     QDate yearStart;
@@ -659,23 +320,23 @@ void InterfaceStatistics::rebuildStats( const QDate &date, int groups )
     QList<QDate> s;
     s.append( recalcDate );
 
-    if ( groups & Week )
+    if ( groups & StatisticsModel::Week )
     {
-        weekStart = setRebuildDate( mWeekStatistics, recalcDate, Week );
+        weekStart = setRebuildDate( mModels.value( StatisticsModel::Week), recalcDate );
         s.append( weekStart );
     }
-    if ( groups & Month )
+    if ( groups & StatisticsModel::Month )
     {
-        monthStart = setRebuildDate( mMonthStatistics, recalcDate, Month );
+        monthStart = setRebuildDate( mModels.value( StatisticsModel::Month), recalcDate );
         // force an old date
         mBillingStart = monthStart;
         if ( recalcDate > monthStart )
             partial = true;
         s.append( monthStart );
     }
-    if ( groups & Year )
+    if ( groups & StatisticsModel::Year )
     {
-        yearStart = setRebuildDate( mYearStatistics, recalcDate, Year );
+        yearStart = setRebuildDate( mModels.value( StatisticsModel::Year ), recalcDate );
         s.append( yearStart );
     }
 
@@ -683,66 +344,279 @@ void InterfaceStatistics::rebuildStats( const QDate &date, int groups )
     qSort( s );
     walkbackDate = s.first();
 
-    // Big loop, but this way we iterate through mDayStatistics once
-    // no matter how many categories we're rebuilding
-    foreach( StatisticEntry* day, mDayStatistics )
+    StatisticsModel *days = mModels.value( StatisticsModel::Day );
+    for ( int i = 0; i < days->rowCount(); ++i )
     {
-        if ( day->date < walkbackDate )
+        QDate day = days->date( i );
+        if ( day < walkbackDate )
             continue;
 
-        if ( groups & Week && day->date >= weekStart )
+        if ( groups & StatisticsModel::Week && day >= weekStart )
         {
-            if ( !weekEntry || mCalendar->weekNumber( weekEntry->date ) != mCalendar->weekNumber( day->date ) ||
-                 weekEntry->date.addDays( mCalendar->daysInWeek( weekEntry->date ) ) <= day->date )
-            {
-                if ( weekEntry )
-                    mWeekStatistics.append( weekEntry );
-                weekEntry = genNewWeek( day->date );
-            }
-            weekEntry->rxBytes += day->rxBytes;
-            weekEntry->txBytes += day->txBytes;
+            genNewWeek( day );
+            amendStats( i, mModels.value( StatisticsModel::Week ) );
         }
 
-        if ( groups & Month && day->date >= monthStart )
+        if ( groups & StatisticsModel::Month && day >= monthStart )
         {
-            if ( !monthEntry || day->date >= monthEntry->date.addDays( monthEntry->span ) )
+            // Not very pretty
+            StatisticsModel *month = mModels.value( StatisticsModel::Month );
+            if ( !partial )
             {
-                if ( monthEntry )
-                    mMonthStatistics.append( monthEntry );
-                if ( partial )
-                {
-                    monthEntry = genNewMonth( monthStart, recalcDate );
-                    // Partial month created; next period will begin on recalcDate
-                    mBillingStart = recalcDate;
-                    partial = false;
-                }
-                else
-                    monthEntry = genNewMonth( day->date );
+                genNewMonth( day );
+                amendStats( i, month );
             }
-            monthEntry->rxBytes += day->rxBytes;
-            monthEntry->txBytes += day->txBytes;
+            else
+            {
+                genNewMonth( monthStart, recalcDate );
+                amendStats( i, month );
+                // Partial month created; next period will begin on recalcDate
+                mBillingStart = recalcDate;
+                partial = false;
+            }
         }
-        if ( groups & Year && day->date >= yearStart )
+        if ( groups & StatisticsModel::Year && day >= yearStart )
         {
-            if ( !yearEntry || mCalendar->year( yearEntry->date ) != mCalendar->year( day->date ) )
-            {
-                if ( yearEntry )
-                    mYearStatistics.append( yearEntry );
-                yearEntry = genNewYear( day->date );
-            }
-            yearEntry->rxBytes += day->rxBytes;
-            yearEntry->txBytes += day->txBytes;
+            genNewYear( day );
+            amendStats( i, mModels.value( StatisticsModel::Year ) );
+        }
+    }
+}
+
+void InterfaceStatistics::checkRebuild( QString oldType )
+{
+    if ( oldType != mCalendar->calendarType() )
+    {
+        KUrl dir( mInterface->getGeneralData().statisticsDir );
+        if ( dir.isLocalFile() )
+        {
+            QFile file( dir.path() + statistics_prefix + mInterface->getName() );
+            file.copy( dir.path() + statistics_prefix + mInterface->getName() +
+                   QString( "_%1.bak" ).arg( QDateTime::currentDateTime().toString( "yyyy-MM-dd-hhmmss" ) ) );
+        }
+        int modThese = StatisticsModel::Week | StatisticsModel::Year;
+        QDate date = mModels.value( StatisticsModel::Day )->date( 0 );
+        doRebuild( date, modThese );
+    }
+
+    StatisticsModel *month = mModels.value( StatisticsModel::Month );
+    if ( mInterface->getSettings().customBilling == false )
+    {
+        if ( oldType != mCalendar->calendarType() || mAllMonths == false )
+        {
+            mBillingStart = month->date( 0 ).addDays( 1 - mCalendar->day( month->date( 0 ) ) );
         }
     }
 
-    mCurrentWeek = appendStats( mWeekStatistics, weekEntry );
-    mCurrentMonth = appendStats( mMonthStatistics, monthEntry );
-    mCurrentYear = appendStats( mYearStatistics, yearEntry );
+    QDate nextStart = nextMonthDate( mBillingStart );
+    if ( mBillingStart.daysTo( nextStart ) != month->days()
+         || mBillingStart != month->date() )
+        doRebuild( mBillingStart, StatisticsModel::Month );
+
+    mAllMonths = true;
+    for ( int i = 0; i < month->rowCount(); ++i )
+    {
+        QDate date = month->date( i );
+        if ( mCalendar->day( date ) != 1 ||
+            month->days( i ) != mCalendar->daysInMonth( date ) )
+        {
+            mAllMonths = false;
+        }
+    }
+
+    emit currentEntryChanged();
 }
 
-StatisticEntry * InterfaceStatistics::appendStats( QList<StatisticEntry *>& statistics, StatisticEntry *entry )
+/**
+ * Find the next billing period's date.
+ * This is complicated by a few things:
+ *   1. it calculates the date according to whatever calendar type the
+ *      the statistics are using
+ *   2. the period can span one or more localized months
+ *   3. termination dates can be awkward (e.g. if a period starts on
+ *      Dec 30 and spans 2 months, which day should it end on?)
+ **/
+QDate InterfaceStatistics::nextMonthDate( const QDate &date )
 {
-    if ( entry )
-        statistics.append( entry );
-    return statistics.last();
+    QDate nextDate( date );
+    int length = mInterface->getSettings().billingMonths;
+    for ( int i = 0; i < length; i++ )
+    {
+        QDate refDay;
+        mCalendar->setDate( refDay, mCalendar->year( nextDate ), mCalendar->month( nextDate ), 1 );
+        refDay = refDay.addDays( mCalendar->daysInMonth( refDay ) );
+
+        nextDate = nextDate.addDays( mCalendar->daysInMonth( nextDate ) );
+
+        // Ensure we don't get weird spans like Jan 31 -> Mar 2
+        // Instead, days will drift to a value that all months can handle.
+        // Test for problematic dates in config module!
+        if ( mCalendar->day( mBillingStart ) > 1 )
+        {
+            while ( mCalendar->month( nextDate ) != mCalendar->month( refDay ) )
+                nextDate = nextDate.addDays( -1 );
+        }
+    }
+    return nextDate;
+}
+
+/**
+ * Return true if at least one daily statistic entry is in a span of days
+ **/
+bool InterfaceStatistics::daysInSpan( const QDate& date, int days )
+{
+    StatisticsModel *model = mModels.value( StatisticsModel::Day );
+    if ( !model->rowCount() )
+        return false;
+
+    QDate endDate = date.addDays( days );
+    for ( int i = model->rowCount() - 1; i >= 0; --i )
+    {
+        // No others will be valid after this; stop early
+        if ( model->date( i ) < date )
+            return false;
+        if ( model->date( i ) < endDate && model->date( i ) >= date )
+            return true;
+    }
+    return false;
+}
+
+void InterfaceStatistics::genNewDay( const QDate &date )
+{
+    StatisticsModel * model = mModels.value( StatisticsModel::Day );
+    if ( model->rowCount() &&
+         model->date().addDays( model->days() ) > date )
+            return;
+
+    mModels.value( StatisticsModel::Day )->appendStats( date, 1 );
+}
+
+void InterfaceStatistics::genNewWeek( const QDate &date )
+{
+    StatisticsModel * model = mModels.value( StatisticsModel::Week );
+    if ( model->rowCount() &&
+         model->date().addDays( model->days() ) > date )
+            return;
+
+    int dow = mCalendar->dayOfWeek( date );
+    // ISO8601: week always starts on a Monday
+    QDate newDate = date.addDays( 1 - dow );
+    model->appendStats( newDate, mCalendar->daysInWeek( newDate ) );
+}
+
+void InterfaceStatistics::genNewMonth( const QDate &date, QDate endDate )
+{
+    StatisticsModel * model = mModels.value( StatisticsModel::Month );
+    if ( model->rowCount() &&
+         model->date().addDays( model->days() ) > date )
+            return;
+
+    int days;
+    // Partial month.  Very little to do.
+    if ( endDate.isValid() )
+    {
+        days = date.daysTo( endDate );
+        if ( daysInSpan( date, date.daysTo( endDate ) ) )
+        {
+            mModels.value( StatisticsModel::Month )->appendStats( date, days );
+            return;
+        }
+        else
+        {
+            // partial month contains no daily stats, so advance start date
+            // and get a new period below
+            mBillingStart = date.addDays( days );
+        }
+    }
+
+    // Given a calendar day and a billing period start date, find a
+    // billing period that the day belongs in.
+    QDate newDate;
+    QDate nextMonthStart = mBillingStart;
+    do
+    {
+        newDate = nextMonthStart;
+        nextMonthStart = nextMonthDate( newDate );
+        days = newDate.daysTo( nextMonthStart );
+    } while ( nextMonthStart <= date || !daysInSpan( newDate, days ) );
+
+    mBillingStart = newDate;
+    mModels.value( StatisticsModel::Month )->appendStats( newDate, days );
+}
+
+void InterfaceStatistics::genNewYear( const QDate &date )
+{
+    StatisticsModel * model = mModels.value( StatisticsModel::Year );
+    if ( model->rowCount() &&
+         model->date().addDays( model->days() ) > date )
+            return;
+
+    int doy = mCalendar->dayOfYear( date );
+    QDate newDate = date.addDays( 1 - doy );
+    mModels.value( StatisticsModel::Year )->appendStats( newDate, mCalendar->daysInYear( newDate ) );
+}
+
+void InterfaceStatistics::checkValidEntry()
+{
+    QDate currentDate = QDate::currentDate();
+    StatisticsModel *days = mModels.value( StatisticsModel::Day );
+
+    if ( !days->rowCount() || days->date() < currentDate )
+    {
+        genNewDay( currentDate );
+        genNewWeek( currentDate );
+        genNewMonth( currentDate );
+        genNewYear( currentDate );
+    }
+}
+
+void InterfaceStatistics::checkTrafficLimit()
+{
+    // Only warn once per interface per session
+    if ( !mWarningDone && mInterface->getSettings().warnThreshold > 0.0 )
+    {
+        quint64 thresholdBytes = mInterface->getSettings().warnThreshold * 1073741824;
+        StatisticsModel *month = mModels.value( StatisticsModel::Month );
+        if ( mInterface->getSettings().warnTotalTraffic )
+        {
+            if ( month->totalBytes() >= thresholdBytes )
+            {
+                mWarningDone = true;
+                emit warnMonthlyTraffic( month->totalBytes() );
+            }
+        }
+        else if ( month->rxBytes() >= thresholdBytes )
+        {
+            mWarningDone = true;
+            emit warnMonthlyTraffic( month->rxBytes() );
+        }
+    }
+}
+
+void InterfaceStatistics::addRxBytes( unsigned long bytes )
+{
+    if ( bytes == 0 )
+        return;
+
+    checkValidEntry();
+
+    foreach( StatisticsModel * s, mModels )
+        s->addRxBytes( bytes );
+
+    checkTrafficLimit();
+    emit currentEntryChanged();
+}
+
+void InterfaceStatistics::addTxBytes( unsigned long bytes )
+{
+    if ( bytes == 0 )
+        return;
+
+    checkValidEntry();
+
+    foreach( StatisticsModel * s, mModels )
+        s->addTxBytes( bytes );
+
+    checkTrafficLimit();
+    emit currentEntryChanged();
 }

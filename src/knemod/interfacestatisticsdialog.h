@@ -24,8 +24,7 @@
 #include <KDialog>
 #include "ui_interfacestatisticsdlg.h"
 
-class KCalendarSystem;
-class QStandardItemModel;
+class StatisticsModel;
 class Interface;
 
 
@@ -52,37 +51,29 @@ public:
      */
     virtual ~InterfaceStatisticsDialog();
 
+    void configChanged();
+
 signals:
     void clearStatistics();
 
 public slots:
-    void updateDays();
-    void updateWeeks();
-    void updateMonths( bool );
-    void updateYears();
-    void updateCurrentEntry();
     void confirmReset();
 
 protected:
     bool event( QEvent *e );
 
 private:
-    void updateEntry( const StatisticEntry* entry, QStandardItemModel* model );
-    void updateModel( const QList<StatisticEntry *>& statistics,
-                      QStandardItemModel* model, QTableView* view,
-                      bool fullRebuild, int group );
+    void setupTable( KConfigGroup* group, QTableView * view, StatisticsModel* model );
 
     Ui::InterfaceStatisticsDlg ui;
     bool mWasShown;
     bool mSetPos;
-    bool mIsMonths;
     KSharedConfigPtr mConfig;
-    const KCalendarSystem* mCalendar;
     Interface* mInterface;
-    QStandardItemModel* dailyModel;
-    QStandardItemModel* weeklyModel;
-    QStandardItemModel* monthlyModel;
-    QStandardItemModel* yearlyModel;
+    QHash<QTableView*, QString> mStateKeys;
+
+private slots:
+    void setCurrentSel();
 };
 
 #endif // INTERFACESTATISTICSDIALOG_H

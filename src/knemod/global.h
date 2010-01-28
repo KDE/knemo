@@ -39,18 +39,4 @@ struct GeneralData
     KUrl statisticsDir;
 };
 
-struct StatisticEntry
-{
-    StatisticEntry()
-        : span( 0 ),
-          rxBytes( 0 ),
-          txBytes( 0 )
-    {}
-
-    QDate date;
-    int span;
-    quint64 rxBytes;
-    quint64 txBytes;
-};
-
 #endif // GLOBAL_H

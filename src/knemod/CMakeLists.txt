@@ -12,6 +12,7 @@ set( knemo_SRCS
     knemodaemon.cpp
     plotterconfigdialog.cpp
     signalplotter.cpp
+    statisticsmodel.cpp
     backends/backendbase.cpp
     ../common/utils.cpp
 )

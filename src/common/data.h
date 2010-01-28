@@ -124,6 +124,10 @@ static const char conf_statisticsPos[] = "StatisticsPos";
 static const char conf_statisticsSize[] = "StatisticsSize";
 static const char conf_statusPos[] = "StatusPos";
 static const char conf_statusSize[] = "StatusSize";
+static const char conf_dayState[] = "DayState";
+static const char conf_weekState[] = "WeekState";
+static const char conf_monthState[] = "MonthState";
+static const char conf_yearState[] = "YearState";
 
 
 struct KNemoTheme

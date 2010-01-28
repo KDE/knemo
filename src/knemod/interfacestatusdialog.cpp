@@ -364,27 +364,24 @@ void InterfaceStatusDialog::doUnavailable()
 
 void InterfaceStatusDialog::statisticsChanged()
 {
-    InterfaceStatistics* statistics = mInterface->getStatistics();
-
-    if ( statistics == 0 )
-    {
+    InterfaceStatistics *stat = mInterface->getStatistics();
+    if ( stat == 0 )
         return;
-    }
 
-    const StatisticEntry* entry = statistics->getCurrentDay();
-    ui.textLabelTodaySent->setText( KIO::convertSize( entry->txBytes ) );
-    ui.textLabelTodayReceived->setText( KIO::convertSize( entry->rxBytes ) );
-    ui.textLabelTodayTotal->setText( KIO::convertSize( entry->txBytes + entry->rxBytes ) );
+    StatisticsModel * statistics = stat->getStatistics( StatisticsModel::Day );
+    ui.textLabelTodaySent->setText( statistics->txText() );
+    ui.textLabelTodayReceived->setText( statistics->rxText() );
+    ui.textLabelTodayTotal->setText( statistics->totalText() );
 
-    entry = statistics->getCurrentMonth();
-    ui.textLabelMonthSent->setText( KIO::convertSize( entry->txBytes ) );
-    ui.textLabelMonthReceived->setText( KIO::convertSize( entry->rxBytes ) );
-    ui.textLabelMonthTotal->setText( KIO::convertSize( entry->txBytes + entry->rxBytes ) );
+    statistics = stat->getStatistics( StatisticsModel::Month );
+    ui.textLabelMonthSent->setText( statistics->txText() );
+    ui.textLabelMonthReceived->setText( statistics->rxText() );
+    ui.textLabelMonthTotal->setText( statistics->totalText() );
 
-    entry = statistics->getCurrentYear();
-    ui.textLabelYearSent->setText( KIO::convertSize( entry->txBytes ) );
-    ui.textLabelYearReceived->setText( KIO::convertSize( entry->rxBytes ) );
-    ui.textLabelYearTotal->setText( KIO::convertSize( entry->txBytes + entry->rxBytes ) );
+    statistics = stat->getStatistics( StatisticsModel::Year );
+    ui.textLabelYearSent->setText( statistics->txText() );
+    ui.textLabelYearReceived->setText( statistics->rxText() );
+    ui.textLabelYearTotal->setText( statistics->totalText() );
 }
 
 #include "interfacestatusdialog.moc"

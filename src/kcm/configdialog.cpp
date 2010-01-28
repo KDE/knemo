@@ -391,6 +391,10 @@ void ConfigDialog::save()
         QSize statisticsSize = interfaceGroup.readEntry( conf_statisticsSize, QSize() );
         QPoint statusPos = interfaceGroup.readEntry( conf_statusPos, QPoint() );
         QSize statusSize = interfaceGroup.readEntry( conf_statusSize, QSize() );
+        QByteArray dayState = interfaceGroup.readEntry( conf_dayState, QByteArray() );
+        QByteArray weekState = interfaceGroup.readEntry( conf_weekState, QByteArray() );
+        QByteArray monthState = interfaceGroup.readEntry( conf_monthState, QByteArray() );
+        QByteArray yearState = interfaceGroup.readEntry( conf_yearState, QByteArray() );
 
         // Make sure we don't get crufty commands left over
         interfaceGroup.deleteGroup();
@@ -409,6 +413,14 @@ void ConfigDialog::save()
             interfaceGroup.writeEntry( conf_statusSize, statusSize );
         if ( !settings->alias.trimmed().isEmpty() )
             interfaceGroup.writeEntry( conf_alias, settings->alias );
+        if ( !dayState.isNull() )
+            interfaceGroup.writeEntry( conf_dayState, dayState );
+        if ( !weekState.isNull() )
+            interfaceGroup.writeEntry( conf_weekState, weekState );
+        if ( !monthState.isNull() )
+            interfaceGroup.writeEntry( conf_monthState, monthState );
+        if ( !yearState.isNull() )
+            interfaceGroup.writeEntry( conf_yearState, yearState );
 
         interfaceGroup.writeEntry( conf_hideWhenNotAvail, settings->hideWhenDisconnected );
         interfaceGroup.writeEntry( conf_hideWhenNotExist, settings->hideWhenUnavailable );

@@ -145,21 +145,19 @@ void Interface::configChanged()
     }
     mIcon.configChanged();
 
-    if ( mStatistics != 0 )
+    if ( mStatistics )
     {
         mStatistics->configChanged();
+        if ( !mSettings.activateStatistics )
+            stopStatistics();
     }
-
-    if ( mSettings.activateStatistics && mStatistics == 0 )
+    else if ( mSettings.activateStatistics )
     {
-        // user turned on statistics
         startStatistics();
     }
-    else if ( !mSettings.activateStatistics && mStatistics != 0 )
-    {
-        // user turned off statistics
-        stopStatistics();
-    }
+
+    if ( mStatisticsDialog != 0 )
+        mStatisticsDialog->configChanged();
 }
 
 void Interface::processUpdate()
@@ -185,8 +183,8 @@ void Interface::processUpdate()
 
         if ( mStatistics )
         {
-            mStatistics->addIncomingData( mBackendData->incomingBytes );
-            mStatistics->addOutgoingData( mBackendData->outgoingBytes );
+            mStatistics->addRxBytes( mBackendData->incomingBytes );
+            mStatistics->addTxBytes( mBackendData->outgoingBytes );
         }
 
         updateTime();
@@ -280,31 +278,9 @@ void Interface::showStatisticsDialog()
             // should never happen but you never know...
             startStatistics();
         }
-        connect( mStatistics, SIGNAL( dayStatisticsChanged() ),
-                 mStatisticsDialog, SLOT( updateDays() ) );
-        connect( mStatistics, SIGNAL( weekStatisticsChanged() ),
-                 mStatisticsDialog, SLOT( updateWeeks() ) );
-        connect( mStatistics, SIGNAL( monthStatisticsChanged( bool ) ),
-                 mStatisticsDialog, SLOT( updateMonths( bool ) ) );
-        connect( mStatistics, SIGNAL( yearStatisticsChanged() ),
-                 mStatisticsDialog, SLOT( updateYears() ) );
-        connect( mStatistics, SIGNAL( currentEntryChanged() ),
-                 mStatisticsDialog, SLOT( updateCurrentEntry() ) );
-        connect( mStatisticsDialog, SIGNAL( clearStatistics() ),
-                 mStatistics, SLOT( clearStatistics() ) );
-
-        /* We need to show the dialog before we update the stats.  That way
-         * the viewport doesn't get messed up when we scroll to the most recent
-         * item. */
-        mStatisticsDialog->show();
-
-        mStatisticsDialog->updateDays();
-        mStatisticsDialog->updateWeeks();
-        mStatisticsDialog->updateMonths( false );
-        mStatisticsDialog->updateYears();
+        connect( mStatisticsDialog, SIGNAL( clearStatistics() ), mStatistics, SLOT( clearStatistics() ) );
     }
-    else
-        mStatisticsDialog->show();
+    mStatisticsDialog->show();
 }
 
 void Interface::updateTime()
