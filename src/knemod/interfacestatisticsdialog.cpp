@@ -41,6 +41,7 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
     setButtons( Reset | Close );
 
     ui.setupUi( mainWidget() );
+    mStateKeys.insert( ui.tableHourly, conf_hourState );
     mStateKeys.insert( ui.tableDaily, conf_dayState );
     mStateKeys.insert( ui.tableWeekly, conf_weekState );
     mStateKeys.insert( ui.tableMonthly, conf_monthState );
@@ -52,6 +53,7 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
     KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
 
     InterfaceStatistics *stat = mInterface->getStatistics();
+    setupTable( &interfaceGroup, ui.tableHourly,  stat->getStatistics( StatisticsModel::Hour ) );
     setupTable( &interfaceGroup, ui.tableDaily,   stat->getStatistics( StatisticsModel::Day ) );
     setupTable( &interfaceGroup, ui.tableWeekly,  stat->getStatistics( StatisticsModel::Week ) );
     setupTable( &interfaceGroup, ui.tableMonthly, stat->getStatistics( StatisticsModel::Month ) );
@@ -147,7 +149,7 @@ bool InterfaceStatisticsDialog::event( QEvent *e )
         mWasShown = true;
         // Set this here!  For some reason the QTableView in the first tab
         // will become ridiculously wide if we set this earlier.
-        ui.tableDaily->horizontalHeader()->setStretchLastSection( true );
+        ui.tableHourly->horizontalHeader()->setStretchLastSection( true );
     }
 
     return KDialog::event( e );

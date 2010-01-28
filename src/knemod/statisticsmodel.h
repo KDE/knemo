@@ -30,10 +30,11 @@ class StatisticsModel : public QStandardItemModel
 public:
     enum GroupType
     {
-        Day   = 1,
-        Week  = 2,
-        Month = 4,
-        Year  = 8
+        Hour  = 1,
+        Day   = 2,
+        Week  = 4,
+        Month = 8,
+        Year  = 16
     };
 
     StatisticsModel( enum GroupType t, QString group, QString elem );
@@ -54,6 +55,7 @@ public:
     QString group() const { return mGroup; }
     QString elem() const { return mElem; }
 
+    void appendStats( const QDateTime& date, int tSpan, quint64 rx = 0, quint64 tx = 0 );
     void appendStats( const QDate& date, int days, quint64 rx = 0, quint64 tx = 0 );
     void setCalendar( const KCalendarSystem * c ) { mCalendar = c; }
 

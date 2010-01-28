@@ -38,7 +38,7 @@ StatisticsModel::~StatisticsModel()
 {
 }
 
-void StatisticsModel::appendStats( const QDate& date, int days, quint64 rx, quint64 tx )
+void StatisticsModel::appendStats( const QDateTime& dateTime, int days, quint64 rx, quint64 tx )
 {
     QStandardItem * dateItem = new QStandardItem();
     QStandardItem * txItem = new QStandardItem();
@@ -55,8 +55,13 @@ void StatisticsModel::appendStats( const QDate& date, int days, quint64 rx, quin
     totalItem->setData( rx + tx, DataRole );
 
     QString dateStr;
+    QDate date = dateTime.date();
     switch ( mType )
     {
+        case Hour:
+            dateStr = KGlobal::locale()->formatTime( dateTime.time() );
+            dateStr += " " + mCalendar->formatDate( dateTime.date(), KLocale::FancyShortDate );
+            break;
         case Month:
             // Format for simple period
             // Starts on the first of the month, lasts exactly one month
@@ -85,12 +90,17 @@ void StatisticsModel::appendStats( const QDate& date, int days, quint64 rx, quin
     }
 
     dateItem->setData( days, SpanRole );
-    dateItem->setData( QDateTime( date ), DataRole );
+    dateItem->setData( dateTime, DataRole );
     dateItem->setData( dateStr, Qt::DisplayRole );
 
     QList<QStandardItem*> entry;
     entry << dateItem << txItem << rxItem << totalItem;
     appendRow( entry );
+}
+
+void StatisticsModel::appendStats( const QDate& date, int days, quint64 rx, quint64 tx )
+{
+    appendStats( QDateTime( date ), days, rx, tx );
 }
 
 QDateTime StatisticsModel::dateTime( int row ) const

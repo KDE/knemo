@@ -391,6 +391,7 @@ void ConfigDialog::save()
         QSize statisticsSize = interfaceGroup.readEntry( conf_statisticsSize, QSize() );
         QPoint statusPos = interfaceGroup.readEntry( conf_statusPos, QPoint() );
         QSize statusSize = interfaceGroup.readEntry( conf_statusSize, QSize() );
+        QByteArray hourState = interfaceGroup.readEntry( conf_hourState, QByteArray() );
         QByteArray dayState = interfaceGroup.readEntry( conf_dayState, QByteArray() );
         QByteArray weekState = interfaceGroup.readEntry( conf_weekState, QByteArray() );
         QByteArray monthState = interfaceGroup.readEntry( conf_monthState, QByteArray() );
@@ -413,6 +414,8 @@ void ConfigDialog::save()
             interfaceGroup.writeEntry( conf_statusSize, statusSize );
         if ( !settings->alias.trimmed().isEmpty() )
             interfaceGroup.writeEntry( conf_alias, settings->alias );
+        if ( !hourState.isNull() )
+            interfaceGroup.writeEntry( conf_hourState, hourState );
         if ( !dayState.isNull() )
             interfaceGroup.writeEntry( conf_dayState, dayState );
         if ( !weekState.isNull() )

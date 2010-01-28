@@ -77,6 +77,7 @@ private:
     void checkValidEntry();
     void checkTrafficLimit();
 
+    void genNewHour( const QDateTime &dateTime );
     void genNewDay( const QDate & );
     void genNewWeek( const QDate & );
     void genNewYear( const QDate & );

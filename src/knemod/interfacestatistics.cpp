@@ -34,11 +34,13 @@
 static const char statistics_prefix[] = "/statistics_";
 
 static const char doc_name[]     = "statistics";
+static const char group_hours[]  = "hours";
 static const char group_days[]   = "days";
 static const char group_weeks[]  = "weeks";
 static const char group_months[] = "months";
 static const char group_years[]  = "years";
 
+static const char elem_hour[]  = "hour";
 static const char elem_day[]   = "day";
 static const char elem_week[]  = "week";
 static const char elem_month[] = "month";
@@ -50,7 +52,7 @@ static const char attrib_span[]     = "span";
 static const char attrib_rx[]       = "rxBytes";
 static const char attrib_tx[]       = "txBytes";
 
-// Needed to upgrade from earlier versions
+static const char attrib_hour[]  = "hour";
 static const char attrib_day[]   = "day";
 static const char attrib_month[] = "month";
 static const char attrib_year[]  = "year";
@@ -62,7 +64,9 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
       mInterface( interface ),
       mAllMonths( true )
 {
-    StatisticsModel * s = new StatisticsModel( StatisticsModel::Day, group_days, elem_day );
+    StatisticsModel * s = new StatisticsModel( StatisticsModel::Hour, group_hours, elem_hour );
+    mModels.insert( StatisticsModel::Hour, s );
+    s = new StatisticsModel( StatisticsModel::Day, group_days, elem_day );
     mModels.insert( StatisticsModel::Day, s );
     s = new StatisticsModel( StatisticsModel::Week, group_weeks, elem_week );
     mModels.insert( StatisticsModel::Week, s );
@@ -141,6 +145,7 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
             {
                 // The following attributes are particular to each statistic category
                 QDate date;
+                QTime time;
 
                 int year = element.attribute( attrib_year ).toInt();
                 int month = element.attribute( attrib_month, "1" ).toInt();
@@ -152,6 +157,9 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                     int days = element.attribute( attrib_span ).toInt();
                     switch ( statistics->type() )
                     {
+                        case StatisticsModel::Hour:
+                            time = QTime( element.attribute( attrib_hour ).toInt(), 0 );
+                            break;
                         case StatisticsModel::Month:
                             // Old format had no span, so daysInMonth using gregorian
                             if ( days == 0 )
@@ -171,7 +179,7 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                             ;;
                     }
 
-                    statistics->appendStats( date, days,
+                    statistics->appendStats( QDateTime( date, time ), days,
                             element.attribute( attrib_rx ).toULongLong(),
                             element.attribute( attrib_tx ).toULongLong() );
                 }
@@ -193,7 +201,9 @@ void InterfaceStatistics::saveStatsGroup( QDomDocument& doc, const StatisticsMod
         element.setAttribute( attrib_day, mCalendar->day( date ) );
         element.setAttribute( attrib_month, mCalendar->month( date ) );
         element.setAttribute( attrib_year, mCalendar->year( date ) );
-        if ( statistics->type() > StatisticsModel::Day )
+        if ( statistics->type() == StatisticsModel::Hour )
+            element.setAttribute( attrib_hour, statistics->dateTime( i ).time().hour() );
+        else if ( statistics->type() > StatisticsModel::Day )
             element.setAttribute( attrib_span, statistics->days( i ) );
         element.setAttribute( attrib_rx, statistics->rxBytes( i ) );
         element.setAttribute( attrib_tx, statistics->txBytes( i ) );
@@ -235,7 +245,7 @@ void InterfaceStatistics::saveStatistics()
     QDomDocument doc( doc_name );
     QDomElement docElement = doc.createElement( doc_name );
     docElement.setAttribute( attrib_calendar, mCalendar->calendarType() );
-    docElement.setAttribute( attrib_version, "1.1" );
+    docElement.setAttribute( attrib_version, "1.2" );
     doc.appendChild( docElement );
 
     foreach( StatisticsModel * s, mModels )
@@ -481,6 +491,25 @@ bool InterfaceStatistics::daysInSpan( const QDate& date, int days )
     return false;
 }
 
+void InterfaceStatistics::genNewHour( const QDateTime &dateTime )
+{
+    StatisticsModel* hours = mModels.value( StatisticsModel::Hour );
+
+    // Only 24 hours
+    while ( hours->rowCount() )
+    {
+        if ( hours->dateTime( 0 ) <= dateTime.addDays( -1 ) )
+            hours->removeRow( 0 );
+        else
+            break;
+    }
+
+    if ( hours->dateTime() == dateTime )
+        return;
+
+    hours->appendStats( dateTime, 0 );
+}
+
 void InterfaceStatistics::genNewDay( const QDate &date )
 {
     StatisticsModel * model = mModels.value( StatisticsModel::Day );
@@ -558,15 +587,20 @@ void InterfaceStatistics::genNewYear( const QDate &date )
 
 void InterfaceStatistics::checkValidEntry()
 {
-    QDate currentDate = QDate::currentDate();
+    QDateTime curDateTime = QDateTime::currentDateTime();
+    QDate curDate = curDateTime.date();
     StatisticsModel *days = mModels.value( StatisticsModel::Day );
 
-    if ( !days->rowCount() || days->date() < currentDate )
+    StatisticsModel *hours = mModels.value( StatisticsModel::Hour );
+    if ( !hours->rowCount() || hours->dateTime().addSecs( 3600 ) < curDateTime )
+        genNewHour( QDateTime( curDate, QTime( curDateTime.time().hour(), 0 ) ) );
+
+    if ( !days->rowCount() || days->date() < curDate )
     {
-        genNewDay( currentDate );
-        genNewWeek( currentDate );
-        genNewMonth( currentDate );
-        genNewYear( currentDate );
+        genNewDay( curDate );
+        genNewWeek( curDate );
+        genNewMonth( curDate );
+        genNewYear( curDate );
     }
 }
 
