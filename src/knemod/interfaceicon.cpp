@@ -318,7 +318,7 @@ void InterfaceIcon::updateBars( bool doUpdate )
     brush = QBrush( topOutGrad );
     p.fillRect( topLeftRect, topOutGrad );
 #ifdef USE_KNOTIFICATIONITEM
-    mTray->setIconByPixmap( textIcon );
+    mTray->setIconByPixmap( barIcon );
 #else
     mTray->setIcon( barIcon );
 #endif
