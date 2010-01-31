@@ -273,25 +273,6 @@ Action=Popup
 
 [Event/exceededTraffic]
 Name=Traffic Limit Exceeded
-Name[da]=Månedlig trafikgrænse overskredet
-Name[de]=Monatliches Datenverkehrslimit überschritten
-Name[en_GB]=Monthly Traffic Limit Exceeded
-Name[es]=Excedido el límite de tráfico mensual
-Name[et]=Liikluse kuulimiit on ületatud
-Name[fi]=Kuukausikohtainen liikenn&ouml;intiraja ylitetty
-Name[fr]=Dépassement de la limite de trafic mensuel
-Name[gl]=Excedeuse o límite mensual de tráfico
-Name[ja]=月間トラフィックが上限を超えました
-Name[nb]=Månedlig trafikkgrense er overskredet
-Name[nl]=Maandelijkse verkeerslimiet overschreden
-Name[pt]=Limite de Tráfego Mensal Excedido
-Name[pt_BR]=Limite de tráfego mensal excedido
-Name[ru]=Превышено ограничение по трафику за месяц
-Name[sv]=Månatlig trafikgräns överskriden
-Name[tr]=Aylık Trafik Sınırı Aşıldı
-Name[uk]=Перевищено місячне обмеження на об’єм даних
-Name[x-test]=xxMonthly Traffic Limit Exceededxx
-Name[zh_TW]=超過每月連線流量限制
 Comment=Monthly traffic for an interface has exceeded a user-defined threshold
 Comment[da]=Månedlig trafik for et netværkskort har overskredet en brugerdefineret tærskel
 Comment[de]=Der Datenverkehr einer Schnittstelle hat einen benutzerdefinierten Schwellwert überschritten
