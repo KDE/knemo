@@ -52,7 +52,7 @@ public:
 
 signals:
     void currentEntryChanged();
-    void warnMonthlyTraffic( quint64 );
+    void warnTraffic( quint64 threshold, quint64 current );
 
 public slots:
     void clearStatistics();
@@ -84,6 +84,10 @@ private:
     void genNewMonth( const QDate &, QDate = QDate() );
     QDate nextMonthDate( const QDate& );
     bool daysInSpan( const QDate& entry, int span );
+
+    void checkThreshold( quint64 bytes );
+    void oneUnit( const StatisticsModel* model );
+    void rollingUnit( const StatisticsModel* model, int days );
 
     QTimer* mSaveTimer;
     Interface* mInterface;

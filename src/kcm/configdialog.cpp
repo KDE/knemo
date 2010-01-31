@@ -109,6 +109,16 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     mDlg->comboBoxIconTheme->addItem( netloadTheme.name, QVariant::fromValue( netloadTheme ) );
     mDlg->comboBoxIconTheme->addItem( textTheme.name, QVariant::fromValue( textTheme ) );
 
+    mDlg->warnType->addItem( i18n( "Hour" ), NotifyHour );
+    mDlg->warnType->addItem( i18n( "Day" ), NotifyDay );
+    mDlg->warnType->addItem( i18n( "Month" ), NotifyMonth );
+    mDlg->warnType->addItem( i18n( "Rolling 24 hours" ), NotifyRoll24Hour );
+    mDlg->warnType->addItem( i18n( "Rolling 7 days" ), NotifyRoll7Day );
+    mDlg->warnType->addItem( i18n( "Rolling 30 days" ), NotifyRoll30Day );
+
+    mDlg->warnUnits->addItem( i18n( "MiB" ), 2 );
+    mDlg->warnUnits->addItem( i18n( "GiB" ), 3 );
+
     InterfaceSettings s;
     int index = findIndexFromName( s.iconTheme );
     if ( index < 0 )
@@ -176,6 +186,10 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( billingMonthsInputChanged( int ) ) );
     connect( mDlg->warnThreshold, SIGNAL( valueChanged( double ) ),
              this, SLOT( warnThresholdChanged ( double ) ) );
+    connect( mDlg->warnUnits, SIGNAL( activated( int ) ),
+             this, SLOT( warnUnitsChanged( int ) ) );
+    connect( mDlg->warnType, SIGNAL( activated( int ) ),
+             this, SLOT( warnTypeChanged( int ) ) );
     connect( mDlg->warnRxTx, SIGNAL( toggled( bool ) ),
              this, SLOT( warnRxTxToggled ( bool ) ) );
 
@@ -281,6 +295,8 @@ void ConfigDialog::load()
             settings->calendar = interfaceGroup.readEntry( conf_calendar, mDefaultCalendarType );
             settings->billingMonths = clamp<int>(interfaceGroup.readEntry( conf_billingMonths, s.billingMonths ), 1, 6 );
             settings->warnThreshold = clamp<double>(interfaceGroup.readEntry( conf_billingWarnThresh, s.warnThreshold ), 0.0, 9999.0 );
+            settings->warnUnits = clamp<int>(interfaceGroup.readEntry( conf_billingWarnUnits, s.warnUnits ), 2, 3 );
+            settings->warnType = clamp<int>(interfaceGroup.readEntry( conf_billingWarnType, s.warnType ), 0, 5 );
             settings->warnTotalTraffic = interfaceGroup.readEntry( conf_billingWarnRxTx, s.warnTotalTraffic );
 
              // If no start date saved, default to first of month.
@@ -464,7 +480,12 @@ void ConfigDialog::save()
             interfaceGroup.writeEntry( conf_calendar, settings->calendar );
         }
         interfaceGroup.writeEntry( conf_billingWarnThresh, settings->warnThreshold );
-        interfaceGroup.writeEntry( conf_billingWarnRxTx, settings->warnTotalTraffic );
+        if ( settings->warnThreshold > 0 )
+        {
+            interfaceGroup.writeEntry( conf_billingWarnUnits, settings->warnUnits );
+            interfaceGroup.writeEntry( conf_billingWarnType, settings->warnType );
+            interfaceGroup.writeEntry( conf_billingWarnRxTx, settings->warnTotalTraffic );
+        }
 
         interfaceGroup.writeEntry( conf_numCommands, settings->commands.size() );
         for ( int i = 0; i < settings->commands.size(); i++ )
@@ -641,6 +662,10 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     comboHidingChanged( index );
     mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
     mDlg->warnThreshold->setValue( settings->warnThreshold );
+    index = mDlg->warnUnits->findData( settings->warnUnits );
+    mDlg->warnUnits->setCurrentIndex( index );
+    index = mDlg->warnType->findData( settings->warnType );
+    mDlg->warnType->setCurrentIndex( index );
     if ( settings->warnTotalTraffic )
         mDlg->warnRxTx->setChecked( true );
     else
@@ -1092,6 +1117,11 @@ void ConfigDialog::checkBoxCustomBillingToggled( bool on )
         return;
 
     settings->customBilling = on;
+    if ( on )
+        mDlg->warnType->setItemText( NotifyMonth, i18n( "Billing Period" ) );
+    else
+        mDlg->warnType->setItemText( NotifyMonth, i18n( "Month" ) );
+
     mDlg->billingStartInput->setDate( QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) ) );
     mDlg->billingMonthsInput->setValue( 1 );
     if (!mLock) changed( true );
@@ -1142,6 +1172,29 @@ void ConfigDialog::warnThresholdChanged( double val )
     bool enable = settings->warnThreshold > 0.0;
     mDlg->warnRx->setEnabled( enable );
     mDlg->warnRxTx->setEnabled( enable );
+    mDlg->warnUnits->setEnabled( enable );
+    mDlg->warnPer->setEnabled( enable );
+    mDlg->warnType->setEnabled( enable );
+    if (!mLock) changed( true );
+}
+
+void ConfigDialog::warnUnitsChanged( int val )
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
+    settings->warnUnits = mDlg->warnUnits->itemData( val ).toInt();
+    if (!mLock) changed( true );
+}
+
+void ConfigDialog::warnTypeChanged( int val )
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
+    settings->warnType = mDlg->warnType->itemData( val ).toInt();
     if (!mLock) changed( true );
 }
 

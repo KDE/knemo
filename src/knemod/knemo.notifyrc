@@ -271,8 +271,8 @@ Comment[zh_TW]=此介面無法使用
 Sound=KDE_Sys-App-Message.ogg
 Action=Popup
 
-[Event/exceededMonthlyTraffic]
-Name=Monthly Traffic Limit Exceeded
+[Event/exceededTraffic]
+Name=Traffic Limit Exceeded
 Name[da]=Månedlig trafikgrænse overskredet
 Name[de]=Monatliches Datenverkehrslimit überschritten
 Name[en_GB]=Monthly Traffic Limit Exceeded

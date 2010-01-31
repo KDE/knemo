@@ -102,6 +102,8 @@ void Interface::configChanged()
     mSettings.activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
     mSettings.trafficThreshold = clamp<unsigned int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
     mSettings.warnThreshold = clamp<double>(interfaceGroup.readEntry( conf_billingWarnThresh, s.warnThreshold ), 0.0, 9999.0 );
+    mSettings.warnUnits = clamp<int>(interfaceGroup.readEntry( conf_billingWarnUnits, s.warnUnits ), 0, 3 );
+    mSettings.warnType = clamp<int>(interfaceGroup.readEntry( conf_billingWarnType, s.warnType ), 0, 5 );
     mSettings.warnTotalTraffic = interfaceGroup.readEntry( conf_billingWarnRxTx, s.warnTotalTraffic );
 
     // TODO: Some of the calendars are a bit buggy, so default to Gregorian for now
@@ -308,8 +310,8 @@ void Interface::updateTime()
 void Interface::startStatistics()
 {
     mStatistics = new InterfaceStatistics( this );
-    connect( mStatistics, SIGNAL( warnMonthlyTraffic( quint64 ) ),
-             this, SLOT( warnMonthlyTraffic( quint64 ) ) );
+    connect( mStatistics, SIGNAL( warnTraffic( quint64, quint64 ) ),
+             this, SLOT( warnTraffic( quint64, quint64 ) ) );
     if ( mStatusDialog != 0 )
     {
         connect( mStatistics, SIGNAL( currentEntryChanged() ),
@@ -328,14 +330,18 @@ void Interface::stopStatistics()
     mStatistics = 0;
 }
 
-void Interface::warnMonthlyTraffic( quint64 traffic )
+void Interface::warnTraffic( quint64 threshold, quint64 current )
 {
-    QString title = mSettings.alias;
-    if ( title.isEmpty() )
-        title = mName;
-
-    KNotification::event( "exceededMonthlyTraffic",
-                          i18n( "%1: Monthly traffic limit exceeded (currently %2)", title, KIO::convertSize( traffic ) )
+    // Don't use mSettings.alias since automatic text wrapping can
+    // cut off the bottom portion of the notification
+    KNotification::event( "exceededTraffic",
+                          i18n( "<table><tr><td style='padding-right:0.2em;'>%1:</td>"
+                                "<td>Exceeded traffic limit of %2\n"
+                                "(currently %3)</td></tr></table>",
+                                mName,
+                                KIO::convertSize( threshold ),
+                                KIO::convertSize( current )
+                              )
                         );
 }
 

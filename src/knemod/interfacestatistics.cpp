@@ -26,6 +26,7 @@
 #include <KConfigGroup>
 #include <KGlobal>
 
+#include <cmath>
 #include <unistd.h>
 
 #include "interface.h"
@@ -508,6 +509,10 @@ void InterfaceStatistics::genNewHour( const QDateTime &dateTime )
         return;
 
     hours->appendStats( dateTime, 0 );
+
+    if ( mInterface->getSettings().warnType == NotifyHour ||
+         mInterface->getSettings().warnType == NotifyRoll24Hour )
+        mWarningDone = false;
 }
 
 void InterfaceStatistics::genNewDay( const QDate &date )
@@ -518,6 +523,11 @@ void InterfaceStatistics::genNewDay( const QDate &date )
             return;
 
     mModels.value( StatisticsModel::Day )->appendStats( date, 1 );
+
+    if ( mInterface->getSettings().warnType == NotifyDay ||
+         mInterface->getSettings().warnType == NotifyRoll7Day ||
+         mInterface->getSettings().warnType == NotifyRoll30Day )
+        mWarningDone = false;
 }
 
 void InterfaceStatistics::genNewWeek( const QDate &date )
@@ -571,6 +581,9 @@ void InterfaceStatistics::genNewMonth( const QDate &date, QDate endDate )
 
     mBillingStart = newDate;
     mModels.value( StatisticsModel::Month )->appendStats( newDate, days );
+
+    if ( mInterface->getSettings().warnType == NotifyMonth )
+        mWarningDone = false;
 }
 
 void InterfaceStatistics::genNewYear( const QDate &date )
@@ -604,25 +617,71 @@ void InterfaceStatistics::checkValidEntry()
     }
 }
 
+void InterfaceStatistics::checkThreshold( quint64 currentBytes )
+{
+    int warnMult = pow( 1024, mInterface->getSettings().warnUnits );
+    quint64 thresholdBytes = mInterface->getSettings().warnThreshold * warnMult;
+    if ( currentBytes > thresholdBytes )
+    {
+        mWarningDone = true;
+        emit warnTraffic( thresholdBytes, currentBytes );
+    }
+}
+
+void InterfaceStatistics::oneUnit( const StatisticsModel* model )
+{
+    if ( mInterface->getSettings().warnTotalTraffic )
+        checkThreshold( model->totalBytes() );
+    else
+        checkThreshold( model->rxBytes() );
+}
+
+void InterfaceStatistics::rollingUnit( const StatisticsModel* model, int days )
+{
+    quint64 total = 0;
+    QDateTime lowerLimit = model->dateTime().addDays( -days );
+
+    for ( int i = model->rowCount() - 1; i >= 0; --i )
+    {
+        if ( model->dateTime( i ) > lowerLimit )
+        {
+            if ( mInterface->getSettings().warnTotalTraffic )
+                total += model->totalBytes( i );
+            else
+                total += model->rxBytes( i );
+        }
+        else
+            break;
+    }
+    checkThreshold( total );
+}
+
 void InterfaceStatistics::checkTrafficLimit()
 {
-    // Only warn once per interface per session
+    int wtype = mInterface->getSettings().warnType;
+
     if ( !mWarningDone && mInterface->getSettings().warnThreshold > 0.0 )
     {
-        quint64 thresholdBytes = mInterface->getSettings().warnThreshold * 1073741824;
-        StatisticsModel *month = mModels.value( StatisticsModel::Month );
-        if ( mInterface->getSettings().warnTotalTraffic )
+        switch ( wtype )
         {
-            if ( month->totalBytes() >= thresholdBytes )
-            {
-                mWarningDone = true;
-                emit warnMonthlyTraffic( month->totalBytes() );
-            }
-        }
-        else if ( month->rxBytes() >= thresholdBytes )
-        {
-            mWarningDone = true;
-            emit warnMonthlyTraffic( month->rxBytes() );
+            case NotifyHour:
+                oneUnit( mModels.value( StatisticsModel::Hour ) );
+                break;
+            case NotifyDay:
+                oneUnit( mModels.value( StatisticsModel::Day ) );
+                break;
+            case NotifyMonth:
+                oneUnit( mModels.value( StatisticsModel::Month ) );
+                break;
+            case NotifyRoll24Hour:
+                rollingUnit( mModels.value( StatisticsModel::Hour ), 24 );
+                break;
+            case NotifyRoll7Day:
+                rollingUnit( mModels.value( StatisticsModel::Day ), 7 );
+                break;
+            case NotifyRoll30Day:
+                rollingUnit( mModels.value( StatisticsModel::Day ), 30 );
+                break;
         }
     }
 }
@@ -654,3 +713,4 @@ void InterfaceStatistics::addTxBytes( unsigned long bytes )
     checkTrafficLimit();
     emit currentEntryChanged();
 }
+

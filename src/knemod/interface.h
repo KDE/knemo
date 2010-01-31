@@ -139,9 +139,9 @@ public slots:
 
 private slots:
     /**
-     * Emit a notification when monthly traffic exceeds a threshold
+     * Emit a notification when traffic exceeds a threshold
      */
-    void warnMonthlyTraffic( quint64 );
+    void warnTraffic( quint64 threshold, quint64 current );
 
 private:
     /**

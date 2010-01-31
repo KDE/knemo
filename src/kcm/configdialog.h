@@ -76,6 +76,8 @@ private slots:
     void checkBoxStatisticsToggled( bool on );
     void checkBoxCustomBillingToggled( bool on );
     void warnThresholdChanged( double val );
+    void warnUnitsChanged( int val );
+    void warnTypeChanged( int val );
     void warnRxTxToggled( bool on );
     void billingStartInputChanged( const QDate& );
     void billingMonthsInputChanged( int value );

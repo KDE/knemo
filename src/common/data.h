@@ -103,6 +103,8 @@ static const char conf_calendar[] = "Calendar";
 static const char conf_billingStart[] = "BillingStart";
 static const char conf_billingMonths[] = "BillingMonths";
 static const char conf_billingWarnThresh[] = "BillingWarnThreshold";
+static const char conf_billingWarnUnits[] = "BillingWarnUnits";
+static const char conf_billingWarnType[] = "BillingWarnType";
 static const char conf_billingWarnRxTx[] = "BillingWarnRxTx";
 
 // interface context menu
@@ -225,6 +227,8 @@ struct InterfaceSettings
         numCommands( 0 ),
         trafficThreshold( 0 ),
         warnThreshold( 0.0 ),
+        warnUnits( 3 ),
+        warnType( 2 ),
         warnTotalTraffic( false ),
         hideWhenUnavailable( false ),
         hideWhenDisconnected( false ),
@@ -247,6 +251,8 @@ struct InterfaceSettings
     int numCommands;
     unsigned int trafficThreshold;
     double warnThreshold;
+    int warnUnits;
+    int warnType;
     bool warnTotalTraffic;
     bool hideWhenUnavailable;
     bool hideWhenDisconnected;
@@ -296,6 +302,16 @@ enum ToolTipEnums
     UPLOAD_SPEED     = 0x00200000,
     NICK_NAME        = 0x00400000,
     ENCRYPTION       = 0x00800000
+};
+
+enum NotificationType
+{
+    NotifyHour,
+    NotifyDay,
+    NotifyMonth,
+    NotifyRoll24Hour,
+    NotifyRoll7Day,
+    NotifyRoll30Day
 };
 
 static const int defaultTip = INTERFACE | STATUS | IP_ADDRESS | ESSID | LINK_QUALITY | DOWNLOAD_SPEED | UPLOAD_SPEED;
