@@ -273,6 +273,10 @@ Action=Popup
 
 [Event/exceededTraffic]
 Name=Traffic Limit Exceeded
+Name[pt]=Limite de Tráfego Excedido
+Name[pt_BR]=Limite de tráfego excedido
+Name[uk]=Перевищено обмеження на об’єм даних
+Name[x-test]=xxTraffic Limit Exceededxx
 Comment=Monthly traffic for an interface has exceeded a user-defined threshold
 Comment[da]=Månedlig trafik for et netværkskort har overskredet en brugerdefineret tærskel
 Comment[de]=Der Datenverkehr einer Schnittstelle hat einen benutzerdefinierten Schwellwert überschritten
