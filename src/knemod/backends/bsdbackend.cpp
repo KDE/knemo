@@ -282,6 +282,11 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
         if ( ifName != ifaddrName )
             continue;
 
+        data->status = KNemoIface::Available;
+
+        if ( ifa->ifa_flags & IFF_UP )
+            data->status |= KNemoIface::Up;
+
         // stats
         if ( ifa->ifa_data )
         {
@@ -298,9 +303,10 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
 
             incBytes( data->interfaceType, tx_bytes, data->outgoingBytes, data->prevTxBytes, data->txBytes );
             data->txString = KIO::convertSize( data->txBytes );
-        }
 
-        data->status = KNemoIface::Available;
+            if ( stats->ifi_link_state == LINK_STATE_UP && ifa->ifa_flags & IFF_UP )
+                data->status |= KNemoIface::Connected;
+        }
 
         // mac address, interface type
         if ( ifa->ifa_addr )
@@ -326,13 +332,9 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
                 QString addrKey;
                 AddrData addrVal;
 
-                if ( ifa->ifa_flags & IFF_UP )
-                    data->status |= KNemoIface::Up;
-
                 addrKey = getAddr( ifa, addrVal );
 
-                // I don't think a link-local address should count as "connected" to
-                // a network.  Yell if I'm wrong
+                // Check here too for non-ethernet interfaces
                 if ( ifa->ifa_flags & IFF_RUNNING &&
                      addrVal.scope != RT_SCOPE_LINK &&
                      addrVal.scope != RT_SCOPE_NOWHERE )
