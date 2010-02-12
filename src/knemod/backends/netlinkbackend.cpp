@@ -32,6 +32,10 @@
 #include "utils.h"
 #include "netlinkbackend.h"
 
+#ifndef IFF_LOWER_UP
+#define IFF_LOWER_UP   0x10000
+#endif
+
 NetlinkBackend::NetlinkBackend()
     : rtsock( NULL ),
       addrCache( NULL ),
@@ -118,7 +122,7 @@ BackendBase* NetlinkBackend::createInstance()
     return new NetlinkBackend();
 }
 
-void NetlinkBackend::updateAddresses( struct rtnl_link* link, BackendData *data )
+void NetlinkBackend::updateAddresses( BackendData *data )
 {
     struct rtnl_addr * rtaddr;
     for ( rtaddr = reinterpret_cast<struct rtnl_addr *>(nl_cache_get_first( addrCache ));
@@ -137,15 +141,6 @@ void NetlinkBackend::updateAddresses( struct rtnl_link* link, BackendData *data 
         addrVal.afType = rtnl_addr_get_family( rtaddr );
         addrVal.label = rtnl_addr_get_label( rtaddr );
         addrVal.scope = rtnl_addr_get_scope( rtaddr );
-
-        // I don't think a link-local address should count as "connected" to
-        // a network.  Yell if I'm wrong.
-        if ( rtnl_link_get_flags( link ) & IFF_RUNNING &&
-             addrVal.scope != RT_SCOPE_LINK &&
-             addrVal.scope != RT_SCOPE_NOWHERE )
-        {
-            data->status |= KNemoIface::Connected;
-        }
 
         nl_addr2str( addr, buf, sizeof( buf ) );
         addrKey = buf;
@@ -223,9 +218,16 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
             data->interfaceType = KNemoIface::PPP;
         else
             data->interfaceType = KNemoIface::Ethernet;
+
         data->status = KNemoIface::Available;
         if ( flags & IFF_UP )
+        {
             data->status |= KNemoIface::Up;
+            if ( rtnl_link_get_flags( link ) & IFF_LOWER_UP )
+            {
+                data->status |= KNemoIface::Connected;
+            }
+        }
 
         // hw address
         struct nl_addr * addr = rtnl_link_get_addr( link );
@@ -244,7 +246,7 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
         data->rxString = KIO::convertSize( data->rxBytes );
         data->txString = KIO::convertSize( data->txBytes );
 
-        updateAddresses( link, data );
+        updateAddresses( data );
 
         rtnl_link_put( link );
     }
