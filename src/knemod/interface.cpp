@@ -24,6 +24,7 @@
 #include <KColorScheme>
 #include <KNotification>
 #include <KWindowSystem>
+#include <kdeversion.h>
 #include <kio/global.h>
 
 #include "backends/backendbase.h"
@@ -106,9 +107,12 @@ void Interface::configChanged()
     mSettings.warnType = clamp<int>(interfaceGroup.readEntry( conf_billingWarnType, s.warnType ), 0, 5 );
     mSettings.warnTotalTraffic = interfaceGroup.readEntry( conf_billingWarnRxTx, s.warnTotalTraffic );
 
-    // TODO: Some of the calendars are a bit buggy, so default to Gregorian for now
-    //mSettings.calendar = interfaceGroup.readEntry( conf_calendar, KGlobal::locale()->calendarType() );
-    mSettings.calendar = interfaceGroup.readEntry( conf_calendar, "gregorian" );
+    QString defaultCal;
+    if ( KDE::versionMajor() >= 4 && KDE::versionMinor() >= 4 )
+        defaultCal = KGlobal::locale()->calendarType();
+    else
+        defaultCal = "gregorian";
+    mSettings.calendar = interfaceGroup.readEntry( conf_calendar, defaultCal );
 
     mSettings.customBilling = interfaceGroup.readEntry( conf_customBilling, s.customBilling );
 

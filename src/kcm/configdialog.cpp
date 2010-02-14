@@ -65,14 +65,13 @@ static bool themesLessThan( const KNemoTheme& s1, const KNemoTheme& s2 )
 ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     : KCModule( KNemoFactory::componentData(), parent, args ),
       mLock( false ),
-      mDlg( new Ui::ConfigDlg() ),
-
-      // If we're going to change KGlobal::locale()->calendar() we're
-      // going to need to track the original calendar type.
-      // TODO: Some of the calendars are a bit buggy, so default to Gregorian for now
-      //mDefaultCalendarType( KGlobal::locale()->calendarType() ),
-      mDefaultCalendarType( "gregorian" )
+      mDlg( new Ui::ConfigDlg() )
 {
+    if ( KDE::versionMajor() >= 4 && KDE::versionMinor() >= 4 )
+        mDefaultCalendarType = KGlobal::locale()->calendarType();
+    else
+        mDefaultCalendarType = "gregorian";
+
     mConfig = KSharedConfig::openConfig( "knemorc" );
 
     setupToolTipMap();
