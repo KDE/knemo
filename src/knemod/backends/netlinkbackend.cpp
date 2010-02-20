@@ -470,3 +470,4 @@ realloc:
 }
 #endif
 
+#include "netlinkbackend.moc"

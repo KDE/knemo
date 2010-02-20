@@ -88,3 +88,5 @@ InterfaceSettings ThemeConfig::getSettings()
 
     return settings;
 }
+
+#include "themeconfig.moc"

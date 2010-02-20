@@ -224,3 +224,5 @@ void StatisticsModel::addTxBytes( quint64 bytes )
     item( rowCount() - 1, TxBytes )->setData( txBytes );
     addTotalBytes( bytes );
 }
+
+#include "statisticsmodel.moc"

@@ -571,3 +571,4 @@ enum ieee80211_opmode BSDBackend::get80211opmode( const QString &ifName )
 
 
 
+#include "bsdbackend.moc"

@@ -308,3 +308,5 @@ void InterfaceTray::setupMappings()
     mScope.insert( RT_SCOPE_SITE, i18n( "site" ) );
     mScope.insert( RT_SCOPE_UNIVERSE, i18n( "global" ) );
 }
+
+#include "interfacetray.moc"
