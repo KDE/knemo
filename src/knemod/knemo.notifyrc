@@ -297,6 +297,7 @@ Comment[nds]=Överdregenmengde för en Koppelsteed is bi de vun den Bruker fastl
 Comment[nl]=Het verkeer op een interface heeft een gebruikergedefinieerde limiet overschreden
 Comment[pt]=O tráfego mensal de uma interface excedeu o limite definido pelo utilizador
 Comment[pt_BR]=O tráfego para uma interface excedeu o limite definido pelo usuário
+Comment[ru]=Трафик через интерфейс превысил заданное пользователем ограничение
 Comment[sv]=Trafik för ett gränssnitt har överskridit en användardefinierad tröskel
 Comment[uk]=Об’єм даних, переданих інтерфейсом перевищив вказане обмеження для користувача
 Comment[x-test]=xxTraffic for an interface has exceeded a user-defined thresholdxx
