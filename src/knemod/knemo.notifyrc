@@ -292,6 +292,7 @@ Name[x-test]=xxTraffic Limit Exceededxx
 Comment=Traffic for an interface has exceeded a user-defined threshold
 Comment[da]=Trafikken for et netværkskort har overskredet en brugerdefineret tærskel
 Comment[en_GB]=Traffic for an interface has exceeded a user-defined threshold
+Comment[et]=Liidese liiklus on ületanud kasutaja määratud piirangut
 Comment[nb]=Trafikk for et grensesnitt har gått over en brukerdefinert grense
 Comment[nds]=Överdregenmengde för en Koppelsteed is bi de vun den Bruker fastleggt Süll anlangt.
 Comment[nl]=Het verkeer op een interface heeft een gebruikergedefinieerde limiet overschreden
