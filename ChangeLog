@@ -6,6 +6,7 @@ Version 0.6.2
  * don't always show ports of a bridge or aggregated interface as "down"
  * if running on KDE >= 4.4, statistics use the calendar system defined in
    System Settings
+ * Let user change the font of the text icon theme
 
 Version 0.6.1
  * support for reading wireless info on FreeBSD
