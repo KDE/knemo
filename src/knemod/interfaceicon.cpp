@@ -394,8 +394,8 @@ void InterfaceIcon::updateIconText( bool doUpdate )
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
 
     // rxFont and txFont should be the same size per poll period
-    QFont rxFont = setIconFont( textIncoming, iconWidth );
-    QFont txFont = setIconFont( textOutgoing, iconWidth );
+    QFont rxFont = setIconFont( textIncoming, mInterface->getSettings().iconFont, iconWidth );
+    QFont txFont = setIconFont( textOutgoing, mInterface->getSettings().iconFont, iconWidth );
     if ( rxFont.pointSizeF() > txFont.pointSizeF() )
         rxFont.setPointSizeF( txFont.pointSizeF() );
 

@@ -83,6 +83,7 @@ private slots:
     void billingMonthsInputChanged( int value );
     void checkBoxStartKNemoToggled( bool on );
     void colorButtonChanged();
+    void iconFontChanged( const QFont &font );
     void advancedButtonClicked();
     void listViewCommandsSelectionChanged( QTreeWidgetItem *current, QTreeWidgetItem *previous );
     void listViewCommandsChanged( QTreeWidgetItem* item, int column );

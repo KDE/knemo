@@ -256,10 +256,10 @@ QList<KNemoTheme> findThemes()
     return iconThemes;
 }
 
-QFont setIconFont( const QString& text, int iconWidth )
+QFont setIconFont( const QString& text, const QFont& font, int iconWidth )
 {
     // Is there a better way to do this?
-    QFont f = KGlobalSettings::generalFont();
+    QFont f( font );
     qreal pointSize = f.pointSizeF();
     QFontMetricsF fm( f );
     qreal w = fm.width( text );

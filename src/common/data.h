@@ -23,9 +23,12 @@
 
 #include <QColor>
 #include <QDate>
+#include <QFont>
 #include <QList>
 #include <QMap>
 #include <QString>
+
+#include <KGlobalSettings>
 
 /**
  * This file contains data structures used to store information about
@@ -95,6 +98,7 @@ static const char conf_colorOutgoingMax[] = "ColorOutgoingMax";
 static const char conf_barScale[] = "BarScale";
 static const char conf_inMaxRate[] = "InMaxRate";
 static const char conf_outMaxRate[] = "OutMaxRate";
+static const char conf_iconFont[] = "IconFont";
 
 // interface statistics
 static const char conf_activateStatistics[] = "ActivateStatistics";
@@ -224,6 +228,7 @@ struct InterfaceSettings
         barScale( false ),
         inMaxRate( 4 ),
         outMaxRate( 4 ),
+        iconFont( KGlobalSettings::generalFont() ),
         numCommands( 0 ),
         trafficThreshold( 0 ),
         warnThreshold( 0.0 ),
@@ -248,6 +253,7 @@ struct InterfaceSettings
     bool barScale;
     unsigned int inMaxRate;
     unsigned int outMaxRate;
+    QFont iconFont;
     int numCommands;
     unsigned int trafficThreshold;
     double warnThreshold;

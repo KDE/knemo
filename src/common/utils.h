@@ -48,7 +48,7 @@ QList<KNemoTheme> findThemes();
  * Given a string and tray icon width, return a font size that fits the text
  * in the tray.
  */
-QFont setIconFont( const QString& text, int iconWidth );
+QFont setIconFont( const QString& text, const QFont& font, int iconWidth );
 
 double validatePoll( double val );
 
