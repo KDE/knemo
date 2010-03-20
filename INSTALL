@@ -14,3 +14,19 @@ Quick installation steps:
     cd build; make; make install
 
 Cmake's equivalent to 'make distclean' is 'rm -rf build'.
+
+
+Notes:
+
+By default, KNemo uses the older KSystemTrayIcon because it behaves well on
+desktops like GNOME or Xfce.  If you are only using this on a KDE desktop, you
+might want to run configure with the '-n' option.  This will use the shiny new
+KStatusNotifierItem.
+
+If you cannot open the KNemo config dialog after you install, you probably need
+to modify your environment.  Assuming you installed KNemo in /usr/local, add
+something like this to your .profile
+
+    export KDEDIRS=/usr/local:/usr
+
+Then restart your session.
