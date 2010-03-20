@@ -15,7 +15,7 @@ Usage: ./configure [OPTION]...
 Options:
   -p, --prefix PREFIX             install files in PREFIX [/usr/local]
   -b, --build-directory BUILDDIR  build the package in BUILDDIR [./build]
-  -n, --new-trayicon              compile the tray icon as a KNotificationItem
+  -n, --new-trayicon              compile the tray icon as a KStatusNotiferItem
                                   instead of the usual KSystemTrayIcon
                                   This only applies to KDE >= 4.3
   -h, --help                      display this help and exit
