@@ -586,7 +586,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                      <double>0.100000000000000</double>
                     </property>
                     <property name="specialValueText">
-                     <string>Unlimited</string>
+                     <string>No limit</string>
                     </property>
                     <property name="decimals">
                      <number>1</number>
