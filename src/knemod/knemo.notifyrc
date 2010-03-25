@@ -323,6 +323,7 @@ Action=Popup
 [Event/exceededTraffic]
 Name=Traffic Limit Exceeded
 Name[da]=Trafikgrænse overskredet
+Name[de]=Datenverkehrslimit überschritten
 Name[en_GB]=Traffic Limit Exceeded
 Name[es]=Sobrepasado el límite de tráfico
 Name[et]=Liikluse limiit on ületatud
@@ -342,6 +343,7 @@ Name[uk]=Перевищено обмеження на об’єм даних
 Name[x-test]=xxTraffic Limit Exceededxx
 Comment=Traffic for an interface has exceeded a user-defined threshold
 Comment[da]=Trafikken for et netværkskort har overskredet en brugerdefineret tærskel
+Comment[de]=Der Datenverkehr einer Schnittstelle hat einen benutzerdefinierten Schwellwert überschritten
 Comment[en_GB]=Traffic for an interface has exceeded a user-defined threshold
 Comment[es]=El tráfico de una interfaz ha superado un umbral definido por el usuario
 Comment[et]=Liidese liiklus on ületanud kasutaja määratud piirangut
