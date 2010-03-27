@@ -235,6 +235,7 @@ Name[uk]=Доступний
 Name[x-test]=xxAvailablexx
 Name[zh_TW]=可用性
 Comment=The interface has become available
+Comment[cs]=Bylo zpřístupněno rozhraní
 Comment[da]=Netkortet er blevet tilgængeligt
 Comment[de]=Die Schnittstelle ist verfügbar
 Comment[en_GB]=The interface has become available
@@ -292,6 +293,7 @@ Name[uk]=Недоступний
 Name[x-test]=xxUnavailablexx
 Name[zh_TW]=無法使用
 Comment=The interface is unavailable
+Comment[cs]=Rozhraní je nedostupné
 Comment[da]=Netkortet er utilgængeligt
 Comment[de]=Die Schnittstelle ist nicht verfügbar
 Comment[en_GB]=The interface is unavailable
@@ -322,6 +324,7 @@ Action=Popup
 
 [Event/exceededTraffic]
 Name=Traffic Limit Exceeded
+Name[cs]=Překročeno omezení přenosu
 Name[da]=Trafikgrænse overskredet
 Name[de]=Datenverkehrslimit überschritten
 Name[en_GB]=Traffic Limit Exceeded
