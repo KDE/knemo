@@ -1,8 +1,7 @@
 To build KNemo you will need a basic build system (g++, make, etc.)  You will
-also need to install cmake and selected Qt4 and KDE4 development packages. On
-Debian-based systems
-   apt-get install build-essential kdebase-workspace-dev net-tools \
-       wireless-tools libiw-dev
+also need to install cmake and some KDE4 development packages. On Debian-based
+systems
+   apt-get install cmake kdelibs5-dev libiw-dev libnl-dev
 should be sufficient.
 
 KNemo also comes with a simple configure script that should work for a generic
@@ -18,10 +17,9 @@ Cmake's equivalent to 'make distclean' is 'rm -rf build'.
 
 Notes:
 
-By default, KNemo uses the older KSystemTrayIcon because it behaves well on
-desktops like GNOME or Xfce.  If you are only using this on a KDE desktop, you
-might want to run configure with the '-n' option.  This will use the shiny new
-KStatusNotifierItem.
+By default, KNemo uses the new KStatusNotifierItem if it is compiled against
+KDE >= 4.3.80.  If you wish to use the older KSystemTrayIcon, either set the
+cmake variable LEGACY_TRAY_ICON=true or run configure with the '-l' option.
 
 If you cannot open the KNemo config dialog after you install, you probably need
 to modify your environment.  Assuming you installed KNemo in /usr/local, add
