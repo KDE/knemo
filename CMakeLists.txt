@@ -22,20 +22,12 @@ if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
 
 endif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
 
-option (USE_KNOTIFICATIONITEM "If building against KDE 4.3, use the experimental KNotificationItem for the tray icon." FALSE )
-if ( USE_KNOTIFICATIONITEM )
-    if ( ${KDE_VERSION} VERSION_GREATER "4.3.66" )
-    #it's in kdeui now
-    else ( ${KDE_VERSION} VERSION_GREATER "4.3.66" )
-        if ( ${KDE_VERSION} VERSION_GREATER "4.2.84" )
-            find_package(LibKNotificationItem-1)
-            macro_log_feature(LIBKNOTIFICATIONITEM-1_FOUND "LibKNotificationItem-1" "An experimental library for a new way to handle the system tray" "svn://anonsvn.kde.org/home/kde/branches/KDE/4.3/kdelibs/experimental" FALSE "" "Lets you compile KNemo's tray icon as a KNotificationItem")
-        else ( ${KDE_VERSION} VERSION_GREATER "4.2.84" )
-            #not available in 4.2; force off
-            set( USE_KNOTIFICATIONITEM 0 )
-        endif ( ${KDE_VERSION} VERSION_GREATER "4.2.84" )
-    endif ( ${KDE_VERSION} VERSION_GREATER "4.3.66" )
-endif ( USE_KNOTIFICATIONITEM )
+option (LEGACY_TRAY_ICON "Force the tray icon to be compiled as a KSystemTrayIcon." FALSE )
+if ( NOT LEGACY_TRAY_ICON )
+    if ( ${KDE_VERSION} VERSION_GREATER "4.3.80" )
+        set ( HAVE_KSTATUSNOTIFIERITEM 1 )
+    endif ( ${KDE_VERSION} VERSION_GREATER "4.3.80" )
+endif ( NOT LEGACY_TRAY_ICON )
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config-knemo.h.cmake
                 ${CMAKE_CURRENT_BINARY_DIR}/config-knemo.h

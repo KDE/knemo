@@ -24,19 +24,9 @@
 
 #include <kdeversion.h>
 
-#ifdef USE_KNOTIFICATIONITEM
-  #if KDE_VERSION >= KDE_MAKE_VERSION(4, 3, 73)
-    #define PARENT_ICON_CLASS KStatusNotifierItem
-    #include <kstatusnotifieritem.h>
-  #else
-    #define PARENT_ICON_CLASS KNotificationItem
-    #if KDE_VERSION >= KDE_MAKE_VERSION(4, 3, 66)
-        #include <knotificationitem.h>
-    #else
-        #include <knotificationitem-1/knotificationitem.h>
-        using namespace Experimental;
-    #endif
-  #endif
+#ifdef HAVE_KSTATUSNOTIFIERITEM
+  #define PARENT_ICON_CLASS KStatusNotifierItem
+  #include <KStatusNotifierItem>
 #else
   #define PARENT_ICON_CLASS KSystemTrayIcon
   #include <KSystemTrayIcon>
@@ -60,7 +50,7 @@ public:
 
     void updateToolTip();
 
-#ifdef USE_KNOTIFICATIONITEM
+#ifdef HAVE_KSTATUSNOTIFIERITEM
 public Q_SLOTS:
     void activate(const QPoint &pos);
 #else
@@ -76,7 +66,7 @@ private:
     void setupMappings();
 
 private Q_SLOTS:
-#ifdef USE_KNOTIFICATIONITEM
+#ifdef HAVE_KSTATUSNOTIFIERITEM
     void togglePlotter();
 #else
     void iconActivated( QSystemTrayIcon::ActivationReason );

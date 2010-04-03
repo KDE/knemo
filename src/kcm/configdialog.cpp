@@ -1432,7 +1432,7 @@ void ConfigDialog::setupToolTipMap()
     // Cannot make this data static as the i18n macro doesn't seem
     // to work when called to early i.e. before setting the catalogue.
     mToolTips.insert( INTERFACE, i18n( "Interface" ) );
-#ifndef USE_KNOTIFICATIONITEM
+#ifndef HAVE_KSTATUSNOTIFIERITEM
     mToolTips.insert( ALIAS, i18n( "Alias" ) );
 #endif
     mToolTips.insert( STATUS, i18n( "Status" ) );

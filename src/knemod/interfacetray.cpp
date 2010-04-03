@@ -38,14 +38,14 @@
 #include <QHelpEvent>
 
 InterfaceTray::InterfaceTray( Interface* interface, const QString &id, QWidget* parent ) :
-#ifdef USE_KNOTIFICATIONITEM
+#ifdef HAVE_KSTATUSNOTIFIERITEM
     PARENT_ICON_CLASS( id, parent )
 #else
     KSystemTrayIcon( parent )
 #endif
 {
     mInterface = interface;
-#ifdef USE_KNOTIFICATIONITEM
+#ifdef HAVE_KSTATUSNOTIFIERITEM
     setToolTipIconByName( "knemo" );
     setCategory(Hardware);
     setStatus(Active);
@@ -68,7 +68,7 @@ InterfaceTray::~InterfaceTray()
 void InterfaceTray::updateToolTip()
 {
     QString currentTip;
-#ifdef USE_KNOTIFICATIONITEM
+#ifdef HAVE_KSTATUSNOTIFIERITEM
     QString title = mInterface->getSettings().alias;
     if ( title.isEmpty() )
         title = mInterface->getName();
@@ -112,7 +112,7 @@ void InterfaceTray::slotQuit()
     kapp->quit();
 }
 
-#ifdef USE_KNOTIFICATIONITEM
+#ifdef HAVE_KSTATUSNOTIFIERITEM
 void InterfaceTray::activate(const QPoint&)
 {
     mInterface->showStatusDialog( false );
@@ -164,7 +164,7 @@ QString InterfaceTray::toolTipData()
 
     tipData = "<table cellspacing='2'>";
 
-#ifndef USE_KNOTIFICATIONITEM
+#ifndef HAVE_KSTATUSNOTIFIERITEM
     QString title = mInterface->getSettings().alias;
     if ( title.isEmpty() )
         title = mInterface->getName();

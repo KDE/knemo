@@ -156,7 +156,7 @@ void InterfaceIcon::updateIconImage( int status )
     {
         iconName += ICON_ERROR;
     }
-#ifdef USE_KNOTIFICATIONITEM
+#ifdef HAVE_KSTATUSNOTIFIERITEM
     mTray->setIconByName( iconName );
 #else
     mTray->setIcon( KIcon( iconName ) );
@@ -317,7 +317,7 @@ void InterfaceIcon::updateBars( bool doUpdate )
     p.fillRect( leftRect, outGrad );
     brush = QBrush( topOutGrad );
     p.fillRect( topLeftRect, topOutGrad );
-#ifdef USE_KNOTIFICATIONITEM
+#ifdef HAVE_KSTATUSNOTIFIERITEM
     mTray->setIconByPixmap( barIcon );
 #else
     mTray->setIcon( barIcon );
@@ -406,7 +406,7 @@ void InterfaceIcon::updateIconText( bool doUpdate )
     p.setFont( rxFont );
     p.setPen( txColor );
     p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, textOutgoing );
-#ifdef USE_KNOTIFICATIONITEM
+#ifdef HAVE_KSTATUSNOTIFIERITEM
     mTray->setIconByPixmap( textIcon );
 #else
     mTray->setIcon( textIcon );
@@ -523,7 +523,7 @@ void InterfaceIcon::updateTrayStatus()
         else
             updateIconImage( mInterface->getState() );
         updateMenu();
-#ifndef USE_KNOTIFICATIONITEM
+#ifndef HAVE_KSTATUSNOTIFIERITEM
         mTray->show();
 #endif
     }
