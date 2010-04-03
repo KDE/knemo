@@ -157,7 +157,7 @@ void InterfaceIcon::updateIconImage( int status )
         iconName += ICON_ERROR;
     }
 #ifdef USE_KNOTIFICATIONITEM
-    mTray->setIconByPixmap( KIcon( iconName ) );
+    mTray->setIconByName( iconName );
 #else
     mTray->setIcon( KIcon( iconName ) );
 #endif
