@@ -320,7 +320,11 @@ enum NotificationType
     NotifyRoll30Day
 };
 
-static const int defaultTip = INTERFACE | STATUS | IP_ADDRESS | ESSID | LINK_QUALITY | DOWNLOAD_SPEED | UPLOAD_SPEED;
+#ifdef HAVE_KSTATUSNOTIFIERITEM
+static const int defaultTip = STATUS | IP_ADDRESS | RX_BYTES | TX_BYTES | ESSID | LINK_QUALITY | DOWNLOAD_SPEED | UPLOAD_SPEED | ENCRYPTION;
+#else
+static const int defaultTip = INTERFACE | STATUS | IP_ADDRESS | RX_BYTES | TX_BYTES | ESSID | LINK_QUALITY | DOWNLOAD_SPEED | UPLOAD_SPEED | ENCRYPTION;
+#endif
 
 static const double pollIntervals[] = { 0.1, 0.2, 0.25, 0.5, 1.0, 2.0 };
 
