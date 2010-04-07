@@ -11,7 +11,7 @@ It also does a whole lot more:
    - multiple addresses per interface
 
  * Supports optional traffic statistics
-   - logs daily, weekly, monthly, yearly statistics
+   - logs hourly, daily, weekly, monthly, yearly statistics
    - monthly statistics can act as billing periods; a billing period can start
      on an arbitrary day and can span 1-6 months
 
@@ -23,7 +23,7 @@ It also does a whole lot more:
 
  * Supports notifications
    - can notify when an interface connects/disconnects from a network, becomes
-     available/unavailable, or when monthly traffic exceeds a threshold
+     available/unavailable, or when traffic exceeds a threshold
 
  * Supports tray icon themes
    - themes modeled after the network status icons in the freedesktop.org icon
