@@ -14,12 +14,14 @@ It also does a whole lot more:
    - logs hourly, daily, weekly, monthly, yearly statistics
    - monthly statistics can act as billing periods; a billing period can start
      on an arbitrary day and can span 1-6 months
+   - if running on KDE SC >= 4.4 statistics will use the calendar selected in
+     System Settings
 
  * Provides detailed information about an interface
    - tray icon displays incoming/outgoing traffic
    - customizable dynamic tray tooltip provides quick access to info
    - left clicking the tray icon presents a status dialog
-   - traffic plotter dialog modelled after the plotter in KDE's System Monitor
+   - traffic plotter dialog modelled after the plotter in System Monitor
 
  * Supports notifications
    - can notify when an interface connects/disconnects from a network, becomes
@@ -37,4 +39,4 @@ It also does a whole lot more:
    - automatically detects available interfaces; by default it monitors only
      the default route interface
    - supports update intervals from 0.1 to 2 seconds
-   - configurable via the tray icon's context menu or KDE System Settings
+   - configurable via the tray icon's context menu or System Settings

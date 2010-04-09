@@ -2,11 +2,12 @@ Version 0.6.2
  * add rolling 24 hour statistics
  * make traffic notification more flexible to accommodate some common limits
    (hourly, daily, etc...)
- * don't always show ports of a bridge or aggregated interface as "down"
- * if running on KDE >= 4.4, statistics use the calendar system defined in
+ * font of the text icon theme is configurable
+ * fix a bug that always showed the ports of a bridge or aggregated interface
+   as down
+ * if compiled against KDE SC >= 4.4, use KStatusNotifierItem by default
+ * if running on KDE SC >= 4.4, statistics use the calendar system selected in
    System Settings
- * Let user change the font of the text icon theme
- * Use KStatusNotifierItem by default if KDE >= 4.4
 
 Version 0.6.1
  * support for reading wireless info on FreeBSD
