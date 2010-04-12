@@ -1,3 +1,6 @@
+Version 0.6.3
+ * bugfix: save changes to traffic threshold setting
+
 Version 0.6.2
  * add rolling 24 hour statistics
  * make traffic notification more flexible to accommodate some common limits
