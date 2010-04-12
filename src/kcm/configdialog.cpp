@@ -1114,6 +1114,7 @@ void ConfigDialog::advancedButtonClicked()
     if ( t.exec() )
     {
         InterfaceSettings s = t.getSettings();
+        settings->trafficThreshold = s.trafficThreshold;
         settings->dynamicColor = s.dynamicColor;
         settings->colorIncomingMax = s.colorIncomingMax;
         settings->colorOutgoingMax = s.colorOutgoingMax;
