@@ -52,6 +52,10 @@ Name[x-test]=xxNetwork Monitorxx
 Name[zh_CN]=网络监控
 Name[zh_TW]=網路監控
 Comment=Configure the KNemo network monitor
+Comment[es]=Configurar el monitor de red de KNemo
+Comment[pt]=Configurar o monitor de rede do KNemo
+Comment[sv]=Anpassa Knemo nätverksövervakning
+Comment[uk]=Налаштування спостереження за мережею KNemo
 Comment[x-test]=xxConfigure the KNemo network monitorxx
 
 X-KDE-Keywords=knemo,network monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systray
