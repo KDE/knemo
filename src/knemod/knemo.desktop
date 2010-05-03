@@ -51,6 +51,7 @@ Name[x-test]=xxKNemoxx
 Name[zh_CN]=KNemo
 Name[zh_TW]=KNemo
 GenericName=Network Monitor
+GenericName[da]=Netværksovervågning
 GenericName[es]=Monitor de red
 GenericName[it]=Monitor di rete
 GenericName[pt]=Monitor da Rede

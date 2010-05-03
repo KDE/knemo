@@ -52,6 +52,7 @@ Name[x-test]=xxNetwork Monitorxx
 Name[zh_CN]=网络监控
 Name[zh_TW]=網路監控
 Comment=Configure the KNemo network monitor
+Comment[da]=Indstil KNemo netværksovervågning
 Comment[es]=Configurar el monitor de red de KNemo
 Comment[it]=Configura il monitor di rete KNemo
 Comment[pt]=Configurar o monitor de rede do KNemo
