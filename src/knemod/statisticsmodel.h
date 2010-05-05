@@ -37,7 +37,7 @@ public:
         Year  = 16
     };
 
-    StatisticsModel( enum GroupType t, QString group, QString elem, QObject *parent = 0 );
+    StatisticsModel( enum GroupType t, QObject *parent = 0 );
     virtual ~StatisticsModel();
 
     enum StatisticRoles
@@ -52,8 +52,6 @@ public:
     void clearRows() { removeRows( 0, rowCount() ); }
 
     enum GroupType type() const { return mType; }
-    QString group() const { return mGroup; }
-    QString elem() const { return mElem; }
 
     void appendStats( const QDateTime& date, int tSpan, quint64 rx = 0, quint64 tx = 0 );
     void appendStats( const QDate& date, int days, quint64 rx = 0, quint64 tx = 0 );
@@ -86,8 +84,6 @@ private:
     };
 
     enum GroupType mType;
-    QString mGroup;
-    QString mElem;
     const KCalendarSystem * mCalendar;
 };
 

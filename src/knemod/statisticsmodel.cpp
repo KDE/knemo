@@ -23,11 +23,9 @@
 #include <KLocale>
 #include <kio/global.h>
 
-StatisticsModel::StatisticsModel( enum GroupType t, QString group, QString elem, QObject *parent ) :
+StatisticsModel::StatisticsModel( enum GroupType t, QObject *parent ) :
     QStandardItemModel( parent ),
-    mType( t ),
-    mGroup( group ),
-    mElem( elem )
+    mType( t )
 {
     QStringList headerList;
     headerList << i18n( "Date" ) << i18n( "Sent" ) << i18n( "Received" ) << i18n( "Total" );

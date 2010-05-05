@@ -61,6 +61,7 @@ private slots:
     void saveStatistics();
 
 private:
+    QString typeToElem( enum StatisticsModel::GroupType t );
     void loadConfig();
     void loadStatistics();
     void loadStatsGroup( const KCalendarSystem * cal, const QDomElement& root,

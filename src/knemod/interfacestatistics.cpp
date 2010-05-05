@@ -35,17 +35,6 @@
 static const char statistics_prefix[] = "/statistics_";
 
 static const char doc_name[]     = "statistics";
-static const char group_hours[]  = "hours";
-static const char group_days[]   = "days";
-static const char group_weeks[]  = "weeks";
-static const char group_months[] = "months";
-static const char group_years[]  = "years";
-
-static const char elem_hour[]  = "hour";
-static const char elem_day[]   = "day";
-static const char elem_week[]  = "week";
-static const char elem_month[] = "month";
-static const char elem_year[]  = "year";
 
 static const char attrib_calendar[] = "calendar";
 static const char attrib_version[]  = "version";
@@ -53,11 +42,7 @@ static const char attrib_span[]     = "span";
 static const char attrib_rx[]       = "rxBytes";
 static const char attrib_tx[]       = "txBytes";
 
-static const char attrib_hour[]  = "hour";
-static const char attrib_day[]   = "day";
-static const char attrib_month[] = "month";
-static const char attrib_year[]  = "year";
-
+static const char* intervals[] = { "hour", "day", "week", "month", "year" };
 
 InterfaceStatistics::InterfaceStatistics( Interface* interface )
     : QObject(),
@@ -65,15 +50,15 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
       mInterface( interface ),
       mAllMonths( true )
 {
-    StatisticsModel * s = new StatisticsModel( StatisticsModel::Hour, group_hours, elem_hour, this );
+    StatisticsModel * s = new StatisticsModel( StatisticsModel::Hour, this );
     mModels.insert( StatisticsModel::Hour, s );
-    s = new StatisticsModel( StatisticsModel::Day, group_days, elem_day, this );
+    s = new StatisticsModel( StatisticsModel::Day, this );
     mModels.insert( StatisticsModel::Day, s );
-    s = new StatisticsModel( StatisticsModel::Week, group_weeks, elem_week, this );
+    s = new StatisticsModel( StatisticsModel::Week, this );
     mModels.insert( StatisticsModel::Week, s );
-    s = new StatisticsModel( StatisticsModel::Month, group_months, elem_month, this );
+    s = new StatisticsModel( StatisticsModel::Month, this );
     mModels.insert( StatisticsModel::Month, s );
-    s = new StatisticsModel( StatisticsModel::Year, group_years, elem_year, this );
+    s = new StatisticsModel( StatisticsModel::Year, this );
     mModels.insert( StatisticsModel::Year, s );
 
     connect( mSaveTimer, SIGNAL( timeout() ), this, SLOT( saveStatistics() ) );
@@ -97,6 +82,18 @@ InterfaceStatistics::~InterfaceStatistics()
         interfaceGroup.writeEntry( conf_billingStart, mBillingStart );
         config->sync();
     }
+}
+
+QString InterfaceStatistics::typeToElem( enum StatisticsModel::GroupType t )
+{
+    int i = 0;
+    int v = t;
+    while ( v > StatisticsModel::Hour )
+    {
+        v = v >> 1;
+        i++;
+    }
+    return intervals[i];
 }
 
 void InterfaceStatistics::clearStatistics()
@@ -135,7 +132,7 @@ void InterfaceStatistics::configChanged()
 void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDomElement& parentItem,
                                           StatisticsModel* statistics )
 {
-    QDomNode n = parentItem.namedItem( statistics->group() );
+    QDomNode n = parentItem.namedItem( typeToElem(statistics->type()) + "s" );
     if ( !n.isNull() )
     {
         QDomNode node = n.firstChild();
@@ -148,9 +145,9 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                 QDate date;
                 QTime time;
 
-                int year = element.attribute( attrib_year ).toInt();
-                int month = element.attribute( attrib_month, "1" ).toInt();
-                int day = element.attribute( attrib_day, "1" ).toInt();
+                int year = element.attribute( typeToElem(StatisticsModel::Year) ).toInt();
+                int month = element.attribute( typeToElem(StatisticsModel::Month), "1" ).toInt();
+                int day = element.attribute( typeToElem(StatisticsModel::Day), "1" ).toInt();
                 cal->setDate( date, year, month, day );
 
                 if ( date.isValid() )
@@ -159,7 +156,7 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                     switch ( statistics->type() )
                     {
                         case StatisticsModel::Hour:
-                            time = QTime( element.attribute( attrib_hour ).toInt(), 0 );
+                            time = QTime( element.attribute( typeToElem(StatisticsModel::Hour) ).toInt(), 0 );
                             break;
                         case StatisticsModel::Month:
                             // Old format had no span, so daysInMonth using gregorian
@@ -194,16 +191,16 @@ void InterfaceStatistics::saveStatsGroup( QDomDocument& doc, const StatisticsMod
 {
     QString groupName;
     QString elementName;
-    QDomElement elements = doc.createElement( statistics->group() );
+    QDomElement elements = doc.createElement( QString( typeToElem(statistics->type()) ) + "s" );
     for ( int i = 0; i < statistics->rowCount(); ++i )
     {
-        QDomElement element = doc.createElement( statistics->elem() );
+        QDomElement element = doc.createElement( typeToElem(statistics->type()) );
         QDate date = statistics->date( i );
-        element.setAttribute( attrib_day, mCalendar->day( date ) );
-        element.setAttribute( attrib_month, mCalendar->month( date ) );
-        element.setAttribute( attrib_year, mCalendar->year( date ) );
+        element.setAttribute( typeToElem(StatisticsModel::Day), mCalendar->day( date ) );
+        element.setAttribute( typeToElem(StatisticsModel::Month), mCalendar->month( date ) );
+        element.setAttribute( typeToElem(StatisticsModel::Year), mCalendar->year( date ) );
         if ( statistics->type() == StatisticsModel::Hour )
-            element.setAttribute( attrib_hour, statistics->dateTime( i ).time().hour() );
+            element.setAttribute( typeToElem(StatisticsModel::Hour), statistics->dateTime( i ).time().hour() );
         else if ( statistics->type() > StatisticsModel::Day )
             element.setAttribute( attrib_span, statistics->days( i ) );
         element.setAttribute( attrib_rx, statistics->rxBytes( i ) );
