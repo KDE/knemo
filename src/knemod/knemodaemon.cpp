@@ -27,6 +27,7 @@
 #include <KStandardDirs>
 
 #include "config-knemo.h"
+#include "global.h"
 #include "knemodaemon.h"
 #include "interface.h"
 #include "backends/backendfactory.h"
@@ -34,8 +35,8 @@
 
 QString KNemoDaemon::sSelectedInterface = QString::null;
 
-GeneralSettings *generalSettings = NULL;
 BackendBase *backend = NULL;
+GeneralSettings *generalSettings = NULL;
 
 KNemoDaemon::KNemoDaemon()
     : QObject(),
@@ -81,6 +82,7 @@ void KNemoDaemon::readConfig()
     KConfigGroup generalGroup( config, confg_general );
     generalSettings->pollInterval = clamp<double>(generalGroup.readEntry( conf_pollInterval, g.pollInterval ), 0.1, 2.0 );
     generalSettings->pollInterval = validatePoll( generalSettings->pollInterval );
+    generalSettings->useBitrate = generalGroup.readEntry( conf_useBitrate, g.useBitrate );
     generalSettings->saveInterval = clamp<int>(generalGroup.readEntry( conf_saveInterval, g.saveInterval ), 0, 300 );
     generalSettings->statisticsDir = generalGroup.readEntry( conf_statisticsDir, g.statisticsDir );
     generalSettings->toolTipContent = generalGroup.readEntry( conf_toolTipContent, g.toolTipContent );

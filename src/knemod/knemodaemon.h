@@ -26,9 +26,6 @@
 
 #include <KApplication>
 
-#include "data.h"
-#include "global.h"
-
 class QTimer;
 class KAboutData;
 class Interface;

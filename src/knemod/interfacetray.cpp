@@ -18,6 +18,7 @@
    Boston, MA 02110-1301, USA.
 */
 
+#include "global.h"
 #include "interfacetray.h"
 
 #ifdef __linux__
@@ -258,9 +259,9 @@ QString InterfaceTray::toolTipData()
     if ( data->status & KNemoIface::Connected )
     {
         if ( toolTipContent & DOWNLOAD_SPEED )
-            tipData += leftTags + i18n( "Download Speed" ) + centerTags + KIO::convertSize( mInterface->getRxRate() ) + i18n( "/s" ) + rightTags;
+            tipData += leftTags + i18n( "Download Speed" ) + centerTags + mInterface->getRxRateStr() + rightTags;
         if ( toolTipContent & UPLOAD_SPEED )
-            tipData += leftTags + i18n( "Upload Speed" ) + centerTags + KIO::convertSize( mInterface->getTxRate() ) + i18n( "/s" ) + rightTags;
+            tipData += leftTags + i18n( "Upload Speed" ) + centerTags + mInterface->getTxRateStr() + rightTags;
     }
 
     if ( data->status & KNemoIface::Connected && data->isWireless )

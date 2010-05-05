@@ -33,4 +33,6 @@
 // application wide settings are stored here
 extern GeneralSettings *generalSettings;
 
+QString formattedRate( quint64 data, bool useBits );
+
 #endif // GLOBAL_H

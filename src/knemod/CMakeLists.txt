@@ -2,6 +2,7 @@ include_directories( ${KDE4_INCLUDES} ../common )
 
 set( knemo_SRCS
     main.cpp
+    global.cpp
     interface.cpp
     interfaceicon.cpp
     interfaceplotterdialog.cpp

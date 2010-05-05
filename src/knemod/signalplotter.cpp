@@ -54,7 +54,9 @@ KSignalPlotter::KSignalPlotter( QWidget *parent)
   mNiceMinValue = mNiceMaxValue = 0.0;
   mNiceRange = 0;
   mUseAutoRange = true;
-  mScaleDownBy = 1;
+  mUseBitrate = false;
+  mMultiplier = 1024;
+  mScaleDownBy = mMultiplier;
   mShowThinFrame = true;
   mSmoothGraph = true;
 
@@ -83,13 +85,48 @@ KSignalPlotter::KSignalPlotter( QWidget *parent)
   mStackBeams = false;
   mFillOpacity = 20;
   mRescaleTime = 0;
-  mUnit = "KiB/s";
+  mByteUnits << i18n( "B/s" ) << i18n( "KiB/s" ) << i18n( "MiB/s" ) << i18n( "GiB/s" );
+  mBitUnits << i18n( "bit/s" ) << i18n( "kbit/s" ) << i18n( "Mbit/s" ) << i18n( "Gbit/s" );
+  mUnit = "B/s";
 
   mVisibleBeams = NONE;
 }
 
 KSignalPlotter::~KSignalPlotter()
 {
+}
+
+void KSignalPlotter::useBitrate( bool useBits )
+{
+    if ( mUseBitrate == useBits )
+        return;
+
+    mUseBitrate = useBits;
+    double conversion;
+    if ( mUseBitrate )
+    {
+        mMultiplier = 1000;
+        conversion = 8;
+    }
+    else
+    {
+        mMultiplier = 1024;
+        conversion = 0.125;
+    }
+
+    QList< QList<double> >::Iterator it;
+    for(it = mBeamData.begin(); it != mBeamData.end(); ++it) {
+        for(int i = 0; i < (*it).count(); ++i)
+        {
+            (*it)[i] = (*it)[i]*conversion;
+        }
+    }
+    mScaleDownBy = mMultiplier;
+    mBackgroundImage = QPixmap();
+    plotterAxisScaleChanged();
+    if ( mUseAutoRange )
+        rescale();
+    update();
 }
 
 QString KSignalPlotter::unit() const {
@@ -143,6 +180,7 @@ void KSignalPlotter::recalculateMaxMinValueForSample(const QList<double>&sampleB
     }
     if(mMinValue > value) mMinValue = value;
     if(mMaxValue < value) mMaxValue = value;
+    if(mMaxValue < mMultiplier ) mMaxValue = mMultiplier;
     if(value > 0.7*mMaxValue)
       mRescaleTime = time;
   } else {
@@ -151,6 +189,7 @@ void KSignalPlotter::recalculateMaxMinValueForSample(const QList<double>&sampleB
       value = sampleBuf[i];
       if(mMinValue > value) mMinValue = value;
       if(mMaxValue < value) mMaxValue = value;
+      if(mMaxValue < mMultiplier ) mMaxValue = mMultiplier;
       if(value > 0.7*mMaxValue)
         mRescaleTime = time;
     }
@@ -259,6 +298,8 @@ void KSignalPlotter::removeBeam( uint pos )
 
 void KSignalPlotter::setScaleDownBy( double value )
 { 
+  if ( value < mMultiplier )
+      value = mMultiplier;
   if(mScaleDownBy == value) return;
   mScaleDownBy = value;
   mBackgroundImage = QPixmap(); //we changed a paint setting, so reset the cache
@@ -281,7 +322,7 @@ bool KSignalPlotter::useAutoRange() const
 
 void KSignalPlotter::setMinValue( double min )
 {
-  mMinValue = min;
+  mMinValue = min*mMultiplier;
   calculateNiceRange();
   //this change will be detected in paint and the image cache regenerated
 }
@@ -293,7 +334,7 @@ double KSignalPlotter::minValue() const
 
 void KSignalPlotter::setMaxValue( double max )
 {
-  mMaxValue = max;
+  mMaxValue = max*mMultiplier;
   calculateNiceRange();
   //this change will be detected in paint and the image cache regenerated
 }
@@ -905,7 +946,7 @@ void KSignalPlotter::drawAxisText(QPainter *p, const QRect &boundingBox)
 
     double value;
     if(y == mHorizontalLinesCount+1)
-        value = mNiceMinValue; //sometimes using the formulas gives us a value very slightly off
+        value = mNiceMinValue/mMultiplier; //sometimes using the formulas gives us a value very slightly off
     else
         value = mNiceMaxValue/mScaleDownBy - y * stepsize;
 
@@ -1000,28 +1041,26 @@ void KSignalPlotter::setFillOpacity(int fill)
 
 void KSignalPlotter::plotterAxisScaleChanged()
 {
-    QString unit = mUnit.toUpper();
-    bool addSecs = unit.contains( "/S" );
     double value = maxValue();
+    int units = 0;
 
-    if (value >= 1024*1024*0.7) //If it's over 0.7GiB, then set the scale to gigabytes
+    if (value >= pow( mMultiplier, 3)*0.7) //If it's over 0.7GiB, then set the scale to gigabytes
     {
-        setScaleDownBy(1024*1024);
-        mUnit = "GiB";
+        units = 3;
     }
-    else if (value > 1024)
+    else if (value > pow(mMultiplier,2))
     {
-        setScaleDownBy(1024);
-        mUnit = "MiB";
+        units = 2;
     }
     else
     {
-        setScaleDownBy(1);
-        mUnit = "KiB";
+        units = 1;
     }
-
-    if ( addSecs )
-        mUnit += "/s";
+    setScaleDownBy( pow(mMultiplier, units ) );
+    if ( mUseBitrate )
+        mUnit = mBitUnits[units];
+    else
+        mUnit = mByteUnits[units];
 
     setUnit(mUnit);
 }

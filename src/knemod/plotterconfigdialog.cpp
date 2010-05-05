@@ -19,7 +19,6 @@
 
 
 #include "plotterconfigdialog.h"
-#include "data.h"
 
 #include <KConfig>
 

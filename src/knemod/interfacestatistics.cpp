@@ -29,6 +29,7 @@
 #include <cmath>
 #include <unistd.h>
 
+#include "global.h"
 #include "interface.h"
 #include "interfacestatistics.h"
 

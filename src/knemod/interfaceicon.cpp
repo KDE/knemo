@@ -18,6 +18,7 @@
    Boston, MA 02110-1301, USA.
 */
 
+#include <math.h>
 #include <unistd.h>
 
 #include <QPainter>
@@ -33,14 +34,13 @@
 #include <KProcess>
 #include <KStandardDirs>
 
-#include "data.h"
+#include "global.h"
 #include "utils.h"
 #include "interface.h"
 #include "knemodaemon.h"
 #include "interfaceicon.h"
 #include "interfacetray.h"
 
-#define MINIMAL_MAX 1024
 #define SHRINK_MAX 0.75
 #define HISTSIZE_STORE 0.5
 
@@ -180,12 +180,15 @@ int InterfaceIcon::calcHeight( QList<unsigned long>& hist, unsigned int& net_max
         QList<unsigned long>sortedMax( hist );
         qSort( sortedMax );
         unsigned long max = sortedMax.last();
+        int multiplier = 1024;
+        if ( generalSettings->useBitrate )
+            multiplier = 1000;
         if( rate > net_max )
         {
             net_max = rate;
         }
         else if( max < net_max * SHRINK_MAX
-                && net_max * SHRINK_MAX >= MINIMAL_MAX )
+                && net_max * SHRINK_MAX >= multiplier )
         {
             net_max *= SHRINK_MAX;
         }
@@ -324,30 +327,46 @@ void InterfaceIcon::updateBars( bool doUpdate )
 #endif
 }
 
-QString InterfaceIcon::compactTrayText(unsigned long bytes )
+QString InterfaceIcon::compactTrayText(unsigned long data )
 {
-    QString byteString;
+    QString dataString;
     // Space is tight, so no space between number and units, and the complete
     // string should be no more than 4 chars.
     /* Visually confusing to display bytes
     if ( bytes < 922 ) // 922B = 0.9K
         byteString = i18n( "%1B", bytes );
     */
-    if ( bytes < 10189 ) // < 9.95K
-        byteString = i18n( "%1K", QString::number( bytes/1024.0, 'f', 1 ) );
-    else if ( bytes < 1023488 ) // < 999.5
-        byteString = i18n( "%1K", QString::number( bytes/1024.0, 'f', 0 ) );
-    else if ( bytes < 10433331 ) // < 9.95M
-        byteString = i18n( "%1M", QString::number( bytes/1048576.0, 'f', 1 ) );
-    else if ( bytes < 1048051712 ) // < 999.5G
-        byteString = i18n( "%1M", QString::number( bytes/1048576.0, 'f', 0 ) );
-    else if ( bytes < 10683731148.0 ) // < 9.95G
-        // xgettext: no-c-format
-        byteString = i18n( "%1G", QString::number( bytes/1073741824.0, 'f', 1 ) );
-    else
-        // xgettext: no-c-format
-        byteString = i18n( "%1G", QString::number( bytes/1073741824.0, 'f', 0) );
-    return byteString;
+    double multiplier = 1024;
+    if ( generalSettings->useBitrate )
+        multiplier = 1000;
+
+    int precision = 0;
+    if ( data < multiplier*9.95 ) // < 9.95K
+    {
+        precision = 1;
+    }
+    if ( data < multiplier*999.5 ) // < 999.5K
+    {
+        if ( generalSettings->useBitrate )
+            dataString = i18n( "%1k", QString::number( data/multiplier, 'f', precision ) );
+        else
+            dataString = i18n( "%1K", QString::number( data/multiplier, 'f', precision ) );
+        return dataString;
+    }
+
+    if ( data < pow(multiplier, 2)*9.95 ) // < 9.95M
+        precision = 1;
+    if ( data < pow(multiplier, 2)*999.5 ) // < 999.5M
+    {
+        dataString = i18n( "%1M", QString::number( data/pow(multiplier, 2), 'f', precision ) );
+        return dataString;
+    }
+
+    if ( data < pow(multiplier, 3)*9.95 ) // < 9.95G
+        precision = 1;
+    // xgettext: no-c-format
+    dataString = i18n( "%1G", QString::number( data/pow(multiplier, 3), 'f', precision) );
+    return dataString;
 }
 
 void InterfaceIcon::updateIconText( bool doUpdate )

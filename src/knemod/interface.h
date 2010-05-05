@@ -22,8 +22,6 @@
 #define INTERFACE_H
 
 #include <time.h>
-#include "data.h"
-#include "global.h"
 #include "interfaceicon.h"
 
 class InterfacePlotterDialog;
@@ -99,6 +97,16 @@ public:
         return mTxRate;
     }
 
+    QString getRxRateStr()
+    {
+        return mRxRateStr;
+    }
+
+    QString getTxRateStr()
+    {
+        return mTxRateStr;
+    }
+
     /**
      * Called from reparseConfiguration() when the user changed
      * the settings.
@@ -169,6 +177,8 @@ private:
     QString mUptimeString;
     unsigned long mRxRate;
     unsigned long mTxRate;
+    QString mRxRateStr;
+    QString mTxRateStr;
     InterfaceIcon mIcon;
     InterfaceSettings mSettings;
     InterfaceStatistics* mStatistics;

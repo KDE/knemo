@@ -126,6 +126,7 @@ static const char conf_toolTipContent[] = "ToolTipContent";
 static const char conf_pollInterval[] = "PollInterval";
 static const char conf_saveInterval[] = "SaveInterval";
 static const char conf_statisticsDir[] = "StatisticsDir";
+static const char conf_useBitrate[] = "UseBitrate";
 static const char conf_plotterPos[] = "PlotterPos";
 static const char conf_plotterSize[] = "PlotterSize";
 static const char conf_statisticsPos[] = "StatisticsPos";
@@ -137,7 +138,6 @@ static const char conf_dayState[] = "DayState";
 static const char conf_weekState[] = "WeekState";
 static const char conf_monthState[] = "MonthState";
 static const char conf_yearState[] = "YearState";
-
 
 enum ToolTipEnums
 {
@@ -256,11 +256,13 @@ struct GeneralSettings
       : toolTipContent( defaultTip ),
         pollInterval( 1.0 ),
         saveInterval( 60 ),
+        useBitrate( false ),
         statisticsDir( KGlobal::dirs()->saveLocation( "data", "knemo/" ) )
     {}
     int toolTipContent;
     double pollInterval;
     int saveInterval;
+    bool useBitrate;
     KUrl statisticsDir;
 };
 

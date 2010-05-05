@@ -24,6 +24,7 @@
 #include <QMenu>
 #include <KApplication>
 
+#include "global.h"
 #include "interfaceplotterdialog.h"
 #include "utils.h"
 #include "signalplotter.h"
@@ -79,6 +80,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
       mConfigDlg( 0 ),
       mSetPos( true ),
       mWasShown( false ),
+      mUseBitrate( generalSettings->useBitrate ),
       mName( name )
 {
     setCaption( i18n( "%1 Traffic", mName ) );
@@ -232,6 +234,17 @@ void InterfacePlotterDialog::configFinished()
     mConfigDlg = 0;
 }
 
+void InterfacePlotterDialog::useBitrate( bool useBits )
+{
+    mUseBitrate = useBits;
+    mPlotter->useBitrate( mUseBitrate );
+    for ( int beamId = 0; beamId < mPlotter->numBeams(); beamId++ )
+    {
+        QString lastValue = formattedRate( mPlotter->lastValue(beamId), mUseBitrate );
+        static_cast<FancyPlotterLabel *>((static_cast<QWidgetItem *>(mLabelLayout->itemAt(beamId)))->widget())->value->setText(lastValue);
+    }
+}
+
 void InterfacePlotterDialog::updatePlotter( const double incomingBytes, const double outgoingBytes )
 {
     QList<double> trafficList;
@@ -242,7 +255,7 @@ void InterfacePlotterDialog::updatePlotter( const double incomingBytes, const do
 
     for ( int beamId = 0; beamId < mPlotter->numBeams(); beamId++ )
     {
-        QString lastValue = mPlotter->lastValueAsString(beamId);
+        QString lastValue = formattedRate( mPlotter->lastValue(beamId), mUseBitrate );
         static_cast<FancyPlotterLabel *>((static_cast<QWidgetItem *>(mLabelLayout->itemAt(beamId)))->widget())->value->setText(lastValue);
     }
 }
@@ -315,6 +328,7 @@ void InterfacePlotterDialog::configChanged()
     int axisTextWidth = fm.width(i18nc("Largest axis title", "99999 XXXX"));
     mPlotter->setMaxAxisTextWidth( axisTextWidth );
     mPlotter->setAxisFont( font );
+    mPlotter->useBitrate( generalSettings->useBitrate );
     if ( !mSettings.automaticDetection )
     {
         mPlotter->setMinValue( mSettings.minimumValue );

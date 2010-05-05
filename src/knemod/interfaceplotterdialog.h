@@ -41,6 +41,7 @@ public:
      * Update the signal plotter with new data
      */
     void updatePlotter( const double, const double );
+    void useBitrate( bool );
 
 protected:
     bool event( QEvent *e );
@@ -59,6 +60,7 @@ private:
     PlotterConfigDialog *mConfigDlg;
     bool mSetPos;
     bool mWasShown;
+    bool mUseBitrate;
     PlotterSettings mSettings;
     QString mName;
     KSignalPlotter *mPlotter;

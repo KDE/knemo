@@ -164,6 +164,8 @@ void Interface::configChanged()
 
     if ( mStatisticsDialog != 0 )
         mStatisticsDialog->configChanged();
+    if ( mPlotterDialog )
+        mPlotterDialog->useBitrate( generalSettings->useBitrate );
 }
 
 void Interface::processUpdate()
@@ -172,8 +174,13 @@ void Interface::processUpdate()
     unsigned int trafficThreshold = mSettings.trafficThreshold;
     mState = mBackendData->status;
 
-    mRxRate = mBackendData->incomingBytes / generalSettings->pollInterval;
-    mTxRate = mBackendData->outgoingBytes / generalSettings->pollInterval;
+    int units = 1;
+    if ( generalSettings->useBitrate )
+        units = 8;
+    mRxRate = mBackendData->incomingBytes * units / generalSettings->pollInterval;
+    mTxRate = mBackendData->outgoingBytes * units / generalSettings->pollInterval;
+    mRxRateStr = formattedRate( mRxRate, generalSettings->useBitrate );
+    mTxRateStr = formattedRate( mTxRate, generalSettings->useBitrate );
 
     QString title = mSettings.alias;
     if ( title.isEmpty() )
@@ -234,7 +241,7 @@ void Interface::processUpdate()
         mIcon.updateTrayStatus();
 
     if ( mPlotterDialog )
-        mPlotterDialog->updatePlotter( mRxRate / 1024.0, mTxRate / 1024.0 );
+        mPlotterDialog->updatePlotter( mRxRate, mTxRate );
 
     mIcon.updateToolTip();
     if ( mStatusDialog )
@@ -248,6 +255,8 @@ void Interface::resetUptime()
     mUptimeString = "00:00:00";
     mRxRate = 0;
     mTxRate = 0;
+    mRxRateStr = formattedRate( mRxRate, generalSettings->useBitrate );
+    mTxRateStr = formattedRate( mTxRate, generalSettings->useBitrate );
 }
 
 void Interface::showStatusDialog( bool fromContextMenu )

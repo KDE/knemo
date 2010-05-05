@@ -21,7 +21,6 @@
 #ifndef INTERFACESTATISTICS_H
 #define INTERFACESTATISTICS_H
 
-#include "global.h"
 #include "statisticsmodel.h"
 
 class QDomDocument;

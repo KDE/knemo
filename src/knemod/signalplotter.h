@@ -315,6 +315,7 @@ class KSignalPlotter : public QWidget
     /** Alpha value for filling the graph. Set to 0 to disable filling the graph, and 255 for a solid fill. Default is 20*/
     void setFillOpacity(int fill);
 
+    void useBitrate( bool useBits );
 
   
   Q_SIGNALS:
@@ -396,7 +397,11 @@ class KSignalPlotter : public QWidget
     unsigned int mSamples; //This is what mBeamData.size() should equal when full.  When we start off and have no data then mSamples will be higher.  If we resize the widget so it's smaller, then for a short while this will be smaller
     int mNewestIndex; //The index to the newest item added.  newestIndex+1   is the second newest, and so on
 
+    bool mUseBitrate;
+    int mMultiplier;
     QString mUnit;
+    QStringList mByteUnits;
+    QStringList mBitUnits;
 
     QFont mFont;
     int mAxisTextWidth;
