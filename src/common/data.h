@@ -29,6 +29,8 @@
 #include <QString>
 
 #include <KGlobalSettings>
+#include <KStandardDirs>
+#include <KUrl>
 
 /**
  * This file contains data structures used to store information about
@@ -137,6 +139,40 @@ static const char conf_monthState[] = "MonthState";
 static const char conf_yearState[] = "YearState";
 
 
+enum ToolTipEnums
+{
+    INTERFACE        = 0x00000001,
+    ALIAS            = 0x00000002,
+    STATUS           = 0x00000004,
+    UPTIME           = 0x00000008,
+    IP_ADDRESS       = 0x00000010,
+    SCOPE            = 0x00000020,
+    HW_ADDRESS       = 0x00000040,
+    PTP_ADDRESS      = 0x00000080,
+    RX_PACKETS       = 0x00000100,
+    TX_PACKETS       = 0x00000200,
+    RX_BYTES         = 0x00000400,
+    TX_BYTES         = 0x00000800,
+    ESSID            = 0x00001000,
+    MODE             = 0x00002000,
+    FREQUENCY        = 0x00004000,
+    BIT_RATE         = 0x00008000,
+    ACCESS_POINT     = 0x00010000,
+    LINK_QUALITY     = 0x00020000,
+    BCAST_ADDRESS    = 0x00040000,
+    GATEWAY          = 0x00080000,
+    DOWNLOAD_SPEED   = 0x00100000,
+    UPLOAD_SPEED     = 0x00200000,
+    NICK_NAME        = 0x00400000,
+    ENCRYPTION       = 0x00800000
+};
+
+#ifdef HAVE_KSTATUSNOTIFIERITEM
+static const int defaultTip = STATUS | IP_ADDRESS | RX_BYTES | TX_BYTES | ESSID | LINK_QUALITY | DOWNLOAD_SPEED | UPLOAD_SPEED | ENCRYPTION;
+#else
+static const int defaultTip = INTERFACE | STATUS | IP_ADDRESS | RX_BYTES | TX_BYTES | ESSID | LINK_QUALITY | DOWNLOAD_SPEED | UPLOAD_SPEED | ENCRYPTION;
+#endif
+
 struct KNemoTheme
 {
     QString name;
@@ -214,6 +250,20 @@ struct InterfaceCommand
     QString menuText;
 };
 
+struct GeneralSettings
+{
+    GeneralSettings()
+      : toolTipContent( defaultTip ),
+        pollInterval( 1.0 ),
+        saveInterval( 60 ),
+        statisticsDir( KGlobal::dirs()->saveLocation( "data", "knemo/" ) )
+    {}
+    int toolTipContent;
+    double pollInterval;
+    int saveInterval;
+    KUrl statisticsDir;
+};
+
 struct InterfaceSettings
 {
     InterfaceSettings()
@@ -282,34 +332,6 @@ enum rt_scope_t
 };
 #endif
 
-enum ToolTipEnums
-{
-    INTERFACE        = 0x00000001,
-    ALIAS            = 0x00000002,
-    STATUS           = 0x00000004,
-    UPTIME           = 0x00000008,
-    IP_ADDRESS       = 0x00000010,
-    SCOPE            = 0x00000020,
-    HW_ADDRESS       = 0x00000040,
-    PTP_ADDRESS      = 0x00000080,
-    RX_PACKETS       = 0x00000100,
-    TX_PACKETS       = 0x00000200,
-    RX_BYTES         = 0x00000400,
-    TX_BYTES         = 0x00000800,
-    ESSID            = 0x00001000,
-    MODE             = 0x00002000,
-    FREQUENCY        = 0x00004000,
-    BIT_RATE         = 0x00008000,
-    ACCESS_POINT     = 0x00010000,
-    LINK_QUALITY     = 0x00020000,
-    BCAST_ADDRESS    = 0x00040000,
-    GATEWAY          = 0x00080000,
-    DOWNLOAD_SPEED   = 0x00100000,
-    UPLOAD_SPEED     = 0x00200000,
-    NICK_NAME        = 0x00400000,
-    ENCRYPTION       = 0x00800000
-};
-
 enum NotificationType
 {
     NotifyHour,
@@ -319,12 +341,6 @@ enum NotificationType
     NotifyRoll7Day,
     NotifyRoll30Day
 };
-
-#ifdef HAVE_KSTATUSNOTIFIERITEM
-static const int defaultTip = STATUS | IP_ADDRESS | RX_BYTES | TX_BYTES | ESSID | LINK_QUALITY | DOWNLOAD_SPEED | UPLOAD_SPEED | ENCRYPTION;
-#else
-static const int defaultTip = INTERFACE | STATUS | IP_ADDRESS | RX_BYTES | TX_BYTES | ESSID | LINK_QUALITY | DOWNLOAD_SPEED | UPLOAD_SPEED | ENCRYPTION;
-#endif
 
 static const double pollIntervals[] = { 0.1, 0.2, 0.25, 0.5, 1.0, 2.0 };
 

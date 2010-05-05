@@ -47,8 +47,7 @@ public:
      * Default Constructor
      */
     Interface(const QString& ifname,
-              const BackendData * const,
-              const GeneralData& generalData );
+              const BackendData * const );
 
     /**
      * Default Destructor
@@ -83,11 +82,6 @@ public:
     InterfaceSettings& getSettings()
     {
         return mSettings;
-    }
-
-    const GeneralData& getGeneralData() const
-    {
-        return mGeneralData;
     }
 
     InterfaceStatistics* getStatistics()
@@ -182,7 +176,6 @@ private:
     InterfaceStatisticsDialog* mStatisticsDialog;
     InterfacePlotterDialog* mPlotterDialog;
     const BackendData* mBackendData;
-    const GeneralData& mGeneralData;
 };
 
 #endif // INTERFACE_H

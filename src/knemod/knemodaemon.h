@@ -107,8 +107,6 @@ private:
     // every time this timer expires we will
     // gather new informations from the backend
     QTimer* mPollTimer;
-    // application wide settings are stored here
-    GeneralData mGeneralData;
     // the name of backend we currently use
     QString mBackendName;
     // a list of all interfaces the user wants to monitor

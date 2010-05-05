@@ -254,14 +254,15 @@ void ConfigDialog::load()
     KConfigGroup generalGroup( config, confg_general );
     bool startKNemo = generalGroup.readEntry( conf_autoStart, true );
     mDlg->checkBoxStartKNemo->setChecked( startKNemo );
-    double pollVal = clamp<double>(generalGroup.readEntry( conf_pollInterval, 1.0 ), 0.1, 2.0 );
+    GeneralSettings g;
+    double pollVal = clamp<double>(generalGroup.readEntry( conf_pollInterval, g.pollInterval ), 0.1, 2.0 );
     pollVal = validatePoll( pollVal );
     int index = mDlg->comboBoxPoll->findData( pollVal );
     if ( index >= 0 )
         mDlg->comboBoxPoll->setCurrentIndex( index );
-    mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( conf_saveInterval, 60 ), 0, 300 ) );
-    mDlg->lineEditStatisticsDir->setUrl( generalGroup.readEntry( conf_statisticsDir, KGlobal::dirs()->saveLocation( "data", "knemo/" ) ) );
-    mToolTipContent = generalGroup.readEntry( conf_toolTipContent, defaultTip );
+    mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( conf_saveInterval, g.saveInterval ), 0, 300 ) );
+    mDlg->lineEditStatisticsDir->setUrl( generalGroup.readEntry( conf_statisticsDir, g.statisticsDir ) );
+    mToolTipContent = generalGroup.readEntry( conf_toolTipContent, g.toolTipContent );
 
     QStringList list = generalGroup.readEntry( conf_interfaces, QStringList() );
 
@@ -581,14 +582,15 @@ void ConfigDialog::defaults()
     }
 
     // Default general settings
-    int index = mDlg->comboBoxPoll->findData( 1.0 );
+    GeneralSettings g;
+    int index = mDlg->comboBoxPoll->findData( g.pollInterval );
     if ( index >= 0 )
         mDlg->comboBoxPoll->setCurrentIndex( index );
-    mDlg->numInputSaveInterval->setValue( 60 );
-    mDlg->lineEditStatisticsDir->setUrl( KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
+    mDlg->numInputSaveInterval->setValue( g.saveInterval );
+    mDlg->lineEditStatisticsDir->setUrl( g.statisticsDir );
 
     // Default tool tips
-    mToolTipContent = defaultTip;
+    mToolTipContent = g.toolTipContent;
     setupToolTipTab();
 
     changed( true );

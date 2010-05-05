@@ -21,8 +21,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include <QDate>
-#include <KUrl>
+#include "data.h"
 
 /**
  * This file contains data structures and enums used in the knemo daemon.
@@ -31,12 +30,7 @@
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
-struct GeneralData
-{
-    int toolTipContent;
-    double pollInterval;
-    int saveInterval;
-    KUrl statisticsDir;
-};
+// application wide settings are stored here
+extern GeneralSettings *generalSettings;
 
 #endif // GLOBAL_H

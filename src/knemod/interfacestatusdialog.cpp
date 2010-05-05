@@ -190,9 +190,9 @@ void InterfaceStatusDialog::doAvailable( const BackendData* data )
     ui.textLabelPacketsReceived->setText( QString::number( data->rxPackets ) );
     ui.textLabelBytesSend->setText( data->txString );
     ui.textLabelBytesReceived->setText( data->rxString );
-    unsigned long bytesPerSecond = data->outgoingBytes / mInterface->getGeneralData().pollInterval;
+    unsigned long bytesPerSecond = data->outgoingBytes / generalSettings->pollInterval;
     ui.textLabelSpeedSend->setText( KIO::convertSize( bytesPerSecond  ) + i18n( "/s" ) );
-    bytesPerSecond = data->incomingBytes / mInterface->getGeneralData().pollInterval;
+    bytesPerSecond = data->incomingBytes / generalSettings->pollInterval;
     ui.textLabelSpeedReceived->setText( KIO::convertSize( bytesPerSecond ) + i18n( "/s" ) );
 }
 

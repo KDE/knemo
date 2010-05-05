@@ -117,9 +117,9 @@ void InterfaceStatistics::loadConfig()
     mWarningDone = false;
     mBillingStart = mInterface->getSettings().billingStart;
 
-    if ( mInterface->getGeneralData().saveInterval > 0 )
+    if ( generalSettings->saveInterval > 0 )
     {
-        mSaveTimer->setInterval( mInterface->getGeneralData().saveInterval * 1000 );
+        mSaveTimer->setInterval( generalSettings->saveInterval * 1000 );
         mSaveTimer->start();
     }
 }
@@ -217,7 +217,7 @@ void InterfaceStatistics::saveStatsGroup( QDomDocument& doc, const StatisticsMod
 void InterfaceStatistics::loadStatistics()
 {
     QDomDocument doc( doc_name );
-    KUrl dir( mInterface->getGeneralData().statisticsDir );
+    KUrl dir( generalSettings->statisticsDir );
     if ( !dir.isLocalFile() )
         return;
     QFile file( dir.path() + statistics_prefix + mInterface->getName() );
@@ -252,7 +252,7 @@ void InterfaceStatistics::saveStatistics()
     foreach( StatisticsModel * s, mModels )
         saveStatsGroup( doc, s );
 
-    KUrl dir( mInterface->getGeneralData().statisticsDir );
+    KUrl dir( generalSettings->statisticsDir );
     if ( !dir.isLocalFile() )
         return;
 
@@ -398,7 +398,7 @@ void InterfaceStatistics::checkRebuild( QString oldType )
 {
     if ( oldType != mCalendar->calendarType() )
     {
-        KUrl dir( mInterface->getGeneralData().statisticsDir );
+        KUrl dir( generalSettings->statisticsDir );
         if ( dir.isLocalFile() )
         {
             QFile file( dir.path() + statistics_prefix + mInterface->getName() );

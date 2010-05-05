@@ -94,7 +94,7 @@ void InterfaceIcon::configChanged()
     int rightMargin = (margins - midMargin)/2;
     leftMargin = margins-midMargin - rightMargin;
     midMargin = leftMargin + barWidth+ midMargin;
-    histSize = HISTSIZE_STORE/mInterface->getGeneralData().pollInterval;
+    histSize = HISTSIZE_STORE/generalSettings->pollInterval;
     if ( histSize < 2 )
         histSize = 2;
 

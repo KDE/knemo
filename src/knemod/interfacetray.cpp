@@ -154,7 +154,7 @@ bool InterfaceTray::event( QEvent *e )
 QString InterfaceTray::toolTipData()
 {
     QString tipData;
-    int toolTipContent = mInterface->getGeneralData().toolTipContent;
+    int toolTipContent = generalSettings->toolTipContent;
     const BackendData * data = mInterface->getData();
     if ( !data )
         return QString();

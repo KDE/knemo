@@ -34,6 +34,7 @@
 
 QString KNemoDaemon::sSelectedInterface = QString::null;
 
+GeneralSettings *generalSettings = NULL;
 BackendBase *backend = NULL;
 
 KNemoDaemon::KNemoDaemon()
@@ -46,6 +47,7 @@ KNemoDaemon::KNemoDaemon()
       mColorOutgoing( 0xFF7F08 ),
       mColorBackground( 0x313031 )
 {
+    generalSettings = new GeneralSettings();
     backend = BackendFactory::backend();
     QDBusConnection::sessionBus().registerObject("/knemo", this, QDBusConnection::ExportScriptableSlots);
     mPollTimer = new QTimer();
@@ -63,6 +65,7 @@ KNemoDaemon::~KNemoDaemon()
         Interface *interface = mInterfaceHash.take( key );
         delete interface;
     }
+    delete generalSettings;
 }
 
 void KNemoDaemon::readConfig()
@@ -74,12 +77,13 @@ void KNemoDaemon::readConfig()
     config->reparseConfiguration();
 
     // General
+    GeneralSettings g;
     KConfigGroup generalGroup( config, confg_general );
-    mGeneralData.pollInterval = clamp<double>(generalGroup.readEntry( conf_pollInterval, 1.0 ), 0.1, 2.0 );
-    mGeneralData.pollInterval = validatePoll( mGeneralData.pollInterval );
-    mGeneralData.saveInterval = clamp<int>(generalGroup.readEntry( conf_saveInterval, 60 ), 0, 300 );
-    mGeneralData.statisticsDir = generalGroup.readEntry( conf_statisticsDir, KGlobal::dirs()->saveLocation( "data", "knemo/" ) );
-    mGeneralData.toolTipContent = generalGroup.readEntry( conf_toolTipContent, defaultTip );
+    generalSettings->pollInterval = clamp<double>(generalGroup.readEntry( conf_pollInterval, g.pollInterval ), 0.1, 2.0 );
+    generalSettings->pollInterval = validatePoll( generalSettings->pollInterval );
+    generalSettings->saveInterval = clamp<int>(generalGroup.readEntry( conf_saveInterval, g.saveInterval ), 0, 300 );
+    generalSettings->statisticsDir = generalGroup.readEntry( conf_statisticsDir, g.statisticsDir );
+    generalSettings->toolTipContent = generalGroup.readEntry( conf_toolTipContent, g.toolTipContent );
     // If we already have an Interfaces key--even if its empty--then we
     // shouldn't try to set up a default interface
     if ( generalGroup.hasKey( conf_interfaces ) )
@@ -124,7 +128,7 @@ void KNemoDaemon::readConfig()
         if ( !mInterfaceHash.contains( key ) )
         {
             const BackendData * data = backend->add( key );
-            Interface *iface = new Interface( key, data, mGeneralData );
+            Interface *iface = new Interface( key, data );
             mInterfaceHash.insert( key, iface );
             newIfaces << key;
         }
@@ -145,7 +149,7 @@ void KNemoDaemon::readConfig()
             connect( backend, SIGNAL( updateComplete() ), iface, SLOT( processUpdate() ) );
         }
     }
-    mPollTimer->start( mGeneralData.pollInterval * 1000 );
+    mPollTimer->start( generalSettings->pollInterval * 1000 );
 }
 
 void KNemoDaemon::reparseConfiguration()

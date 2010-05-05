@@ -28,6 +28,7 @@
 #include <kio/global.h>
 
 #include "backends/backendbase.h"
+#include "global.h"
 #include "utils.h"
 #include "interface.h"
 #include "interfaceplotterdialog.h"
@@ -36,8 +37,7 @@
 #include "interfacestatisticsdialog.h"
 
 Interface::Interface( const QString &ifname,
-                      const BackendData* data,
-                      const GeneralData& generalData )
+                      const BackendData* data )
     : QObject(),
       mType( KNemoIface::UnknownType ),
       mState( KNemoIface::UnknownState ),
@@ -53,8 +53,7 @@ Interface::Interface( const QString &ifname,
       mStatusDialog( 0 ),
       mStatisticsDialog(  0 ),
       mPlotterDialog( 0 ),
-      mBackendData( data ),
-      mGeneralData( generalData )
+      mBackendData( data )
 {
     mPlotterDialog = new InterfacePlotterDialog( mName );
 
@@ -173,8 +172,8 @@ void Interface::processUpdate()
     unsigned int trafficThreshold = mSettings.trafficThreshold;
     mState = mBackendData->status;
 
-    mRxRate = mBackendData->incomingBytes / mGeneralData.pollInterval;
-    mTxRate = mBackendData->outgoingBytes / mGeneralData.pollInterval;
+    mRxRate = mBackendData->incomingBytes / generalSettings->pollInterval;
+    mTxRate = mBackendData->outgoingBytes / generalSettings->pollInterval;
 
     QString title = mSettings.alias;
     if ( title.isEmpty() )
@@ -292,7 +291,7 @@ void Interface::showStatisticsDialog()
 
 void Interface::updateTime()
 {
-    mRealSec += mGeneralData.pollInterval;
+    mRealSec += generalSettings->pollInterval;
     if ( mRealSec < 1.0 )
         return;
 
