@@ -65,15 +65,15 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
       mInterface( interface ),
       mAllMonths( true )
 {
-    StatisticsModel * s = new StatisticsModel( StatisticsModel::Hour, group_hours, elem_hour );
+    StatisticsModel * s = new StatisticsModel( StatisticsModel::Hour, group_hours, elem_hour, this );
     mModels.insert( StatisticsModel::Hour, s );
-    s = new StatisticsModel( StatisticsModel::Day, group_days, elem_day );
+    s = new StatisticsModel( StatisticsModel::Day, group_days, elem_day, this );
     mModels.insert( StatisticsModel::Day, s );
-    s = new StatisticsModel( StatisticsModel::Week, group_weeks, elem_week );
+    s = new StatisticsModel( StatisticsModel::Week, group_weeks, elem_week, this );
     mModels.insert( StatisticsModel::Week, s );
-    s = new StatisticsModel( StatisticsModel::Month, group_months, elem_month );
+    s = new StatisticsModel( StatisticsModel::Month, group_months, elem_month, this );
     mModels.insert( StatisticsModel::Month, s );
-    s = new StatisticsModel( StatisticsModel::Year, group_years, elem_year );
+    s = new StatisticsModel( StatisticsModel::Year, group_years, elem_year, this );
     mModels.insert( StatisticsModel::Year, s );
 
     connect( mSaveTimer, SIGNAL( timeout() ), this, SLOT( saveStatistics() ) );

@@ -37,7 +37,7 @@ public:
         Year  = 16
     };
 
-    StatisticsModel( enum GroupType t, QString group, QString elem );
+    StatisticsModel( enum GroupType t, QString group, QString elem, QObject *parent = 0 );
     virtual ~StatisticsModel();
 
     enum StatisticRoles

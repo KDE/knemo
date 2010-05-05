@@ -23,8 +23,8 @@
 #include <KLocale>
 #include <kio/global.h>
 
-StatisticsModel::StatisticsModel( enum GroupType t, QString group, QString elem ) :
-    QStandardItemModel(),
+StatisticsModel::StatisticsModel( enum GroupType t, QString group, QString elem, QObject *parent ) :
+    QStandardItemModel( parent ),
     mType( t ),
     mGroup( group ),
     mElem( elem )
