@@ -32,6 +32,7 @@
 #include "global.h"
 #include "interface.h"
 #include "interfacestatistics.h"
+#include "syncstats/statsfactory.h"
 
 static const char statistics_prefix[] = "/statistics_";
 
@@ -39,6 +40,7 @@ static const char doc_name[]     = "statistics";
 
 static const char attrib_calendar[] = "calendar";
 static const char attrib_version[]  = "version";
+static const char attrib_updated[]  = "lastUpdated";
 static const char attrib_span[]     = "span";
 static const char attrib_rx[]       = "rxBytes";
 static const char attrib_tx[]       = "txBytes";
@@ -231,12 +233,85 @@ void InterfaceStatistics::loadStatistics()
 
     QDomElement root = doc.documentElement();
 
+    uint updated = root.attribute( attrib_updated ).toUInt();
+
     // If unknown or empty calendar it will default to gregorian
     KCalendarSystem *inCal = KCalendarSystem::create( root.attribute( attrib_calendar ) );
     foreach( StatisticsModel * s, mModels )
         loadStatsGroup( inCal, root, s );
 
     checkRebuild( inCal->calendarType() );
+
+    syncWithExternal( updated );
+}
+
+void InterfaceStatistics::syncWithExternal( uint updated )
+{
+    ExternalStats *v = StatsFactory::stats( mInterface );
+    if ( !v )
+        return;
+
+    v->importIfaceStats();
+    const StatisticsModel *syncDays = v->days();
+    const StatisticsModel *syncHours = v->hours();
+    StatisticsModel *days = mModels.value( StatisticsModel::Day );
+    StatisticsModel *hours = mModels.value( StatisticsModel::Hour );
+    QDateTime curDateTime = QDateTime( QDate::currentDate(), QTime( QDateTime::currentDateTime().time().hour(), 0 ) );
+
+    for ( int i = 0; i < syncDays->rowCount(); ++i )
+    {
+        QDate syncDate = syncDays->date( i );
+
+        if ( days->rowCount() && days->date() > syncDate )
+            continue;
+        if ( !days->rowCount() || days->date() < syncDate )
+        {
+            genNewDay( syncDate );
+            genNewWeek( syncDate );
+            genNewMonth( syncDate );
+            genNewYear( syncDate );
+        }
+
+        foreach( StatisticsModel * s, mModels )
+        {
+            if ( s->type() == StatisticsModel::Hour )
+               continue;
+
+            s->addRxBytes( v->addBytes( s->rxBytes(), syncDays->rxBytes( i ) ) );
+            s->addTxBytes( v->addBytes( s->txBytes(), syncDays->txBytes( i ) ) );
+        }
+    }
+    for ( int i = 0; i < syncHours->rowCount(); ++i )
+    {
+        QDateTime syncDateTime = syncHours->dateTime( i );
+
+        if ( hours->rowCount() && hours->dateTime() > syncDateTime )
+            continue;
+        if ( !hours->rowCount() || hours->dateTime() < syncDateTime )
+            genNewHour( syncDateTime );
+
+        hours->addRxBytes( v->addBytes( hours->rxBytes(), syncHours->rxBytes( i ) ) );
+        hours->addTxBytes( v->addBytes( hours->txBytes(), syncHours->txBytes( i ) ) );
+    }
+    StatsPair lag = v->addLagged( updated, days );
+    if ( lag.rxBytes > 0 || lag.txBytes > 0 )
+    {
+        if ( lag.rxBytes || lag.txBytes )
+        {
+            genNewHour( curDateTime );
+            genNewDay( curDateTime.date() );
+            genNewWeek( curDateTime.date() );
+            genNewMonth( curDateTime.date() );
+            genNewYear( curDateTime.date() );
+
+            foreach ( StatisticsModel * s, mModels )
+            {
+                s->addRxBytes( lag.rxBytes );
+                s->addTxBytes( lag.txBytes );
+            }
+        }
+    }
+    delete v;
 }
 
 void InterfaceStatistics::saveStatistics()
@@ -244,7 +319,8 @@ void InterfaceStatistics::saveStatistics()
     QDomDocument doc( doc_name );
     QDomElement docElement = doc.createElement( doc_name );
     docElement.setAttribute( attrib_calendar, mCalendar->calendarType() );
-    docElement.setAttribute( attrib_version, "1.2" );
+    docElement.setAttribute( attrib_version, "1.3" );
+    docElement.setAttribute( attrib_updated, QDateTime::currentDateTime().toTime_t() );
     doc.appendChild( docElement );
 
     foreach( StatisticsModel * s, mModels )
@@ -596,9 +672,8 @@ void InterfaceStatistics::genNewYear( const QDate &date )
     mModels.value( StatisticsModel::Year )->appendStats( newDate, mCalendar->daysInYear( newDate ) );
 }
 
-void InterfaceStatistics::checkValidEntry()
+void InterfaceStatistics::checkValidEntry( QDateTime curDateTime )
 {
-    QDateTime curDateTime = QDateTime::currentDateTime();
     QDate curDate = curDateTime.date();
     StatisticsModel *days = mModels.value( StatisticsModel::Day );
 

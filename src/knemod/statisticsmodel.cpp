@@ -202,6 +202,8 @@ QString StatisticsModel::totalText( int row ) const
 
 void StatisticsModel::addTotalBytes( quint64 bytes )
 {
+    if ( !bytes )
+        return;
     quint64 totalBytes = item( rowCount() - 1, TotalBytes )->data().toULongLong() + bytes;
     item( rowCount() - 1, TotalBytes )->setData( KIO::convertSize( totalBytes ), Qt::DisplayRole );
     item( rowCount() - 1, TotalBytes )->setData( totalBytes );
@@ -209,6 +211,8 @@ void StatisticsModel::addTotalBytes( quint64 bytes )
 
 void StatisticsModel::addRxBytes( quint64 bytes )
 {
+    if ( !bytes )
+        return;
     quint64 rxBytes = item( rowCount() - 1, RxBytes )->data().toULongLong() + bytes;
     item( rowCount() - 1, RxBytes )->setData( KIO::convertSize( rxBytes ), Qt::DisplayRole );
     item( rowCount() - 1, RxBytes )->setData( rxBytes );
@@ -217,6 +221,8 @@ void StatisticsModel::addRxBytes( quint64 bytes )
 
 void StatisticsModel::addTxBytes( quint64 bytes )
 {
+    if ( !bytes )
+        return;
     quint64 txBytes = item( rowCount() - 1, TxBytes )->data().toULongLong() + bytes;
     item( rowCount() - 1, TxBytes )->setData( KIO::convertSize( txBytes ), Qt::DisplayRole );
     item( rowCount() - 1, TxBytes )->setData( txBytes );

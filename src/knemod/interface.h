@@ -23,6 +23,7 @@
 
 #include <time.h>
 #include "interfaceicon.h"
+#include "data.h"
 
 class InterfacePlotterDialog;
 class InterfaceStatistics;

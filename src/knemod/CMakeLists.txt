@@ -16,6 +16,9 @@ set( knemo_SRCS
     statisticsmodel.cpp
     backends/backendbase.cpp
     ../common/utils.cpp
+    syncstats/externalstats.cpp
+    syncstats/statsfactory.cpp
+    syncstats/stats_vnstat.cpp
 )
 
 if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )

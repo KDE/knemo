@@ -66,6 +66,8 @@ private:
     void loadStatsGroup( const KCalendarSystem * cal, const QDomElement& root,
                          StatisticsModel* statistics );
 
+    void syncWithExternal( uint updated );
+
     void saveStatsGroup( QDomDocument& doc, const StatisticsModel* statistics );
 
     void checkRebuild( QString oldType );
@@ -74,7 +76,7 @@ private:
                           const QDate &recalcDate );
     void amendStats( int, StatisticsModel * );
 
-    void checkValidEntry();
+    void checkValidEntry( QDateTime curDateTime = QDateTime::currentDateTime() );
     void checkTrafficLimit();
 
     void genNewHour( const QDateTime &dateTime );
