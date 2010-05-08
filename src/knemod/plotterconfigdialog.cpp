@@ -69,9 +69,9 @@ PlotterConfigDialog::PlotterConfigDialog( QWidget * parent, const QString& iface
              this, SLOT( changed() ) );
     connect( ui.spinBoxFontSize, SIGNAL( valueChanged( int ) ),
              this, SLOT( changed() ) );
-    connect( ui.spinBoxMinValue, SIGNAL( valueChanged( int ) ),
+    connect( ui.spinBoxMinValue, SIGNAL( valueChanged( double ) ),
              this, SLOT( changed() ) );
-    connect( ui.spinBoxMaxValue, SIGNAL( valueChanged( int ) ),
+    connect( ui.spinBoxMaxValue, SIGNAL( valueChanged( double ) ),
              this, SLOT( changed() ) );
     connect( ui.kColorButtonIncoming, SIGNAL( changed( const QColor& ) ),
              this, SLOT( changed() ) );
