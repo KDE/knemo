@@ -19,6 +19,7 @@
 
 
 #include "plotterconfigdialog.h"
+#include "global.h"
 
 #include <KConfig>
 
@@ -28,6 +29,17 @@ PlotterConfigDialog::PlotterConfigDialog( QWidget * parent, const QString& iface
 {
     setButtons( Ok | Apply | Default | Close );
     ui.setupUi( mainWidget() );
+    QString suffix;
+    if ( generalSettings->useBitrate )
+    {
+        suffix = i18n( " kbit/s" );
+    }
+    else
+    {
+        suffix = i18n( " KiB/s" );
+    }
+    ui.spinBoxMinValue->setSuffix( suffix );
+    ui.spinBoxMaxValue->setSuffix( suffix );
     load();
     enableButtonApply( false );
     //enableButtonDefault( true );
@@ -37,8 +49,6 @@ PlotterConfigDialog::PlotterConfigDialog( QWidget * parent, const QString& iface
     connect( this, SIGNAL( okClicked() ), SLOT( save() ) );
 
     // connect the plotter widgets
-    connect( ui.checkBoxBottomBar, SIGNAL( toggled( bool ) ),
-             this, SLOT( changed() ) );
     connect( ui.checkBoxLabels, SIGNAL( toggled( bool ) ),
              this, SLOT( changed() ) );
     connect( ui.checkBoxVLines, SIGNAL( toggled( bool ) ),
@@ -63,17 +73,9 @@ PlotterConfigDialog::PlotterConfigDialog( QWidget * parent, const QString& iface
              this, SLOT( changed() ) );
     connect( ui.spinBoxMaxValue, SIGNAL( valueChanged( int ) ),
              this, SLOT( changed() ) );
-    connect( ui.kColorButtonVLines, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
-    connect( ui.kColorButtonHLines, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
     connect( ui.kColorButtonIncoming, SIGNAL( changed( const QColor& ) ),
              this, SLOT( changed() ) );
     connect( ui.kColorButtonOutgoing, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
-    connect( ui.kColorButtonBackground, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
-    connect( ui.spinBoxOpacity, SIGNAL( valueChanged( const int ) ),
              this, SLOT( changed() ) );
 }
 
@@ -89,19 +91,14 @@ void PlotterConfigDialog::load()
     ui.spinBoxMinValue->setValue( mSettings->minimumValue );
     ui.spinBoxMaxValue->setValue( mSettings->maximumValue );
     ui.checkBoxLabels->setChecked( mSettings->labels );
-    ui.checkBoxBottomBar->setChecked( mSettings->bottomBar );
     ui.checkBoxVLines->setChecked( mSettings->verticalLines );
     ui.checkBoxHLines->setChecked( mSettings->horizontalLines );
     ui.checkBoxIncoming->setChecked( mSettings->showIncoming );
     ui.checkBoxOutgoing->setChecked( mSettings->showOutgoing );
-    ui.checkBoxAutoDetection->setChecked( mSettings->automaticDetection );
+    ui.checkBoxAutoDetection->setChecked( !mSettings->automaticDetection );
     ui.checkBoxVLinesScroll->setChecked( mSettings->verticalLinesScroll );
-    ui.kColorButtonVLines->setColor( mSettings->colorVLines );
-    ui.kColorButtonHLines->setColor( mSettings->colorHLines );
     ui.kColorButtonIncoming->setColor( mSettings->colorIncoming );
     ui.kColorButtonOutgoing->setColor( mSettings->colorOutgoing );
-    ui.kColorButtonBackground->setColor( mSettings->colorBackground );
-    ui.spinBoxOpacity->setValue( mSettings->opacity );
 }
 
 void PlotterConfigDialog::save()
@@ -112,19 +109,14 @@ void PlotterConfigDialog::save()
     mSettings->minimumValue = ui.spinBoxMinValue->value();
     mSettings->maximumValue = ui.spinBoxMaxValue->value();
     mSettings->labels = ui.checkBoxLabels->isChecked();
-    mSettings->bottomBar = ui.checkBoxBottomBar->isChecked();
     mSettings->verticalLines = ui.checkBoxVLines->isChecked();
     mSettings->horizontalLines = ui.checkBoxHLines->isChecked();
     mSettings->showIncoming = ui.checkBoxIncoming->isChecked();
     mSettings->showOutgoing = ui.checkBoxOutgoing->isChecked();
-    mSettings->automaticDetection = ui.checkBoxAutoDetection->isChecked();
+    mSettings->automaticDetection = !ui.checkBoxAutoDetection->isChecked();
     mSettings->verticalLinesScroll = ui.checkBoxVLinesScroll->isChecked();
-    mSettings->colorVLines = ui.kColorButtonVLines->color();
-    mSettings->colorHLines = ui.kColorButtonHLines->color();
     mSettings->colorIncoming = ui.kColorButtonIncoming->color();
     mSettings->colorOutgoing = ui.kColorButtonOutgoing->color();
-    mSettings->colorBackground = ui.kColorButtonBackground->color();
-    mSettings->opacity = ui.spinBoxOpacity->value();
     emit saved();
 }
 
@@ -139,19 +131,14 @@ void PlotterConfigDialog::defaults()
     ui.spinBoxMinValue->setValue( s.minimumValue );
     ui.spinBoxMaxValue->setValue( s.maximumValue );
     ui.checkBoxLabels->setChecked( s.labels );
-    ui.checkBoxBottomBar->setChecked( s.bottomBar );
     ui.checkBoxVLines->setChecked( s.verticalLines );
     ui.checkBoxHLines->setChecked( s.horizontalLines );
     ui.checkBoxIncoming->setChecked( s.showIncoming );
     ui.checkBoxOutgoing->setChecked( s.showOutgoing );
-    ui.checkBoxAutoDetection->setChecked( s.automaticDetection );
+    ui.checkBoxAutoDetection->setChecked( !s.automaticDetection );
     ui.checkBoxVLinesScroll->setChecked( s.verticalLinesScroll );
-    ui.kColorButtonVLines->setColor( s.colorVLines );
-    ui.kColorButtonHLines->setColor( s.colorHLines );
     ui.kColorButtonIncoming->setColor( s.colorIncoming );
     ui.kColorButtonOutgoing->setColor( s.colorOutgoing );
-    ui.kColorButtonBackground->setColor( s.colorBackground );
-    ui.spinBoxOpacity->setValue( s.opacity );
 }
 
 void PlotterConfigDialog::changed()

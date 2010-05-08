@@ -1,7 +1,7 @@
 /*
-    KSysGuard, the KDE System Guard
+    This file is part of the KDE project
 
-    Copyright (c) 1999 - 2001 Chris Schlaeger <cs@kde.org>
+    Copyright (c) 2006 - 2009 John Tapsell <tapsell@kde.org>
 
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public
@@ -22,70 +22,61 @@
 #ifndef KSIGNALPLOTTER_H
 #define KSIGNALPLOTTER_H
 
+#include <QtCore/QList>
+#include <QtCore/QString>
+#include <QtGui/QColor>
+#include <QtGui/QFont>
+#include <QtGui/QWidget>
+#include <klocalizedstring.h>
+#include <kcomponentdata.h>
 
-#include <QWidget>
-#include <QResizeEvent>
-#include <QPaintEvent>
-#include <QImage>
+class QPaintEvent;
+class QResizeEvent;
+class KSignalPlotterPrivate;
 
-#define USE_QIMAGE
+Q_DECLARE_METATYPE(KLocalizedString)
 
-// Svg support causes it to crash at the moment :(
-//#define SVG_SUPPORT
-#ifdef SVG_SUPPORT
-namespace Plasma
-{
-    class Svg;
-}
-#endif
-class QColor;
-
-/** \brief The KSignalPlotter widget draws a real time graph of data that updates continually
- * 
+/** \brief The KSignalPlotter widget draws a real time graph of data that updates continually.
+ *
  *  Features include:
- *  *) Points are joined by a bezier curve.
- *  *) Lines are anti-aliased
- *  *) Background can be set as a specified SVG
- *  *) The lines can be reordered
- *  *) Uses as little memory and CPU as possible
- *  *) Graph can be smoothed using the formula (value * 2 + last_value)/3.
+ *  \li Points are joined by a bezier curve.
+ *  \li Lines are anti-aliased
+ *  \li Background can be set as a specified SVG
+ *  \li The lines can be reordered
+ *  \li Uses as little memory and CPU as possible
+ *  \li Graph can be smoothed using the formula (value * 2 + last_value)/3
+ *  \li Can cope with positive/negative infinity and NaN values.
  *
  *  Example usage:
  *  \code
  *    KSignalPlotter *s = KSignalPlotter(parent);
- *    s->addBeam(Qt::Blue);
- *    s->addBeam(Qt::Green);
- *    QList data;
+ *    s->addBeam(Qt::blue);
+ *    s->addBeam(Qt::green);
+ *    QList<double> data;
  *    data << 4.0 << 5.0;
- *    s->addSample(data); 
+ *    s->addSample(data);
  *  \endcode
  *
  *  Note that the number of horizontal lines is calculated automatically based on the axis font size, even if the axis labels are not shown.
- *  
+ *
  *  Smoothing looks very nice visually and is enabled by default.  It can be disabled with setSmoothGraph().
  *
  *  \image KSignalPlotter.png  Example KSignalPlotter with two beams
  */
-class KSignalPlotter : public QWidget
+class KDE_EXPORT KSignalPlotter : public QWidget
 {
   Q_OBJECT
-  Q_PROPERTY( double minValue READ minValue WRITE setMinValue )
-  Q_PROPERTY( double maxValue READ maxValue WRITE setMaxValue )
+  Q_PROPERTY( double minimumValue READ minimumValue WRITE setMinimumValue )
+  Q_PROPERTY( double maximumValue READ maximumValue WRITE setMaximumValue )
   Q_PROPERTY( bool useAutoRange READ useAutoRange WRITE setUseAutoRange )
-  Q_PROPERTY( QString unit READ unit WRITE setUnit )
-  Q_PROPERTY( bool thinFrame READ thinFrame WRITE setThinFrame )
+  Q_PROPERTY( KLocalizedString unit READ unit WRITE setUnit )
   Q_PROPERTY( double scaleDownBy READ scaleDownBy WRITE setScaleDownBy )
   Q_PROPERTY( uint horizontalScale READ horizontalScale WRITE setHorizontalScale )
   Q_PROPERTY( bool showHorizontalLines READ showHorizontalLines WRITE setShowHorizontalLines )
   Q_PROPERTY( bool showVerticalLines READ showVerticalLines WRITE setShowVerticalLines )
   Q_PROPERTY( bool verticalLinesScroll READ verticalLinesScroll WRITE setVerticalLinesScroll )
-  Q_PROPERTY( QColor verticalLinesColor READ verticalLinesColor WRITE setVerticalLinesColor )
-  Q_PROPERTY( QColor horizontalLinesColor READ horizontalLinesColor WRITE setHorizontalLinesColor )
-  Q_PROPERTY( bool verticalLinesDistance READ verticalLinesDistance WRITE setVerticalLinesDistance )
-  Q_PROPERTY( QColor axisFontColor READ axisFontColor WRITE setAxisFontColor )
-  Q_PROPERTY( QFont axisFont READ axisFont WRITE setAxisFont )
+  Q_PROPERTY( uint verticalLinesDistance READ verticalLinesDistance WRITE setVerticalLinesDistance )
   Q_PROPERTY( bool showAxis READ showAxis WRITE setShowAxis )
-  Q_PROPERTY( QColor backgroundColor READ backgroundColor WRITE setBackgroundColor )
   Q_PROPERTY( QString svgBackground READ svgBackground WRITE setSvgBackground )
   Q_PROPERTY( int maxAxisTextWidth READ maxAxisTextWidth WRITE setMaxAxisTextWidth )
   Q_PROPERTY( bool smoothGraph READ smoothGraph WRITE setSmoothGraph )
@@ -94,7 +85,7 @@ class KSignalPlotter : public QWidget
 
   public:
     KSignalPlotter( QWidget *parent = 0);
-    ~KSignalPlotter();
+    virtual ~KSignalPlotter();
 
     enum VisibleBeams
     {
@@ -109,307 +100,370 @@ class KSignalPlotter : public QWidget
         INCOMING_BEAM = 1
     };
 
-    /** Set which beams are visible.  All beams are tracked whether visible
-     *  or not.
-     */
-    void setVisibleBeams( int );
-
-    /** Add a new line to the graph plotter, with the specified color.
+    /** \brief Add a new line to the graph plotter, with the specified color.
+     *
      *  Note that the order you add the beams in must be the same order that
-     *  the beam data is given in. (Unless you reorder the beams)
+     *  the beam data is given in (Unless you reorder the beams).
+     *
+     *  \param color Color of beam - does not have to be unique.
      */
     void addBeam( const QColor &color );
 
-    /** Add data to the graph, and advance the graph by one time period.
+    /** \brief Add data to the graph, and advance the graph by one time period.
+     *
      *  The data must be given as a list in the same order that the beams were
-     *  added (or consequently reordered)
+     *  added (or consequently reordered).  If samples.count() != numBeams(),
+     *  a warning is printed and the data discarded.
+     *
+     *  To indicate that no data is available for a given beam, set its value to
+     *  (non-signalling) NaN.
+     *
+     *  For example:
+     *
+     *  \code
+     *    KSignalPlotter *s = KSignalPlotter(parent);
+     *    s->addBeam(Qt::red);
+     *    s->addBeam(Qt::green);
+     *    s->addBeam(Qt::blue);
+     *    signalPlotter->addSample( QList<double>() << std::numeric_limits<double>::quiet_NaN() << 1.0/0 << 10.0 );
+     *  \endcode
+     *
+     *  This indicates that no data is available yet for red (so the beam will not be drawn for this section),
+     *  that's it positive infinity for green, and 10 for blue.
+     *
+     *  Infinity is handled by drawing a straight line up to the top or bottom of the display, and does not affect the range.
+     *  For the above example, the displayed range would now be 0 to 10.
      */
     void addSample( const QList<double> &samples );
 
-    /** Reorder the beams into the order given.  For example:
+    /** \brief Reorder the beams into the order given.
+     *
+     * For example:
      * \code
      *   KSignalPlotter *s = KSignalPlotter(parent);
-     *   s->addBeam(Qt::Blue);
-     *   s->addBeam(Qt::Green);   
-     *   QList neworder;
-     *   neworder << 1 << 0;
-     *   reorderBeams( newOrder);
-     *   //Now the order is Green then Blue
+     *   s->addBeam(Qt::blue);
+     *   s->addBeam(Qt::green);
+     *   s->addBeam(Qt::red);
+     *   QList<int> neworder;
+     *   neworder << 2 << 0 << 1;
+     *   s->reorderBeams( newOrder);
+     *   //Now the order is red, blue then green
      * \endcode
+     *
+     * The size of the \p newOrder list must be equal to the result of numBeams().
+     * \param newOrder New order of beams.
      */
     void reorderBeams( const QList<int>& newOrder );
 
-    /** Removes the beam at the specified index.  This causes the graph to be redrawn with the
-     *  specified beam completely removed.
+    /** \brief Removes the beam at the specified index.
+     *
+     * This causes the graph to be redrawn with the specified beam completely
+     * removed.
      */
-    void removeBeam( uint pos );
+    void removeBeam( int index );
 
-    /** Get the beam (the graph lines) colors, in the order
-     *  that the beams were added (or later reordered)
+    /** \brief Get the color of the beam at the specified index.
+     *
+     * For example:
+     * \code
+     *   KSignalPlotter *s = KSignalPlotter(parent);
+     *   s->addBeam(Qt::blue);
+     *   s->addBeam(Qt::green);
+     *   s->addBeam(Qt::red);
+     *
+     *   QColor color = s->beamColor(0);  //returns blue
+     * \endcode
+     *
+     * \sa setBeamColor()
      */
-    QColor beamColor( int index );
+    QColor beamColor( int index ) const;
 
-    /** Set the beam (the graph lines) colors, in the order
-     *  that the beams were added (or later reordered)
+    /** \brief Set the color of the beam at the specified index.
+     *
+     * \sa beamColor()
      */
-    void setBeamColor( int index, QColor color );
+    void setBeamColor( int index, const QColor &color );
 
-    /** returns the number of beams */
-    int numBeams();
+    /** \brief Returns the number of beams. */
+    int numBeams() const;
 
-    /** Set the units.  Drawn on the vertical axis of the graph.
-     *  Must be already translated into the local language. 
+    /** \brief Set the axis units with a localized string.
+     *
+     * The localized string must contain a placeholder "%1" which is substituted for the value.
+     * The plural form (ki18np) can be used if the unit string changes depending on the number (for example
+     * "1 second", "2 seconds").
+     *
+     * For example:
+     *
+     * \code
+     *   KSignalPlotter plotter;
+     *   plotter.setUnit( ki18ncp("Units", "%1 second", "%1 seconds") );
+     *   QString formattedString = plotter.valueAsString(3.4); //returns "3.4 seconds"
+     * \endcode
+     *
+     * Typically a new unit would be set when setScaleDownBy is called.
+     * Note that even the singular should use "%1 second" instead of "1 second", so that a value of -1 works correctly.
+     *
+     * \see unit(), setScaleDownBy()
      */
-    void setUnit( const QString &unit );
+    void setUnit( const KLocalizedString &unit );
 
-    /** Return the units used on the vertical axis of the graph.
-     */ 
-    QString unit() const;
+    /** \brief The localizable units used on the vertical axis of the graph.
+     *
+     * The returns the localizable string set with setUnit().
+     *
+     * Default is the string "%1" - i.e. to just display the number.
+     *
+     * \see setUnit
+     */
+    KLocalizedString unit() const;
 
-    /** Scale all the values down by the given amount.  This is useful
-     *  when the data is given in, say, kilobytes, but you set the 
-     *  units as megabytes.  Thus you would have to call this with @p value
-     *  set to 1024.  This affects all the data already entered.
-     *  Typically this is followed by calling setUnit to set
-     *  the display axis units.
+    /** \brief Scale all the values down by the given amount.
+     *
+     * This is useful when the data is given in, say, kilobytes, but you set
+     * the units as megabytes.  Thus you would have to call this with @p value
+     * set to 1024.  This affects all the data already entered.
+     *
+     * Typically this is followed by calling setUnit() to set the display axis
+     * units.  Default value is 1.
      */
     void setScaleDownBy( double value );
 
-    /** Amount scaled down by.  @see setScaleDownBy */
+    /** \brief Amount scaled down by.
+     *
+     * \sa setScaleDownBy */
     double scaleDownBy() const;
 
-    /** Set the minimum and maximum values on the vertical axis
-     *  automatically from the data available.
+    /** \brief Set whether to scale the graph automatically beyond the given range.
+     *
+     * If true, the range on vertical axis is automatically expanded from the
+     * data available, expanding beyond the range set by changeRange() if data
+     * values are outside of this range.
+     *
+     * Regardless whether this is set of not, the range of the vertical axis
+     * will never be less than the range given by maximumValue() and minimumvalue().
+     *
+     * \param value Whether to scale beyond the given range. Default is true.
+     *
+     * \sa useAutoRange
      */
     void setUseAutoRange( bool value );
 
-    /** Whether the vertical axis range is set automatically.
+    /** \brief Whether the vertical axis range is set automatically.
      */
     bool useAutoRange() const;
 
-    /** Change the minimum and maximum values drawn on the graph.
+    /** \brief Change the minimum and maximum values drawn on the graph.
+     *
      *  Note that these values are sanitised.  For example, if you
      *  set the minimum as 3, and the maximum as 97, then the graph
      *  would be drawn between 0 and 100.  The algorithm to determine
      *  this "nice range" attempts to minimize the number of non-zero
      *  digits.
      *
-     *  Use setAutoRange instead to determine the range automatically 
-     *  from the data.
-     */ 
+     *  If autoRange() is true, then this range is taking as a 'hint'.
+     *  The range will never be smaller than the given range, but can grow
+     *  if there are values larger than the given range.
+     *
+     *  This is equivalent to calling
+     *  \code
+     *    setMinimumValue(min);
+     *    setMaximumValue(max);
+     *  \endcode
+     *
+     *  \sa setMinimumValue(), setMaximumValue(), minimumValue(), maximumValue()
+     */
     void changeRange( double min, double max );
-    /** Set the min value of the vertical axis.  @see changeRange */
-    void setMinValue( double min );
-    /** Get the min value of the vertical axis.  @see changeRange */
-    double minValue() const;
-    /** Set the max value of the vertical axis.  @see changeRange */
-    void setMaxValue( double max );
-    /** Get the max value of the vertical axis.  @see changeRange */
-    double maxValue() const;
 
-    /** Set the number of pixels horizontally between data points */
+    /** \brief Set the min value hint for the vertical axis.
+     *
+     * \sa changeRange(), minimumValue(), setMaximumValue(), maximumValue() */
+    void setMinimumValue( double min );
+
+    /** \brief Get the min value hint for the vertical axis.
+     *
+     * \sa changeRange(), minimumValue(), setMaximumValue(), maximumValue() */
+    double minimumValue() const;
+
+    /** \brief Set the max value hint for the vertical axis. *
+     *
+     * \sa changeRange(), minimumValue(), setMaximumValue(), maximumValue() */
+    void setMaximumValue( double max );
+
+    /** \brief Get the maximum value hint for the vertical axis.
+     *
+     * \sa changeRange(), minimumValue(), setMaximumValue(), maximumValue() */
+    double maximumValue() const;
+
+    /** \brief Get the current maximum value on the y-axis.
+     *
+     *  This will never be lower than maximumValue(), and if autoRange() is true,
+     *  it will be equal or larger (due to rounding up to make it a nice number)
+     *  than the highest value being shown.
+     */
+    double currentMaximumRangeValue() const;
+    /** \brief Get the current minimum value on the y-axis.
+     *
+     *  This will never be lower than minimumValue(), and if autoRange() is true,
+     *  it will be equal or larger (due to rounding up to make it a nice number)
+     *  than the highest value being shown.
+     */
+    double currentMinimumRangeValue() const;
+
+    /** \brief Set the number of pixels horizontally between data points.
+     *  Default is 6. */
     void setHorizontalScale( uint scale );
-    /** The number of pixels horizontally between data points*/
+    /** \brief The number of pixels horizontally between data points.
+     *  Default is 6. */
     int horizontalScale() const;
 
-    /** Whether to draw the vertical grid lines */
+    /** \brief Set whether to draw the vertical grid lines.
+     *  Default is false. */
     void setShowVerticalLines( bool value );
-    /** Whether to draw the vertical grid lines */
+    /** \brief Whether to draw the vertical grid lines.
+     *  Default is false. */
     bool showVerticalLines() const;
 
-    /** The color of the vertical grid lines */
-    void setVerticalLinesColor( const QColor &color );
-    /** The color of the vertical grid lines */
-    QColor verticalLinesColor() const;
-
-    /** The horizontal distance between the vertical grid lines */
+    /** \brief Set the horizontal distance, in pixels, between the vertical grid lines.
+     *  Must be a distance of 1 or more.
+     *  Default is 30 pixels. */
     void setVerticalLinesDistance( uint distance );
-    /** The horizontal distance between the vertical grid lines */
-    int verticalLinesDistance() const;
+    /** \brief The horizontal distance, in pixels, between the vertical grid lines.
+      *  Default is 30 pixels. */
+    uint verticalLinesDistance() const;
 
-    /** Whether the vertical lines move with the data */
+    /** \brief Set whether the vertical lines move with the data.
+     *  Default is true. This has no effect is showVerticalLines is false. */
     void setVerticalLinesScroll( bool value );
-    /** Whether the vertical lines move with the data */
+    /** \brief Whether the vertical lines move with the data.
+     *  Default is true. This has no effect is showVerticalLines is false. */
     bool verticalLinesScroll() const;
 
-    /** Whether to draw the horizontal grid lines */
+    /** \brief Set whether to draw the horizontal grid lines.
+     *  Default is true. */
     void setShowHorizontalLines( bool value );
-    /** Whether to draw the horizontal grid lines */
+    /** \brief Whether to draw the horizontal grid lines.
+     *  Default is true. */
     bool showHorizontalLines() const;
 
-    /** The color of the horizontal grid lines */
-    void setHorizontalLinesColor( const QColor &color );
-    /** The color of the horizontal grid lines */
-    QColor horizontalLinesColor() const;
+    /** \brief The number of decimal places used for the axis labels
+     *
+     *  This is calculated based on the current range */
+    int currentAxisPrecision() const;
 
-    /** The color of the font used for the axis */
-    void setAxisFontColor( const QColor &color );
-    /** The color of the font used for the axis */
-    QColor axisFontColor() const;
-
-    /** The font used for the axis */
-    void setAxisFont( const QFont &font );
-    /** The font used for the axis */
-    QFont axisFont() const;
-
-    /** Whether to show the vertical axis labels */
+    /** \brief Set whether to show the vertical axis labels.
+     *
+     * Default is true.
+     * \sa showAxis(), setAxisFont(), setAxisFontColor(), setMaxAxisTextWidth() */
     void setShowAxis( bool show );
-    /** Whether to show the vertical axis labels */
+    /** \brief Whether to show the vertical axis labels.
+     *
+     * Default is true.
+     * \sa setShowAxis(), axisFont(), axisFontColor(), maxAxisTextWidth() */
     bool showAxis() const;
 
-    /** The color to set the background.  This is painted even if there
-     *  is an SVG, to allow for translucent/transparent SVGs.
-     */
-    void setBackgroundColor( const QColor &color );
-    
-    /** The color to set the background.  This is painted even if there
-     *  is an SVG, to allow for translucent/transparent SVGs.
-     */
-    QColor backgroundColor() const;
-
-    /** The filename of the svg background.  Set to empty to disable
-     *  again. */
+    /** \brief Set the filename of the SVG background.
+     *
+     * Set to empty (default) to disable again. */
     void setSvgBackground( const QString &filename );
 
-    /** The filename of the svg background.  Set to empty to disable
-     *  again. */
+    /** \brief The filename of the SVG background. */
     QString svgBackground() const;
 
-    /** Return the last value that we have for beam i.
-     *  Returns 0 if not known */
-    double lastValue( int i) const;
+    /** \brief Return the last value that we have for the given beam index.
+     *
+     * \return last value, or 0 if not known. */
+    double lastValue( int index) const;
 
-    /** Return a translated string like:   "34 %" or "100 KB" for beam i */
-    QString lastValueAsString( int i) const;
-    
-    /** Return a translated string like:   "34 %" or "100 KB" for the given value in unscaled units */
-    QString valueAsString( double value) const;
-    
-    /**  Whether to show a white line on the left and bottom of the widget, for a 3D effect */
-    void setThinFrame( bool set );
-    
-    /**  Whether to show a white line on the left and bottom of the widget, for a 3D effect */
-    bool thinFrame() const;
+    /** \brief Return a translated string for the last value at the given index.
+     *
+     * Returns, for example,  "34 %" or "100 KB" for the given beam index,
+     * using the last value set for the beam, using the given precision.
+     *
+     * If precision is -1 (the default) then if @p value is greater than 99.5, no decimal figures are shown,
+     * otherwise if @p value is greater than 0.995, 1 decimal figure is used, otherwise 2.
+     */
+    QString lastValueAsString( int index, int precision = -1) const;
 
-    /** Set the distance between the left of the widget and the left of the plotting region. */
+    /** \brief Return a translated string for the given value.
+     *
+     * Returns, for example, "34 %" or "100 KB" for the given value in unscaled units.
+     *
+     * If precision is -1 (the default) then if @p value is greater than 99.5, no decimal figures are shown,
+     * otherwise if @p value is greater than 0.995, 1 decimal figure is used, otherwise 2.
+     *
+     * For example:
+     * \code
+     *   KSignalPlotter plotter;
+     *   plotter.setUnit( ki18ncp("Units", "1 hour", "%1 hours") );
+     *   plotter.scaleDownBy( 60 ); //The input will be in seconds, and there's 60 seconds in an hour
+     *   QString formattedString = plotter.valueAsString(150); //returns "2.5 hours"
+     * \endcode
+     *
+     */
+    QString valueAsString( double value, int precision = -1) const;
+
+    /** \brief Set the distance between the left of the widget and the left of the plotting region.
+     *
+     *  For example:
+     *  \code
+     *      int axisTextWidth = fontMetrics().width(i18nc("Largest axis title", "99999 XXXX"));
+     *      plotter->setAxisTextWidth(axisTextWidth);
+     *  \endcode
+     *
+     *  If this is 0, the default, then the text will be shown inside the plotting area.
+     */
     void setMaxAxisTextWidth(int maxAxisTextWidth);
-
-    /** Get the distance between the left of the widget and the left of the plotting region. */
+    /** \brief Get the distance between the left of the widget and the left of the plotting region. */
     int maxAxisTextWidth() const;
 
-    /** Whether to smooth the graph by averaging the points using the formula:  (value*2 + last_value)/3 */
+    /** \brief Set whether to smooth the graph by averaging the points.
+     *
+     * This uses the formula:  (value*2 + last_value)/3.
+     * Default is true. */
+    void setSmoothGraph(bool smooth);
+    /** \brief Whether to smooth the graph by averaging the points.
+     *
+     * This uses the formula:  (value*2 + last_value)/3.
+     * Default is true. */
     bool smoothGraph() const;
 
-    /** Set whether to smooth the graph by averaging the points using the formula:  (value*2 + last_value)/3 */
-    void setSmoothGraph(bool smooth);
-
-    /** Whether to stack the beams on top of each other.  Default is false */
+    /** \brief Set whether to stack the beams on top of each other.
+     *
+     * Default is false */
+    void setStackGraph(bool stack);
+    /** \brief Whether to stack the beams on top of each other.
+     *
+     * Default is false */
     bool stackGraph() const;
 
-    /** Whether to stack the beams on top of each other.  Default is false */
-    void setStackGraph(bool stack);
-
-    /** Alpha value for filling the graph. Set to 0 to disable filling the graph, and 255 for a solid fill. Default is 20*/
+    /** \brief Alpha value for filling the graph.
+     *
+     * Set to 0 to disable filling the graph, and 255 for a solid fill. Default is 20*/
+    void setFillOpacity(int fill);
+    /** \brief Alpha value for filling the graph. */
     int fillOpacity() const;
 
-    /** Alpha value for filling the graph. Set to 0 to disable filling the graph, and 255 for a solid fill. Default is 20*/
-    void setFillOpacity(int fill);
-
     void useBitrate( bool useBits );
+    void setVisibleBeams( int beams );
+    void plotterAxisScaleChanged();
 
-  
   Q_SIGNALS:
-    /** When the axis has changed because we are in autorange mode, then this signal is emitted */
+    /** When the axis has changed this signal is emitted. */
     void axisScaleChanged();
 
   protected:
+    /* Reimplemented */
     virtual void resizeEvent( QResizeEvent* );
+    /* Reimplemented */
     virtual void paintEvent( QPaintEvent* );
-    virtual void hideEvent( QHideEvent* );
-
-    void drawWidget(QPainter *p, QRect boundingBox, bool onlyDrawPlotter);
-    void drawBackground(QPainter *p, const QRect & boundingBox);
-    void drawThinFrame(QPainter *p, const QRect &boundingBox);
-    void calculateNiceRange();
-    void drawVerticalLines(QPainter *p, const QRect &boundingBox, int correction=0);
-    void drawBeamToScrollableImage(int index);
-    void drawBeam(QPainter *p, const QRect &boundingBox, int horizontalScale, int index);
-    void drawAxisText(QPainter *p, const QRect &boundingBox);
-    void drawHorizontalLines(QPainter *p, const QRect &boundingBox);
-
+    /* Reimplemented */
+    virtual void changeEvent ( QEvent * event );
+    /* Reimplemented */
+    virtual QSize sizeHint() const;
   private:
-    void plotterAxisScaleChanged();
-    void recalculateMaxMinValueForSample(const QList<double>&sampleBuf, int time );
-    void rescale();
-    void updateDataBuffers();
-    /** We make the svg renderer static so that an svg renderer is shared among all of the images.  This is because a svg renderer takes up a lot of memory, so we want to 
-     *  share them as much as we can */
-#ifdef SVG_SUPPORT
-    static QHash<QString, Plasma::Svg *> sSvgRenderer;
-#endif
-    QString mSvgFilename; 
-
-    QPixmap mBackgroundImage;	///A cache of the background of the widget. Contains the svg or just white background with lines
-#ifdef USE_QIMAGE
-    QImage mScrollableImage;	///The scrollable image for the widget.  Contains the svg lines
-#else
-    QPixmap mScrollableImage;	///The scrollable image for the widget.  Contains the svg lines
-#endif
-    int mScrollOffset;		///The scrollable image is, well, scrolled in a wrap-around window.  mScrollOffset determines where the left hand side of the mScrollableImage should be drawn relative to the right hand side of view.  0 <= mScrollOffset < mScrollableImage.width()
-    double mMinValue;		///The minimum value (unscaled) currently being displayed
-    double mMaxValue;		///The maximum value (unscaled) currently being displayed
-    unsigned int mRescaleTime;		///The number of data points passed since a value that is within 70% of the current maximum was found.  This is for scaling the graph
-
-    double mNiceMinValue;	///The minimum value rounded down to a 'nice' value
-    double mNiceMaxValue;	///The maximum value rounded up to a 'nice' value.  The idea is to round the value, say, 93 to 100.
-    double mNiceRange;		/// mNiceMaxValue - mNiceMinValue
-    int mPrecision;		///The number of decimal place required to unambiguously label the axis
-
-    double mScaleDownBy;	/// @see setScaleDownBy
-    bool mUseAutoRange;		/// @see setUseAutoRange
-
-    /**  Whether to show a white line on the left and bottom of the widget, for a 3D effect */
-    bool mShowThinFrame;
-
-    bool mShowVerticalLines;
-    QColor mVerticalLinesColor;
-    uint mVerticalLinesDistance;
-    bool mVerticalLinesScroll;
-    uint mVerticalLinesOffset;
-    uint mHorizontalScale;
-    int mHorizontalLinesCount;
-
-    bool mShowHorizontalLines;
-    QColor mHorizontalLinesColor;
-
-    bool mStackBeams;	/// Set to add the beam values onto each other
-    int mFillOpacity;	/// Fill the area underneath the beams
-
-    bool mShowAxis;
-
-    QColor mBackgroundColor;
-    QColor mFontColor;
-
-    QList < QList<double> > mBeamData; // Every item in the linked list contains a set of data points to plot.  The first item is the newest
-    QList< QColor> mBeamColors;  //These colors match up against the QList<double>  in mBeamData
-    QList< QColor> mBeamColorsDark;  //These colors match up against the QList<double> in mBeamData, and are darker than mBeamColors.  Done for gradient effects
-
-    unsigned int mSamples; //This is what mBeamData.size() should equal when full.  When we start off and have no data then mSamples will be higher.  If we resize the widget so it's smaller, then for a short while this will be smaller
-    int mNewestIndex; //The index to the newest item added.  newestIndex+1   is the second newest, and so on
-
-    bool mUseBitrate;
-    int mMultiplier;
-    QString mUnit;
-    QStringList mByteUnits;
-    QStringList mBitUnits;
-
-    QFont mFont;
-    int mAxisTextWidth;
-    QRect mPlottingArea; /// The area in which the beams are drawn.  Saved to make update() more efficient
-
-    bool mSmoothGraph; /// Whether to smooth the graph by averaging using the formula (value*2 + last_value)/3.
-
-    int mVisibleBeams;
+    KSignalPlotterPrivate * const d;
+    friend class KSignalPlotterPrivate;
 };
 
 #endif

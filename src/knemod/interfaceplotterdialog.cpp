@@ -22,6 +22,7 @@
 */
 
 #include <QMenu>
+#include <QMouseEvent>
 #include <KApplication>
 
 #include "global.h"
@@ -36,19 +37,14 @@ static const char plot_fontSize[] = "FontSize";
 static const char plot_minimumValue[] = "MinimumValue";
 static const char plot_maximumValue[] = "MaximumValue";
 static const char plot_labels[] = "Labels";
-static const char plot_bottomBar[] = "BottomBar";
 static const char plot_verticalLines[] = "VerticalLines";
 static const char plot_horizontalLines[] = "HorizontalLines";
 static const char plot_showIncoming[] = "ShowIncoming";
 static const char plot_showOutgoing[] = "ShowOutgoing";
 static const char plot_automaticDetection[] = "AutomaticDetection";
 static const char plot_verticalLinesScroll[] = "VerticalLinesScroll";
-static const char plot_colorVLines[] = "ColorVLines";
-static const char plot_colorHLines[] = "ColorHLines";
 static const char plot_colorIncoming[] = "ColorIncoming";
 static const char plot_colorOutgoing[] = "ColorOutgoing";
-static const char plot_colorBackground[] = "ColorBackground";
-static const char plot_opacity[] = "Opacity";
 
 class FancyPlotterLabel : public QWidget
 {
@@ -96,7 +92,6 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     mainWidget()->setLayout( layout );
     layout->setSpacing(0);
     mPlotter = new KSignalPlotter( this );
-    mPlotter->setThinFrame( true );
     mPlotter->setShowAxis( true );
     int axisTextWidth = fontMetrics().width(i18nc("Largest axis title", "99999 XXXX"));
     mPlotter->addBeam( Qt::black );
@@ -271,22 +266,17 @@ void InterfacePlotterDialog::loadConfig()
     mSettings.pixel = clamp<int>(plotterGroup.readEntry( plot_pixel, s.pixel ), 1, 50 );
     mSettings.distance = clamp<int>(plotterGroup.readEntry( plot_distance, s.distance ), 10, 120 );
     mSettings.fontSize = clamp<int>(plotterGroup.readEntry( plot_fontSize, s.fontSize ), 5, 24 );
-    mSettings.minimumValue = clamp<int>(plotterGroup.readEntry( plot_minimumValue, s.minimumValue ), 0, 49999 );
-    mSettings.maximumValue = clamp<int>(plotterGroup.readEntry( plot_maximumValue, s.maximumValue ), 0, 50000 );
+    mSettings.minimumValue = clamp<double>(plotterGroup.readEntry( plot_minimumValue, s.minimumValue ), 0.0, 49999.0 );
+    mSettings.maximumValue = clamp<double>(plotterGroup.readEntry( plot_maximumValue, s.maximumValue ), 0.0, 50000.0 );
     mSettings.labels = plotterGroup.readEntry( plot_labels, s.labels );
-    mSettings.bottomBar = plotterGroup.readEntry( plot_bottomBar, s.bottomBar );
     mSettings.showIncoming = plotterGroup.readEntry( plot_showIncoming, s.showIncoming );
     mSettings.showOutgoing = plotterGroup.readEntry( plot_showOutgoing, s.showOutgoing );
     mSettings.verticalLines = plotterGroup.readEntry( plot_verticalLines, s.verticalLines );
     mSettings.horizontalLines = plotterGroup.readEntry( plot_horizontalLines, s.horizontalLines );
     mSettings.automaticDetection = plotterGroup.readEntry( plot_automaticDetection, s.automaticDetection );
     mSettings.verticalLinesScroll = plotterGroup.readEntry( plot_verticalLinesScroll, s.verticalLinesScroll );
-    mSettings.colorVLines = plotterGroup.readEntry( plot_colorVLines, s.colorVLines );
-    mSettings.colorHLines = plotterGroup.readEntry( plot_colorHLines, s.colorHLines );
     mSettings.colorIncoming = plotterGroup.readEntry( plot_colorIncoming, s.colorIncoming );
     mSettings.colorOutgoing = plotterGroup.readEntry( plot_colorOutgoing, s.colorOutgoing );
-    mSettings.colorBackground = plotterGroup.readEntry( plot_colorBackground, s.colorBackground );
-    mSettings.opacity = clamp<int>(plotterGroup.readEntry( plot_opacity, s.opacity ), 0, 100 );
     configChanged();
 }
 
@@ -303,36 +293,31 @@ void InterfacePlotterDialog::saveConfig()
     plotterGroup.writeEntry( plot_minimumValue, mSettings.minimumValue );
     plotterGroup.writeEntry( plot_maximumValue, mSettings.maximumValue );
     plotterGroup.writeEntry( plot_labels, mSettings.labels );
-    plotterGroup.writeEntry( plot_bottomBar, mSettings.bottomBar );
     plotterGroup.writeEntry( plot_verticalLines, mSettings.verticalLines );
     plotterGroup.writeEntry( plot_horizontalLines, mSettings.horizontalLines );
     plotterGroup.writeEntry( plot_showIncoming, mSettings.showIncoming );
     plotterGroup.writeEntry( plot_showOutgoing, mSettings.showOutgoing );
     plotterGroup.writeEntry( plot_automaticDetection, mSettings.automaticDetection );
     plotterGroup.writeEntry( plot_verticalLinesScroll, mSettings.verticalLinesScroll );
-    plotterGroup.writeEntry( plot_colorVLines, mSettings.colorVLines );
-    plotterGroup.writeEntry( plot_colorHLines, mSettings.colorHLines );
     plotterGroup.writeEntry( plot_colorIncoming, mSettings.colorIncoming );
     plotterGroup.writeEntry( plot_colorOutgoing, mSettings.colorOutgoing );
-    plotterGroup.writeEntry( plot_colorBackground, mSettings.colorBackground );
-    plotterGroup.writeEntry( plot_opacity, mSettings.opacity );
     config->sync();
     configChanged();
 }
 
 void InterfacePlotterDialog::configChanged()
 {
-    QFont font = mPlotter->axisFont();
-    font.setPointSize( mSettings.fontSize );
-    QFontMetrics fm( font );
+    QFont pfont = mPlotter->font();
+    pfont.setPointSize( mSettings.fontSize );
+    QFontMetrics fm( pfont );
     int axisTextWidth = fm.width(i18nc("Largest axis title", "99999 XXXX"));
     mPlotter->setMaxAxisTextWidth( axisTextWidth );
-    mPlotter->setAxisFont( font );
+    mPlotter->setFont( pfont );
     mPlotter->useBitrate( generalSettings->useBitrate );
     if ( !mSettings.automaticDetection )
     {
-        mPlotter->setMinValue( mSettings.minimumValue );
-        mPlotter->setMaxValue( mSettings.maximumValue );
+        mPlotter->setMinimumValue( mSettings.minimumValue );
+        mPlotter->setMaximumValue( mSettings.maximumValue );
     }
     mPlotter->setHorizontalScale( mSettings.pixel );
     mPlotter->setVerticalLinesDistance( mSettings.distance );
@@ -341,10 +326,6 @@ void InterfacePlotterDialog::configChanged()
     mPlotter->setShowHorizontalLines( mSettings.horizontalLines );
     mPlotter->setUseAutoRange( mSettings.automaticDetection );
     mPlotter->setVerticalLinesScroll( mSettings.verticalLinesScroll );
-    mPlotter->setVerticalLinesColor( mSettings.colorVLines );
-    mPlotter->setHorizontalLinesColor( mSettings.colorHLines );
-    mPlotter->setBackgroundColor( mSettings.colorBackground );
-    mPlotter->setFillOpacity( mSettings.opacity * 255 / 100.0 + 0.5 );
 
     // add or remove beams according to user settings
     int visibleBeams = KSignalPlotter::NONE;
@@ -360,18 +341,15 @@ void InterfacePlotterDialog::configChanged()
     mPlotter->setBeamColor( KSignalPlotter::OUTGOING_BEAM, mSettings.colorOutgoing );
     mPlotter->setVisibleBeams( visibleBeams );
 
-    if ( mSettings.bottomBar )
-    {
-        if ( visibleBeams & KSignalPlotter::INCOMING_TRAFFIC )
-            mReceivedLabel->show();
-        else
-            mReceivedLabel->hide();
+    if ( visibleBeams & KSignalPlotter::INCOMING_TRAFFIC )
+        mReceivedLabel->show();
+    else
+        mReceivedLabel->hide();
 
-        if ( visibleBeams & KSignalPlotter::OUTGOING_TRAFFIC )
-            mSentLabel->show();
-        else
-            mSentLabel->hide();
-    }
+    if ( visibleBeams & KSignalPlotter::OUTGOING_TRAFFIC )
+        mSentLabel->show();
+    else
+        mSentLabel->hide();
 }
 
 #include "interfaceplotterdialog.moc"

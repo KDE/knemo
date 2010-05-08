@@ -31,43 +31,33 @@ struct PlotterSettings
       : pixel( 6 ),
         distance( 30 ),
         fontSize( 8 ),
-        minimumValue( 0 ),
-        maximumValue( 0 ),
+        minimumValue( 0.0 ),
+        maximumValue( 20.0 ),
         labels( true ),
-        bottomBar( true ),
         showIncoming( true ),
         showOutgoing( true ),
         verticalLines( false ),
         horizontalLines( true ),
         automaticDetection( true ),
         verticalLinesScroll( false ),
-        colorVLines( 0x888888 ),
-        colorHLines( 0x888888 ),
         colorIncoming( 0x1889FF ),
-        colorOutgoing( 0xFF7F08 ),
-        colorBackground(0xFFFFFF ),
-        opacity( 20 )
+        colorOutgoing( 0xFF7F08 )
     {}
 
     int pixel;
     int distance;
     int fontSize;
-    int minimumValue;
-    int maximumValue;
+    double minimumValue;
+    double maximumValue;
     bool labels;
-    bool bottomBar;
     bool showIncoming;
     bool showOutgoing;
     bool verticalLines;
     bool horizontalLines;
     bool automaticDetection;
     bool verticalLinesScroll;
-    QColor colorVLines;
-    QColor colorHLines;
     QColor colorIncoming;
     QColor colorOutgoing;
-    QColor colorBackground;
-    int opacity;
 };
 
 class PlotterConfigDialog : public KDialog
@@ -86,13 +76,8 @@ class PlotterConfigDialog : public KDialog
         void load();
         Ui::Form ui;
 
-    QString mName;
-    PlotterSettings *mSettings;
-    /*QColor mColorVLines;
-    QColor mColorHLines;
-    QColor mColorIncoming;
-    QColor mColorOutgoing;
-    QColor mColorBackground;*/
+        QString mName;
+        PlotterSettings *mSettings;
 };
 
 #endif
