@@ -49,7 +49,7 @@ Name[th]=โปรแกรมเฝ้าสังเกตระบบเค�
 Name[tr]=Ağ İzleyici
 Name[uk]=Спостереження за мережею
 Name[x-test]=xxNetwork Monitorxx
-Name[zh_CN]=网络监控
+Name[zh_CN]=网络监视器
 Name[zh_TW]=網路監控
 Comment=Configure the KNemo network monitor
 Comment[da]=Indstil KNemo netværksovervågning
@@ -64,6 +64,7 @@ Comment[sv]=Anpassa Knemo nätverksövervakning
 Comment[tr]=KNemo ağ izleyicisini yapılandır
 Comment[uk]=Налаштування спостереження за мережею KNemo
 Comment[x-test]=xxConfigure the KNemo network monitorxx
+Comment[zh_CN]=配置 KNemo 网络监视器
 
 X-KDE-Keywords=knemo,network monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systray
 X-KDE-Keywords[cs]=knemo,monitor sítě,monitor wlan,monitor wifi,monitor ethernetu,monitor bezdrátového připojení,systray
