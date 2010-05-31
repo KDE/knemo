@@ -1,5 +1,10 @@
 Version 0.6.3
  * bugfix: save changes to traffic threshold setting
+ * add option to report traffic rate in bit/s
+ * update the signal plotter from KDE SC 4.4 branch; a few minor plotter
+   config options were dropped as a result
+ * on startup sync recent traffic statistics with vnstat if it's available;
+   this should help KNemo account for traffic between sessions
 
 Version 0.6.2
  * add rolling 24 hour statistics
