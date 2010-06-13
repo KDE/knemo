@@ -268,7 +268,7 @@ QFont setIconFont( const QString& text, const QFont& font, int iconWidth )
         pointSize *= qreal( iconWidth ) / w;
         f.setPointSizeF( pointSize );
         fm = QFontMetricsF( f );
-        while ( fm.width( text ) > iconWidth )
+        while ( pointSize > 0.5 && fm.width( text ) > iconWidth )
         {
             pointSize -= 0.5;
             f.setPointSizeF( pointSize );
@@ -282,7 +282,7 @@ QFont setIconFont( const QString& text, const QFont& font, int iconWidth )
         pointSize *=  iconWidth / 2.0 / fm.ascent();
         f.setPointSizeF( pointSize );
         fm = QFontMetricsF( f );
-        while ( fm.ascent() > iconWidth/2.0 )
+        while ( pointSize > 0.5 && fm.ascent() > iconWidth/2.0 )
         {
             pointSize -= 0.5;
             f.setPointSizeF( pointSize );
