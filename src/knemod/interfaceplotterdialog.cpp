@@ -63,7 +63,7 @@ public:
         if ( kapp->layoutDirection() == Qt::RightToLeft )
 	            label->setText(QString("<qt>: ") + name + " <font color=\"" + color.name() + "\">" + indicatorSymbol + "</font>");
         else
-            label->setText(QString("<qt><font color=\"") + color.name() + "\">" + indicatorSymbol + "</font> " + name + " :");
+            label->setText(QString("<qt><font color=\"") + color.name() + "\">" + indicatorSymbol + "</font> " + name + ":");
     }
     QLabel *label;
     QLabel *value;
