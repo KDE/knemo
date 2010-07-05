@@ -12,7 +12,7 @@ X-KDE-System-Settings-Parent-Category=network-settings
 X-KDE-Weight=60
 
 Name=Network Monitor
-Name[bg]=Монитор на мрежата
+Name[bg]=Наблюдение на мрежата
 Name[cs]=Monitor sítě
 Name[da]=Netværksovervågning
 Name[de]=Netzwerkmonitor
@@ -52,6 +52,7 @@ Name[x-test]=xxNetwork Monitorxx
 Name[zh_CN]=网络监视器
 Name[zh_TW]=網路監控
 Comment=Configure the KNemo network monitor
+Comment[bg]=Настройки на мрежовото наблюдение KNemo
 Comment[da]=Indstil KNemo netværksovervågning
 Comment[de]=Den Netzwerkmonitor KNemo einrichten
 Comment[en_GB]=Configure the KNemo network monitor

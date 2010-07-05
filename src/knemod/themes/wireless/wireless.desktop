@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=Wireless
+Name[bg]=Безжично
 Name[cs]=Bezdrátové
 Name[da]=Trådløst
 Name[de]=Drahtlose Verbindung
@@ -30,6 +31,7 @@ Name[x-test]=xxWirelessxx
 Name[zh_CN]=无线
 Name[zh_TW]=無線
 Comment=KNemo wireless icon theme
+Comment[bg]=Набор икони в стил "безжично" за KNemo
 Comment[da]=KNemo ikontema til trådløst
 Comment[de]=KNemo-Symbol-Design „Drahtlosnetzwerk“
 Comment[en_GB]=KNemo wireless icon theme
