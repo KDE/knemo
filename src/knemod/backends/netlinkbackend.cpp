@@ -244,7 +244,7 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
             data->status |= KNemoIface::Up;
             if ( rtnl_link_get_flags( link ) & IFF_LOWER_UP )
             {
-                if ( !(flags & IFF_POINTOPOINT) || data->addrData().size() )
+                if ( !(flags & IFF_POINTOPOINT) || data->addrData.size() )
                     data->status |= KNemoIface::Connected;
             }
         }
