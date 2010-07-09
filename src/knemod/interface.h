@@ -168,8 +168,6 @@ private:
 
     void resetUptime();
 
-    KNemoIface::Type mType;
-
     int mState;
     int mPreviousState;
     QString mName;

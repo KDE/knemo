@@ -39,7 +39,6 @@
 Interface::Interface( const QString &ifname,
                       const BackendData* data )
     : QObject(),
-      mType( KNemoIface::UnknownType ),
       mState( KNemoIface::UnknownState ),
       mPreviousState( KNemoIface::UnknownState ),
       mName( ifname ),
@@ -218,7 +217,7 @@ void Interface::processUpdate()
         if ( mPreviousState & KNemoIface::Connected )
         {
             KNotification::event( "disconnected", i18n( "%1 has disconnected", title ) );
-            if ( mType == KNemoIface::PPP )
+            if ( mBackendData->interfaceType == KNemoIface::PPP )
                 backend->clearTraffic( mName );
             resetUptime();
         }
@@ -232,8 +231,7 @@ void Interface::processUpdate()
               mPreviousState > KNemoIface::Unavailable )
     {
         KNotification::event( "unavailable", i18n( "%1 is unavailable", title ) );
-        if ( mType == KNemoIface::PPP )
-            backend->clearTraffic( mName );
+        backend->clearTraffic( mName );
         resetUptime();
     }
 
