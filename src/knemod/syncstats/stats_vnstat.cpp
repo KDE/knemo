@@ -84,7 +84,7 @@ void StatsVnstat::getBtime()
     size_t len = sizeof( bootTime );
     int mib[2] = { CTL_KERN, KERN_BOOTTIME };
 
-    if ( sysctl( mib, 2, &btm, &len, NULL, 0 ) >= 0 )
+    if ( sysctl( mib, 2, &bootTime, &len, NULL, 0 ) >= 0 )
         mSysBtime = bootTime.tv_sec;
 #endif
 }
