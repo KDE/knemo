@@ -278,6 +278,7 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
     struct ifaddrs *ifa;
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
     {
+        bool allUp = false;
         QString ifaddrName( ifa->ifa_name );
         if ( ifName != ifaddrName )
             continue;
@@ -305,7 +306,7 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
             data->txString = KIO::convertSize( data->txBytes );
 
             if ( stats->ifi_link_state == LINK_STATE_UP && ifa->ifa_flags & IFF_UP )
-                data->status |= KNemoIface::Connected;
+                allUp = true;
         }
 
         // mac address, interface type
@@ -345,6 +346,12 @@ void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
                 if ( !addrKey.isEmpty() )
                     data->addrData.insert( addrKey, addrVal );
             }
+        }
+
+        if ( allUp )
+        {
+            if ( data->interfaceType != KNemoIface::PPP || data->addrData.size() )
+                data->status |= KNemoIface::Connected;
         }
     }
     if ( data->status < KNemoIface::Available )

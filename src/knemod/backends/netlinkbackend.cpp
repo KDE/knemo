@@ -219,16 +219,6 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
         else
             data->interfaceType = KNemoIface::Ethernet;
 
-        data->status = KNemoIface::Available;
-        if ( flags & IFF_UP )
-        {
-            data->status |= KNemoIface::Up;
-            if ( rtnl_link_get_flags( link ) & IFF_LOWER_UP )
-            {
-                data->status |= KNemoIface::Connected;
-            }
-        }
-
         // hw address
         struct nl_addr * addr = rtnl_link_get_addr( link );
         if ( addr && nl_addr_get_len( addr ) )
@@ -247,6 +237,18 @@ void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* da
         data->txString = KIO::convertSize( data->txBytes );
 
         updateAddresses( data );
+
+        data->status = KNemoIface::Available;
+        if ( flags & IFF_UP )
+        {
+            data->status |= KNemoIface::Up;
+            if ( rtnl_link_get_flags( link ) & IFF_LOWER_UP )
+            {
+                if ( !(flags & IFF_POINTOPOINT) || data->addrData().size() )
+                    data->status |= KNemoIface::Connected;
+            }
+        }
+
 
         rtnl_link_put( link );
     }
