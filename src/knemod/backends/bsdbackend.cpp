@@ -53,6 +53,11 @@
 #include <kio/global.h>
 #include <stdio.h>
 
+#ifdef __GLIBC__
+#include <unistd.h>
+#include <netinet/ether.h>
+#endif
+
 #include "config-knemo.h"
 #include "bsdbackend.h"
 #include "utils.h"
