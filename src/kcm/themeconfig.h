@@ -17,8 +17,8 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef THEMEDIALOG_H
-#define THEMEDIALOG_H
+#ifndef THEMECONFIG_H
+#define THEMECONFIG_H
 
 #include <KDialog>
 #include "data.h"
