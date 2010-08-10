@@ -129,6 +129,7 @@ void InterfaceStatisticsDialog::setupTable( KConfigGroup* group, QTableView *vie
         view->resizeColumnsToContents();
     else
         view->horizontalHeader()->restoreState( state );
+    proxy->setDynamicSortFilter( true );
 }
 
 bool InterfaceStatisticsDialog::event( QEvent *e )
