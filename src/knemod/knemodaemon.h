@@ -22,8 +22,6 @@
 #define KNEMODAEMON_H
 
 #include <QHash>
-#include <QColor>
-
 #include <KApplication>
 
 class QTimer;
@@ -95,12 +93,6 @@ private:
     KSharedConfigPtr mConfig;
     bool mHaveInterfaces;
 
-    QColor mColorVLines;
-    QColor mColorHLines;
-    QColor mColorIncoming;
-    QColor mColorOutgoing;
-    QColor mColorBackground;
-
     // every time this timer expires we will
     // gather new informations from the backend
     QTimer* mPollTimer;
@@ -109,7 +101,7 @@ private:
     // a list of all interfaces the user wants to monitor
     QHash<QString, Interface *> mInterfaceHash;
 
-    static KAboutData* mAboutData;    
+    static KAboutData* mAboutData;
 };
 
 #endif // KNEMODAEMON_H

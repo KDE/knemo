@@ -41,12 +41,7 @@ GeneralSettings *generalSettings = NULL;
 KNemoDaemon::KNemoDaemon()
     : QObject(),
       mConfig( KGlobal::config() ),
-      mHaveInterfaces( false ),
-      mColorVLines( 0x04FB1D ),
-      mColorHLines( 0x04FB1D ),
-      mColorIncoming( 0x1889FF ),
-      mColorOutgoing( 0xFF7F08 ),
-      mColorBackground( 0x313031 )
+      mHaveInterfaces( false )
 {
     generalSettings = new GeneralSettings();
     backend = BackendFactory::backend();
