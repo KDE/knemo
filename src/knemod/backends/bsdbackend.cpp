@@ -78,7 +78,7 @@ BackendBase* BSDBackend::createInstance()
     return new BSDBackend();
 }
 
-QStringList BSDBackend::getIfaceList()
+QStringList BSDBackend::ifaceList()
 {
     QStringList ifaces;
     struct ifaddrs *ifaddr;
@@ -113,7 +113,7 @@ void BSDBackend::update()
         interface->ip6DefaultGateway = ip6DefGw;
         interface->interfaceType = KNemoIface::Ethernet;
 
-        updateInterfaceData( key, interface );
+        updateIfaceData( key, interface );
 
         if ( s >= 0 )
         {
@@ -131,7 +131,7 @@ void BSDBackend::update()
     updateComplete();
 }
 
-QString BSDBackend::getDefaultRouteIface( int afInet )
+QString BSDBackend::defaultRouteIface( int afInet )
 {
     return getDefaultRoute( afInet );
 }
@@ -278,7 +278,7 @@ int BSDBackend::getSubnet( struct ifaddrs * ifa )
     return len;
 }
 
-void BSDBackend::updateInterfaceData( const QString& ifName, BackendData* data )
+void BSDBackend::updateIfaceData( const QString& ifName, BackendData* data )
 {
     struct ifaddrs *ifa;
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
