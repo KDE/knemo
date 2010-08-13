@@ -69,7 +69,7 @@ private:
     bool mWasShown;
     bool mSetPos;
     QWidget *mBillingWidget;
-    QTableView *mBillingView;
+    StatisticsView *mBillingView;
     KSharedConfigPtr mConfig;
     Interface* mInterface;
     QHash<QTableView*, QString> mStateKeys;

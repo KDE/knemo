@@ -14,6 +14,7 @@ set( knemo_SRCS
     plotterconfigdialog.cpp
     signalplotter.cpp
     statisticsmodel.cpp
+    statisticsview.cpp
     backends/backendbase.cpp
     ../common/data.cpp
     ../common/utils.cpp

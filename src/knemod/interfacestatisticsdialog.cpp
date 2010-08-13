@@ -45,7 +45,7 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
 
     mBillingWidget = new QWidget();
     QVBoxLayout *bl = new QVBoxLayout( mBillingWidget );
-    mBillingView = new QTableView( mBillingWidget );
+    mBillingView = new StatisticsView( mBillingWidget );
     mBillingView->setEditTriggers( QAbstractItemView::NoEditTriggers );
     mBillingView->setSortingEnabled( true );
     mBillingView->horizontalHeader()->setStretchLastSection( true );
@@ -118,6 +118,7 @@ InterfaceStatisticsDialog::~InterfaceStatisticsDialog()
 void InterfaceStatisticsDialog::configChanged()
 {
     bool billingTab = false;
+    bool logOffpeak = false;
     KCalendarSystem *cal = mInterface->getStatistics()->calendar();
     foreach ( StatsRule rule, mInterface->getSettings().statsRules )
     {
@@ -127,7 +128,17 @@ void InterfaceStatisticsDialog::configChanged()
         {
             billingTab = true;
         }
+        if ( rule.logOffpeak )
+            logOffpeak = true;
     }
+
+    ui.tableHourly->haveOffpeak( logOffpeak );
+    ui.tableDaily->haveOffpeak( logOffpeak );
+    ui.tableWeekly->haveOffpeak( logOffpeak );
+    ui.tableMonthly->haveOffpeak( logOffpeak );
+    ui.tableYearly->haveOffpeak( logOffpeak );
+    mBillingView->haveOffpeak( logOffpeak );
+
     if ( billingTab && ui.tabWidget->count() < 6 )
     {
         ui.tabWidget->insertTab( 4, mBillingWidget, i18n( "Billing Periods" ) );
