@@ -47,7 +47,9 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
     : QObject(),
       mInterface( interface ),
       mSaveTimer( new QTimer() ),
-      mEntryTimer( new QTimer() )
+      mWarnTimer( new QTimer() ),
+      mEntryTimer( new QTimer() ),
+      mTrafficChanged( false )
 {
     StatisticsModel * s = new StatisticsModel( KNemoStats::Hour, this );
     mModels.insert( KNemoStats::Hour, s );
@@ -70,6 +72,7 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
     }
 
     connect( mSaveTimer, SIGNAL( timeout() ), this, SLOT( saveStatistics() ) );
+    connect( mWarnTimer, SIGNAL( timeout() ), this, SLOT( checkWarnings() ) );
     connect( mEntryTimer, SIGNAL( timeout() ), this, SLOT( checkValidEntry() ) );
 
     KUrl dir( generalSettings->statisticsDir );
@@ -82,8 +85,10 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
 InterfaceStatistics::~InterfaceStatistics()
 {
     mSaveTimer->stop();
+    mWarnTimer->stop();
     mEntryTimer->stop();
     delete mSaveTimer;
+    delete mWarnTimer;
     delete mEntryTimer;
 
     saveStatistics();
@@ -136,6 +141,15 @@ bool InterfaceStatistics::loadStats()
  * Stats Entry Generators         *
  **********************************/
 
+void InterfaceStatistics::resetWarnings( int modelType )
+{
+    for ( int i = 0; i < mInterface->getSettings().warnRules.count(); ++i )
+    {
+        if ( modelType == mInterface->getSettings().warnRules[i].periodUnits )
+            mInterface->getSettings().warnRules[i].warnDone = false;
+    }
+}
+
 void InterfaceStatistics::hoursToArchive( const QDateTime &dateTime )
 {
     bool removedRow = false;
@@ -185,9 +199,7 @@ void InterfaceStatistics::genNewHour( const QDateTime &dateTime )
     hours->createEntry();
     hours->setDateTime( dateTime );
 
-    if ( mInterface->getSettings().warnType == NotifyHour ||
-         mInterface->getSettings().warnType == NotifyRoll24Hour )
-        mWarningDone = false;
+    resetWarnings( hours->periodType() );
 }
 
 bool InterfaceStatistics::genNewCalendarType( const QDate &date, const KNemoStats::PeriodUnits stype )
@@ -208,10 +220,6 @@ bool InterfaceStatistics::genNewCalendarType( const QDate &date, const KNemoStat
     {
         case KNemoStats::Day:
             newDate = date;
-            if ( mInterface->getSettings().warnType == NotifyDay ||
-                 mInterface->getSettings().warnType == NotifyRoll7Day ||
-                 mInterface->getSettings().warnType == NotifyRoll30Day )
-                mWarningDone = false;
             break;
         case KNemoStats::Week:
             dayOf = mStorageData.calendar->dayOfWeek( date );
@@ -223,8 +231,6 @@ bool InterfaceStatistics::genNewCalendarType( const QDate &date, const KNemoStat
         case KNemoStats::Month:
             dayOf = mStorageData.calendar->day( date );
             newDate = date.addDays( 1 - dayOf );
-            if ( mInterface->getSettings().warnType == NotifyMonth )
-                mWarningDone = false;
             break;
         case KNemoStats::Year:
             dayOf = mStorageData.calendar->dayOfYear( date );
@@ -236,6 +242,7 @@ bool InterfaceStatistics::genNewCalendarType( const QDate &date, const KNemoStat
 
     mModels.value( stype )->createEntry();
     mModels.value( stype )->setDateTime( QDateTime( newDate, QTime() ) );
+    resetWarnings( stype );
 
     return true;
 }
@@ -334,6 +341,8 @@ void InterfaceStatistics::genNewBillPeriod( const QDate &date )
     billing->createEntry();
     billing->setDays( days );
     billing->setDateTime( QDateTime( newDate, QTime() ) );
+
+    resetWarnings( KNemoStats::BillPeriod );
 }
 
 
@@ -342,8 +351,7 @@ void InterfaceStatistics::genNewBillPeriod( const QDate &date )
 void InterfaceStatistics::configChanged()
 {
     mSaveTimer->stop();
-
-    mWarningDone = false;
+    mWarnTimer->stop();
 
     QString origCalendarType;
     if ( mStorageData.calendar )
@@ -380,7 +388,15 @@ void InterfaceStatistics::configChanged()
         mSaveTimer->start();
     }
 
+    foreach ( StatisticsModel * s, mModels )
+    {
+        resetWarnings( s->periodType() );
+    }
+
     checkValidEntry();
+
+    mWarnTimer->setInterval( 2000 );
+    mWarnTimer->start();
 }
 
 int InterfaceStatistics::ruleForDate( const QDate &date )
@@ -933,6 +949,7 @@ void InterfaceStatistics::checkRebuild( const QString &oldCalendar, bool force )
         saveStatistics( true );
     }
 
+    mTrafficChanged = true;
     emit currentEntryChanged();
 }
 
@@ -972,6 +989,72 @@ void InterfaceStatistics::checkValidEntry()
     mEntryTimer->start();
 }
 
+void InterfaceStatistics::checkWarnings()
+{
+    if ( !mTrafficChanged )
+        return;
+    mTrafficChanged = false;
+
+    QList<WarnRule> warn = mInterface->getSettings().warnRules;
+    for ( int wi=0; wi < warn.count(); ++wi )
+    {
+        if ( warn[wi].warnDone || !warn[wi].threshold > 0.0 )
+            continue;
+
+        quint64 total = 0;
+        StatisticsModel *model = 0;
+
+        model = mModels.value( warn[wi].periodUnits );
+        if ( !model )
+            return;
+
+        int lowerIndex = model->rowCount() - warn[wi].periodCount;
+
+        for ( int i = model->rowCount() - 1; i >= 0; --i )
+        {
+            if ( i >= lowerIndex )
+            {
+                switch ( warn[wi].trafficDirection )
+                {
+                    case KNemoStats::TrafficIn:
+                        if ( warn[wi].trafficType == KNemoStats::PeakOffpeak )
+                            total += model->rxBytes( i );
+                        else if ( warn[wi].trafficType == KNemoStats::Offpeak )
+                            total += model->rxBytes( i, KNemoStats::OffpeakTraffic );
+                        else
+                            total += model->rxBytes( i ) - model->rxBytes( i, KNemoStats::OffpeakTraffic );
+                        break;
+                    case KNemoStats::TrafficOut:
+                        if ( warn[wi].trafficType == KNemoStats::PeakOffpeak )
+                            total += model->txBytes( i );
+                        else if ( warn[wi].trafficType == KNemoStats::Offpeak )
+                            total += model->txBytes( i, KNemoStats::OffpeakTraffic );
+                        else
+                            total += model->txBytes( i ) - model->txBytes( i, KNemoStats::OffpeakTraffic );
+                        break;
+                    default:
+                        if ( warn[wi].trafficType == KNemoStats::PeakOffpeak )
+                            total += model->totalBytes( i );
+                        else if ( warn[wi].trafficType == KNemoStats::Offpeak )
+                            total += model->totalBytes( i, KNemoStats::OffpeakTraffic );
+                        else
+                            total += model->totalBytes( i ) - model->totalBytes( i, KNemoStats::OffpeakTraffic );
+                }
+            }
+            else
+                break;
+        }
+
+        int warnMult = pow( 1024, warn[wi].trafficUnits );
+        quint64 thresholdBytes = warn[wi].threshold * warnMult;
+        if ( total > thresholdBytes )
+        {
+            emit warnTraffic( warn[wi].customText, thresholdBytes, total );
+            mInterface->getSettings().warnRules[wi].warnDone = true;
+        }
+    }
+}
+
 
 
 /******************************
@@ -988,65 +1071,8 @@ void InterfaceStatistics::clearStatistics()
     }
     sql->clearStats( &mStorageData );
     checkValidEntry();
+    mTrafficChanged = true;
     emit currentEntryChanged();
-}
-
-void InterfaceStatistics::checkThreshold( quint64 currentBytes )
-{
-    int warnMult = pow( 1024, mInterface->getSettings().warnUnits );
-    quint64 thresholdBytes = mInterface->getSettings().warnThreshold * warnMult;
-    if ( currentBytes > thresholdBytes )
-    {
-        mWarningDone = true;
-        emit warnTraffic( thresholdBytes, currentBytes );
-    }
-}
-
-void InterfaceStatistics::rollingUnit( const StatisticsModel* model, int count )
-{
-    quint64 total = 0;
-    int lowerLimit = model->rowCount() - count;
-    if ( lowerLimit < 0 )
-       lowerLimit = 0;
-
-    for ( int i = model->rowCount() - 1; i >= lowerLimit; --i )
-    {
-       if ( mInterface->getSettings().warnTotalTraffic )
-            total += model->totalBytes( i );
-        else
-            total += model->rxBytes( i );
-    }
-    checkThreshold( total );
-}
-
-void InterfaceStatistics::checkTrafficLimit()
-{
-    int wtype = mInterface->getSettings().warnType;
-
-    if ( !mWarningDone && mInterface->getSettings().warnThreshold > 0.0 )
-    {
-        switch ( wtype )
-        {
-            case NotifyHour:
-                rollingUnit( mModels.value( KNemoStats::Hour ), 1 );
-                break;
-            case NotifyDay:
-                rollingUnit( mModels.value( KNemoStats::Day ), 1 );
-                break;
-            case NotifyMonth:
-                rollingUnit( mModels.value( KNemoStats::Month ), 1 );
-                break;
-            case NotifyRoll24Hour:
-                rollingUnit( mModels.value( KNemoStats::Hour ), 24 );
-                break;
-            case NotifyRoll7Day:
-                rollingUnit( mModels.value( KNemoStats::Day ), 7 );
-                break;
-            case NotifyRoll30Day:
-                rollingUnit( mModels.value( KNemoStats::Day ), 30 );
-                break;
-        }
-    }
 }
 
 void InterfaceStatistics::addRxBytes( unsigned long bytes )
@@ -1064,7 +1090,7 @@ void InterfaceStatistics::addRxBytes( unsigned long bytes )
         }
     }
 
-    checkTrafficLimit();
+    mTrafficChanged = true;
     emit currentEntryChanged();
 }
 
@@ -1083,7 +1109,7 @@ void InterfaceStatistics::addTxBytes( unsigned long bytes )
         }
     }
 
-    checkTrafficLimit();
+    mTrafficChanged = true;
     emit currentEntryChanged();
 }
 

@@ -144,7 +144,7 @@ private slots:
     /**
      * Emit a notification when traffic exceeds a threshold
      */
-    void warnTraffic( quint64 threshold, quint64 current );
+    void warnTraffic( QString text, quint64 threshold, quint64 current );
 
 private:
     /**

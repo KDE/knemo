@@ -51,18 +51,20 @@ public:
 
 signals:
     void currentEntryChanged();
-    void warnTraffic( quint64 threshold, quint64 current );
+    void warnTraffic( QString warnText, quint64 threshold, quint64 current );
 
 public slots:
     void clearStatistics();
 
 private slots:
     void saveStatistics( bool fullSave = false );
+    void checkWarnings();
     void checkValidEntry();
 
 private:
     bool loadStats();
 
+    void resetWarnings( int periodUnits );
     void hoursToArchive( const QDateTime &dateTime );
     bool daysInSpan( const QDate& entry, int span );
     QDate nextBillPeriodStart( const StatsRule &rule, const QDate& );
@@ -86,14 +88,11 @@ private:
     void prependStatsRule( QList<StatsRule> &rules );
     void checkRebuild( const QString &oldCalendar, bool force = false );
 
-    void checkThreshold( quint64 currentBytes );
-    void rollingUnit( const StatisticsModel* model, int count );
-    void checkTrafficLimit();
-
     Interface* mInterface;
     QTimer* mSaveTimer;
+    QTimer* mWarnTimer;
     QTimer* mEntryTimer;
-    bool mWarningDone;
+    bool mTrafficChanged;
     int mWeekStartDay;
     StorageData mStorageData;
     QHash<int, StatisticsModel*> mModels;

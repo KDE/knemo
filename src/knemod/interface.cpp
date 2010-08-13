@@ -101,10 +101,26 @@ void Interface::configChanged()
     mSettings.hideWhenUnavailable = interfaceGroup.readEntry( conf_hideWhenNotExist, s.hideWhenUnavailable );
     mSettings.activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
     mSettings.trafficThreshold = clamp<unsigned int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
-    mSettings.warnThreshold = clamp<double>(interfaceGroup.readEntry( conf_billingWarnThresh, s.warnThreshold ), 0.0, 9999.0 );
-    mSettings.warnUnits = clamp<int>(interfaceGroup.readEntry( conf_billingWarnUnits, s.warnUnits ), 0, 3 );
-    mSettings.warnType = clamp<int>(interfaceGroup.readEntry( conf_billingWarnType, s.warnType ), 0, 5 );
-    mSettings.warnTotalTraffic = interfaceGroup.readEntry( conf_billingWarnRxTx, s.warnTotalTraffic );
+    mSettings.warnRules.clear();
+    int warnRuleCount = interfaceGroup.readEntry( conf_warnRules, 0 );
+    for ( int i = 0; i < warnRuleCount; ++i )
+    {
+        group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( mName ).arg( i );
+        if ( config->hasGroup( group ) )
+        {
+            KConfigGroup warnGroup( config, group );
+            WarnRule warn;
+            warn.periodUnits = clamp<int>(warnGroup.readEntry( conf_warnPeriodUnits, warn.periodUnits ), KNemoStats::Hour, KNemoStats::Year );
+            warn.periodCount = clamp<int>(warnGroup.readEntry( conf_warnPeriodCount, warn.periodUnits ), 1, 1000 );
+            warn.trafficType = clamp<int>(warnGroup.readEntry( conf_warnTrafficType, warn.trafficType ), KNemoStats::PeakOffpeak, KNemoStats::Offpeak );
+            warn.trafficDirection = clamp<int>(warnGroup.readEntry( conf_warnTrafficDirection, warn.trafficDirection ), KNemoStats::TrafficIn, KNemoStats::TrafficTotal );
+            warn.trafficUnits = clamp<int>(warnGroup.readEntry( conf_warnTrafficUnits, warn.trafficUnits ), KNemoStats::UnitB, KNemoStats::UnitG );
+            warn.threshold = clamp<double>(warnGroup.readEntry( conf_warnThreshold, warn.threshold ), 0.0, 9999.0 );
+            warn.customText = warnGroup.readEntry( conf_warnCustomText, warn.customText ).trimmed();
+
+            mSettings.warnRules << warn;
+        }
+    }
 
     QString defaultCal;
     if ( KDE::versionMajor() >= 4 && KDE::versionMinor() >= 4 )
@@ -338,8 +354,8 @@ void Interface::updateTime()
 void Interface::startStatistics()
 {
     mStatistics = new InterfaceStatistics( this );
-    connect( mStatistics, SIGNAL( warnTraffic( quint64, quint64 ) ),
-             this, SLOT( warnTraffic( quint64, quint64 ) ) );
+    connect( mStatistics, SIGNAL( warnTraffic( QString, quint64, quint64 ) ),
+             this, SLOT( warnTraffic( QString, quint64, quint64 ) ) );
     if ( mStatusDialog != 0 )
     {
         connect( mStatistics, SIGNAL( currentEntryChanged() ),
@@ -358,19 +374,25 @@ void Interface::stopStatistics()
     mStatistics = 0;
 }
 
-void Interface::warnTraffic( quint64 threshold, quint64 current )
+void Interface::warnTraffic( QString warnText, quint64 threshold, quint64 current )
 {
-    // Don't use mSettings.alias since automatic text wrapping can
-    // cut off the bottom portion of the notification
-    KNotification::event( "exceededTraffic",
-                          i18n( "<table><tr><td style='padding-right:0.2em;'>%1:</td>"
+    if ( !warnText.isEmpty() )
+    {
+        warnText = warnText.replace( QRegExp("%i"), mName );
+        warnText = warnText.replace( QRegExp("%a"), mSettings.alias );
+        warnText = warnText.replace( QRegExp("%t"), KIO::convertSize( threshold ) );
+        warnText = warnText.replace( QRegExp("%c"), KIO::convertSize( threshold ) );
+    }
+    else
+    {
+        warnText = i18n( "<table><tr><td style='padding-right:0.2em;'>%1:</td>"
                                 "<td>Exceeded traffic limit of %2\n"
                                 "(currently %3)</td></tr></table>",
                                 mName,
                                 KIO::convertSize( threshold ),
-                                KIO::convertSize( current )
-                              )
-                        );
+                                KIO::convertSize( current ) );
+    }
+    KNotification::event( "exceededTraffic", warnText );
 }
 
 // taken from ksystemtray.cpp

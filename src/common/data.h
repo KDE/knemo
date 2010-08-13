@@ -66,6 +66,28 @@ namespace KNemoIface {
 
 namespace KNemoStats
 {
+    enum TrafficUnits
+    {
+        UnitB = 0,
+        UnitK,
+        UnitM,
+        UnitG
+    };
+
+    enum TrafficDirection
+    {
+        TrafficIn = 0,
+        TrafficOut,
+        TrafficTotal
+    };
+
+    enum WarnType
+    {
+        Peak = 0,
+        Offpeak,
+        PeakOffpeak
+    };
+
     enum PeriodUnits
     {
         Hour = 0,
@@ -102,6 +124,7 @@ static const char confg_general[] = "General";
 static const char confg_interface[] = "Interface_";
 static const char confg_plotter[] = "Plotter_";
 static const char confg_statsRule[] = "StatsRule_";
+static const char confg_warnRule[] = "WarnRule_";
 
 static const char conf_firstStart[] = "FirstStart";
 static const char conf_autoStart[] = "AutoStart";
@@ -131,10 +154,7 @@ static const char conf_iconFont[] = "IconFont";
 static const char conf_activateStatistics[] = "ActivateStatistics";
 static const char conf_calendar[] = "Calendar";
 static const char conf_statsRules[] = "StatsRules";
-static const char conf_billingWarnThresh[] = "BillingWarnThreshold";
-static const char conf_billingWarnUnits[] = "BillingWarnUnits";
-static const char conf_billingWarnType[] = "BillingWarnType";
-static const char conf_billingWarnRxTx[] = "BillingWarnRxTx";
+static const char conf_warnRules[] = "WarnRules";
 
 // interface billing
 static const char conf_statsStartDate[] = "StartDate";
@@ -148,6 +168,15 @@ static const char conf_weekendDayStart[] = "WeekendDayStart";
 static const char conf_weekendDayEnd[] = "WeekendDayEnd";
 static const char conf_weekendTimeStart[] = "WeekendTimeStart";
 static const char conf_weekendTimeEnd[] = "WeekendTimeEnd";
+
+// warning
+static const char conf_warnPeriodUnits[] = "PeriodUnits";
+static const char conf_warnPeriodCount[] = "PeriodCount";
+static const char conf_warnTrafficType[] = "TrafficType";
+static const char conf_warnTrafficDirection[] = "TrafficDirection";
+static const char conf_warnTrafficUnits[] = "TrafficUnits";
+static const char conf_warnThreshold[] = "Threshold";
+static const char conf_warnCustomText[] = "CustomText";
 
 // interface context menu
 static const char conf_numCommands[] = "NumCommands";
@@ -335,6 +364,40 @@ public:
     QTime weekendTimeEnd;
 };
 
+struct WarnRule
+{
+    WarnRule()
+        : periodUnits( KNemoStats::Month ),
+        periodCount( 1 ),
+        trafficType( KNemoStats::PeakOffpeak ),
+        trafficDirection( KNemoStats::TrafficIn ),
+        trafficUnits( KNemoStats::UnitG ),
+        threshold( 5.0 ),
+        warnDone( false )
+    {
+    }
+    bool operator==( WarnRule &r )
+    {
+        if ( periodUnits == r.periodUnits &&
+             periodCount == r.periodCount &&
+             trafficType == r.trafficType &&
+             trafficDirection == r.trafficDirection &&
+             trafficUnits == r.trafficUnits &&
+             threshold == r.threshold )
+            return true;
+        else
+            return false;
+    }
+    int periodUnits;
+    uint periodCount;
+    int trafficType;
+    int trafficDirection;
+    int trafficUnits;
+    double threshold;
+    QString customText;
+    bool warnDone;
+};
+
 struct InterfaceSettings
 {
     InterfaceSettings()
@@ -352,10 +415,6 @@ struct InterfaceSettings
         iconFont( KGlobalSettings::generalFont() ),
         numCommands( 0 ),
         trafficThreshold( 0 ),
-        warnThreshold( 0.0 ),
-        warnUnits( 3 ),
-        warnType( 2 ),
-        warnTotalTraffic( false ),
         hideWhenUnavailable( false ),
         hideWhenDisconnected( false ),
         activateStatistics( false )
@@ -375,14 +434,11 @@ struct InterfaceSettings
     QFont iconFont;
     int numCommands;
     unsigned int trafficThreshold;
-    double warnThreshold;
-    int warnUnits;
-    int warnType;
-    bool warnTotalTraffic;
     bool hideWhenUnavailable;
     bool hideWhenDisconnected;
     bool activateStatistics;
     QList<StatsRule> statsRules;
+    QList<WarnRule> warnRules;
     QString calendar;
     QString alias;
     QList<InterfaceCommand> commands;
@@ -398,16 +454,6 @@ enum rt_scope_t
     RT_SCOPE_NOWHERE=255
 };
 #endif
-
-enum NotificationType
-{
-    NotifyHour,
-    NotifyDay,
-    NotifyMonth,
-    NotifyRoll24Hour,
-    NotifyRoll7Day,
-    NotifyRoll30Day
-};
 
 static const double pollIntervals[] = { 0.1, 0.2, 0.25, 0.5, 1.0, 2.0 };
 

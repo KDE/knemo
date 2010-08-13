@@ -55,6 +55,19 @@ class StatsRuleModel : public QStandardItemModel
         const KCalendarSystem *mCalendar;
 };
 
+class WarnModel : public QStandardItemModel
+{
+    Q_OBJECT
+    public:
+        WarnModel( QObject *parent = 0 ) : QStandardItemModel( parent ) {}
+        virtual ~WarnModel() {}
+        QModelIndex addWarn( const WarnRule &w );
+        void modifyWarn( const QModelIndex &index, const WarnRule &warn );
+        QList<WarnRule> getRules();
+    private:
+        QString ruleText( const WarnRule &warn );
+};
+
 class ConfigDialog : public KCModule
 {
     Q_OBJECT
@@ -90,10 +103,6 @@ private slots:
     void iconThemeChanged( int set );
     void comboHidingChanged( int val );
     void checkBoxStatisticsToggled( bool on );
-    void warnThresholdChanged( double val );
-    void warnUnitsChanged( int val );
-    void warnTypeChanged( int val );
-    void warnRxTxToggled( bool on );
     void checkBoxStartKNemoToggled( bool on );
     void colorButtonChanged();
     void iconFontChanged( const QFont &font );
@@ -101,6 +110,9 @@ private slots:
     void addStatsClicked();
     void modifyStatsClicked();
     void removeStatsClicked();
+    void addWarnClicked();
+    void modifyWarnClicked();
+    void removeWarnClicked();
     void listViewCommandsSelectionChanged( QTreeWidgetItem *current, QTreeWidgetItem *previous );
     void listViewCommandsChanged( QTreeWidgetItem* item, int column );
     void moveTips( QListWidget *from, QListWidget *to );
@@ -121,6 +133,7 @@ private:
     const KCalendarSystem* mCalendar;
     int mMaxDay;
     StatsRuleModel *statsModel;
+    WarnModel *warnModel;
 
     // Delete this once KCalendarSystem fixed
     QString mDefaultCalendarType;

@@ -37,6 +37,7 @@
 #include "config-knemo.h"
 #include "configdialog.h"
 #include "statsconfig.h"
+#include "warnconfig.h"
 #include "themeconfig.h"
 #include "utils.h"
 
@@ -57,6 +58,7 @@ K_EXPORT_PLUGIN(KNemoFactory("kcm_knemo"))
 
 Q_DECLARE_METATYPE( KNemoTheme )
 Q_DECLARE_METATYPE( StatsRule )
+Q_DECLARE_METATYPE( WarnRule )
 
 
 static bool themesLessThan( const KNemoTheme& s1, const KNemoTheme& s2 )
@@ -143,6 +145,66 @@ void StatsRuleModel::modifyRule( const QModelIndex &index, const StatsRule &s )
     item( index.row(), 1 )->setData( periodText( s.periodCount, s.periodUnits ), Qt::DisplayRole );
 }
 
+QString WarnModel::ruleText( const WarnRule &warn )
+{
+    QString warnType;
+    switch ( warn.trafficType )
+    {
+        case KNemoStats::Peak:
+           warnType = i18n( "peak" );
+           break;
+        case KNemoStats::Offpeak:
+           warnType = i18n( "off-peak" );
+    }
+    QString warnDirection;
+    switch ( warn.trafficDirection )
+    {
+        case KNemoStats::TrafficIn:
+           warnDirection = i18n( "incoming" );
+           break;
+        case KNemoStats::TrafficOut:
+           warnDirection = i18n( "outgoing" );
+           break;
+    }
+    quint64 siz = warn.threshold * pow( 1024, warn.trafficUnits );
+    QString text = QString( "%1 %2 traffic > %3" ).arg( warnType ).arg( warnDirection )
+        .arg( KIO::convertSize( siz ) );
+    return text.simplified();
+}
+
+QList<WarnRule> WarnModel::getRules()
+{
+    QList<WarnRule> warnRules;
+    for ( int i = 0; i < rowCount(); ++i )
+    {
+        warnRules << item( i, 0 )->data( Qt::UserRole ).value<WarnRule>();
+    }
+    return warnRules;
+}
+
+QModelIndex WarnModel::addWarn( const WarnRule &warn )
+{
+    QList<QStandardItem*> items;
+    QStandardItem *item = new QStandardItem( ruleText( warn ) );
+    QVariant v;
+    v.setValue( warn );
+    item->setData( v, Qt::UserRole );
+    items << item;
+    item = new QStandardItem( periodText( warn.periodCount, warn.periodUnits ) );
+    items << item;
+    appendRow( items );
+    return indexFromItem( items[0] );
+}
+
+void WarnModel::modifyWarn( const QModelIndex &index, const WarnRule &warn )
+{
+    QVariant v;
+    v.setValue( warn );
+    item( index.row(), 0 )->setData( v, Qt::UserRole );
+    item( index.row(), 0 )->setData( ruleText( warn ), Qt::DisplayRole );
+    item( index.row(), 1 )->setData( periodText( warn.periodCount, warn.periodUnits ), Qt::DisplayRole );
+}
+
 
 ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     : KCModule( KNemoFactory::componentData(), parent, args ),
@@ -173,6 +235,12 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     mDlg->statsView->setModel( proxy );
     mDlg->statsView->sortByColumn( 0, Qt::AscendingOrder );
 
+    warnModel = new WarnModel( this );
+    l.clear();
+    l << i18n( "Alert" ) << i18n( "Period" );
+    warnModel->setHorizontalHeaderLabels( l );
+    mDlg->warnView->setModel( warnModel );
+
     QList<KNemoTheme> themes = findThemes();
     qSort( themes.begin(), themes.end(), themesLessThan );
     foreach ( KNemoTheme theme, themes )
@@ -199,16 +267,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     //mDlg->comboBoxIconTheme->addItem( systemTheme.name, QVariant::fromValue( systemTheme ) );
     mDlg->comboBoxIconTheme->addItem( netloadTheme.name, QVariant::fromValue( netloadTheme ) );
     mDlg->comboBoxIconTheme->addItem( textTheme.name, QVariant::fromValue( textTheme ) );
-
-    mDlg->warnType->addItem( i18n( "Hour" ), NotifyHour );
-    mDlg->warnType->addItem( i18n( "Day" ), NotifyDay );
-    mDlg->warnType->addItem( i18n( "Month" ), NotifyMonth );
-    mDlg->warnType->addItem( i18n( "Rolling 24 hours" ), NotifyRoll24Hour );
-    mDlg->warnType->addItem( i18n( "Rolling 7 days" ), NotifyRoll7Day );
-    mDlg->warnType->addItem( i18n( "Rolling 30 days" ), NotifyRoll30Day );
-
-    mDlg->warnUnits->addItem( i18n( "MiB" ), 2 );
-    mDlg->warnUnits->addItem( i18n( "GiB" ), 3 );
 
     InterfaceSettings s;
     int index = findIndexFromName( s.iconTheme );
@@ -277,14 +335,12 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( modifyStatsClicked() ) );
     connect( mDlg->removeStats, SIGNAL( clicked() ),
              this, SLOT( removeStatsClicked() ) );
-    connect( mDlg->warnThreshold, SIGNAL( valueChanged( double ) ),
-             this, SLOT( warnThresholdChanged ( double ) ) );
-    connect( mDlg->warnUnits, SIGNAL( activated( int ) ),
-             this, SLOT( warnUnitsChanged( int ) ) );
-    connect( mDlg->warnType, SIGNAL( activated( int ) ),
-             this, SLOT( warnTypeChanged( int ) ) );
-    connect( mDlg->warnRxTx, SIGNAL( toggled( bool ) ),
-             this, SLOT( warnRxTxToggled ( bool ) ) );
+    connect( mDlg->addWarn, SIGNAL( clicked() ),
+             this, SLOT( addWarnClicked() ) );
+    connect( mDlg->modifyWarn, SIGNAL( clicked() ),
+             this, SLOT( modifyWarnClicked() ) );
+    connect( mDlg->removeWarn, SIGNAL( clicked() ),
+             this, SLOT( removeWarnClicked() ) );
 
     // Interface - Context Menu
     connect( mDlg->listViewCommands, SIGNAL( currentItemChanged( QTreeWidgetItem*, QTreeWidgetItem* ) ),
@@ -372,10 +428,6 @@ void ConfigDialog::load()
             settings->inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate );
             settings->outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate );
             settings->calendar = interfaceGroup.readEntry( conf_calendar, mDefaultCalendarType );
-            settings->warnThreshold = clamp<double>(interfaceGroup.readEntry( conf_billingWarnThresh, s.warnThreshold ), 0.0, 9999.0 );
-            settings->warnUnits = clamp<int>(interfaceGroup.readEntry( conf_billingWarnUnits, s.warnUnits ), 2, 3 );
-            settings->warnType = clamp<int>(interfaceGroup.readEntry( conf_billingWarnType, s.warnType ), 0, 5 );
-            settings->warnTotalTraffic = interfaceGroup.readEntry( conf_billingWarnRxTx, s.warnTotalTraffic );
             settings->activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
             int statsRuleCount = interfaceGroup.readEntry( conf_statsRules, 0 );
             for ( int i = 0; i < statsRuleCount; ++i )
@@ -398,6 +450,27 @@ void ConfigDialog::load()
                     stats.weekendTimeStart = QTime::fromString( statsGroup.readEntry( conf_weekendTimeStart, stats.weekendTimeStart.toString( Qt::ISODate ) ), Qt::ISODate );
                     stats.weekendTimeEnd = QTime::fromString( statsGroup.readEntry( conf_weekendTimeEnd, stats.weekendTimeEnd.toString( Qt::ISODate ) ), Qt::ISODate );
                     settings->statsRules << stats;
+                }
+            }
+
+            int warnRuleCount = interfaceGroup.readEntry( conf_warnRules, 0 );
+            for ( int i = 0; i < warnRuleCount; ++i )
+            {
+                group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( interface ).arg( i );
+                if ( config->hasGroup( group ) )
+                {
+                    KConfigGroup warnGroup( config, group );
+                    WarnRule warn;
+
+                    warn.periodUnits = clamp<int>(warnGroup.readEntry( conf_warnPeriodUnits, warn.periodUnits ), KNemoStats::Hour, KNemoStats::Year );
+                    warn.periodCount = clamp<int>(warnGroup.readEntry( conf_warnPeriodCount, warn.periodCount ), 1, 1000 );
+                    warn.trafficType = clamp<int>(warnGroup.readEntry( conf_warnTrafficType, warn.trafficType ), KNemoStats::PeakOffpeak, KNemoStats::Offpeak );
+                    warn.trafficDirection = clamp<int>(warnGroup.readEntry( conf_warnTrafficDirection, warn.trafficDirection ), KNemoStats::TrafficIn, KNemoStats::TrafficTotal );
+                    warn.trafficUnits = clamp<int>(warnGroup.readEntry( conf_warnTrafficUnits, warn.trafficUnits ), KNemoStats::UnitB, KNemoStats::UnitG );
+                    warn.threshold = clamp<double>(warnGroup.readEntry( conf_warnThreshold, warn.threshold ), 0.0, 9999.0 );
+                    warn.customText = warnGroup.readEntry( conf_warnCustomText, warn.customText ).trimmed();
+
+                    settings->warnRules << warn;
                 }
             }
 
@@ -480,7 +553,7 @@ void ConfigDialog::save()
     QStringList groupList = config->groupList();
     foreach ( QString tempDel, groupList )
     {
-        if ( tempDel.contains( confg_statsRule ) )
+        if ( tempDel.contains( confg_statsRule ) || tempDel.contains( confg_warnRule ) )
             config->deleteGroup( tempDel );
     }
 
@@ -593,12 +666,18 @@ void ConfigDialog::save()
                 }
             }
         }
-        interfaceGroup.writeEntry( conf_billingWarnThresh, settings->warnThreshold );
-        if ( settings->warnThreshold > 0 )
+        interfaceGroup.writeEntry( conf_warnRules, settings->warnRules.count() );
+        for ( int i = 0; i < settings->warnRules.count(); i++ )
         {
-            interfaceGroup.writeEntry( conf_billingWarnUnits, settings->warnUnits );
-            interfaceGroup.writeEntry( conf_billingWarnType, settings->warnType );
-            interfaceGroup.writeEntry( conf_billingWarnRxTx, settings->warnTotalTraffic );
+            QString group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( it ).arg( i );
+            KConfigGroup warnGroup( config, group );
+            warnGroup.writeEntry( conf_warnPeriodUnits, settings->warnRules[i].periodUnits );
+            warnGroup.writeEntry( conf_warnPeriodCount, settings->warnRules[i].periodCount );
+            warnGroup.writeEntry( conf_warnTrafficType, settings->warnRules[i].trafficType );
+            warnGroup.writeEntry( conf_warnTrafficDirection, settings->warnRules[i].trafficDirection );
+            warnGroup.writeEntry( conf_warnTrafficUnits, settings->warnRules[i].trafficUnits );
+            warnGroup.writeEntry( conf_warnThreshold, settings->warnRules[i].threshold );
+            warnGroup.writeEntry( conf_warnCustomText, settings->warnRules[i].customText.trimmed() );
         }
 
         interfaceGroup.writeEntry( conf_numCommands, settings->commands.size() );
@@ -779,15 +858,16 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     mDlg->comboHiding->setCurrentIndex( index );
     comboHidingChanged( index );
     mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
-    mDlg->warnThreshold->setValue( settings->warnThreshold );
-    index = mDlg->warnUnits->findData( settings->warnUnits );
-    mDlg->warnUnits->setCurrentIndex( index );
-    index = mDlg->warnType->findData( settings->warnType );
-    mDlg->warnType->setCurrentIndex( index );
-    if ( settings->warnTotalTraffic )
-        mDlg->warnRxTx->setChecked( true );
-    else
-        mDlg->warnRx->setChecked( true );
+
+    warnModel->removeRows(0, warnModel->rowCount() );
+    foreach( WarnRule warn, settings->warnRules )
+    {
+        warnModel->addWarn( warn );
+    }
+    mDlg->modifyWarn->setEnabled( warnModel->rowCount() );
+    mDlg->removeWarn->setEnabled( warnModel->rowCount() );
+    if ( warnModel->rowCount() )
+        mDlg->warnView->setCurrentIndex( warnModel->indexFromItem ( warnModel->item( 0, 0 ) ) );
 
     QString calType;
     if ( settings->calendar.isEmpty() )
@@ -1300,54 +1380,60 @@ void ConfigDialog::removeStatsClicked()
     changed( true );
 }
 
-void ConfigDialog::warnThresholdChanged( double val )
+void ConfigDialog::addWarnClicked()
 {
     InterfaceSettings* settings = getItemSettings();
     if ( !settings )
         return;
 
-    settings->warnThreshold = round(val*10.0)/10.0;
-    // If single stepping through values and we go back to 0.0,
-    // we might not get the specialValueText
-    if ( val != settings->warnThreshold )
-        mDlg->warnThreshold->setValue( settings->warnThreshold );
-    bool enable = settings->warnThreshold > 0.0;
-    mDlg->warnRx->setEnabled( enable );
-    mDlg->warnRxTx->setEnabled( enable );
-    mDlg->warnUnits->setEnabled( enable );
-    mDlg->warnPer->setEnabled( enable );
-    mDlg->warnType->setEnabled( enable );
-    if (!mLock) changed( true );
+    WarnRule warn;
+    WarnConfig dlg( settings, warn, true );
+    if ( dlg.exec() )
+    {
+        warn = dlg.getSettings();
+        QModelIndex index = warnModel->addWarn( warn );
+        mDlg->warnView->setCurrentIndex( index );
+        settings->warnRules = warnModel->getRules();
+        changed( true );
+        mDlg->modifyWarn->setEnabled( true );
+        mDlg->removeWarn->setEnabled( true );
+    }
 }
 
-void ConfigDialog::warnUnitsChanged( int val )
+void ConfigDialog::modifyWarnClicked()
 {
     InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
+    if ( !settings || mDlg->warnView->model()->rowCount() < 1 )
         return;
 
-    settings->warnUnits = mDlg->warnUnits->itemData( val ).toInt();
-    if (!mLock) changed( true );
+    const QModelIndex index = mDlg->warnView->selectionModel()->currentIndex();
+    if ( !index.isValid() )
+        return;
+    WarnRule warn = mDlg->warnView->model()->data( index.sibling( index.row(), 0 ), Qt::UserRole ).value<WarnRule>();
+    WarnConfig dlg( settings, warn, false );
+    if ( dlg.exec() )
+    {
+        warn = dlg.getSettings();
+        warnModel->modifyWarn( index, warn );
+        settings->warnRules = warnModel->getRules();
+        changed( true );
+    }
 }
 
-void ConfigDialog::warnTypeChanged( int val )
+void ConfigDialog::removeWarnClicked()
 {
     InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
+    if ( !settings || mDlg->warnView->model()->rowCount() < 1 )
         return;
 
-    settings->warnType = mDlg->warnType->itemData( val ).toInt();
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::warnRxTxToggled( bool on )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
+    const QModelIndex index = mDlg->warnView->selectionModel()->currentIndex();
+    if ( !index.isValid() )
         return;
-
-    settings->warnTotalTraffic = on;
-    if (!mLock) changed( true );
+    warnModel->removeRow( index.row() );
+    settings->warnRules = warnModel->getRules();
+    mDlg->modifyWarn->setEnabled( warnModel->rowCount() );
+    mDlg->removeWarn->setEnabled( warnModel->rowCount() );
+    changed( true );
 }
 
 
