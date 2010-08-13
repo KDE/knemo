@@ -45,7 +45,7 @@ public:
     virtual ~InterfaceStatistics();
 
     void configChanged();
-    StatisticsModel* getStatistics( enum StatisticsModel::GroupType t ) { return mModels.value( t ); }
+    StatisticsModel* getStatistics( enum KNemoStats::PeriodUnits t ) { return mModels.value( t ); }
     void addRxBytes( unsigned long bytes );
     void addTxBytes( unsigned long bytes );
 
@@ -60,7 +60,7 @@ private slots:
     void saveStatistics();
 
 private:
-    QString typeToElem( enum StatisticsModel::GroupType t );
+    QString typeToElem( enum KNemoStats::PeriodUnits t );
     void loadConfig();
     void loadStatistics();
     void loadStatsGroup( const KCalendarSystem * cal, const QDomElement& root,

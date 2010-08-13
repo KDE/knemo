@@ -166,7 +166,12 @@ void StatsVnstat::parseOutput( const QString &output )
             rx += fields[5].toULongLong() * 1024;
             tx += fields[6].toULongLong() * 1024;
             if ( rx != 0 || tx != 0 )
-                mExternalDays->appendStats( QDateTime::fromTime_t(fields[2].toUInt()).date(), 1, rx, tx );
+            {
+                int entryIndex = mExternalDays->createEntry();
+                mExternalDays->setDateTime( QDateTime::fromTime_t(fields[2].toUInt()) );
+                mExternalDays->setDays( 1 );
+                mExternalDays->setTraffic( entryIndex, rx, tx );
+            }
         }
         else if ( fields[0] == "h" )
         {
@@ -175,7 +180,12 @@ void StatsVnstat::parseOutput( const QString &output )
             QDateTime hour = QDateTime::fromTime_t(fields[2].toUInt());
             hour = QDateTime( hour.date(), QTime( hour.time().hour(), 0 ) );
             if ( rx != 0 || tx != 0 )
-                mExternalHours->appendStats( hour, 1, rx, tx );
+            {
+                int entryIndex = mExternalHours->createEntry();
+                mExternalHours->setDateTime( hour );
+                mExternalHours->setDays( 1 );
+                mExternalHours->setTraffic( entryIndex, rx, tx );
+            }
         }
     }
     mExternalHours->sort( 0 );

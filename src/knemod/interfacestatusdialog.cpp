@@ -366,17 +366,17 @@ void InterfaceStatusDialog::statisticsChanged()
     if ( stat == 0 )
         return;
 
-    StatisticsModel * statistics = stat->getStatistics( StatisticsModel::Day );
+    StatisticsModel * statistics = stat->getStatistics( KNemoStats::Day );
     ui.textLabelTodaySent->setText( statistics->txText() );
     ui.textLabelTodayReceived->setText( statistics->rxText() );
     ui.textLabelTodayTotal->setText( statistics->totalText() );
 
-    statistics = stat->getStatistics( StatisticsModel::Month );
+    statistics = stat->getStatistics( KNemoStats::Month );
     ui.textLabelMonthSent->setText( statistics->txText() );
     ui.textLabelMonthReceived->setText( statistics->rxText() );
     ui.textLabelMonthTotal->setText( statistics->totalText() );
 
-    statistics = stat->getStatistics( StatisticsModel::Year );
+    statistics = stat->getStatistics( KNemoStats::Year );
     ui.textLabelYearSent->setText( statistics->txText() );
     ui.textLabelYearReceived->setText( statistics->rxText() );
     ui.textLabelYearTotal->setText( statistics->totalText() );

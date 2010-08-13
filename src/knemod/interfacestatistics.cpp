@@ -53,16 +53,16 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
       mInterface( interface ),
       mAllMonths( true )
 {
-    StatisticsModel * s = new StatisticsModel( StatisticsModel::Hour, this );
-    mModels.insert( StatisticsModel::Hour, s );
-    s = new StatisticsModel( StatisticsModel::Day, this );
-    mModels.insert( StatisticsModel::Day, s );
-    s = new StatisticsModel( StatisticsModel::Week, this );
-    mModels.insert( StatisticsModel::Week, s );
-    s = new StatisticsModel( StatisticsModel::Month, this );
-    mModels.insert( StatisticsModel::Month, s );
-    s = new StatisticsModel( StatisticsModel::Year, this );
-    mModels.insert( StatisticsModel::Year, s );
+    StatisticsModel * s = new StatisticsModel( KNemoStats::Hour, this );
+    mModels.insert( KNemoStats::Hour, s );
+    s = new StatisticsModel( KNemoStats::Day, this );
+    mModels.insert( KNemoStats::Day, s );
+    s = new StatisticsModel( KNemoStats::Week, this );
+    mModels.insert( KNemoStats::Week, s );
+    s = new StatisticsModel( KNemoStats::Month, this );
+    mModels.insert( KNemoStats::Month, s );
+    s = new StatisticsModel( KNemoStats::Year, this );
+    mModels.insert( KNemoStats::Year, s );
 
     connect( mSaveTimer, SIGNAL( timeout() ), this, SLOT( saveStatistics() ) );
 
@@ -87,11 +87,11 @@ InterfaceStatistics::~InterfaceStatistics()
     }
 }
 
-QString InterfaceStatistics::typeToElem( enum StatisticsModel::GroupType t )
+QString InterfaceStatistics::typeToElem( enum KNemoStats::PeriodUnits t )
 {
     int i = 0;
     int v = t;
-    while ( v > StatisticsModel::Hour )
+    while ( v > KNemoStats::Hour )
     {
         v = v >> 1;
         i++;
@@ -135,7 +135,7 @@ void InterfaceStatistics::configChanged()
 void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDomElement& parentItem,
                                           StatisticsModel* statistics )
 {
-    QDomNode n = parentItem.namedItem( typeToElem(statistics->type()) + "s" );
+    QDomNode n = parentItem.namedItem( typeToElem(statistics->periodType()) + "s" );
     if ( !n.isNull() )
     {
         QDomNode node = n.firstChild();
@@ -148,20 +148,20 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                 QDate date;
                 QTime time;
 
-                int year = element.attribute( typeToElem(StatisticsModel::Year) ).toInt();
-                int month = element.attribute( typeToElem(StatisticsModel::Month), "1" ).toInt();
-                int day = element.attribute( typeToElem(StatisticsModel::Day), "1" ).toInt();
+                int year = element.attribute( typeToElem(KNemoStats::Year) ).toInt();
+                int month = element.attribute( typeToElem(KNemoStats::Month), "1" ).toInt();
+                int day = element.attribute( typeToElem(KNemoStats::Day), "1" ).toInt();
                 cal->setDate( date, year, month, day );
 
                 if ( date.isValid() )
                 {
                     int days = element.attribute( attrib_span ).toInt();
-                    switch ( statistics->type() )
+                    switch ( statistics->periodType() )
                     {
-                        case StatisticsModel::Hour:
-                            time = QTime( element.attribute( typeToElem(StatisticsModel::Hour) ).toInt(), 0 );
+                        case KNemoStats::Hour:
+                            time = QTime( element.attribute( typeToElem(KNemoStats::Hour) ).toInt(), 0 );
                             break;
-                        case StatisticsModel::Month:
+                        case KNemoStats::Month:
                             // Old format had no span, so daysInMonth using gregorian
                             if ( days == 0 )
                                 days = date.daysInMonth();
@@ -169,20 +169,21 @@ void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDo
                                  days != cal->daysInMonth( date ) )
                                 mAllMonths = false;
                             break;
-                        case StatisticsModel::Year:
+                        case KNemoStats::Year:
                             // Old format had no span, so daysInYear using gregorian
                             if ( days == 0 )
                                 days = date.daysInYear();
                             break;
-                        case StatisticsModel::Day:
+                        case KNemoStats::Day:
                             days = 1;
                         default:
                             ;;
                     }
-
-                    statistics->appendStats( QDateTime( date, time ), days,
-                            element.attribute( attrib_rx ).toULongLong(),
-                            element.attribute( attrib_tx ).toULongLong() );
+                    statistics->createEntry();
+                    statistics->setDateTime( QDateTime( date, time ) );
+                    statistics->setDays( days );
+                    statistics->addRxBytes( element.attribute( attrib_rx ).toULongLong() );
+                    statistics->addTxBytes( element.attribute( attrib_tx ).toULongLong() );
                 }
             }
             node = node.nextSibling();
@@ -194,17 +195,17 @@ void InterfaceStatistics::saveStatsGroup( QDomDocument& doc, const StatisticsMod
 {
     QString groupName;
     QString elementName;
-    QDomElement elements = doc.createElement( QString( typeToElem(statistics->type()) ) + "s" );
+    QDomElement elements = doc.createElement( QString( typeToElem(statistics->periodType()) ) + "s" );
     for ( int i = 0; i < statistics->rowCount(); ++i )
     {
-        QDomElement element = doc.createElement( typeToElem(statistics->type()) );
+        QDomElement element = doc.createElement( typeToElem(statistics->periodType()) );
         QDate date = statistics->date( i );
-        element.setAttribute( typeToElem(StatisticsModel::Day), mCalendar->day( date ) );
-        element.setAttribute( typeToElem(StatisticsModel::Month), mCalendar->month( date ) );
-        element.setAttribute( typeToElem(StatisticsModel::Year), mCalendar->year( date ) );
-        if ( statistics->type() == StatisticsModel::Hour )
-            element.setAttribute( typeToElem(StatisticsModel::Hour), statistics->dateTime( i ).time().hour() );
-        else if ( statistics->type() > StatisticsModel::Day )
+        element.setAttribute( typeToElem(KNemoStats::Day), mCalendar->day( date ) );
+        element.setAttribute( typeToElem(KNemoStats::Month), mCalendar->month( date ) );
+        element.setAttribute( typeToElem(KNemoStats::Year), mCalendar->year( date ) );
+        if ( statistics->periodType() == KNemoStats::Hour )
+            element.setAttribute( typeToElem(KNemoStats::Hour), statistics->dateTime( i ).time().hour() );
+        else if ( statistics->periodType() > KNemoStats::Day )
             element.setAttribute( attrib_span, statistics->days( i ) );
         element.setAttribute( attrib_rx, statistics->rxBytes( i ) );
         element.setAttribute( attrib_tx, statistics->txBytes( i ) );
@@ -254,8 +255,8 @@ void InterfaceStatistics::syncWithExternal( uint updated )
     v->importIfaceStats();
     const StatisticsModel *syncDays = v->days();
     const StatisticsModel *syncHours = v->hours();
-    StatisticsModel *days = mModels.value( StatisticsModel::Day );
-    StatisticsModel *hours = mModels.value( StatisticsModel::Hour );
+    StatisticsModel *days = mModels.value( KNemoStats::Day );
+    StatisticsModel *hours = mModels.value( KNemoStats::Hour );
     QDateTime curDateTime = QDateTime( QDate::currentDate(), QTime( QDateTime::currentDateTime().time().hour(), 0 ) );
 
     for ( int i = 0; i < syncDays->rowCount(); ++i )
@@ -274,7 +275,7 @@ void InterfaceStatistics::syncWithExternal( uint updated )
 
         foreach( StatisticsModel * s, mModels )
         {
-            if ( s->type() == StatisticsModel::Hour )
+            if ( s->periodType() == KNemoStats::Hour )
                continue;
 
             s->addRxBytes( v->addBytes( s->rxBytes(), syncDays->rxBytes( i ) ) );
@@ -348,7 +349,7 @@ QDate InterfaceStatistics::setRebuildDate( StatisticsModel* statistics,
                                            const QDate &recalcDate )
 {
     QDate returnDate = recalcDate;
-    if ( statistics->type() <= StatisticsModel::Day )
+    if ( statistics->periodType() <= KNemoStats::Day )
         return returnDate;
 
     // Keep removing entries and rolling back returnDate while
@@ -357,7 +358,7 @@ QDate InterfaceStatistics::setRebuildDate( StatisticsModel* statistics,
     {
         int days = statistics->days( i );
         QDate date = statistics->date( i ).addDays( days );
-        if ( date > mModels.value( StatisticsModel::Day )->date( 0 ) &&
+        if ( date > mModels.value( KNemoStats::Day )->date( 0 ) &&
              ( date > returnDate || days < 1 )
            )
         {
@@ -370,17 +371,17 @@ QDate InterfaceStatistics::setRebuildDate( StatisticsModel* statistics,
     }
 
     // now take care of instances when we're going earlier than the first recorded stats.
-    if ( statistics->type() == StatisticsModel::Week )
+    if ( statistics->periodType() == KNemoStats::Week )
     {
         returnDate = returnDate.addDays( 1 - mCalendar->dayOfWeek( returnDate ) );
         while ( returnDate > recalcDate )
             returnDate = returnDate.addDays( -mCalendar->daysInWeek( returnDate ) );
     }
-    else if ( statistics->type() == StatisticsModel::Year )
+    else if ( statistics->periodType() == KNemoStats::Year )
     {
         returnDate = returnDate.addDays( 1 - mCalendar->dayOfYear( returnDate ) );
         while ( returnDate > recalcDate )
-            returnDate = returnDate.addDays( mCalendar->daysInYear( returnDate ) );
+            returnDate = returnDate.addDays( -mCalendar->daysInYear( returnDate ) );
     }
 
     return returnDate;
@@ -388,7 +389,7 @@ QDate InterfaceStatistics::setRebuildDate( StatisticsModel* statistics,
 
 void InterfaceStatistics::amendStats( int i, StatisticsModel* model )
 {
-    StatisticsModel *days = mModels.value( StatisticsModel::Day );
+    StatisticsModel *days = mModels.value( KNemoStats::Day );
     model->addRxBytes( days->rxBytes( i ) );
     model->addTxBytes( days->txBytes( i ) );
 }
@@ -405,23 +406,23 @@ void InterfaceStatistics::doRebuild( const QDate &date, int groups )
     QList<QDate> s;
     s.append( recalcDate );
 
-    if ( groups & StatisticsModel::Week )
+    if ( groups & KNemoStats::Week )
     {
-        weekStart = setRebuildDate( mModels.value( StatisticsModel::Week), recalcDate );
+        weekStart = setRebuildDate( mModels.value( KNemoStats::Week), recalcDate );
         s.append( weekStart );
     }
-    if ( groups & StatisticsModel::Month )
+    if ( groups & KNemoStats::Month )
     {
-        monthStart = setRebuildDate( mModels.value( StatisticsModel::Month), recalcDate );
+        monthStart = setRebuildDate( mModels.value( KNemoStats::Month), recalcDate );
         // force an old date
         mBillingStart = monthStart;
         if ( recalcDate > monthStart )
             partial = true;
         s.append( monthStart );
     }
-    if ( groups & StatisticsModel::Year )
+    if ( groups & KNemoStats::Year )
     {
-        yearStart = setRebuildDate( mModels.value( StatisticsModel::Year ), recalcDate );
+        yearStart = setRebuildDate( mModels.value( KNemoStats::Year ), recalcDate );
         s.append( yearStart );
     }
 
@@ -429,23 +430,23 @@ void InterfaceStatistics::doRebuild( const QDate &date, int groups )
     qSort( s );
     walkbackDate = s.first();
 
-    StatisticsModel *days = mModels.value( StatisticsModel::Day );
+    StatisticsModel *days = mModels.value( KNemoStats::Day );
     for ( int i = 0; i < days->rowCount(); ++i )
     {
         QDate day = days->date( i );
         if ( day < walkbackDate )
             continue;
 
-        if ( groups & StatisticsModel::Week && day >= weekStart )
+        if ( groups & KNemoStats::Week && day >= weekStart )
         {
             genNewWeek( day );
-            amendStats( i, mModels.value( StatisticsModel::Week ) );
+            amendStats( i, mModels.value( KNemoStats::Week ) );
         }
 
-        if ( groups & StatisticsModel::Month && day >= monthStart )
+        if ( groups & KNemoStats::Month && day >= monthStart )
         {
             // Not very pretty
-            StatisticsModel *month = mModels.value( StatisticsModel::Month );
+            StatisticsModel *month = mModels.value( KNemoStats::Month );
             if ( !partial )
             {
                 genNewMonth( day );
@@ -460,10 +461,10 @@ void InterfaceStatistics::doRebuild( const QDate &date, int groups )
                 partial = false;
             }
         }
-        if ( groups & StatisticsModel::Year && day >= yearStart )
+        if ( groups & KNemoStats::Year && day >= yearStart )
         {
             genNewYear( day );
-            amendStats( i, mModels.value( StatisticsModel::Year ) );
+            amendStats( i, mModels.value( KNemoStats::Year ) );
         }
     }
 }
@@ -479,12 +480,12 @@ void InterfaceStatistics::checkRebuild( QString oldType )
             file.copy( dir.path() + statistics_prefix + mInterface->getName() +
                    QString( "_%1.bak" ).arg( QDateTime::currentDateTime().toString( "yyyy-MM-dd-hhmmss" ) ) );
         }
-        int modThese = StatisticsModel::Week | StatisticsModel::Year;
-        QDate date = mModels.value( StatisticsModel::Day )->date( 0 );
+        int modThese = KNemoStats::Week | KNemoStats::Year;
+        QDate date = mModels.value( KNemoStats::Day )->date( 0 );
         doRebuild( date, modThese );
     }
 
-    StatisticsModel *month = mModels.value( StatisticsModel::Month );
+    StatisticsModel *month = mModels.value( KNemoStats::Month );
     if ( mInterface->getSettings().customBilling == false )
     {
         if ( oldType != mCalendar->calendarType() || mAllMonths == false )
@@ -496,7 +497,7 @@ void InterfaceStatistics::checkRebuild( QString oldType )
     QDate nextStart = nextMonthDate( mBillingStart );
     if ( mBillingStart.daysTo( nextStart ) != month->days()
          || mBillingStart != month->date() )
-        doRebuild( mBillingStart, StatisticsModel::Month );
+        doRebuild( mBillingStart, KNemoStats::Month );
 
     mAllMonths = true;
     for ( int i = 0; i < month->rowCount(); ++i )
@@ -550,7 +551,7 @@ QDate InterfaceStatistics::nextMonthDate( const QDate &date )
  **/
 bool InterfaceStatistics::daysInSpan( const QDate& date, int days )
 {
-    StatisticsModel *model = mModels.value( StatisticsModel::Day );
+    StatisticsModel *model = mModels.value( KNemoStats::Day );
     if ( !model->rowCount() )
         return false;
 
@@ -568,7 +569,7 @@ bool InterfaceStatistics::daysInSpan( const QDate& date, int days )
 
 void InterfaceStatistics::genNewHour( const QDateTime &dateTime )
 {
-    StatisticsModel* hours = mModels.value( StatisticsModel::Hour );
+    StatisticsModel* hours = mModels.value( KNemoStats::Hour );
 
     // Only 24 hours
     while ( hours->rowCount() )
@@ -582,7 +583,8 @@ void InterfaceStatistics::genNewHour( const QDateTime &dateTime )
     if ( hours->dateTime() == dateTime )
         return;
 
-    hours->appendStats( dateTime, 0 );
+    hours->createEntry();
+    hours->setDateTime( dateTime );
 
     if ( mInterface->getSettings().warnType == NotifyHour ||
          mInterface->getSettings().warnType == NotifyRoll24Hour )
@@ -591,12 +593,14 @@ void InterfaceStatistics::genNewHour( const QDateTime &dateTime )
 
 void InterfaceStatistics::genNewDay( const QDate &date )
 {
-    StatisticsModel * model = mModels.value( StatisticsModel::Day );
+    StatisticsModel * model = mModels.value( KNemoStats::Day );
     if ( model->rowCount() &&
          model->date().addDays( model->days() ) > date )
             return;
 
-    mModels.value( StatisticsModel::Day )->appendStats( date, 1 );
+    model->createEntry();
+    model->setDateTime( QDateTime( date, QTime() ) );
+    model->setDays( 1 );
 
     if ( mInterface->getSettings().warnType == NotifyDay ||
          mInterface->getSettings().warnType == NotifyRoll7Day ||
@@ -606,7 +610,7 @@ void InterfaceStatistics::genNewDay( const QDate &date )
 
 void InterfaceStatistics::genNewWeek( const QDate &date )
 {
-    StatisticsModel * model = mModels.value( StatisticsModel::Week );
+    StatisticsModel * model = mModels.value( KNemoStats::Week );
     if ( model->rowCount() &&
          model->date().addDays( model->days() ) > date )
             return;
@@ -614,12 +618,14 @@ void InterfaceStatistics::genNewWeek( const QDate &date )
     int dow = mCalendar->dayOfWeek( date );
     // ISO8601: week always starts on a Monday
     QDate newDate = date.addDays( 1 - dow );
-    model->appendStats( newDate, mCalendar->daysInWeek( newDate ) );
+    model->createEntry();
+    model->setDateTime( QDateTime( date, QTime() ) );
+    model->setDays( mCalendar->daysInWeek( date ) );
 }
 
 void InterfaceStatistics::genNewMonth( const QDate &date, QDate endDate )
 {
-    StatisticsModel * model = mModels.value( StatisticsModel::Month );
+    StatisticsModel * model = mModels.value( KNemoStats::Month );
     if ( model->rowCount() &&
          model->date().addDays( model->days() ) > date )
             return;
@@ -631,7 +637,9 @@ void InterfaceStatistics::genNewMonth( const QDate &date, QDate endDate )
         days = date.daysTo( endDate );
         if ( daysInSpan( date, date.daysTo( endDate ) ) )
         {
-            mModels.value( StatisticsModel::Month )->appendStats( date, days );
+            model->createEntry();
+            model->setDateTime( QDateTime( date, QTime() ) );
+            model->setDays( days );
             return;
         }
         else
@@ -654,7 +662,9 @@ void InterfaceStatistics::genNewMonth( const QDate &date, QDate endDate )
     } while ( nextMonthStart <= date || !daysInSpan( newDate, days ) );
 
     mBillingStart = newDate;
-    mModels.value( StatisticsModel::Month )->appendStats( newDate, days );
+    model->createEntry();
+    model->setDateTime( QDateTime( newDate, QTime() ) );
+    model->setDays( days );
 
     if ( mInterface->getSettings().warnType == NotifyMonth )
         mWarningDone = false;
@@ -662,22 +672,24 @@ void InterfaceStatistics::genNewMonth( const QDate &date, QDate endDate )
 
 void InterfaceStatistics::genNewYear( const QDate &date )
 {
-    StatisticsModel * model = mModels.value( StatisticsModel::Year );
+    StatisticsModel * model = mModels.value( KNemoStats::Year );
     if ( model->rowCount() &&
          model->date().addDays( model->days() ) > date )
             return;
 
     int doy = mCalendar->dayOfYear( date );
     QDate newDate = date.addDays( 1 - doy );
-    mModels.value( StatisticsModel::Year )->appendStats( newDate, mCalendar->daysInYear( newDate ) );
+    model->createEntry();
+    model->setDateTime( QDateTime( newDate, QTime() ) );
+    model->setDays( mCalendar->daysInYear( newDate ) );
 }
 
 void InterfaceStatistics::checkValidEntry( QDateTime curDateTime )
 {
     QDate curDate = curDateTime.date();
-    StatisticsModel *days = mModels.value( StatisticsModel::Day );
+    StatisticsModel *days = mModels.value( KNemoStats::Day );
 
-    StatisticsModel *hours = mModels.value( StatisticsModel::Hour );
+    StatisticsModel *hours = mModels.value( KNemoStats::Hour );
     if ( !hours->rowCount() || hours->dateTime().addSecs( 3600 ) < curDateTime )
         genNewHour( QDateTime( curDate, QTime( curDateTime.time().hour(), 0 ) ) );
 
@@ -738,22 +750,22 @@ void InterfaceStatistics::checkTrafficLimit()
         switch ( wtype )
         {
             case NotifyHour:
-                oneUnit( mModels.value( StatisticsModel::Hour ) );
+                oneUnit( mModels.value( KNemoStats::Hour ) );
                 break;
             case NotifyDay:
-                oneUnit( mModels.value( StatisticsModel::Day ) );
+                oneUnit( mModels.value( KNemoStats::Day ) );
                 break;
             case NotifyMonth:
-                oneUnit( mModels.value( StatisticsModel::Month ) );
+                oneUnit( mModels.value( KNemoStats::Month ) );
                 break;
             case NotifyRoll24Hour:
-                rollingUnit( mModels.value( StatisticsModel::Hour ), 24 );
+                rollingUnit( mModels.value( KNemoStats::Hour ), 24 );
                 break;
             case NotifyRoll7Day:
-                rollingUnit( mModels.value( StatisticsModel::Day ), 7 );
+                rollingUnit( mModels.value( KNemoStats::Day ), 7 );
                 break;
             case NotifyRoll30Day:
-                rollingUnit( mModels.value( StatisticsModel::Day ), 30 );
+                rollingUnit( mModels.value( KNemoStats::Day ), 30 );
                 break;
         }
     }

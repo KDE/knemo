@@ -49,8 +49,8 @@ namespace KNemoIface {
         Ethernet,
         PPP
     };
-    
-    enum InterfaceState
+
+    enum IfaceState
     {
         UnknownState =  0,
         Unavailable  =  1,
@@ -61,6 +61,18 @@ namespace KNemoIface {
         TxTraffic    = 32
     };
 }
+
+namespace KNemoStats
+{
+    enum PeriodUnits
+    {
+        Hour = 1,
+        Day  = 2,
+        Week = 4,
+        Month = 8,
+        Year = 16
+    };
+};
 
 static const char NETLOAD_THEME[] = "netloadtheme";
 static const char TEXT_THEME[] = "texttheme";

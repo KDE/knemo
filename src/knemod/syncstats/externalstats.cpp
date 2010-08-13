@@ -27,9 +27,9 @@ ExternalStats::ExternalStats( Interface * interface, QObject * parent )
       mExternalDays( 0 ),
       mExternalHours( 0 )
 {
-    mExternalHours = new StatisticsModel( StatisticsModel::Hour );
+    mExternalHours = new StatisticsModel( KNemoStats::Hour );
     mExternalHours->setSortRole( StatisticsModel::DataRole );
-    mExternalDays = new StatisticsModel( StatisticsModel::Day );
+    mExternalDays = new StatisticsModel( KNemoStats::Day );
     mExternalDays->setSortRole( StatisticsModel::DataRole );
     KCalendarSystem * calendar = KCalendarSystem::create( mInterface->getSettings().calendar );
     mExternalHours->setCalendar( calendar );

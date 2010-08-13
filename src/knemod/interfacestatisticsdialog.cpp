@@ -53,11 +53,11 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
     KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
 
     InterfaceStatistics *stat = mInterface->getStatistics();
-    setupTable( &interfaceGroup, ui.tableHourly,  stat->getStatistics( StatisticsModel::Hour ) );
-    setupTable( &interfaceGroup, ui.tableDaily,   stat->getStatistics( StatisticsModel::Day ) );
-    setupTable( &interfaceGroup, ui.tableWeekly,  stat->getStatistics( StatisticsModel::Week ) );
-    setupTable( &interfaceGroup, ui.tableMonthly, stat->getStatistics( StatisticsModel::Month ) );
-    setupTable( &interfaceGroup, ui.tableYearly,  stat->getStatistics( StatisticsModel::Year ) );
+    setupTable( &interfaceGroup, ui.tableHourly,  stat->getStatistics( KNemoStats::Hour ) );
+    setupTable( &interfaceGroup, ui.tableDaily,   stat->getStatistics( KNemoStats::Day ) );
+    setupTable( &interfaceGroup, ui.tableWeekly,  stat->getStatistics( KNemoStats::Week ) );
+    setupTable( &interfaceGroup, ui.tableMonthly, stat->getStatistics( KNemoStats::Month ) );
+    setupTable( &interfaceGroup, ui.tableYearly,  stat->getStatistics( KNemoStats::Year ) );
 
     connect( this, SIGNAL( resetClicked() ), SLOT( confirmReset() ) );
 

@@ -23,59 +23,52 @@
 #include <QDate>
 #include <QStandardItemModel>
 #include <KCalendarSystem>
+#include "data.h"
 
 class StatisticsModel : public QStandardItemModel
 {
     Q_OBJECT
 public:
-    enum GroupType
-    {
-        Hour  = 1,
-        Day   = 2,
-        Week  = 4,
-        Month = 8,
-        Year  = 16
-    };
-
-    StatisticsModel( enum GroupType t, QObject *parent = 0 );
+    StatisticsModel( enum KNemoStats::PeriodUnits t, QObject *parent = 0 );
     virtual ~StatisticsModel();
 
     enum StatisticRoles
     {
-        DataRole = Qt::UserRole + 1,
-        SpanRole
+        SpanRole = Qt::UserRole + 1,
+        DataRole
     };
 
     /**
      * Clear rows but leave column headers intact
      */
     void clearRows() { removeRows( 0, rowCount() ); }
+    void updateDateText( int row );
 
-    enum GroupType type() const { return mType; }
+    enum KNemoStats::PeriodUnits periodType() const { return mPeriodType; }
 
-    void appendStats( const QDateTime& date, int tSpan, quint64 rx = 0, quint64 tx = 0 );
-    void appendStats( const QDate& date, int days, quint64 rx = 0, quint64 tx = 0 );
     void setCalendar( const KCalendarSystem * c ) { mCalendar = c; }
 
+    int createEntry();
     QDate date( int row = -1 ) const;
     QDateTime dateTime( int row = -1 ) const;
+    void setDateTime( QDateTime );
     int days( int row = -1 ) const;
+    void setDays( int days );
     quint64 rxBytes( int row = -1 ) const;
     quint64 txBytes( int row = -1 ) const;
     quint64 totalBytes( int row = -1 ) const;
+    void setTraffic( int i, quint64 rx, quint64 tx );
+
     QString rxText( int row = -1 ) const;
     QString txText( int row = -1 ) const;
     QString totalText( int row = -1 ) const;
 
     // Always added to the current entry (last row)
-    void addRxBytes( quint64 bytes );
-    void addTxBytes( quint64 bytes );
+    void addRxBytes( quint64 bytes, int row = -1 );
+    void addTxBytes( quint64 bytes, int row = -1 );
 
 private:
-    // Always added to the current entry (last row)
-    void addTotalBytes( quint64 bytes );
-
-    enum StatisticColumns
+    enum StatsColumn
     {
         Date = 0,
         TxBytes,
@@ -83,7 +76,12 @@ private:
         TotalBytes
     };
 
-    enum GroupType mType;
+    void addBytes( enum StatsColumn column, quint64 bytes, int row = -1 );
+    quint64 bytes( enum StatsColumn column, int row ) const;
+    QString text( enum StatsColumn column, int row ) const;
+    void updateText( QStandardItem * i );
+
+    enum KNemoStats::PeriodUnits mPeriodType;
     const KCalendarSystem * mCalendar;
 };
 
