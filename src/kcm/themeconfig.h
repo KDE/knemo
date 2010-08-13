@@ -1,5 +1,5 @@
 /* This file is part of KNemo
-   Copyright (C) 2009 John Stamp <jstamp@users.sourceforge.net>
+   Copyright (C) 2009, 2010 John Stamp <jstamp@users.sourceforge.net>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as

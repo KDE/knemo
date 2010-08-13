@@ -1,6 +1,6 @@
 /* This file is part of KNemo
    Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
-   Copyright (C) 2009 John Stamp <jstamp@users.sourceforge.net>
+   Copyright (C) 2009, 2010 John Stamp <jstamp@users.sourceforge.net>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -198,7 +198,7 @@ void KNemoDaemon::createAboutData()
                       ki18n( description ),
                       KAboutData::License_GPL_V2,
                       KLocalizedString(),
-                      ki18n( "Copyright (C) 2004, 2005, 2006 Percy Leonhardt\nCopyright (C) 2009 John Stamp\n\nSignal plotter taken from KSysGuard\nCopyright (C) 2006 - 2009 John Tapsell" ),
+                      ki18n( "Copyright (C) 2004, 2005, 2006 Percy Leonhardt\nCopyright (C) 2009, 2010 John Stamp\n\nSignal plotter taken from KSysGuard\nCopyright (C) 2006 - 2009 John Tapsell" ),
                       "http://extragear.kde.org/apps/knemo/",
                       "jstamp@users.sourceforge.net");
 
