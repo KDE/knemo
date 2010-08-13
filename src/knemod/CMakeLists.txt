@@ -16,6 +16,8 @@ set( knemo_SRCS
     statisticsmodel.cpp
     backends/backendbase.cpp
     ../common/utils.cpp
+    storage/sqlstorage.cpp
+    storage/xmlstorage.cpp
     syncstats/externalstats.cpp
     syncstats/statsfactory.cpp
     syncstats/stats_vnstat.cpp
@@ -30,7 +32,7 @@ endif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
 kde4_add_ui_files( knemo_SRCS interfacestatisticsdlg.ui interfacestatusdlg.ui plotterconfigdlg.ui )
 kde4_add_executable( knemo ${knemo_SRCS} )
 
-target_link_libraries( knemo ${KDE4_KIO_LIBS} ${LIBIW_LIBRARIES} ${LIBNL_LIBRARIES} )
+target_link_libraries( knemo ${KDE4_KIO_LIBS} ${LIBIW_LIBRARIES} ${LIBNL_LIBRARIES} ${QT_QTSQL_LIBRARY} )
 
 install( TARGETS knemo ${INSTALL_TARGETS_DEFAULT_ARGS} )
 

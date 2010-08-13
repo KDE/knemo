@@ -85,7 +85,7 @@ int StatisticsModel::createEntry()
     QStandardItem * txItem = new QStandardItem();
     QStandardItem * rxItem = new QStandardItem();
     QStandardItem * totalItem = new QStandardItem();
-    //dateItem->setData( rowCount(), IdRole );
+    dateItem->setData( rowCount(), IdRole );
     entry << dateItem << txItem << rxItem << totalItem;
     appendRow( entry );
     setTraffic( rowCount() - 1, 0, 0 );
@@ -147,7 +147,28 @@ void StatisticsModel::updateDateText( int row )
         default:
             dateStr = mCalendar->formatDate( dt.date(), KLocale::ShortDate );
     }
-    item( row, 0 )->setData( dateStr, Qt::DisplayRole );
+    item( row, Date )->setData( dateStr, Qt::DisplayRole );
+}
+
+void StatisticsModel::setId( int id, int row )
+{
+    if ( !rowCount() )
+        return;
+    if ( row < 0 )
+        row = rowCount() - 1;
+
+    item( row, Date )->setData(id, IdRole );
+}
+
+int StatisticsModel::id( int row ) const
+{
+    if ( row < 0 )
+        row = rowCount() - 1;
+
+    if ( !rowCount() || rowCount() <= row )
+        return -1;
+
+    return item( row, Date )->data( IdRole ).toInt();
 }
 
 QDateTime StatisticsModel::dateTime( int row ) const
@@ -219,6 +240,18 @@ void StatisticsModel::addTxBytes( quint64 bytes, int row )
 {
     addBytes( TxBytes, bytes, row );
     addBytes( TotalBytes, bytes, row );
+}
+
+int StatisticsModel::indexOfId( int id ) const
+{
+    int index = 0;
+    while ( index < rowCount() )
+    {
+        if ( item( index, Date )->data( IdRole ).toInt() == id )
+            return index;
+        index++;
+    }
+    return -1;
 }
 
 void StatisticsModel::setTraffic( int i, quint64 rx, quint64 tx )

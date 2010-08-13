@@ -9,6 +9,11 @@ include( CheckLibraryExists )
 include( FindPackageHandleStandardArgs )
 include(MacroOptionalAddSubdirectory)
 
+set( QT_USE_QTSQL TRUE )
+if ( NOT QT_QTSQL_FOUND )
+    message( FATAL_ERROR "The QtSql development package could not be found. Please install libQtSql." )
+endif( NOT QT_QTSQL_FOUND )
+
 if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
     find_package( Libnl )
     macro_log_feature( LIBNL_FOUND "libnl" "Linux netlink sockets library" "http://people.suug.ch/~tgr/libnl/" TRUE "" "" )

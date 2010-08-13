@@ -32,6 +32,7 @@
 #include "interface.h"
 #include "interfacestatistics.h"
 #include "interfacestatusdialog.h"
+#include "statisticsmodel.h"
 
 InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* parent )
     : KDialog( parent ),

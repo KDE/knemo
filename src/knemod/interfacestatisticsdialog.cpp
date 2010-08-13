@@ -28,6 +28,7 @@
 #include "interface.h"
 #include "interfacestatistics.h"
 #include "interfacestatisticsdialog.h"
+#include "statisticsmodel.h"
 
 
 InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWidget* parent )

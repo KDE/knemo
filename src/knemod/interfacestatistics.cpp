@@ -18,7 +18,6 @@
    Boston, MA 02110-1301, USA.
 */
 
-#include <QDomNode>
 #include <QFile>
 #include <QTimer>
 
@@ -32,20 +31,11 @@
 #include "global.h"
 #include "interface.h"
 #include "interfacestatistics.h"
+#include "statisticsmodel.h"
 #include "syncstats/statsfactory.h"
-
-static const char statistics_prefix[] = "/statistics_";
-
-static const char doc_name[]     = "statistics";
-
-static const char attrib_calendar[] = "calendar";
-static const char attrib_version[]  = "version";
-static const char attrib_updated[]  = "lastUpdated";
-static const char attrib_span[]     = "span";
-static const char attrib_rx[]       = "rxBytes";
-static const char attrib_tx[]       = "txBytes";
-
-static const char* intervals[] = { "hour", "day", "week", "month", "year" };
+#include "storage/sqlstorage.h"
+#include "storage/xmlstorage.h"
+#include "storage/commonstorage.h"
 
 InterfaceStatistics::InterfaceStatistics( Interface* interface )
     : QObject(),
@@ -64,10 +54,18 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
     s = new StatisticsModel( KNemoStats::Year, this );
     mModels.insert( KNemoStats::Year, s );
 
+    foreach ( StatisticsModel *s, mModels )
+    {
+        mStorageData.saveFromId.insert( s->periodType(), 0 );
+    }
+
     connect( mSaveTimer, SIGNAL( timeout() ), this, SLOT( saveStatistics() ) );
 
-    loadConfig();
+    sql = new SqlStorage( mInterface->getName() );
+
+    mBillingStart = mInterface->getSettings().billingStart;
     loadStatistics();
+    loadConfig();
 }
 
 InterfaceStatistics::~InterfaceStatistics()
@@ -76,6 +74,7 @@ InterfaceStatistics::~InterfaceStatistics()
     delete mSaveTimer;
 
     saveStatistics();
+    delete sql;
 
     if ( mInterface->getSettings().customBilling )
     {
@@ -96,23 +95,26 @@ QString InterfaceStatistics::typeToElem( enum KNemoStats::PeriodUnits t )
         v = v >> 1;
         i++;
     }
-    return intervals[i];
+    return periods[i];
 }
 
 void InterfaceStatistics::clearStatistics()
 {
     foreach( StatisticsModel * s, mModels )
+    {
         s->clearRows();
+        mStorageData.saveFromId.insert( s->periodType(), 0 );
+    }
     emit currentEntryChanged();
 }
 
 void InterfaceStatistics::loadConfig()
 {
-    mCalendar = KCalendarSystem::create( mInterface->getSettings().calendar );
+    mStorageData.calendar = KCalendarSystem::create( mInterface->getSettings().calendar );
     // TODO: Test for a KDE release that contains SVN commit 1013534
-    KGlobal::locale()->setCalendar( mCalendar->calendarType() );
+    KGlobal::locale()->setCalendar( mStorageData.calendar->calendarType() );
     foreach( StatisticsModel * s, mModels )
-        s->setCalendar( mCalendar );
+        s->setCalendar( mStorageData.calendar );
 
     mWarningDone = false;
     mBillingStart = mInterface->getSettings().billingStart;
@@ -127,123 +129,78 @@ void InterfaceStatistics::loadConfig()
 void InterfaceStatistics::configChanged()
 {
     mSaveTimer->stop();
-    QString oldType = mCalendar->calendarType();
-    loadConfig();
-    checkRebuild( oldType );
-}
 
-void InterfaceStatistics::loadStatsGroup( const KCalendarSystem * cal, const QDomElement& parentItem,
-                                          StatisticsModel* statistics )
-{
-    QDomNode n = parentItem.namedItem( typeToElem(statistics->periodType()) + "s" );
-    if ( !n.isNull() )
+    QString origCalendarType;
+    if ( mStorageData.calendar )
+       origCalendarType = mStorageData.calendar->calendarType();
+
+    if ( mInterface->getSettings().calendar != origCalendarType )
     {
-        QDomNode node = n.firstChild();
-        while ( !node.isNull() )
+        mStorageData.calendar = KCalendarSystem::create( mInterface->getSettings().calendar );
+
+        foreach( StatisticsModel * s, mModels )
         {
-            QDomElement element = node.toElement();
-            if ( !element.isNull() )
+            s->setCalendar( mStorageData.calendar );
+        }
+        if ( !origCalendarType.isEmpty() )
+        {
+            StatisticsModel *hours = mModels.value( KNemoStats::Hour );
+            StatisticsModel *days = mModels.value( KNemoStats::Day );
+            for ( int i = 0; i < days->rowCount(); ++i )
             {
-                // The following attributes are particular to each statistic category
-                QDate date;
-                QTime time;
-
-                int year = element.attribute( typeToElem(KNemoStats::Year) ).toInt();
-                int month = element.attribute( typeToElem(KNemoStats::Month), "1" ).toInt();
-                int day = element.attribute( typeToElem(KNemoStats::Day), "1" ).toInt();
-                cal->setDate( date, year, month, day );
-
-                if ( date.isValid() )
-                {
-                    int days = element.attribute( attrib_span ).toInt();
-                    switch ( statistics->periodType() )
-                    {
-                        case KNemoStats::Hour:
-                            time = QTime( element.attribute( typeToElem(KNemoStats::Hour) ).toInt(), 0 );
-                            break;
-                        case KNemoStats::Month:
-                            // Old format had no span, so daysInMonth using gregorian
-                            if ( days == 0 )
-                                days = date.daysInMonth();
-                            if ( cal->day( date ) != 1 ||
-                                 days != cal->daysInMonth( date ) )
-                                mAllMonths = false;
-                            break;
-                        case KNemoStats::Year:
-                            // Old format had no span, so daysInYear using gregorian
-                            if ( days == 0 )
-                                days = date.daysInYear();
-                            break;
-                        case KNemoStats::Day:
-                            days = 1;
-                        default:
-                            ;;
-                    }
-                    statistics->createEntry();
-                    statistics->setDateTime( QDateTime( date, time ) );
-                    statistics->setDays( days );
-                    statistics->addRxBytes( element.attribute( attrib_rx ).toULongLong() );
-                    statistics->addTxBytes( element.attribute( attrib_tx ).toULongLong() );
-                }
+                days->updateDateText( i );
             }
-            node = node.nextSibling();
+            for ( int i = 0; i < hours->rowCount(); ++i )
+            {
+                hours->updateDateText( i );
+            }
         }
     }
-}
+    mBillingStart = mInterface->getSettings().billingStart;
 
-void InterfaceStatistics::saveStatsGroup( QDomDocument& doc, const StatisticsModel* statistics )
-{
-    QString groupName;
-    QString elementName;
-    QDomElement elements = doc.createElement( QString( typeToElem(statistics->periodType()) ) + "s" );
-    for ( int i = 0; i < statistics->rowCount(); ++i )
+    checkRebuild( origCalendarType );
+
+    if ( generalSettings->saveInterval > 0 )
     {
-        QDomElement element = doc.createElement( typeToElem(statistics->periodType()) );
-        QDate date = statistics->date( i );
-        element.setAttribute( typeToElem(KNemoStats::Day), mCalendar->day( date ) );
-        element.setAttribute( typeToElem(KNemoStats::Month), mCalendar->month( date ) );
-        element.setAttribute( typeToElem(KNemoStats::Year), mCalendar->year( date ) );
-        if ( statistics->periodType() == KNemoStats::Hour )
-            element.setAttribute( typeToElem(KNemoStats::Hour), statistics->dateTime( i ).time().hour() );
-        else if ( statistics->periodType() > KNemoStats::Day )
-            element.setAttribute( attrib_span, statistics->days( i ) );
-        element.setAttribute( attrib_rx, statistics->rxBytes( i ) );
-        element.setAttribute( attrib_tx, statistics->txBytes( i ) );
-        elements.appendChild( element );
+        mSaveTimer->setInterval( generalSettings->saveInterval * 1000 );
+        mSaveTimer->start();
     }
-    QDomElement statElement = doc.elementsByTagName( doc_name ).at( 0 ).toElement();
-    statElement.appendChild( elements );
+
+    checkValidEntry();
 }
 
-void InterfaceStatistics::loadStatistics()
+bool InterfaceStatistics::loadStatistics()
 {
-    QDomDocument doc( doc_name );
     KUrl dir( generalSettings->statisticsDir );
     if ( !dir.isLocalFile() )
-        return;
-    QFile file( dir.path() + statistics_prefix + mInterface->getName() );
+        return 0;
 
-    if ( !file.open( QIODevice::ReadOnly ) )
-        return;
-    if ( !doc.setContent( &file ) )
+    bool loaded = false;
+
+    if ( sql->dbExists() )
     {
-        file.close();
-        return;
+        loaded = sql->loadStats( &mStorageData, &mModels );
     }
-    file.close();
+    else
+    {
+        XmlStorage xml;
+        loaded = xml.loadStats( mInterface->getName(), &mStorageData, &mModels );
+        sql->createDb();
+        if ( loaded )
+        {
+            checkRebuild( mStorageData.calendar->calendarType(), true );
+        }
+    }
 
-    QDomElement root = doc.documentElement();
-
-    uint updated = root.attribute( attrib_updated ).toUInt();
-
-    // If unknown or empty calendar it will default to gregorian
-    KCalendarSystem *inCal = KCalendarSystem::create( root.attribute( attrib_calendar ) );
-    foreach( StatisticsModel * s, mModels )
-        loadStatsGroup( inCal, root, s );
-
-    checkRebuild( inCal->calendarType() );
-
-    syncWithExternal( updated );
+    if ( !mStorageData.calendar )
+    {
+        mStorageData.calendar = KCalendarSystem::create( mInterface->getSettings().calendar );
+        foreach( StatisticsModel * s, mModels )
+        {
+            s->setCalendar( mStorageData.calendar );
+        }
+    }
+    return loaded;
 }
 
 void InterfaceStatistics::syncWithExternal( uint updated )
@@ -291,8 +248,8 @@ void InterfaceStatistics::syncWithExternal( uint updated )
         if ( !hours->rowCount() || hours->dateTime() < syncDateTime )
             genNewHour( syncDateTime );
 
-        hours->addRxBytes( v->addBytes( hours->rxBytes(), syncHours->rxBytes( i ) ) );
-        hours->addTxBytes( v->addBytes( hours->txBytes(), syncHours->txBytes( i ) ) );
+        hours->addRxBytes( syncHours->rxBytes( i ) );
+        hours->addTxBytes( syncHours->txBytes( i ) );
     }
     StatsPair lag = v->addLagged( updated, days );
     if ( lag.rxBytes > 0 || lag.txBytes > 0 )
@@ -317,27 +274,7 @@ void InterfaceStatistics::syncWithExternal( uint updated )
 
 void InterfaceStatistics::saveStatistics()
 {
-    QDomDocument doc( doc_name );
-    QDomElement docElement = doc.createElement( doc_name );
-    docElement.setAttribute( attrib_calendar, mCalendar->calendarType() );
-    docElement.setAttribute( attrib_version, "1.3" );
-    docElement.setAttribute( attrib_updated, QDateTime::currentDateTime().toTime_t() );
-    doc.appendChild( docElement );
-
-    foreach( StatisticsModel * s, mModels )
-        saveStatsGroup( doc, s );
-
-    KUrl dir( generalSettings->statisticsDir );
-    if ( !dir.isLocalFile() )
-        return;
-
-    QFile file( dir.path() + statistics_prefix + mInterface->getName() );
-    if ( file.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
-    {
-        file.write( doc.toByteArray() );
-        fsync( file.handle() );
-        file.close();
-    }
+    sql->saveStats( &mStorageData, &mModels );
 }
 
 /**
@@ -365,6 +302,10 @@ QDate InterfaceStatistics::setRebuildDate( StatisticsModel* statistics,
             if ( returnDate > statistics->date( i ) )
                 returnDate = statistics->date( i );
             statistics->removeRow( i );
+            if ( mStorageData.saveFromId.value( statistics->periodType() ) > statistics->rowCount() - 1 )
+            {
+                mStorageData.saveFromId.insert( statistics->periodType(), statistics->rowCount() - 1 );
+            }
         }
         else
             break;
@@ -373,15 +314,15 @@ QDate InterfaceStatistics::setRebuildDate( StatisticsModel* statistics,
     // now take care of instances when we're going earlier than the first recorded stats.
     if ( statistics->periodType() == KNemoStats::Week )
     {
-        returnDate = returnDate.addDays( 1 - mCalendar->dayOfWeek( returnDate ) );
+        returnDate = returnDate.addDays( 1 - mStorageData.calendar->dayOfWeek( returnDate ) );
         while ( returnDate > recalcDate )
-            returnDate = returnDate.addDays( -mCalendar->daysInWeek( returnDate ) );
+            returnDate = returnDate.addDays( -mStorageData.calendar->daysInWeek( returnDate ) );
     }
     else if ( statistics->periodType() == KNemoStats::Year )
     {
-        returnDate = returnDate.addDays( 1 - mCalendar->dayOfYear( returnDate ) );
+        returnDate = returnDate.addDays( 1 - mStorageData.calendar->dayOfYear( returnDate ) );
         while ( returnDate > recalcDate )
-            returnDate = returnDate.addDays( -mCalendar->daysInYear( returnDate ) );
+            returnDate = returnDate.addDays( -mStorageData.calendar->daysInYear( returnDate ) );
     }
 
     return returnDate;
@@ -469,17 +410,10 @@ void InterfaceStatistics::doRebuild( const QDate &date, int groups )
     }
 }
 
-void InterfaceStatistics::checkRebuild( QString oldType )
+void InterfaceStatistics::checkRebuild( QString oldType, bool force )
 {
-    if ( oldType != mCalendar->calendarType() )
+    if ( oldType != mStorageData.calendar->calendarType() || force )
     {
-        KUrl dir( generalSettings->statisticsDir );
-        if ( dir.isLocalFile() )
-        {
-            QFile file( dir.path() + statistics_prefix + mInterface->getName() );
-            file.copy( dir.path() + statistics_prefix + mInterface->getName() +
-                   QString( "_%1.bak" ).arg( QDateTime::currentDateTime().toString( "yyyy-MM-dd-hhmmss" ) ) );
-        }
         int modThese = KNemoStats::Week | KNemoStats::Year;
         QDate date = mModels.value( KNemoStats::Day )->date( 0 );
         doRebuild( date, modThese );
@@ -488,9 +422,9 @@ void InterfaceStatistics::checkRebuild( QString oldType )
     StatisticsModel *month = mModels.value( KNemoStats::Month );
     if ( mInterface->getSettings().customBilling == false )
     {
-        if ( oldType != mCalendar->calendarType() || mAllMonths == false )
+        if ( oldType != mStorageData.calendar->calendarType() || mAllMonths == false )
         {
-            mBillingStart = month->date( 0 ).addDays( 1 - mCalendar->day( month->date( 0 ) ) );
+            mBillingStart = month->date( 0 ).addDays( 1 - mStorageData.calendar->day( month->date( 0 ) ) );
         }
     }
 
@@ -503,8 +437,8 @@ void InterfaceStatistics::checkRebuild( QString oldType )
     for ( int i = 0; i < month->rowCount(); ++i )
     {
         QDate date = month->date( i );
-        if ( mCalendar->day( date ) != 1 ||
-            month->days( i ) != mCalendar->daysInMonth( date ) )
+        if ( mStorageData.calendar->day( date ) != 1 ||
+            month->days( i ) != mStorageData.calendar->daysInMonth( date ) )
         {
             mAllMonths = false;
         }
@@ -529,17 +463,17 @@ QDate InterfaceStatistics::nextMonthDate( const QDate &date )
     for ( int i = 0; i < length; i++ )
     {
         QDate refDay;
-        mCalendar->setDate( refDay, mCalendar->year( nextDate ), mCalendar->month( nextDate ), 1 );
-        refDay = refDay.addDays( mCalendar->daysInMonth( refDay ) );
+        mStorageData.calendar->setDate( refDay, mStorageData.calendar->year( nextDate ), mStorageData.calendar->month( nextDate ), 1 );
+        refDay = refDay.addDays( mStorageData.calendar->daysInMonth( refDay ) );
 
-        nextDate = nextDate.addDays( mCalendar->daysInMonth( nextDate ) );
+        nextDate = nextDate.addDays( mStorageData.calendar->daysInMonth( nextDate ) );
 
         // Ensure we don't get weird spans like Jan 31 -> Mar 2
         // Instead, days will drift to a value that all months can handle.
         // Test for problematic dates in config module!
-        if ( mCalendar->day( mBillingStart ) > 1 )
+        if ( mStorageData.calendar->day( mBillingStart ) > 1 )
         {
-            while ( mCalendar->month( nextDate ) != mCalendar->month( refDay ) )
+            while ( mStorageData.calendar->month( nextDate ) != mStorageData.calendar->month( refDay ) )
                 nextDate = nextDate.addDays( -1 );
         }
     }
@@ -555,13 +489,13 @@ bool InterfaceStatistics::daysInSpan( const QDate& date, int days )
     if ( !model->rowCount() )
         return false;
 
-    QDate endDate = date.addDays( days );
+    QDate nextRuleStart = date.addDays( days );
     for ( int i = model->rowCount() - 1; i >= 0; --i )
     {
         // No others will be valid after this; stop early
         if ( model->date( i ) < date )
             return false;
-        if ( model->date( i ) < endDate && model->date( i ) >= date )
+        if ( model->date( i ) < nextRuleStart && model->date( i ) >= date )
             return true;
     }
     return false;
@@ -575,7 +509,10 @@ void InterfaceStatistics::genNewHour( const QDateTime &dateTime )
     while ( hours->rowCount() )
     {
         if ( hours->dateTime( 0 ) <= dateTime.addDays( -1 ) )
+        {
             hours->removeRow( 0 );
+            mStorageData.saveFromId.insert( KNemoStats::Hour, 0 );
+        }
         else
             break;
     }
@@ -615,15 +552,15 @@ void InterfaceStatistics::genNewWeek( const QDate &date )
          model->date().addDays( model->days() ) > date )
             return;
 
-    int dow = mCalendar->dayOfWeek( date );
+    int dow = mStorageData.calendar->dayOfWeek( date );
     // ISO8601: week always starts on a Monday
     QDate newDate = date.addDays( 1 - dow );
     model->createEntry();
     model->setDateTime( QDateTime( date, QTime() ) );
-    model->setDays( mCalendar->daysInWeek( date ) );
+    model->setDays( mStorageData.calendar->daysInWeek( date ) );
 }
 
-void InterfaceStatistics::genNewMonth( const QDate &date, QDate endDate )
+void InterfaceStatistics::genNewMonth( const QDate &date, QDate nextRuleStart )
 {
     StatisticsModel * model = mModels.value( KNemoStats::Month );
     if ( model->rowCount() &&
@@ -632,10 +569,10 @@ void InterfaceStatistics::genNewMonth( const QDate &date, QDate endDate )
 
     int days;
     // Partial month.  Very little to do.
-    if ( endDate.isValid() )
+    if ( nextRuleStart.isValid() )
     {
-        days = date.daysTo( endDate );
-        if ( daysInSpan( date, date.daysTo( endDate ) ) )
+        days = date.daysTo( nextRuleStart );
+        if ( daysInSpan( date, date.daysTo( nextRuleStart ) ) )
         {
             model->createEntry();
             model->setDateTime( QDateTime( date, QTime() ) );
@@ -677,11 +614,11 @@ void InterfaceStatistics::genNewYear( const QDate &date )
          model->date().addDays( model->days() ) > date )
             return;
 
-    int doy = mCalendar->dayOfYear( date );
+    int doy = mStorageData.calendar->dayOfYear( date );
     QDate newDate = date.addDays( 1 - doy );
     model->createEntry();
     model->setDateTime( QDateTime( newDate, QTime() ) );
-    model->setDays( mCalendar->daysInYear( newDate ) );
+    model->setDays( mStorageData.calendar->daysInYear( newDate ) );
 }
 
 void InterfaceStatistics::checkValidEntry( QDateTime curDateTime )
@@ -779,7 +716,9 @@ void InterfaceStatistics::addRxBytes( unsigned long bytes )
     checkValidEntry();
 
     foreach( StatisticsModel * s, mModels )
+    {
         s->addRxBytes( bytes );
+    }
 
     checkTrafficLimit();
     emit currentEntryChanged();
@@ -793,7 +732,9 @@ void InterfaceStatistics::addTxBytes( unsigned long bytes )
     checkValidEntry();
 
     foreach( StatisticsModel * s, mModels )
+    {
         s->addTxBytes( bytes );
+    }
 
     checkTrafficLimit();
     emit currentEntryChanged();

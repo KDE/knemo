@@ -183,7 +183,6 @@ void StatsVnstat::parseOutput( const QString &output )
             {
                 int entryIndex = mExternalHours->createEntry();
                 mExternalHours->setDateTime( hour );
-                mExternalHours->setDays( 1 );
                 mExternalHours->setTraffic( entryIndex, rx, tx );
             }
         }

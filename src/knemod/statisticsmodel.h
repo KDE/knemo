@@ -34,7 +34,8 @@ public:
 
     enum StatisticRoles
     {
-        SpanRole = Qt::UserRole + 1,
+        IdRole = Qt::UserRole + 1,
+        SpanRole,
         DataRole
     };
 
@@ -49,11 +50,15 @@ public:
     void setCalendar( const KCalendarSystem * c ) { mCalendar = c; }
 
     int createEntry();
+    int id( int row = -1 ) const;
+    void setId( int id, int row = -1 );
     QDate date( int row = -1 ) const;
     QDateTime dateTime( int row = -1 ) const;
     void setDateTime( QDateTime );
     int days( int row = -1 ) const;
     void setDays( int days );
+    int indexOfId( int row ) const;
+
     quint64 rxBytes( int row = -1 ) const;
     quint64 txBytes( int row = -1 ) const;
     quint64 totalBytes( int row = -1 ) const;

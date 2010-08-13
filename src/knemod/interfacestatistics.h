@@ -21,13 +21,13 @@
 #ifndef INTERFACESTATISTICS_H
 #define INTERFACESTATISTICS_H
 
-#include "statisticsmodel.h"
+#include "storage/storagedata.h"
 
-class QDomDocument;
-class QDomElement;
 class QTimer;
 class KCalendarSystem;
 class Interface;
+class StatisticsModel;
+class SqlStorage;
 
 /**
  * This class is able to collect transfered data for an interface,
@@ -62,15 +62,11 @@ private slots:
 private:
     QString typeToElem( enum KNemoStats::PeriodUnits t );
     void loadConfig();
-    void loadStatistics();
-    void loadStatsGroup( const KCalendarSystem * cal, const QDomElement& root,
-                         StatisticsModel* statistics );
+    bool loadStatistics();
 
     void syncWithExternal( uint updated );
 
-    void saveStatsGroup( QDomDocument& doc, const StatisticsModel* statistics );
-
-    void checkRebuild( QString oldType );
+    void checkRebuild( QString oldType, bool force = false );
     void doRebuild( const QDate &recalcDate, int groups );
     QDate setRebuildDate( StatisticsModel* statistics,
                           const QDate &recalcDate );
@@ -96,8 +92,9 @@ private:
     bool mWarningDone;
     bool mAllMonths;
     QDate mBillingStart;
-    const KCalendarSystem* mCalendar;
+    StorageData mStorageData;
     QHash<int, StatisticsModel*> mModels;
+    SqlStorage *sql;
 };
 
 #endif // INTERFACESTATISTICS_H

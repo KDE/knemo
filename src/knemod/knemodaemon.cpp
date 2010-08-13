@@ -18,12 +18,14 @@
    Boston, MA 02110-1301, USA.
 */
 
+#include <QSqlDatabase>
 #include <QtDBus/QDBusConnection>
 #include <QTimer>
 
 #include <KAboutData>
 #include <KConfigGroup>
 #include <KLocale>
+#include <KMessageBox>
 #include <KStandardDirs>
 
 #include "config-knemo.h"
@@ -146,6 +148,23 @@ void KNemoDaemon::readConfig()
             connect( backend, SIGNAL( updateComplete() ), iface, SLOT( processUpdate() ) );
         }
     }
+
+    bool statsActivated = false;
+    foreach ( Interface *iface, mInterfaceHash )
+    {
+        if ( iface->getSettings().activateStatistics )
+            statsActivated = true;
+    }
+    if ( statsActivated )
+    {
+        QStringList drivers = QSqlDatabase::drivers();
+        if ( !drivers.contains( "QSQLITE" ) )
+        {
+            KMessageBox::sorry( 0, i18n( "The Qt4 SQLite database plugin is not available.\n"
+                                         "Please install it to store traffic statistics." ) );
+        }
+    }
+
     mPollTimer->start( generalSettings->pollInterval * 1000 );
 }
 
