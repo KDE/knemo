@@ -12,8 +12,9 @@ It also does a whole lot more:
 
  * Supports optional traffic statistics
    - logs hourly, daily, weekly, monthly, yearly statistics
-   - monthly statistics can act as billing periods; a billing period can start
-     on an arbitrary day and can span 1-6 months
+   - optional billing periods; a billing period can start on an arbitrary day
+     and can span nearly any length you choose; it can also track configurable
+     peak/offpeak hours
    - if running on KDE SC >= 4.4 statistics will use the calendar selected in
      System Settings
 

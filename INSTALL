@@ -17,6 +17,9 @@ Cmake's equivalent to 'make distclean' is 'rm -rf build'.
 
 Notes:
 
+KNemo saves statistics in an SQLite 3 database.  It will complain loudly if it
+cannot find Qt4's SQLite 3 database driver.
+
 By default, KNemo uses the new KStatusNotifierItem if it is compiled against
 KDE SC >= 4.3.80.  If you wish to use the older KSystemTrayIcon, either set the
 cmake variable LEGACY_TRAY_ICON=true or run configure with the '-l' option.
