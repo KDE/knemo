@@ -76,7 +76,7 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
     connect( mEntryTimer, SIGNAL( timeout() ), this, SLOT( checkValidEntry() ) );
 
     KUrl dir( generalSettings->statisticsDir );
-    sql = new SqlStorage( mInterface->getName() );
+    sql = new SqlStorage( mInterface->ifaceName() );
     loadStats();
     syncWithExternal( mStorageData.lastSaved );
     configChanged();
@@ -93,7 +93,7 @@ InterfaceStatistics::~InterfaceStatistics()
 
     saveStatistics();
     delete sql;
-    QSqlDatabase::removeDatabase( mInterface->getName() );
+    QSqlDatabase::removeDatabase( mInterface->ifaceName() );
 }
 
 void InterfaceStatistics::saveStatistics( bool fullSave )
@@ -117,7 +117,7 @@ bool InterfaceStatistics::loadStats()
     else
     {
         XmlStorage xml;
-        loaded = xml.loadStats( mInterface->getName(), &mStorageData, &mModels );
+        loaded = xml.loadStats( mInterface->ifaceName(), &mStorageData, &mModels );
         sql->createDb();
         if ( loaded )
         {
@@ -128,7 +128,7 @@ bool InterfaceStatistics::loadStats()
 
     if ( !mStorageData.calendar )
     {
-        mStorageData.calendar = KCalendarSystem::create( mInterface->getSettings().calendar );
+        mStorageData.calendar = KCalendarSystem::create( mInterface->settings().calendar );
         foreach( StatisticsModel * s, mModels )
         {
             s->setCalendar( mStorageData.calendar );
@@ -143,10 +143,10 @@ bool InterfaceStatistics::loadStats()
 
 void InterfaceStatistics::resetWarnings( int modelType )
 {
-    for ( int i = 0; i < mInterface->getSettings().warnRules.count(); ++i )
+    for ( int i = 0; i < mInterface->settings().warnRules.count(); ++i )
     {
-        if ( modelType == mInterface->getSettings().warnRules[i].periodUnits )
-            mInterface->getSettings().warnRules[i].warnDone = false;
+        if ( modelType == mInterface->settings().warnRules[i].periodUnits )
+            mInterface->settings().warnRules[i].warnDone = false;
     }
 }
 
@@ -353,9 +353,9 @@ void InterfaceStatistics::configChanged()
     if ( mStorageData.calendar )
        origCalendarType = mStorageData.calendar->calendarType();
 
-    if ( mInterface->getSettings().calendar != origCalendarType )
+    if ( mInterface->settings().calendar != origCalendarType )
     {
-        mStorageData.calendar = KCalendarSystem::create( mInterface->getSettings().calendar );
+        mStorageData.calendar = KCalendarSystem::create( mInterface->settings().calendar );
 
         foreach( StatisticsModel * s, mModels )
         {
@@ -819,10 +819,10 @@ void InterfaceStatistics::prependStatsRule( QList<StatsRule> &rules )
 
 void InterfaceStatistics::checkRebuild( const QString &oldCalendar, bool force )
 {
-    QList<StatsRule> newRules = mInterface->getSettings().statsRules;
+    QList<StatsRule> newRules = mInterface->settings().statsRules;
     bool forceWeek = false;
 
-    if ( oldCalendar != mInterface->getSettings().calendar )
+    if ( oldCalendar != mInterface->settings().calendar )
     {
         StatisticsModel *hours = mModels.value( KNemoStats::Hour );
         StatisticsModel *days = mModels.value( KNemoStats::Day );
@@ -936,7 +936,7 @@ void InterfaceStatistics::checkRebuild( const QString &oldCalendar, bool force )
         rebuildCalendarPeriods( mModels.value( KNemoStats::Day )->date( 0 ), true );
     }
 
-    mStatsRules = mInterface->getSettings().statsRules;
+    mStatsRules = mInterface->settings().statsRules;
     if ( mStatsRules.count() )
         prependStatsRule( mStatsRules );
 
@@ -991,7 +991,7 @@ void InterfaceStatistics::checkWarnings()
         return;
     mTrafficChanged = false;
 
-    QList<WarnRule> warn = mInterface->getSettings().warnRules;
+    QList<WarnRule> warn = mInterface->settings().warnRules;
     for ( int wi=0; wi < warn.count(); ++wi )
     {
         if ( warn[wi].warnDone || !warn[wi].threshold > 0.0 )
@@ -1046,7 +1046,7 @@ void InterfaceStatistics::checkWarnings()
         if ( total > thresholdBytes )
         {
             emit warnTraffic( warn[wi].customText, thresholdBytes, total );
-            mInterface->getSettings().warnRules[wi].warnDone = true;
+            mInterface->settings().warnRules[wi].warnDone = true;
         }
     }
 }

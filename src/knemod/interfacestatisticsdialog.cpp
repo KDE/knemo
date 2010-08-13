@@ -38,7 +38,7 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
       mConfig( KGlobal::config() ),
       mInterface( interface )
 {
-    setCaption( i18n( "%1 Statistics", interface->getName() ) );
+    setCaption( i18n( "%1 Statistics", interface->ifaceName() ) );
     setButtons( Reset | Close );
 
     ui.setupUi( mainWidget() );
@@ -62,9 +62,9 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
     configChanged();
 
     KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+    KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
 
-    InterfaceStatistics *stat = mInterface->getStatistics();
+    InterfaceStatistics *stat = mInterface->ifaceStatistics();
     setupTable( &interfaceGroup, ui.tableHourly,  stat->getStatistics( KNemoStats::Hour ) );
     setupTable( &interfaceGroup, ui.tableDaily,   stat->getStatistics( KNemoStats::Day ) );
     setupTable( &interfaceGroup, ui.tableWeekly,  stat->getStatistics( KNemoStats::Week ) );
@@ -99,7 +99,7 @@ InterfaceStatisticsDialog::~InterfaceStatisticsDialog()
     if ( mWasShown )
     {
         KConfig *config = mConfig.data();
-        KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+        KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
 
         interfaceGroup.writeEntry( conf_statisticsPos, pos() );
         interfaceGroup.writeEntry( conf_statisticsSize, size() );
@@ -119,8 +119,8 @@ void InterfaceStatisticsDialog::configChanged()
 {
     bool billingTab = false;
     bool logOffpeak = false;
-    KCalendarSystem *cal = mInterface->getStatistics()->calendar();
-    foreach ( StatsRule rule, mInterface->getSettings().statsRules )
+    KCalendarSystem *cal = mInterface->ifaceStatistics()->calendar();
+    foreach ( StatsRule rule, mInterface->settings().statsRules )
     {
         if ( rule.periodCount != 1 ||
              rule.periodUnits != KNemoStats::Month ||

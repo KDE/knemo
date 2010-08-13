@@ -28,7 +28,7 @@ BackendBase::~BackendBase()
 {
 }
 
-const BackendData* BackendBase::add( const QString& iface )
+const BackendData* BackendBase::addIface( const QString& iface )
 {
     BackendData * data;
     if ( mInterfaces.contains( iface ) )
@@ -43,7 +43,7 @@ const BackendData* BackendBase::add( const QString& iface )
     }
 }
 
-void BackendBase::remove( const QString& iface )
+void BackendBase::removeIface( const QString& iface )
 {
     mInterfaces.remove( iface );
 }

@@ -29,7 +29,7 @@ class WarnConfig : public KDialog
 Q_OBJECT
 public:
     WarnConfig( const InterfaceSettings *settings, const WarnRule &warn, bool addRule = true );
-    WarnRule getSettings();
+    WarnRule settings();
 private:
     Ui::WarnCfg mDlg;
     const InterfaceSettings *mSettings;

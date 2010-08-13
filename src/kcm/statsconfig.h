@@ -29,7 +29,7 @@ class StatsConfig : public KDialog
 Q_OBJECT
 public:
     StatsConfig( const InterfaceSettings *settings, const KCalendarSystem *calendar, const StatsRule &rule, bool addRule = true );
-    StatsRule getSettings();
+    StatsRule settings();
 private:
     Ui::StatsCfg mDlg;
     const InterfaceSettings *mSettings;

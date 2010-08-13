@@ -47,12 +47,12 @@ public:
     static BackendBase* createInstance();
 
     virtual void update();
-    virtual QStringList getIfaceList();
-    virtual QString getDefaultRouteIface( int afInet );
+    virtual QStringList ifaceList();
+    virtual QString defaultRouteIface( int afInet );
 
 private:
     int s;
-    void updateInterfaceData( const QString& ifName, BackendData* data );
+    void updateIfaceData( const QString& ifName, BackendData* data );
     void updateWirelessData( const QString& ifName, BackendData* data );
     QString formattedAddr( struct sockaddr * addr );
     QString getAddr( struct ifaddrs *ifa, AddrData& addrData );

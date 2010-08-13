@@ -53,57 +53,57 @@ public:
      */
     virtual ~Interface();
 
-    int getState()
+    int ifaceState()
     {
-        return mState;
+        return mIfaceState;
     }
 
-    int getPreviousState()
+    int previousIfaceState()
     {
-        return mPreviousState;
+        return mPreviousIfaceState;
     }
 
-    QString getUptimeString()
+    QString uptimeString()
     {
         return mUptimeString;
     }
 
-    const QString& getName() const
+    const QString& ifaceName() const
     {
-        return mName;
+        return mIfaceName;
     }
 
-    const BackendData* getData() const
+    const BackendData* backendData() const
     {
         return mBackendData;
     }
 
-    InterfaceSettings& getSettings()
+    InterfaceSettings& settings()
     {
         return mSettings;
     }
 
-    InterfaceStatistics* getStatistics()
+    InterfaceStatistics* ifaceStatistics()
     {
-        return mStatistics;
+        return mIfaceStatistics;
     }
 
-    unsigned long getRxRate()
+    unsigned long rxRate()
     {
         return mRxRate;
     }
 
-    unsigned long getTxRate()
+    unsigned long txRate()
     {
         return mTxRate;
     }
 
-    QString getRxRateStr()
+    QString rxRateStr()
     {
         return mRxRateStr;
     }
 
-    QString getTxRateStr()
+    QString txRateStr()
     {
         return mTxRateStr;
     }
@@ -168,9 +168,9 @@ private:
 
     void resetUptime();
 
-    int mState;
-    int mPreviousState;
-    QString mName;
+    int mIfaceState;
+    int mPreviousIfaceState;
+    QString mIfaceName;
     qreal mRealSec;
     time_t mUptime;
     QString mUptimeString;
@@ -180,7 +180,7 @@ private:
     QString mTxRateStr;
     InterfaceIcon mIcon;
     InterfaceSettings mSettings;
-    InterfaceStatistics* mStatistics;
+    InterfaceStatistics* mIfaceStatistics;
     InterfaceStatusDialog* mStatusDialog;
     InterfaceStatisticsDialog* mStatisticsDialog;
     InterfacePlotterDialog* mPlotterDialog;

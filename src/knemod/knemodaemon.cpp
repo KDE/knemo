@@ -96,7 +96,7 @@ void KNemoDaemon::readConfig()
         {
             Interface *interface = mInterfaceHash.take( key );
             delete interface;
-            backend->remove( key );
+            backend->removeIface( key );
 
             // If knemo is running while config removes an interface to monitor,
             // it will keep the interface and plotter groups. Delete them here.
@@ -110,9 +110,9 @@ void KNemoDaemon::readConfig()
 
     if ( !mHaveInterfaces )
     {
-        QString ifaceName = backend->getDefaultRouteIface( AF_INET );
+        QString ifaceName = backend->defaultRouteIface( AF_INET );
         if ( ifaceName.isEmpty() )
-            ifaceName = backend->getDefaultRouteIface( AF_INET6 );
+            ifaceName = backend->defaultRouteIface( AF_INET6 );
         if ( !ifaceName.isEmpty() )
         {
             interfaceList << ifaceName;
@@ -126,7 +126,7 @@ void KNemoDaemon::readConfig()
     {
         if ( !mInterfaceHash.contains( key ) )
         {
-            const BackendData * data = backend->add( key );
+            const BackendData * data = backend->addIface( key );
             Interface *iface = new Interface( key, data );
             mInterfaceHash.insert( key, iface );
             newIfaces << key;
@@ -152,7 +152,7 @@ void KNemoDaemon::readConfig()
     bool statsActivated = false;
     foreach ( Interface *iface, mInterfaceHash )
     {
-        if ( iface->getSettings().activateStatistics )
+        if ( iface->settings().activateStatistics )
             statsActivated = true;
     }
     if ( statsActivated )

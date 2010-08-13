@@ -76,7 +76,7 @@ void StatsConfig::setDefaults()
     setControls( s );
 }
 
-StatsRule StatsConfig::getSettings()
+StatsRule StatsConfig::settings()
 {
     StatsRule rule;
     rule.startDate = mDlg.startDate->date();
@@ -118,7 +118,7 @@ void StatsConfig::slotButtonClicked( int button )
     if ( mAddRule && ( (button == Ok) || (button == Apply) ) )
     {
         bool duplicateEntry = false;
-        StatsRule testRule = getSettings();
+        StatsRule testRule = settings();
         QList<StatsRule> statsRules = mSettings->statsRules;
         foreach ( StatsRule rule, statsRules )
         {

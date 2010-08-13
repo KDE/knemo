@@ -39,22 +39,22 @@
 Interface::Interface( const QString &ifname,
                       const BackendData* data )
     : QObject(),
-      mState( KNemoIface::UnknownState ),
-      mPreviousState( KNemoIface::UnknownState ),
-      mName( ifname ),
+      mIfaceState( KNemoIface::UnknownState ),
+      mPreviousIfaceState( KNemoIface::UnknownState ),
+      mIfaceName( ifname ),
       mRealSec( 0.0 ),
       mUptime( 0 ),
       mUptimeString( "00:00:00" ),
       mRxRate( 0 ),
       mTxRate( 0 ),
       mIcon( this ),
-      mStatistics( 0 ),
+      mIfaceStatistics( 0 ),
       mStatusDialog( 0 ),
       mStatisticsDialog(  0 ),
       mPlotterDialog( 0 ),
       mBackendData( data )
 {
-    mPlotterDialog = new InterfacePlotterDialog( mName );
+    mPlotterDialog = new InterfacePlotterDialog( mIfaceName );
 
     connect( &mIcon, SIGNAL( statisticsSelected() ),
              this, SLOT( showStatisticsDialog() ) );
@@ -65,14 +65,14 @@ Interface::~Interface()
     delete mStatusDialog;
     delete mPlotterDialog;
     delete mStatisticsDialog;
-    delete mStatistics;
+    delete mIfaceStatistics;
 }
 
 void Interface::configChanged()
 {
     KSharedConfigPtr config = KGlobal::config();
     QString group( confg_interface );
-    group += mName;
+    group += mIfaceName;
     KConfigGroup interfaceGroup( config, group );
     InterfaceSettings s;
     mSettings.alias = interfaceGroup.readEntry( conf_alias ).trimmed();
@@ -105,7 +105,7 @@ void Interface::configChanged()
     int warnRuleCount = interfaceGroup.readEntry( conf_warnRules, 0 );
     for ( int i = 0; i < warnRuleCount; ++i )
     {
-        group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( mName ).arg( i );
+        group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( mIfaceName ).arg( i );
         if ( config->hasGroup( group ) )
         {
             KConfigGroup warnGroup( config, group );
@@ -134,7 +134,7 @@ void Interface::configChanged()
     KCalendarSystem *testCal = KCalendarSystem::create( mSettings.calendar );
     for ( int i = 0; i < statsRuleCount; ++i )
     {
-        group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( mName ).arg( i );
+        group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( mIfaceName ).arg( i );
         if ( config->hasGroup( group ) )
         {
             KConfigGroup statsGroup( config, group );
@@ -174,16 +174,16 @@ void Interface::configChanged()
     }
 
     // This prevents needless regeneration of icon when first shown in tray
-    if ( mState == KNemoIface::UnknownState )
+    if ( mIfaceState == KNemoIface::UnknownState )
     {
-        mState = mBackendData->status;
-        mPreviousState = mState;
+        mIfaceState = mBackendData->status;
+        mPreviousIfaceState = mIfaceState;
     }
     mIcon.configChanged();
 
-    if ( mStatistics )
+    if ( mIfaceStatistics )
     {
-        mStatistics->configChanged();
+        mIfaceStatistics->configChanged();
         if ( !mSettings.activateStatistics )
             stopStatistics();
     }
@@ -202,9 +202,9 @@ void Interface::configChanged()
 
 void Interface::processUpdate()
 {
-    mPreviousState = mState;
+    mPreviousIfaceState = mIfaceState;
     unsigned int trafficThreshold = mSettings.trafficThreshold;
-    mState = mBackendData->status;
+    mIfaceState = mBackendData->status;
 
     int units = 1;
     if ( generalSettings->useBitrate )
@@ -216,59 +216,59 @@ void Interface::processUpdate()
 
     QString title = mSettings.alias;
     if ( title.isEmpty() )
-        title = mName;
+        title = mIfaceName;
 
-    if ( mState & KNemoIface::Connected )
+    if ( mIfaceState & KNemoIface::Connected )
     {
         // the interface is connected, look for traffic
         if ( ( mBackendData->rxPackets - mBackendData->prevRxPackets ) > trafficThreshold )
-            mState |= KNemoIface::RxTraffic;
+            mIfaceState |= KNemoIface::RxTraffic;
         if ( ( mBackendData->txPackets - mBackendData->prevTxPackets ) > trafficThreshold )
-            mState |= KNemoIface::TxTraffic;
+            mIfaceState |= KNemoIface::TxTraffic;
 
-        if ( mStatistics )
+        if ( mIfaceStatistics )
         {
-            mStatistics->addRxBytes( mBackendData->incomingBytes );
-            mStatistics->addTxBytes( mBackendData->outgoingBytes );
+            mIfaceStatistics->addRxBytes( mBackendData->incomingBytes );
+            mIfaceStatistics->addTxBytes( mBackendData->outgoingBytes );
         }
 
         updateTime();
 
-        if ( mPreviousState < KNemoIface::Connected )
+        if ( mPreviousIfaceState < KNemoIface::Connected )
         {
             QString connectedStr;
             if ( mBackendData->isWireless )
                 connectedStr = i18n( "%1 is connected to %2", title, mBackendData->essid );
             else
                 connectedStr = i18n( "%1 is connected", title );
-            if ( mPreviousState != KNemoIface::UnknownState )
+            if ( mPreviousIfaceState != KNemoIface::UnknownState )
                 KNotification::event( "connected", connectedStr );
         }
     }
-    else if ( mState & KNemoIface::Available )
+    else if ( mIfaceState & KNemoIface::Available )
     {
-        if ( mPreviousState & KNemoIface::Connected )
+        if ( mPreviousIfaceState & KNemoIface::Connected )
         {
             KNotification::event( "disconnected", i18n( "%1 has disconnected", title ) );
             if ( mBackendData->interfaceType == KNemoIface::PPP )
-                backend->clearTraffic( mName );
+                backend->clearTraffic( mIfaceName );
             resetUptime();
         }
-        else if ( mPreviousState < KNemoIface::Available )
+        else if ( mPreviousIfaceState < KNemoIface::Available )
         {
-            if ( mPreviousState != KNemoIface::UnknownState )
+            if ( mPreviousIfaceState != KNemoIface::UnknownState )
                 KNotification::event( "available", i18n( "%1 is available", title ) );
         }
     }
-    else if ( mState == KNemoIface::Unavailable &&
-              mPreviousState > KNemoIface::Unavailable )
+    else if ( mIfaceState == KNemoIface::Unavailable &&
+              mPreviousIfaceState > KNemoIface::Unavailable )
     {
         KNotification::event( "unavailable", i18n( "%1 is unavailable", title ) );
-        backend->clearTraffic( mName );
+        backend->clearTraffic( mIfaceName );
         resetUptime();
     }
 
-    if ( mPreviousState != mState )
+    if ( mPreviousIfaceState != mIfaceState )
         mIcon.updateTrayStatus();
 
     if ( mPlotterDialog )
@@ -297,9 +297,9 @@ void Interface::showStatusDialog( bool fromContextMenu )
     if ( mStatusDialog == 0L )
     {
         mStatusDialog = new InterfaceStatusDialog( this );
-        if ( mStatistics != 0 )
+        if ( mIfaceStatistics != 0 )
         {
-            connect( mStatistics, SIGNAL( currentEntryChanged() ),
+            connect( mIfaceStatistics, SIGNAL( currentEntryChanged() ),
                      mStatusDialog, SLOT( statisticsChanged() ) );
             mStatusDialog->statisticsChanged();
         }
@@ -319,12 +319,12 @@ void Interface::showStatisticsDialog()
     if ( mStatisticsDialog == 0 )
     {
         mStatisticsDialog = new InterfaceStatisticsDialog( this );
-        if ( mStatistics == 0 )
+        if ( mIfaceStatistics == 0 )
         {
             // should never happen but you never know...
             startStatistics();
         }
-        connect( mStatisticsDialog, SIGNAL( clearStatistics() ), mStatistics, SLOT( clearStatistics() ) );
+        connect( mStatisticsDialog, SIGNAL( clearStatistics() ), mIfaceStatistics, SLOT( clearStatistics() ) );
     }
     mStatisticsDialog->show();
 }
@@ -353,12 +353,12 @@ void Interface::updateTime()
 
 void Interface::startStatistics()
 {
-    mStatistics = new InterfaceStatistics( this );
-    connect( mStatistics, SIGNAL( warnTraffic( QString, quint64, quint64 ) ),
+    mIfaceStatistics = new InterfaceStatistics( this );
+    connect( mIfaceStatistics, SIGNAL( warnTraffic( QString, quint64, quint64 ) ),
              this, SLOT( warnTraffic( QString, quint64, quint64 ) ) );
     if ( mStatusDialog != 0 )
     {
-        connect( mStatistics, SIGNAL( currentEntryChanged() ),
+        connect( mIfaceStatistics, SIGNAL( currentEntryChanged() ),
                  mStatusDialog, SLOT( statisticsChanged() ) );
         mStatusDialog->statisticsChanged();
     }
@@ -370,15 +370,15 @@ void Interface::stopStatistics()
     delete mStatisticsDialog;
     mStatisticsDialog = 0;
 
-    delete mStatistics;
-    mStatistics = 0;
+    delete mIfaceStatistics;
+    mIfaceStatistics = 0;
 }
 
 void Interface::warnTraffic( QString warnText, quint64 threshold, quint64 current )
 {
     if ( !warnText.isEmpty() )
     {
-        warnText = warnText.replace( QRegExp("%i"), mName );
+        warnText = warnText.replace( QRegExp("%i"), mIfaceName );
         warnText = warnText.replace( QRegExp("%a"), mSettings.alias );
         warnText = warnText.replace( QRegExp("%t"), KIO::convertSize( threshold ) );
         warnText = warnText.replace( QRegExp("%c"), KIO::convertSize( threshold ) );
@@ -388,7 +388,7 @@ void Interface::warnTraffic( QString warnText, quint64 threshold, quint64 curren
         warnText = i18n( "<table><tr><td style='padding-right:0.2em;'>%1:</td>"
                                 "<td>Exceeded traffic limit of %2\n"
                                 "(currently %3)</td></tr></table>",
-                                mName,
+                                mIfaceName,
                                 KIO::convertSize( threshold ),
                                 KIO::convertSize( current ) );
     }

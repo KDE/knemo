@@ -51,10 +51,10 @@ public:
      * interfaces in the QHash.
      */
     virtual void update() = 0;
-    virtual QStringList getIfaceList() = 0;
-    virtual QString getDefaultRouteIface( int afInet ) = 0;
-    const BackendData* add( const QString& iface );
-    void remove( const QString& iface );
+    virtual QStringList ifaceList() = 0;
+    virtual QString defaultRouteIface( int afInet ) = 0;
+    const BackendData* addIface( const QString& iface );
+    void removeIface( const QString& iface );
     void clearTraffic( const QString& iface );
     void updatePackets( const QString& iface );
 

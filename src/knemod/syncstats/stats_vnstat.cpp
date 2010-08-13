@@ -50,7 +50,7 @@ void StatsVnstat::importIfaceStats()
     vnstatProc.setOutputChannelMode( KProcess::OnlyStdoutChannel );
     vnstatProc.setEnv( "LANG", "C" );
     vnstatProc.setEnv( "LC_ALL", "C" );
-    vnstatProc << "vnstat" << "--dumpdb" << "-i" << mInterface->getName();
+    vnstatProc << "vnstat" << "--dumpdb" << "-i" << mInterface->ifaceName();
     vnstatProc.execute();
 
     parseOutput( vnstatProc.readAllStandardOutput() );
@@ -100,8 +100,8 @@ StatsPair StatsVnstat::addLagged( uint lastUpdated, StatisticsModel * days )
     {
         if ( mSysBtime > lastUpdated )
         {
-            lag.rxBytes = mInterface->getData()->rxBytes;
-            lag.txBytes = mInterface->getData()->txBytes;
+            lag.rxBytes = mInterface->backendData()->rxBytes;
+            lag.txBytes = mInterface->backendData()->txBytes;
         }
     }
     else if ( ( lastUpdated > mVnstatUpdated ) )
@@ -109,7 +109,7 @@ StatsPair StatsVnstat::addLagged( uint lastUpdated, StatisticsModel * days )
         if ( days->rxBytes() > mExternalDays->rxBytes() )
         {
             quint64 loggedDiff = days->rxBytes() - mExternalDays->rxBytes();
-            quint64 byteCounterDiff = mInterface->getData()->rxBytes - mVnstatRx;
+            quint64 byteCounterDiff = mInterface->backendData()->rxBytes - mVnstatRx;
             if ( byteCounterDiff > loggedDiff )
             {
                 lag.rxBytes = byteCounterDiff - loggedDiff;
@@ -118,7 +118,7 @@ StatsPair StatsVnstat::addLagged( uint lastUpdated, StatisticsModel * days )
         if ( days->txBytes() > mExternalDays->txBytes() )
         {
             quint64 loggedDiff = days->txBytes() - mExternalDays->txBytes();
-            quint64 byteCounterDiff = mInterface->getData()->txBytes - mVnstatTx;
+            quint64 byteCounterDiff = mInterface->backendData()->txBytes - mVnstatTx;
             if ( byteCounterDiff > loggedDiff )
             {
                 lag.txBytes = byteCounterDiff - loggedDiff;

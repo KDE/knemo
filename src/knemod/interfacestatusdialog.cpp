@@ -41,7 +41,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
       mConfig( KGlobal::config() ),
       mInterface( interface )
 {
-    setCaption( i18n( "%1 Interface Status", interface->getName() ) );
+    setCaption( i18n( "%1 Interface Status", interface->ifaceName() ) );
     setButtons( Close );
 
     ui.setupUi( mainWidget() );
@@ -58,7 +58,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     connect( ui.comboBoxIP, SIGNAL( currentIndexChanged(int) ), this, SLOT( updateDialog() ) );
 
     updateDialog();
-    const BackendData * data = mInterface->getData();
+    const BackendData * data = mInterface->backendData();
     if ( !data )
         return;
     if ( !data->isWireless )
@@ -70,7 +70,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
 
     // Restore window size and position.
     KConfig *config = mConfig.data();
-    KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+    KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
     if ( interfaceGroup.hasKey( conf_statusPos ) )
     {
         QPoint p = interfaceGroup.readEntry( conf_statusPos, QPoint() );
@@ -94,7 +94,7 @@ InterfaceStatusDialog::~InterfaceStatusDialog()
     if ( mWasShown )
     {
         KConfig *config = mConfig.data();
-        KConfigGroup interfaceGroup( config, confg_interface + mInterface->getName() );
+        KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
         interfaceGroup.writeEntry( conf_statusPos, pos() );
         interfaceGroup.writeEntry( conf_statusSize, size() );
         config->sync();
@@ -128,15 +128,15 @@ void InterfaceStatusDialog::updateDialog()
     if ( isHidden() )
         return;
 
-    const BackendData* data = mInterface->getData();
+    const BackendData* data = mInterface->backendData();
     if ( !data )
         return;
-    InterfaceSettings& settings = mInterface->getSettings();
+    InterfaceSettings& settings = mInterface->settings();
 
     // connection tab
-    ui.textLabelInterface->setText( mInterface->getName() );
+    ui.textLabelInterface->setText( mInterface->ifaceName() );
     ui.textLabelAlias->setText( settings.alias );
-    ui.textLabelUptime->setText( mInterface->getUptimeString() );
+    ui.textLabelUptime->setText( mInterface->uptimeString() );
 
     if ( data->status & KNemoIface::Connected )
         ui.textLabelStatus->setText( i18n( "Connected" ) );
@@ -147,7 +147,7 @@ void InterfaceStatusDialog::updateDialog()
     else
         ui.textLabelStatus->setText( i18n( "Unavailable" ) );
 
-    ui.groupBoxStatistics->setEnabled( mInterface->getSettings().activateStatistics );
+    ui.groupBoxStatistics->setEnabled( mInterface->settings().activateStatistics );
 
     if ( data->status & KNemoIface::Available )
     {
@@ -192,8 +192,8 @@ void InterfaceStatusDialog::doAvailable( const BackendData* data )
     ui.textLabelPacketsReceived->setText( QString::number( data->rxPackets ) );
     ui.textLabelBytesSend->setText( data->txString );
     ui.textLabelBytesReceived->setText( data->rxString );
-    ui.textLabelSpeedSend->setText( mInterface->getTxRateStr() );
-    ui.textLabelSpeedReceived->setText( mInterface->getRxRateStr() );
+    ui.textLabelSpeedSend->setText( mInterface->txRateStr() );
+    ui.textLabelSpeedReceived->setText( mInterface->rxRateStr() );
 }
 
 void InterfaceStatusDialog::doConnected( const BackendData *data )
@@ -365,11 +365,11 @@ void InterfaceStatusDialog::doUnavailable()
 void InterfaceStatusDialog::configChanged()
 {
     bool billText = false;
-    foreach ( StatsRule rule, mInterface->getSettings().statsRules )
+    foreach ( StatsRule rule, mInterface->settings().statsRules )
     {
         if ( rule.periodCount != 1 ||
              rule.periodUnits != KNemoStats::Month ||
-             mInterface->getStatistics()->calendar()->day( rule.startDate ) != 1 )
+             mInterface->ifaceStatistics()->calendar()->day( rule.startDate ) != 1 )
         {
             billText = true;
         }
@@ -383,7 +383,7 @@ void InterfaceStatusDialog::configChanged()
 
 void InterfaceStatusDialog::statisticsChanged()
 {
-    InterfaceStatistics *stat = mInterface->getStatistics();
+    InterfaceStatistics *stat = mInterface->ifaceStatistics();
     if ( stat == 0 )
         return;
 

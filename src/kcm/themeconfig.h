@@ -29,13 +29,13 @@ class ThemeConfig : public KDialog
 Q_OBJECT
 public:
     ThemeConfig( const InterfaceSettings s );
-    InterfaceSettings getSettings();
+    InterfaceSettings settings();
 private slots:
     void setDefaults();
     void updateRateGroup();
 private:
     Ui::ThemeCfg mDlg;
-    InterfaceSettings settings;
+    InterfaceSettings mSettings;
 };
 
 #endif

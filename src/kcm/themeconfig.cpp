@@ -20,29 +20,29 @@
 #include "themeconfig.h"
 
 ThemeConfig::ThemeConfig( const InterfaceSettings s ) : KDialog(),
-    settings( s )
+    mSettings( s )
 {
     mDlg.setupUi( mainWidget() );
     setButtons( KDialog::Default | KDialog::Ok | KDialog::Cancel );
 
-    if ( settings.iconTheme != NETLOAD_THEME )
+    if ( mSettings.iconTheme != NETLOAD_THEME )
         mDlg.checkBarScale->hide();
-    if ( settings.iconTheme != NETLOAD_THEME &&
-         settings.iconTheme != TEXT_THEME )
+    if ( mSettings.iconTheme != NETLOAD_THEME &&
+         mSettings.iconTheme != TEXT_THEME )
     {
         mDlg.rateGroup->hide();
         mDlg.maxRateGroup->hide();
     }
 
-    mDlg.spinBoxTrafficThreshold->setValue( settings.trafficThreshold );
+    mDlg.spinBoxTrafficThreshold->setValue( mSettings.trafficThreshold );
 
-    mDlg.txMaxRate->setValue( settings.outMaxRate );
-    mDlg.rxMaxRate->setValue( settings.inMaxRate );
+    mDlg.txMaxRate->setValue( mSettings.outMaxRate );
+    mDlg.rxMaxRate->setValue( mSettings.inMaxRate );
 
-    mDlg.checkBarScale->setChecked( settings.barScale );
-    mDlg.checkDynColor->setChecked( settings.dynamicColor );
-    mDlg.colorIncomingMax->setColor( settings.colorIncomingMax );
-    mDlg.colorOutgoingMax->setColor( settings.colorOutgoingMax );
+    mDlg.checkBarScale->setChecked( mSettings.barScale );
+    mDlg.checkDynColor->setChecked( mSettings.dynamicColor );
+    mDlg.colorIncomingMax->setColor( mSettings.colorIncomingMax );
+    mDlg.colorOutgoingMax->setColor( mSettings.colorOutgoingMax );
     updateRateGroup();
 
     connect( this, SIGNAL( defaultClicked() ), SLOT( setDefaults() ) );
@@ -74,19 +74,19 @@ void ThemeConfig::updateRateGroup()
 }
 
 
-InterfaceSettings ThemeConfig::getSettings()
+InterfaceSettings ThemeConfig::settings()
 {
-    settings.trafficThreshold = mDlg.spinBoxTrafficThreshold->value();
+    mSettings.trafficThreshold = mDlg.spinBoxTrafficThreshold->value();
 
-    settings.outMaxRate = mDlg.txMaxRate->value();
-    settings.inMaxRate = mDlg.rxMaxRate->value();
+    mSettings.outMaxRate = mDlg.txMaxRate->value();
+    mSettings.inMaxRate = mDlg.rxMaxRate->value();
 
-    settings.barScale = mDlg.checkBarScale->isChecked();
-    settings.dynamicColor = mDlg.checkDynColor->isChecked();
-    settings.colorIncomingMax = mDlg.colorIncomingMax->color();
-    settings.colorOutgoingMax = mDlg.colorOutgoingMax->color();
+    mSettings.barScale = mDlg.checkBarScale->isChecked();
+    mSettings.dynamicColor = mDlg.checkDynColor->isChecked();
+    mSettings.colorIncomingMax = mDlg.colorIncomingMax->color();
+    mSettings.colorOutgoingMax = mDlg.colorOutgoingMax->color();
 
-    return settings;
+    return mSettings;
 }
 
 #include "themeconfig.moc"

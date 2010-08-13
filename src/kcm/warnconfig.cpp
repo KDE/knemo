@@ -80,7 +80,7 @@ void WarnConfig::setControls( const WarnRule &warn )
     mDlg.customTextCheck->setChecked( !warn.customText.trimmed().isEmpty() );
 }
 
-WarnRule WarnConfig::getSettings()
+WarnRule WarnConfig::settings()
 {
     WarnRule warn;
     warn.trafficType = mDlg.trafficType->currentIndex();
@@ -111,7 +111,7 @@ void WarnConfig::setDefaults()
 
 void WarnConfig::slotButtonClicked( int button )
 {
-    WarnRule testRule = getSettings();
+    WarnRule testRule = settings();
     if ( mAddRule && ( (button == Ok) || (button == Apply) ) )
     {
         bool duplicateEntry = false;

@@ -1305,7 +1305,7 @@ void ConfigDialog::advancedButtonClicked()
     ThemeConfig dlg( *settings );
     if ( dlg.exec() )
     {
-        InterfaceSettings s = dlg.getSettings();
+        InterfaceSettings s = dlg.settings();
         settings->trafficThreshold = s.trafficThreshold;
         settings->dynamicColor = s.dynamicColor;
         settings->colorIncomingMax = s.colorIncomingMax;
@@ -1329,7 +1329,7 @@ void ConfigDialog::addStatsClicked()
     StatsConfig dlg( settings, mCalendar, rule, true );
     if ( dlg.exec() )
     {
-        rule = dlg.getSettings();
+        rule = dlg.settings();
         QSortFilterProxyModel* proxy = static_cast<QSortFilterProxyModel*>(mDlg->statsView->model());
         QModelIndex index = statsModel->addRule( rule );
         mDlg->statsView->setCurrentIndex( proxy->mapFromSource( index ) );
@@ -1355,7 +1355,7 @@ void ConfigDialog::modifyStatsClicked()
     StatsConfig dlg( settings, mCalendar, s, false );
     if ( dlg.exec() )
     {
-        s = dlg.getSettings();
+        s = dlg.settings();
         statsModel->modifyRule( index, s );
         settings->statsRules = statsModel->getRules();
         changed( true );
@@ -1390,7 +1390,7 @@ void ConfigDialog::addWarnClicked()
     WarnConfig dlg( settings, warn, true );
     if ( dlg.exec() )
     {
-        warn = dlg.getSettings();
+        warn = dlg.settings();
         QModelIndex index = warnModel->addWarn( warn );
         mDlg->warnView->setCurrentIndex( index );
         settings->warnRules = warnModel->getRules();
@@ -1413,7 +1413,7 @@ void ConfigDialog::modifyWarnClicked()
     WarnConfig dlg( settings, warn, false );
     if ( dlg.exec() )
     {
-        warn = dlg.getSettings();
+        warn = dlg.settings();
         warnModel->modifyWarn( index, warn );
         settings->warnRules = warnModel->getRules();
         changed( true );

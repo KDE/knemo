@@ -104,31 +104,31 @@ void InterfaceIcon::configChanged()
         outHist.append( 0 );
     }
 
-    inMaxRate = mInterface->getSettings().inMaxRate;
-    outMaxRate = mInterface->getSettings().outMaxRate;
+    inMaxRate = mInterface->settings().inMaxRate;
+    outMaxRate = mInterface->settings().outMaxRate;
 
     updateTrayStatus();
 
     if ( mTray != 0L )
     {
         updateMenu();
-        if ( mInterface->getSettings().iconTheme == TEXT_THEME )
+        if ( mInterface->settings().iconTheme == TEXT_THEME )
              updateIconText( true );
-        else if ( mInterface->getSettings().iconTheme == NETLOAD_THEME )
+        else if ( mInterface->settings().iconTheme == NETLOAD_THEME )
              updateBars( true );
     }
 }
 
 void InterfaceIcon::updateIconImage( int status )
 {
-    if ( mTray == 0L || mInterface->getSettings().iconTheme == TEXT_THEME )
+    if ( mTray == 0L || mInterface->settings().iconTheme == TEXT_THEME )
         return;
 
     QString iconName;
-    if ( mInterface->getSettings().iconTheme == SYSTEM_THEME )
+    if ( mInterface->settings().iconTheme == SYSTEM_THEME )
         iconName = "network-";
     else
-        iconName = "knemo-" + mInterface->getSettings().iconTheme + "-";
+        iconName = "knemo-" + mInterface->settings().iconTheme + "-";
 
     // Now set the correct icon depending on the status of the interface.
     if ( ( status & KNemoIface::RxTraffic ) &&
@@ -175,7 +175,7 @@ int InterfaceIcon::calcHeight( QList<unsigned long>& hist, unsigned int& net_max
     rate = histcalculate / histSize;
 
     /* update maximum */
-    if ( !mInterface->getSettings().barScale )
+    if ( !mInterface->settings().barScale )
     {
         QList<unsigned long>sortedMax( hist );
         qSort( sortedMax );
@@ -201,21 +201,21 @@ int InterfaceIcon::calcHeight( QList<unsigned long>& hist, unsigned int& net_max
 
 QColor InterfaceIcon::calcColor( QList<unsigned long>& hist, const QColor& low, const QColor& high, int hival )
 {
-    const BackendData * data = mInterface->getData();
+    const BackendData * data = mInterface->backendData();
 
     if ( data->status & KNemoIface::Connected )
     {
-        if ( ! mInterface->getSettings().dynamicColor )
+        if ( ! mInterface->settings().dynamicColor )
             return low;
     }
     else if ( data->status & KNemoIface::Available )
-        return mInterface->getSettings().colorDisabled;
+        return mInterface->settings().colorDisabled;
     else if ( data->status & KNemoIface::Unavailable )
-        return mInterface->getSettings().colorUnavailable;
+        return mInterface->settings().colorUnavailable;
 
     unsigned long histcalculate = 0;
     unsigned long rate = 0;
-    if ( mInterface->getSettings().iconTheme == NETLOAD_THEME )
+    if ( mInterface->settings().iconTheme == NETLOAD_THEME )
     {
         foreach( unsigned long j, hist )
         {
@@ -248,8 +248,8 @@ QColor InterfaceIcon::calcColor( QList<unsigned long>& hist, const QColor& low, 
 void InterfaceIcon::updateBars( bool doUpdate )
 {
     // Has color changed?
-    QColor rxColor = calcColor( inHist, mInterface->getSettings().colorIncoming, mInterface->getSettings().colorIncomingMax, mInterface->getSettings().inMaxRate );
-    QColor txColor = calcColor( outHist, mInterface->getSettings().colorOutgoing, mInterface->getSettings().colorOutgoingMax, mInterface->getSettings().outMaxRate );
+    QColor rxColor = calcColor( inHist, mInterface->settings().colorIncoming, mInterface->settings().colorIncomingMax, mInterface->settings().inMaxRate );
+    QColor txColor = calcColor( outHist, mInterface->settings().colorOutgoing, mInterface->settings().colorOutgoingMax, mInterface->settings().outMaxRate );
     if ( rxColor != colorIncoming )
     {
         doUpdate = true;
@@ -297,8 +297,8 @@ void InterfaceIcon::updateBars( bool doUpdate )
     QPainter p( &barIcon );
     p.setOpacity( 1.0 );
 
-    QColor topColor = mInterface->getSettings().colorUnavailable;
-    QColor topColorD = mInterface->getSettings().colorUnavailable.darker();
+    QColor topColor = mInterface->settings().colorUnavailable;
+    QColor topColorD = mInterface->settings().colorUnavailable.darker();
     topColor.setAlpha( 128 );
     topColorD.setAlpha( 128 );
     topInGrad.setColorAt(0, topColorD);
@@ -372,8 +372,8 @@ QString InterfaceIcon::compactTrayText(unsigned long data )
 void InterfaceIcon::updateIconText( bool doUpdate )
 {
     // Has color changed?
-    QColor rxColor = calcColor( inHist, mInterface->getSettings().colorIncoming, mInterface->getSettings().colorIncomingMax, mInterface->getSettings().inMaxRate );
-    QColor txColor = calcColor( outHist, mInterface->getSettings().colorOutgoing, mInterface->getSettings().colorOutgoingMax, mInterface->getSettings().outMaxRate );
+    QColor rxColor = calcColor( inHist, mInterface->settings().colorIncoming, mInterface->settings().colorIncomingMax, mInterface->settings().inMaxRate );
+    QColor txColor = calcColor( outHist, mInterface->settings().colorOutgoing, mInterface->settings().colorOutgoingMax, mInterface->settings().outMaxRate );
     if ( rxColor != colorIncoming )
     {
         doUpdate = true;
@@ -386,13 +386,13 @@ void InterfaceIcon::updateIconText( bool doUpdate )
     }
 
     // Has text changed?
-    QString byteText = compactTrayText( mInterface->getRxRate() );
+    QString byteText = compactTrayText( mInterface->rxRate() );
     if ( byteText != textIncoming )
     {
         doUpdate = true;
         textIncoming = byteText;
     }
-    byteText = compactTrayText( mInterface->getTxRate() );
+    byteText = compactTrayText( mInterface->txRate() );
     if ( byteText != textOutgoing )
     {
         doUpdate = true;
@@ -413,8 +413,8 @@ void InterfaceIcon::updateIconText( bool doUpdate )
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
 
     // rxFont and txFont should be the same size per poll period
-    QFont rxFont = setIconFont( textIncoming, mInterface->getSettings().iconFont, iconWidth );
-    QFont txFont = setIconFont( textOutgoing, mInterface->getSettings().iconFont, iconWidth );
+    QFont rxFont = setIconFont( textIncoming, mInterface->settings().iconFont, iconWidth );
+    QFont txFont = setIconFont( textOutgoing, mInterface->settings().iconFont, iconWidth );
     if ( rxFont.pointSizeF() > txFont.pointSizeF() )
         rxFont.setPointSizeF( txFont.pointSizeF() );
 
@@ -436,8 +436,8 @@ void InterfaceIcon::updateToolTip()
 {
     if ( mTray == 0L )
         return;
-    inHist.prepend( mInterface->getRxRate() );
-    outHist.prepend( mInterface->getTxRate() );
+    inHist.prepend( mInterface->rxRate() );
+    outHist.prepend( mInterface->txRate() );
     while ( inHist.count() > histSize )
     {
         inHist.removeLast();
@@ -445,9 +445,9 @@ void InterfaceIcon::updateToolTip()
     }
 
 
-    if ( mInterface->getSettings().iconTheme == TEXT_THEME )
+    if ( mInterface->settings().iconTheme == TEXT_THEME )
         updateIconText();
-    else if ( mInterface->getSettings().iconTheme == NETLOAD_THEME )
+    else if ( mInterface->settings().iconTheme == NETLOAD_THEME )
         updateBars();
     mTray->updateToolTip();
 }
@@ -461,7 +461,7 @@ void InterfaceIcon::updateMenu()
         menu->removeAction( action );
     commandActions->clear();
 
-    InterfaceSettings& settings = mInterface->getSettings();
+    InterfaceSettings& settings = mInterface->settings();
 
     // If the user wants custom commands, add them.
     if ( settings.commands.size() > 0 )
@@ -487,13 +487,13 @@ void InterfaceIcon::updateMenu()
 
 void InterfaceIcon::updateTrayStatus()
 {
-    const QString ifaceName( mInterface->getName() );
-    const BackendData * data = mInterface->getData();
+    const QString ifaceName( mInterface->ifaceName() );
+    const BackendData * data = mInterface->backendData();
     int currentStatus = data->status;
-    bool hideWhenUnavailable = mInterface->getSettings().hideWhenUnavailable;
-    bool hideWhenDisconnected = mInterface->getSettings().hideWhenDisconnected;
+    bool hideWhenUnavailable = mInterface->settings().hideWhenUnavailable;
+    bool hideWhenDisconnected = mInterface->settings().hideWhenDisconnected;
 
-    QString title = mInterface->getSettings().alias;
+    QString title = mInterface->settings().alias;
     if ( title.isEmpty() )
         title = ifaceName;
 
@@ -535,12 +535,12 @@ void InterfaceIcon::updateTrayStatus()
         connect( menu, SIGNAL( triggered( QAction * ) ),
                  this, SLOT( menuTriggered( QAction * ) ) );
 
-        if ( mInterface->getSettings().iconTheme == TEXT_THEME )
+        if ( mInterface->settings().iconTheme == TEXT_THEME )
             updateIconText();
-        else if ( mInterface->getSettings().iconTheme == NETLOAD_THEME )
+        else if ( mInterface->settings().iconTheme == NETLOAD_THEME )
             updateBars();
         else
-            updateIconImage( mInterface->getState() );
+            updateIconImage( mInterface->ifaceState() );
         updateMenu();
 #ifndef HAVE_KSTATUSNOTIFIERITEM
         mTray->show();
@@ -548,15 +548,15 @@ void InterfaceIcon::updateTrayStatus()
     }
     else if ( mTray != 0L )
     {
-        if ( mInterface->getSettings().iconTheme != TEXT_THEME &&
-             mInterface->getSettings().iconTheme != NETLOAD_THEME )
-            updateIconImage( mInterface->getState() );
+        if ( mInterface->settings().iconTheme != TEXT_THEME &&
+             mInterface->settings().iconTheme != NETLOAD_THEME )
+            updateIconImage( mInterface->ifaceState() );
     }
 }
 
 void InterfaceIcon::showConfigDialog()
 {
-    KNemoDaemon::sSelectedInterface = mInterface->getName();
+    KNemoDaemon::sSelectedInterface = mInterface->ifaceName();
 
     KProcess process;
     process << "kcmshell4" << "kcm_knemo";

@@ -70,9 +70,9 @@ void InterfaceTray::updateToolTip()
 {
     QString currentTip;
 #ifdef HAVE_KSTATUSNOTIFIERITEM
-    QString title = mInterface->getSettings().alias;
+    QString title = mInterface->settings().alias;
     if ( title.isEmpty() )
-        title = mInterface->getName();
+        title = mInterface->ifaceName();
     title = i18n( "KNemo - %1", title );
     if ( toolTipTitle() != title )
         setToolTipTitle( title );
@@ -156,7 +156,7 @@ QString InterfaceTray::toolTipData()
 {
     QString tipData;
     int toolTipContent = generalSettings->toolTipContent;
-    const BackendData * data = mInterface->getData();
+    const BackendData * data = mInterface->backendData();
     if ( !data )
         return QString();
     QString leftTags = "<tr><td style='padding-right:1em; white-space:nowrap;'>";
@@ -166,15 +166,15 @@ QString InterfaceTray::toolTipData()
     tipData = "<table cellspacing='2'>";
 
 #ifndef HAVE_KSTATUSNOTIFIERITEM
-    QString title = mInterface->getSettings().alias;
+    QString title = mInterface->settings().alias;
     if ( title.isEmpty() )
-        title = mInterface->getName();
+        title = mInterface->ifaceName();
 
     if ( toolTipContent & ALIAS )
         tipData += "<tr><th colspan='2' style='text-align:center;'>" + title + "</th></tr>";
 #endif
     if ( toolTipContent & INTERFACE )
-        tipData += leftTags + i18n( "Interface" ) + centerTags + mInterface->getName() + rightTags;
+        tipData += leftTags + i18n( "Interface" ) + centerTags + mInterface->ifaceName() + rightTags;
 
     if ( toolTipContent & STATUS )
     {
@@ -193,7 +193,7 @@ QString InterfaceTray::toolTipData()
     if ( data->status & KNemoIface::Connected &&
          toolTipContent & UPTIME )
     {
-            tipData += leftTags + i18n( "Connection time" ) + centerTags + mInterface->getUptimeString() + rightTags ;
+            tipData += leftTags + i18n( "Connection time" ) + centerTags + mInterface->uptimeString() + rightTags ;
     }
 
     if ( data->status & KNemoIface::Up )
@@ -259,9 +259,9 @@ QString InterfaceTray::toolTipData()
     if ( data->status & KNemoIface::Connected )
     {
         if ( toolTipContent & DOWNLOAD_SPEED )
-            tipData += leftTags + i18n( "Download Speed" ) + centerTags + mInterface->getRxRateStr() + rightTags;
+            tipData += leftTags + i18n( "Download Speed" ) + centerTags + mInterface->rxRateStr() + rightTags;
         if ( toolTipContent & UPLOAD_SPEED )
-            tipData += leftTags + i18n( "Upload Speed" ) + centerTags + mInterface->getTxRateStr() + rightTags;
+            tipData += leftTags + i18n( "Upload Speed" ) + centerTags + mInterface->txRateStr() + rightTags;
     }
 
     if ( data->status & KNemoIface::Connected && data->isWireless )

@@ -69,7 +69,7 @@ NetlinkBackend::~NetlinkBackend()
 #endif
 }
 
-QStringList NetlinkBackend::getIfaceList()
+QStringList NetlinkBackend::ifaceList()
 {
     QStringList ifaces;
     struct rtnl_link * rtlink;
@@ -95,7 +95,7 @@ void NetlinkBackend::update()
     foreach ( QString key, mInterfaces.keys() )
     {
         BackendData *interface = mInterfaces.value( key );
-        updateInterfaceData( key, interface );
+        updateIfaceData( key, interface );
 
 #ifdef HAVE_LIBIW
         if ( iwfd > 0 )
@@ -112,7 +112,7 @@ void NetlinkBackend::update()
     emit updateComplete();
 }
 
-QString NetlinkBackend::getDefaultRouteIface( int afInet )
+QString NetlinkBackend::defaultRouteIface( int afInet )
 {
     return getDefaultRoute( afInet, NULL, routeCache );
 }
@@ -191,7 +191,7 @@ void NetlinkBackend::updateAddresses( BackendData *data )
     }
 }
 
-void NetlinkBackend::updateInterfaceData( const QString& ifName, BackendData* data )
+void NetlinkBackend::updateIfaceData( const QString& ifName, BackendData* data )
 {
     if ( !linkCache || !addrCache )
         return;
