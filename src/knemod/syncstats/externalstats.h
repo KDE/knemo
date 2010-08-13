@@ -35,12 +35,13 @@ struct StatsPair
 
 class Interface;
 class StatisticsModel;
+class KCalendarSystem;
 
 class ExternalStats : public QObject
 {
     Q_OBJECT
     public:
-        ExternalStats( Interface * interface, QObject * parent = 0 );
+        ExternalStats( Interface * interface, KCalendarSystem * calendar, QObject * parent = 0 );
         virtual ~ExternalStats();
 
         /* Import hour/day statistics into StatisticsModels */

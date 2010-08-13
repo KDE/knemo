@@ -29,19 +29,6 @@
 
 static const QString time_format( "hh:mm:ss" );
 
-// This will go away soon
-static QString typeToElem( enum KNemoStats::PeriodUnits t )
-{
-    int i = 0;
-    int v = t;
-    while ( v > KNemoStats::Hour )
-    {
-        v = v >> 1;
-        i++;
-    }
-    return periods[i];
-}
-
 SqlStorage::SqlStorage( QString ifaceName )
     : mIfaceName( ifaceName )
 {
@@ -76,12 +63,18 @@ bool SqlStorage::createDb()
                      " last_saved BIGINT, calendar TEXT );";
     qry.exec( qryStr );
 
-    foreach ( QString period, periods )
-    {
-        qryStr = "CREATE TABLE IF NOT EXISTS %1s (id INTEGER PRIMARY KEY, datetime DATETIME,"
-                 " rx BIGINT, tx BIGINT, days INTEGER );";
+    qryStr = "CREATE TABLE IF NOT EXISTS stats_rules (id INTEGER PRIMARY KEY, start_date DATETIME,"
+             " period_units INTEGER, period_count INTEGER );";
+    qry.exec( qryStr );
 
-        qryStr = qryStr.arg( period );
+    for ( int i = KNemoStats::Hour; i <= KNemoStats::Year; ++i )
+    {
+        QString daysStr;
+        qryStr = "CREATE TABLE IF NOT EXISTS %1s (id INTEGER PRIMARY KEY, datetime DATETIME,%2"
+                 " rx BIGINT, tx BIGINT );";
+        if ( i == KNemoStats::BillPeriod  )
+            daysStr += " days INTEGER,";
+        qryStr = qryStr.arg( periods.at( i ) ).arg( daysStr );
         qry.exec( qryStr );
     }
 
@@ -90,7 +83,7 @@ bool SqlStorage::createDb()
     return ok;
 }
 
-bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *models )
+bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *models, QList<StatsRule> *rules )
 {
     bool ok = false;
     if ( !open() )
@@ -119,33 +112,58 @@ bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *model
 
         foreach ( StatisticsModel * s, *models )
         {
-            qry.exec( QString( "SELECT * FROM %1s ORDER BY id;" ).arg( typeToElem( s->periodType() ) ) );
+            qry.exec( QString( "SELECT * FROM %1s ORDER BY id;" ).arg( periods.at( s->periodType() ) ) );
             int cId = qry.record().indexOf( "id" );
             int cDt = qry.record().indexOf( "datetime" );
             int cRx = qry.record().indexOf( "rx" );
             int cTx = qry.record().indexOf( "tx" );
-            int cDays = qry.record().indexOf( "days" );
+            int cDays = 0;
+            if ( s->periodType() == KNemoStats::BillPeriod )
+            {
+                cDays = qry.record().indexOf( "days" );
+            }
 
             while ( qry.next() )
             {
                 int id = qry.value( cId ).toInt();
                 s->createEntry();
                 s->setId( id );
-                s->setDays( qry.value( cDays ).toInt() );
+                if ( s->periodType() == KNemoStats::BillPeriod )
+                {
+                    s->setDays( qry.value( cDays ).toInt() );
+                }
                 s->setDateTime( QDateTime::fromString( qry.value( cDt ).toString(), Qt::ISODate ) );
                 s->setTraffic( id, qry.value( cRx ).toULongLong(), qry.value( cTx ).toULongLong() );
             }
             if ( s->rowCount() )
+            {
                 sd->saveFromId.insert( s->periodType(), s->id() );
+            }
         }
     }
 
+    if ( rules )
+    {
+        qry.exec( "SELECT * FROM stats_rules;" );
+        int cDt = qry.record().indexOf( "start_date" );
+        int cType = qry.record().indexOf( "period_units" );
+        int cUnits = qry.record().indexOf( "period_count" );
+        while ( qry.next() )
+        {
+            StatsRule entry;
+            entry.startDate = QDate::fromString( qry.value( cDt ).toString(), Qt::ISODate );
+            entry.periodUnits = qry.value( cType ).toInt();
+            entry.periodCount = qry.value( cUnits ).toInt();
+            *rules << entry;
+        }
+    }
     ok = QSqlDatabase::database( mIfaceName ).commit();
+    qry.exec( "VACUUM;" );
     db.close();
     return ok;
 }
 
-bool SqlStorage::saveStats( StorageData *sd, QHash<int, StatisticsModel*> *models )
+bool SqlStorage::saveStats( StorageData *sd, QHash<int, StatisticsModel*> *models, QList<StatsRule> *rules, bool fullSave )
 {
     bool ok = false;
     if ( !open() )
@@ -153,9 +171,14 @@ bool SqlStorage::saveStats( StorageData *sd, QHash<int, StatisticsModel*> *model
 
     QSqlDatabase::database( mIfaceName ).transaction();
 
-    save( sd, models );
+    save( sd, models, rules, fullSave );
 
     ok = QSqlDatabase::database( mIfaceName ).commit();
+    if ( fullSave )
+    {
+        QSqlQuery qry( db );
+        qry.exec( "VACUUM;" );
+    }
     db.close();
     return ok;
 }
@@ -169,7 +192,9 @@ bool SqlStorage::clearStats( StorageData *sd )
     QSqlDatabase::database( mIfaceName ).transaction();
     QSqlQuery qry( db );
     foreach ( QString period, periods )
+    {
         qry.exec( QString( "DELETE FROM %1s;" ).arg( period ) );
+    }
     save( sd );
     ok = QSqlDatabase::database( mIfaceName ).commit();
     qry.exec( "VACUUM;" );
@@ -190,7 +215,7 @@ bool SqlStorage::open()
     return db.open();
 }
 
-void SqlStorage::save( StorageData *sd, QHash<int, StatisticsModel*> *models )
+void SqlStorage::save( StorageData *sd, QHash<int, StatisticsModel*> *models, QList<StatsRule> *rules, bool fullSave )
 {
     QSqlQuery qry( db );
     QString qryStr = "REPLACE INTO general (id, version, last_saved, calendar )"
@@ -206,30 +231,75 @@ void SqlStorage::save( StorageData *sd, QHash<int, StatisticsModel*> *models )
     {
         foreach ( StatisticsModel * s, *models )
         {
-            qryStr = QString( "DELETE FROM %1s WHERE id >= '%2';" )
-                        .arg( typeToElem( s->periodType() ) )
-                        .arg( s->id() );
-            qry.exec( qryStr );
-            QString days1;
-            QString days2;
-            qryStr = "REPLACE INTO %1s (id, datetime, rx, tx, days )"
-                         " VALUES (?, ?, ?, ?, ? );";
-            qryStr = qryStr.arg( typeToElem( s->periodType() ) );
+            if ( s->periodType() == KNemoStats::Hour ||
+                 ( fullSave && !( ( ( s->periodType() == KNemoStats::Day ) ) ) )
+               )
+            {
+                int deleteFrom = sd->saveFromId.value( s->periodType() );
+                qryStr = QString( "DELETE FROM %1s WHERE id >= '%2';" )
+                            .arg( periods.at( s->periodType() ) )
+                            .arg( deleteFrom );
+                qry.exec( qryStr );
+            }
+
+            if ( !s->rowCount() )
+            {
+                continue;
+            }
+
+            QString daysStr1;
+            QString daysStr2;
+            if ( s->periodType() == KNemoStats::BillPeriod )
+            {
+                daysStr1 += " days,";
+                daysStr2 += " ?,";
+            }
+            qryStr = "REPLACE INTO %1s (id, datetime,%2 rx, tx )"
+                         " VALUES (?, ?,%3 ?, ? );";
+            qryStr = qryStr
+                        .arg( periods.at( s->periodType() ) )
+                        .arg( daysStr1 )
+                        .arg( daysStr2 );
             qry.prepare( qryStr );
 
-            for ( int i = sd->saveFromId.value( s->periodType() ); i < s->rowCount(); ++i )
+            int j = sd->saveFromId.value( s->periodType() );
+            for ( j = s->indexOfId( j ); j < s->rowCount(); ++j )
             {
-                qry.addBindValue( s->id( i ) );
-                qry.addBindValue( s->dateTime( i ).toString( Qt::ISODate ) );
-                qry.addBindValue( s->rxBytes( i ) );
-                qry.addBindValue( s->txBytes( i ) );
-                qry.addBindValue( s->days( i ) );
+                qry.addBindValue( s->id( j ) );
+                qry.addBindValue( s->dateTime( j ).toString( Qt::ISODate ) );
+                if ( s->periodType() == KNemoStats::BillPeriod )
+                {
+                    qry.addBindValue( s->days( j ) );
+                }
+                qry.addBindValue( s->rxBytes( j ) );
+                qry.addBindValue( s->txBytes( j ) );
                 qry.exec();
             }
-            int sf = s->rowCount() - 1;
-            if ( sf < 0 )
-                sf = 0;
-            sd->saveFromId.insert( s->periodType(), sf );
+            if ( s->rowCount() )
+            {
+                sd->saveFromId.insert( s->periodType(), s->id() );
+            }
+        }
+    }
+
+    if ( fullSave && rules )
+    {
+        qryStr = QString( "DELETE FROM stats_rules WHERE id >= '%1';" ).arg( rules->count() );
+        qry.exec( qryStr );
+        if ( rules->count() )
+        {
+            qryStr = "REPLACE INTO stats_rules (id, start_date, period_units, period_count )"
+                     " VALUES( ?, ?, ?, ? );";
+            qry.prepare( qryStr );
+
+            for ( int i = 0; i < rules->count(); ++i )
+            {
+                qry.addBindValue( i );
+                qry.addBindValue( rules->at(i).startDate.toString( Qt::ISODate ) );
+                qry.addBindValue( rules->at(i).periodUnits );
+                qry.addBindValue( rules->at(i).periodCount );
+                qry.exec();
+            }
         }
     }
 }

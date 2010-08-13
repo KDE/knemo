@@ -29,8 +29,8 @@
 #include <sys/sysctl.h>
 #endif
 
-StatsVnstat::StatsVnstat( Interface * interface, QObject * parent )
-    : ExternalStats( interface, parent ),
+StatsVnstat::StatsVnstat( Interface * interface, KCalendarSystem * calendar, QObject * parent )
+    : ExternalStats( interface, calendar, parent ),
       mVnstatRx( 0 ),
       mVnstatTx( 0 ),
       mSysBtime( 0 ),

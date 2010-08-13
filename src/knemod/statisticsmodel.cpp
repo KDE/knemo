@@ -109,7 +109,7 @@ void StatisticsModel::setDays( int days )
 
 void StatisticsModel::updateDateText( int row )
 {
-    if ( row < 0 || !rowCount() )
+    if ( row < 0 || !rowCount() || !mCalendar )
         return;
 
     QString dateStr;
@@ -122,6 +122,14 @@ void StatisticsModel::updateDateText( int row )
             dateStr += " " + mCalendar->formatDate( dt.date(), KLocale::FancyShortDate );
             break;
         case KNemoStats::Month:
+            dateStr = QString( "%1 %2" )
+                        .arg( mCalendar->monthName( dt.date(), KCalendarSystem::ShortName ) )
+                        .arg( mCalendar->year( dt.date() ) );
+            break;
+        case KNemoStats::Year:
+            dateStr = QString::number( mCalendar->year( dt.date() ) );
+            break;
+        case KNemoStats::BillPeriod:
             // Format for simple period
             // Starts on the first of the month, lasts exactly one month
             if ( mCalendar->day( dt.date() ) == 1 &&
@@ -140,9 +148,6 @@ void StatisticsModel::updateDateText( int row )
                             .arg( mCalendar->monthName( endDate, KCalendarSystem::ShortName ) )
                             .arg( mCalendar->year( endDate ) );
             }
-            break;
-        case KNemoStats::Year:
-            dateStr = QString::number( mCalendar->year( dt.date() ) );
             break;
         default:
             dateStr = mCalendar->formatDate( dt.date(), KLocale::ShortDate );
@@ -194,7 +199,31 @@ int StatisticsModel::days( int row ) const
 
     if ( rowCount() && rowCount() > row )
     {
-        return item( row, Date )->data( SpanRole ).toInt();
+        if ( mPeriodType != KNemoStats::BillPeriod )
+        {
+            QDate dateTime = item( row, Date )->data( DataRole ).toDateTime().date();
+            switch ( mPeriodType )
+            {
+                case KNemoStats::Day:
+                    return 1;
+                    break;
+                case KNemoStats::Week:
+                    return mCalendar->daysInWeek( dateTime );
+                    break;
+                case KNemoStats::Month:
+                    return mCalendar->daysInMonth( dateTime );
+                    break;
+                case KNemoStats::Year:
+                    return mCalendar->daysInYear( dateTime );
+                    break;
+                default:
+                    return 0;
+            }
+        }
+        else
+        {
+            return item( row, Date )->data( SpanRole ).toInt();
+        }
     }
     else
         return 0;

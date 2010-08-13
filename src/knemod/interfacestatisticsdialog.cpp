@@ -42,11 +42,22 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
     setButtons( Reset | Close );
 
     ui.setupUi( mainWidget() );
+
+    mBillingWidget = new QWidget();
+    QVBoxLayout *bl = new QVBoxLayout( mBillingWidget );
+    mBillingView = new QTableView( mBillingWidget );
+    mBillingView->setEditTriggers( QAbstractItemView::NoEditTriggers );
+    mBillingView->setSortingEnabled( true );
+    mBillingView->horizontalHeader()->setStretchLastSection( true );
+    mBillingView->verticalHeader()->setVisible( false );
+    bl->addWidget( mBillingView );
+
     mStateKeys.insert( ui.tableHourly, conf_hourState );
     mStateKeys.insert( ui.tableDaily, conf_dayState );
     mStateKeys.insert( ui.tableWeekly, conf_weekState );
     mStateKeys.insert( ui.tableMonthly, conf_monthState );
     mStateKeys.insert( ui.tableYearly, conf_yearState );
+    mStateKeys.insert( mBillingView, conf_billingState );
 
     configChanged();
 
@@ -59,6 +70,7 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
     setupTable( &interfaceGroup, ui.tableWeekly,  stat->getStatistics( KNemoStats::Week ) );
     setupTable( &interfaceGroup, ui.tableMonthly, stat->getStatistics( KNemoStats::Month ) );
     setupTable( &interfaceGroup, ui.tableYearly,  stat->getStatistics( KNemoStats::Year ) );
+    setupTable( &interfaceGroup, mBillingView,    stat->getStatistics( KNemoStats::BillPeriod ) );
 
     connect( this, SIGNAL( resetClicked() ), SLOT( confirmReset() ) );
 
@@ -105,10 +117,23 @@ InterfaceStatisticsDialog::~InterfaceStatisticsDialog()
 
 void InterfaceStatisticsDialog::configChanged()
 {
-    if ( mInterface->getSettings().customBilling )
-        ui.tabWidget->setTabText( ui.tabWidget->indexOf(ui.monthly), i18n( "Billing Periods", 0 ) );
-    else
-        ui.tabWidget->setTabText( ui.tabWidget->indexOf(ui.monthly), i18n( "Months", 0 ) );
+    bool billingTab = false;
+    KCalendarSystem *cal = mInterface->getStatistics()->calendar();
+    foreach ( StatsRule rule, mInterface->getSettings().statsRules )
+    {
+        if ( rule.periodCount != 1 ||
+             rule.periodUnits != KNemoStats::Month ||
+             cal->day( rule.startDate ) != 1 )
+        {
+            billingTab = true;
+        }
+    }
+    if ( billingTab && ui.tabWidget->count() < 6 )
+    {
+        ui.tabWidget->insertTab( 4, mBillingWidget, i18n( "Billing Periods" ) );
+    }
+    else if ( !billingTab && ui.tabWidget->count() > 5 )
+       ui.tabWidget->removeTab( 4 );
 }
 
 void InterfaceStatisticsDialog::setupTable( KConfigGroup* group, QTableView *view, StatisticsModel *model )

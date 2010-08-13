@@ -25,7 +25,7 @@
 class StatsFactory
 {
     public:
-       static ExternalStats * stats( Interface * i );
+       static ExternalStats * stats( Interface * i, KCalendarSystem * calendar );
 };
 
 #endif

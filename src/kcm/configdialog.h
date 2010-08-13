@@ -39,6 +39,22 @@ class KCalendarSystem;
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
+class StatsRuleModel : public QStandardItemModel
+{
+    Q_OBJECT
+    public:
+        StatsRuleModel( QObject *parent = 0 ) :
+            QStandardItemModel( parent ) {}
+        virtual ~StatsRuleModel() {}
+        void setCalendar( const KCalendarSystem *cal );
+        QModelIndex addRule( const StatsRule &s );
+        void modifyRule( const QModelIndex &index, const StatsRule &s );
+        QList<StatsRule> getRules();
+    private:
+        QString dateText( const StatsRule &s );
+        const KCalendarSystem *mCalendar;
+};
+
 class ConfigDialog : public KCModule
 {
     Q_OBJECT
@@ -74,23 +90,22 @@ private slots:
     void iconThemeChanged( int set );
     void comboHidingChanged( int val );
     void checkBoxStatisticsToggled( bool on );
-    void checkBoxCustomBillingToggled( bool on );
     void warnThresholdChanged( double val );
     void warnUnitsChanged( int val );
     void warnTypeChanged( int val );
     void warnRxTxToggled( bool on );
-    void billingStartInputChanged( const QDate& );
-    void billingMonthsInputChanged( int value );
     void checkBoxStartKNemoToggled( bool on );
     void colorButtonChanged();
     void iconFontChanged( const QFont &font );
     void advancedButtonClicked();
+    void addStatsClicked();
+    void modifyStatsClicked();
+    void removeStatsClicked();
     void listViewCommandsSelectionChanged( QTreeWidgetItem *current, QTreeWidgetItem *previous );
     void listViewCommandsChanged( QTreeWidgetItem* item, int column );
     void moveTips( QListWidget *from, QListWidget *to );
 
 private:
-    void setMaxDay();
     void setupToolTipTab();
     void setupToolTipMap();
     void updateControls( InterfaceSettings *settings );
@@ -105,6 +120,7 @@ private:
     Ui::ConfigDlg* mDlg;
     const KCalendarSystem* mCalendar;
     int mMaxDay;
+    StatsRuleModel *statsModel;
 
     // Delete this once KCalendarSystem fixed
     QString mDefaultCalendarType;

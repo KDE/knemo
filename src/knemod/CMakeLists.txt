@@ -15,6 +15,7 @@ set( knemo_SRCS
     signalplotter.cpp
     statisticsmodel.cpp
     backends/backendbase.cpp
+    ../common/data.cpp
     ../common/utils.cpp
     storage/sqlstorage.cpp
     storage/xmlstorage.cpp

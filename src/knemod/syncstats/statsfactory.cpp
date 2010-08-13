@@ -23,14 +23,14 @@
 #include <QDir>
 #include <QFile>
 
-ExternalStats * StatsFactory::stats( Interface * iface )
+ExternalStats * StatsFactory::stats( Interface * iface, KCalendarSystem * calendar )
 {
     ExternalStats * s = NULL;
     QStringList paths = QString( getenv("PATH")).split( ':' );
     for ( int i = 0; i < paths.count(); i++ )
     {
         if ( QFile::exists( paths[i] + "/" + "vnstat" ) )
-            s = new StatsVnstat( iface );
+            s = new StatsVnstat( iface, calendar );
         /* else if others */
 
         if ( s )

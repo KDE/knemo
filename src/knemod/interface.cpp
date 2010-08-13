@@ -113,20 +113,27 @@ void Interface::configChanged()
         defaultCal = "gregorian";
     mSettings.calendar = interfaceGroup.readEntry( conf_calendar, defaultCal );
 
-    mSettings.customBilling = interfaceGroup.readEntry( conf_customBilling, s.customBilling );
-
-    KCalendarSystem* calendar = KCalendarSystem::create( mSettings.calendar );
-    QDate startDate = QDate::currentDate().addDays( 1 - calendar->day( QDate::currentDate() ) );
-    mSettings.billingStart = interfaceGroup.readEntry( conf_billingStart, startDate );
-    // No future start period
-    if ( mSettings.billingStart > QDate::currentDate() )
-        mSettings.billingStart = startDate;
-    mSettings.billingMonths = clamp<int>(interfaceGroup.readEntry( conf_billingMonths, s.billingMonths ), 1, 6 );
-    if ( mSettings.customBilling == false )
+    mSettings.statsRules.clear();
+    int statsRuleCount = interfaceGroup.readEntry( conf_statsRules, 0 );
+    KCalendarSystem *testCal = KCalendarSystem::create( mSettings.calendar );
+    for ( int i = 0; i < statsRuleCount; ++i )
     {
-        mSettings.billingMonths = 1;
-        mSettings.billingStart = mSettings.billingStart.addDays( 1 - calendar->day( mSettings.billingStart ) );
+        group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( mName ).arg( i );
+        if ( config->hasGroup( group ) )
+        {
+            KConfigGroup statsGroup( config, group );
+            StatsRule rule;
+
+            rule.startDate = statsGroup.readEntry( conf_statsStartDate, QDate() );
+            rule.periodUnits = clamp<int>(statsGroup.readEntry( conf_statsPeriodUnits, rule.periodUnits ), KNemoStats::Day, KNemoStats::Year );
+            rule.periodCount = clamp<int>(statsGroup.readEntry( conf_statsPeriodCount, rule.periodCount ), 1, 1000 );
+            if ( rule.isValid( testCal ) )
+            {
+                mSettings.statsRules << rule;
+            }
+        }
     }
+
     mSettings.commands.clear();
     int numCommands = interfaceGroup.readEntry( conf_numCommands, s.numCommands );
     for ( int i = 0; i < numCommands; i++ )
@@ -161,6 +168,8 @@ void Interface::configChanged()
         startStatistics();
     }
 
+    if ( mStatusDialog )
+        mStatusDialog->configChanged();
     if ( mStatisticsDialog != 0 )
         mStatisticsDialog->configChanged();
     if ( mPlotterDialog )

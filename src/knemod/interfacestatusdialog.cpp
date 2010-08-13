@@ -45,6 +45,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     setButtons( Close );
 
     ui.setupUi( mainWidget() );
+    configChanged();
 
     // FreeBSD doesn't have these
 #ifndef __linux__
@@ -361,6 +362,25 @@ void InterfaceStatusDialog::doUnavailable()
     ui.textLabelSpeedReceived->setText( QString::null );
 }
 
+void InterfaceStatusDialog::configChanged()
+{
+    bool billText = false;
+    foreach ( StatsRule rule, mInterface->getSettings().statsRules )
+    {
+        if ( rule.periodCount != 1 ||
+             rule.periodUnits != KNemoStats::Month ||
+             mInterface->getStatistics()->calendar()->day( rule.startDate ) != 1 )
+        {
+            billText = true;
+        }
+    }
+
+    ui.textLabelBill->setVisible( billText );
+    ui.textLabelBillSent->setVisible( billText );
+    ui.textLabelBillReceived->setVisible( billText );
+    ui.textLabelBillTotal->setVisible( billText );
+}
+
 void InterfaceStatusDialog::statisticsChanged()
 {
     InterfaceStatistics *stat = mInterface->getStatistics();
@@ -376,6 +396,11 @@ void InterfaceStatusDialog::statisticsChanged()
     ui.textLabelMonthSent->setText( statistics->txText() );
     ui.textLabelMonthReceived->setText( statistics->rxText() );
     ui.textLabelMonthTotal->setText( statistics->totalText() );
+
+    statistics = stat->getStatistics( KNemoStats::BillPeriod );
+    ui.textLabelBillSent->setText( statistics->txText() );
+    ui.textLabelBillReceived->setText( statistics->rxText() );
+    ui.textLabelBillTotal->setText( statistics->totalText() );
 
     statistics = stat->getStatistics( KNemoStats::Year );
     ui.textLabelYearSent->setText( statistics->txText() );

@@ -28,7 +28,7 @@ class StatsVnstat : public ExternalStats
 {
     Q_OBJECT
     public:
-        StatsVnstat( Interface * interface, QObject * parent = 0 );
+        StatsVnstat( Interface * interface, KCalendarSystem * calendar, QObject * parent = 0 );
         virtual ~StatsVnstat();
         void importIfaceStats();
 

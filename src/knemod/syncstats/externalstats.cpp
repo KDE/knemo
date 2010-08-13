@@ -21,7 +21,9 @@
 #include "statisticsmodel.h"
 #include "interface.h"
 
-ExternalStats::ExternalStats( Interface * interface, QObject * parent )
+#include <KCalendarSystem>
+
+ExternalStats::ExternalStats( Interface * interface, KCalendarSystem * calendar, QObject * parent )
     : QObject( parent ),
       mInterface( interface ),
       mExternalDays( 0 ),
@@ -31,7 +33,6 @@ ExternalStats::ExternalStats( Interface * interface, QObject * parent )
     mExternalHours->setSortRole( StatisticsModel::DataRole );
     mExternalDays = new StatisticsModel( KNemoStats::Day );
     mExternalDays->setSortRole( StatisticsModel::DataRole );
-    KCalendarSystem * calendar = KCalendarSystem::create( mInterface->getSettings().calendar );
     mExternalHours->setCalendar( calendar );
     mExternalDays->setCalendar( calendar );
 }

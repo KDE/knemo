@@ -1,6 +1,6 @@
 /* This file is part of KNemo
    Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
-   Copyright (C) 2009 John Stamp <jstamp@users.sourceforge.net>
+   Copyright (C) 2009, 2010 John Stamp <jstamp@users.sourceforge.net>
 
    KNemo is free software; you can redistribute it and/or modify
    it under the terms of the GNU Library General Public License as
@@ -20,22 +20,26 @@
 
 #include <QDBusInterface>
 #include <QPainter>
+#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
 
 #include <KCalendarSystem>
 #include <KColorScheme>
 #include <KGenericFactory>
 #include <KInputDialog>
+#include <kio/global.h>
 #include <KMessageBox>
 #include <KNotifyConfigWidget>
 #include <KStandardDirs>
+#include <math.h>
 
 #include "ui_configdlg.h"
 #include "config-knemo.h"
 #include "configdialog.h"
+#include "statsconfig.h"
 #include "themeconfig.h"
 #include "utils.h"
 
-#include <math.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
@@ -52,6 +56,7 @@ K_PLUGIN_FACTORY(KNemoFactory, registerPlugin<ConfigDialog>();)
 K_EXPORT_PLUGIN(KNemoFactory("kcm_knemo"))
 
 Q_DECLARE_METATYPE( KNemoTheme )
+Q_DECLARE_METATYPE( StatsRule )
 
 
 static bool themesLessThan( const KNemoTheme& s1, const KNemoTheme& s2 )
@@ -62,10 +67,88 @@ static bool themesLessThan( const KNemoTheme& s1, const KNemoTheme& s2 )
         return false;
 }
 
+static QString periodText( int c, int u )
+{
+    QString units;
+    switch ( u )
+    {
+        case KNemoStats::Hour:
+            units = i18np( "%1 hour", "%1 hours", c );
+            break;
+        case KNemoStats::Day:
+            units = i18np( "%1 day", "%1 days", c );
+            break;
+        case KNemoStats::Week:
+            units = i18np( "%1 week", "%1 weeks", c );
+            break;
+        case KNemoStats::Month:
+            units = i18np( "%1 month", "%1 months", c );
+            break;
+        case KNemoStats::Year:
+            units = i18np( "%1 year", "%1 years", c );
+            break;
+        default:
+            units = i18n( "Invalid period" );
+            ;;
+    }
+    return units;
+}
+
+void StatsRuleModel::setCalendar( const KCalendarSystem *cal )
+{
+    mCalendar = cal;
+}
+
+QString StatsRuleModel::dateText( const StatsRule &s )
+{
+    QString dateStr = mCalendar->formatDate( s.startDate, KLocale::LongDate );
+    if ( !mCalendar->isValid( s.startDate ) )
+        dateStr = i18n( "Invalid Date" );
+    return dateStr;
+}
+
+QList<StatsRule> StatsRuleModel::getRules()
+{
+    QList<StatsRule> statsRules;
+    for ( int i = 0; i < rowCount(); ++i )
+    {
+        statsRules << item( i, 0 )->data( Qt::UserRole ).value<StatsRule>();
+    }
+    return statsRules;
+}
+
+QModelIndex StatsRuleModel::addRule( const StatsRule &s )
+{
+    QList<QStandardItem*> items;
+    QStandardItem *item = new QStandardItem( dateText( s ) );
+    QVariant v;
+    v.setValue( s );
+    item->setData( v, Qt::UserRole );
+    item->setData( s.startDate, Qt::UserRole + 1 );
+    items << item;
+
+    item = new QStandardItem( periodText( s.periodCount, s.periodUnits ) );
+    items << item;
+    appendRow( items );
+    return indexFromItem (items[0] );
+}
+
+void StatsRuleModel::modifyRule( const QModelIndex &index, const StatsRule &s )
+{
+    QVariant v;
+    v.setValue( s );
+    item( index.row(), 0 )->setData( v, Qt::UserRole );
+    item( index.row(), 0 )->setData( s.startDate, Qt::UserRole + 1 );
+    item( index.row(), 0 )->setData( dateText( s ), Qt::DisplayRole );
+    item( index.row(), 1 )->setData( periodText( s.periodCount, s.periodUnits ), Qt::DisplayRole );
+}
+
+
 ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     : KCModule( KNemoFactory::componentData(), parent, args ),
       mLock( false ),
-      mDlg( new Ui::ConfigDlg() )
+      mDlg( new Ui::ConfigDlg() ),
+      mCalendar( 0 )
 {
     if ( KDE::versionMajor() >= 4 && KDE::versionMinor() >= 4 )
         mDefaultCalendarType = KGlobal::locale()->calendarType();
@@ -80,6 +163,15 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     QVBoxLayout* top = new QVBoxLayout( this );
     mDlg->setupUi( main );
     top->addWidget( main );
+    statsModel = new StatsRuleModel( this );
+    QStringList l;
+    l << i18n( "Start Date" ) << i18n( "Period" );
+    statsModel->setHorizontalHeaderLabels( l );
+    QSortFilterProxyModel *proxy = new QSortFilterProxyModel( mDlg->statsView );
+    proxy->setSourceModel( statsModel );
+    proxy->setSortRole( Qt::UserRole + 1 );
+    mDlg->statsView->setModel( proxy );
+    mDlg->statsView->sortByColumn( 0, Qt::AscendingOrder );
 
     QList<KNemoTheme> themes = findThemes();
     qSort( themes.begin(), themes.end(), themesLessThan );
@@ -179,12 +271,12 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     // Interface - Statistics
     connect( mDlg->checkBoxStatistics, SIGNAL( toggled( bool ) ),
              this, SLOT( checkBoxStatisticsToggled ( bool ) ) );
-    connect( mDlg->checkBoxCustomBilling, SIGNAL( toggled( bool ) ),
-             this, SLOT( checkBoxCustomBillingToggled( bool ) ) );
-    connect( mDlg->billingStartInput, SIGNAL( dateEntered( const QDate& ) ),
-             this, SLOT( billingStartInputChanged( const QDate& ) ) );
-    connect( mDlg->billingMonthsInput, SIGNAL( valueChanged( int ) ),
-             this, SLOT( billingMonthsInputChanged( int ) ) );
+    connect( mDlg->addStats, SIGNAL( clicked() ),
+             this, SLOT( addStatsClicked() ) );
+    connect( mDlg->modifyStats, SIGNAL( clicked() ),
+             this, SLOT( modifyStatsClicked() ) );
+    connect( mDlg->removeStats, SIGNAL( clicked() ),
+             this, SLOT( removeStatsClicked() ) );
     connect( mDlg->warnThreshold, SIGNAL( valueChanged( double ) ),
              this, SLOT( warnThresholdChanged ( double ) ) );
     connect( mDlg->warnUnits, SIGNAL( activated( int ) ),
@@ -228,23 +320,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
 ConfigDialog::~ConfigDialog()
 {
     delete mDlg;
-}
-
-void ConfigDialog::setMaxDay()
-{
-    QDate date = QDate::currentDate();
-    mMaxDay = mCalendar->daysInMonth( date );
-    if ( mCalendar->isLeapYear( date ) )
-        date = date.addDays( 0 - mCalendar->dayOfYear( date ) );
-    int months = mCalendar->monthsInYear( date );
-    for ( int i = 1; i < months; i++ )
-    {
-        QDate month;
-        mCalendar->setYMD( month, mCalendar->year( date ), i, 1 );
-        int days = mCalendar->daysInMonth( month );
-        if ( days < mMaxDay )
-            mMaxDay = days;
-    }
 }
 
 void ConfigDialog::load()
@@ -296,31 +371,25 @@ void ConfigDialog::load()
             settings->barScale = interfaceGroup.readEntry( conf_barScale, s.barScale );
             settings->inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate );
             settings->outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate );
-            settings->activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
-            settings->customBilling = interfaceGroup.readEntry( conf_customBilling, s.customBilling );
             settings->calendar = interfaceGroup.readEntry( conf_calendar, mDefaultCalendarType );
-            settings->billingMonths = clamp<int>(interfaceGroup.readEntry( conf_billingMonths, s.billingMonths ), 1, 6 );
             settings->warnThreshold = clamp<double>(interfaceGroup.readEntry( conf_billingWarnThresh, s.warnThreshold ), 0.0, 9999.0 );
             settings->warnUnits = clamp<int>(interfaceGroup.readEntry( conf_billingWarnUnits, s.warnUnits ), 2, 3 );
             settings->warnType = clamp<int>(interfaceGroup.readEntry( conf_billingWarnType, s.warnType ), 0, 5 );
             settings->warnTotalTraffic = interfaceGroup.readEntry( conf_billingWarnRxTx, s.warnTotalTraffic );
-
-             // If no start date saved, default to first of month.
-            mCalendar = KCalendarSystem::create( settings->calendar );
-            QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
-            settings->billingStart = interfaceGroup.readEntry( conf_billingStart, startDate );
-
-            // If date is saved but very old, update it to current period
-            QDate currentDate = QDate::currentDate();
-            QDate nextMonthStart = settings->billingStart;
-            if ( nextMonthStart <= currentDate )
+            settings->activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
+            int statsRuleCount = interfaceGroup.readEntry( conf_statsRules, 0 );
+            for ( int i = 0; i < statsRuleCount; ++i )
             {
-                int length = settings->billingMonths;
-                while ( nextMonthStart <= currentDate )
+                group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( interface ).arg( i );
+                if ( config->hasGroup( group ) )
                 {
-                    settings->billingStart = nextMonthStart;
-                    for ( int i = 0; i < length; i++ )
-                        nextMonthStart = nextMonthStart.addDays( mCalendar->daysInMonth( nextMonthStart ) );
+                    KConfigGroup statsGroup( config, group );
+                    StatsRule stats;
+
+                    stats.startDate = statsGroup.readEntry( conf_statsStartDate, QDate() );
+                    stats.periodUnits = clamp<int>(statsGroup.readEntry( conf_statsPeriodUnits, stats.periodUnits ), KNemoStats::Day, KNemoStats::Year );
+                    stats.periodCount = clamp<int>(statsGroup.readEntry( conf_statsPeriodCount, stats.periodCount ), 1, 1000 );
+                    settings->statsRules << stats;
                 }
             }
 
@@ -400,6 +469,13 @@ void ConfigDialog::save()
         }
     }
 
+    QStringList groupList = config->groupList();
+    foreach ( QString tempDel, groupList )
+    {
+        if ( tempDel.contains( confg_statsRule ) )
+            config->deleteGroup( tempDel );
+    }
+
     foreach ( QString it, mSettingsMap.keys() )
     {
         list.append( it );
@@ -417,6 +493,7 @@ void ConfigDialog::save()
         QByteArray dayState = interfaceGroup.readEntry( conf_dayState, QByteArray() );
         QByteArray weekState = interfaceGroup.readEntry( conf_weekState, QByteArray() );
         QByteArray monthState = interfaceGroup.readEntry( conf_monthState, QByteArray() );
+        QByteArray billingState = interfaceGroup.readEntry( conf_billingState, QByteArray() );
         QByteArray yearState = interfaceGroup.readEntry( conf_yearState, QByteArray() );
 
         // Make sure we don't get crufty commands left over
@@ -444,6 +521,8 @@ void ConfigDialog::save()
             interfaceGroup.writeEntry( conf_weekState, weekState );
         if ( !monthState.isNull() )
             interfaceGroup.writeEntry( conf_monthState, monthState );
+        if ( !billingState.isNull() )
+            interfaceGroup.writeEntry( conf_billingState, billingState );
         if ( !yearState.isNull() )
             interfaceGroup.writeEntry( conf_yearState, yearState );
 
@@ -482,12 +561,15 @@ void ConfigDialog::save()
             }
         }
         interfaceGroup.writeEntry( conf_activateStatistics, settings->activateStatistics );
-        interfaceGroup.writeEntry( conf_customBilling, settings->customBilling );
-        if ( settings->customBilling )
+        interfaceGroup.writeEntry( conf_calendar, settings->calendar );
+        interfaceGroup.writeEntry( conf_statsRules, settings->statsRules.count() );
+        for ( int i = 0; i < settings->statsRules.count(); i++ )
         {
-            interfaceGroup.writeEntry( conf_billingStart, mDlg->billingStartInput->date() );
-            interfaceGroup.writeEntry( conf_billingMonths, settings->billingMonths );
-            interfaceGroup.writeEntry( conf_calendar, settings->calendar );
+            QString group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( it ).arg( i );
+            KConfigGroup statsGroup( config, group );
+            statsGroup.writeEntry( conf_statsStartDate, settings->statsRules[i].startDate );
+            statsGroup.writeEntry( conf_statsPeriodUnits, settings->statsRules[i].periodUnits );
+            statsGroup.writeEntry( conf_statsPeriodCount, settings->statsRules[i].periodCount );
         }
         interfaceGroup.writeEntry( conf_billingWarnThresh, settings->warnThreshold );
         if ( settings->warnThreshold > 0 )
@@ -571,7 +653,6 @@ void ConfigDialog::defaults()
     {
         InterfaceSettings* settings = new InterfaceSettings();
         QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
-        settings->billingStart = startDate;
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
@@ -685,27 +766,33 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
         mDlg->warnRxTx->setChecked( true );
     else
         mDlg->warnRx->setChecked( true );
-    if ( settings->customBilling )
-        mDlg->checkBoxCustomBilling->setChecked( true );
-    else
-        mDlg->checkBoxCustomBilling->setChecked( false );
 
+    QString calType;
     if ( settings->calendar.isEmpty() )
     {
-        // TODO: Test for a KDE release that contains SVN commit 1013534
-        KGlobal::locale()->setCalendar( mDefaultCalendarType );
-
-        mCalendar = KCalendarSystem::create( mDefaultCalendarType );
+        calType = mDefaultCalendarType;
     }
     else
     {
-        // TODO: Test for a KDE release that contains SVN commit 1013534
-        KGlobal::locale()->setCalendar( settings->calendar );
-
-        mCalendar = KCalendarSystem::create( settings->calendar );
+        calType = settings->calendar;
     }
-    setMaxDay();
-    mDlg->billingStartInput->setDate( settings->billingStart );
+    if ( !mCalendar || mCalendar->calendarType() != calType )
+        mCalendar = KCalendarSystem::create( calType );
+
+    statsModel->removeRows(0, statsModel->rowCount() );
+    statsModel->setCalendar( mCalendar );
+    foreach( StatsRule s, settings->statsRules )
+    {
+        statsModel->addRule( s );
+    }
+    if ( statsModel->rowCount() )
+    {
+        QSortFilterProxyModel* proxy = static_cast<QSortFilterProxyModel*>(mDlg->statsView->model());
+        QModelIndex index = statsModel->indexFromItem( statsModel->item( 0, 0 ) );
+        mDlg->statsView->setCurrentIndex( proxy->mapFromSource( index ) );
+    }
+    mDlg->modifyStats->setEnabled( statsModel->rowCount() );
+    mDlg->removeStats->setEnabled( statsModel->rowCount() );
 
     mDlg->listViewCommands->clear();
     QList<QTreeWidgetItem *>items;
@@ -761,8 +848,6 @@ void ConfigDialog::buttonNewSelected()
         QListWidgetItem *item = new QListWidgetItem( ifname );
         mDlg->listBoxInterfaces->addItem( item );
         InterfaceSettings *settings = new InterfaceSettings();
-        mCalendar = KCalendarSystem::create( mDefaultCalendarType );
-        settings->billingStart = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
@@ -819,8 +904,6 @@ void ConfigDialog::buttonAllSelected()
         if ( mSettingsMap.contains( ifname ) )
             continue;
         InterfaceSettings* settings = new InterfaceSettings();
-        mCalendar = KCalendarSystem::create( mDefaultCalendarType );
-        settings->billingStart = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
@@ -1117,10 +1200,10 @@ void ConfigDialog::advancedButtonClicked()
     if ( !settings )
         return;
 
-    ThemeConfig t( *settings );
-    if ( t.exec() )
+    ThemeConfig dlg( *settings );
+    if ( dlg.exec() )
     {
-        InterfaceSettings s = t.getSettings();
+        InterfaceSettings s = dlg.getSettings();
         settings->trafficThreshold = s.trafficThreshold;
         settings->dynamicColor = s.dynamicColor;
         settings->colorIncomingMax = s.colorIncomingMax;
@@ -1134,69 +1217,65 @@ void ConfigDialog::advancedButtonClicked()
     }
 }
 
-
-/******************************************
- *                                        *
- * Interface tab - Statistics             *
- *                                        *
- ******************************************/
-
-void ConfigDialog::checkBoxStatisticsToggled( bool on )
+void ConfigDialog::addStatsClicked()
 {
     InterfaceSettings* settings = getItemSettings();
     if ( !settings )
         return;
 
-    settings->activateStatistics = on;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::checkBoxCustomBillingToggled( bool on )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    settings->customBilling = on;
-    if ( on )
-        mDlg->warnType->setItemText( NotifyMonth, i18n( "Billing Period" ) );
-    else
-        mDlg->warnType->setItemText( NotifyMonth, i18n( "Month" ) );
-
-    mDlg->billingStartInput->setDate( QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) ) );
-    mDlg->billingMonthsInput->setValue( 1 );
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::billingStartInputChanged( const QDate& date )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    // KDateEdit doesn't guarantee a valid date
-    if ( !date.isValid() ||
-         date > QDate::currentDate() ||
-         mCalendar->day( date ) > mMaxDay )
+    StatsRule rule;
+    StatsConfig dlg( settings, mCalendar, rule, true );
+    if ( dlg.exec() )
     {
-        KMessageBox::error( this, i18n( "The billing day of the month can be any day from 1 - %1, and the complete date must be a valid, non-future date.", QString::number( mMaxDay ) ) );
-        mDlg->billingStartInput->setDate( settings->billingStart );
-    }
-    else
-    {
-        settings->billingStart = date;
-        if (!mLock) changed( true );
+        rule = dlg.getSettings();
+        QSortFilterProxyModel* proxy = static_cast<QSortFilterProxyModel*>(mDlg->statsView->model());
+        QModelIndex index = statsModel->addRule( rule );
+        mDlg->statsView->setCurrentIndex( proxy->mapFromSource( index ) );
+        settings->statsRules = statsModel->getRules();
+        mDlg->modifyStats->setEnabled( true );
+        mDlg->removeStats->setEnabled( true );
+        changed( true );
     }
 }
 
-void ConfigDialog::billingMonthsInputChanged( int value )
+void ConfigDialog::modifyStatsClicked()
 {
     InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
+    if ( !settings || mDlg->statsView->model()->rowCount() < 1 )
         return;
 
-    settings->billingMonths = value;
-    if (!mLock) changed( true );
+    QModelIndex index = mDlg->statsView->selectionModel()->currentIndex();
+    if ( !index.isValid() )
+        return;
+    QSortFilterProxyModel* proxy = static_cast<QSortFilterProxyModel*>(mDlg->statsView->model());
+    index = proxy->mapToSource( index );
+    StatsRule s = statsModel->item( index.row(), 0 )->data( Qt::UserRole ).value<StatsRule>();
+    StatsConfig dlg( settings, mCalendar, s, false );
+    if ( dlg.exec() )
+    {
+        s = dlg.getSettings();
+        statsModel->modifyRule( index, s );
+        settings->statsRules = statsModel->getRules();
+        changed( true );
+    }
+}
+
+void ConfigDialog::removeStatsClicked()
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings || mDlg->statsView->model()->rowCount() < 1 )
+        return;
+
+    QModelIndex index = mDlg->statsView->selectionModel()->currentIndex();
+    if ( !index.isValid() )
+        return;
+    QSortFilterProxyModel* proxy = static_cast<QSortFilterProxyModel*>(mDlg->statsView->model());
+    index = proxy->mapToSource( index );
+    statsModel->removeRow( index.row() );
+    settings->statsRules = statsModel->getRules();
+    mDlg->modifyStats->setEnabled( statsModel->rowCount() );
+    mDlg->removeStats->setEnabled( statsModel->rowCount() );
+    changed( true );
 }
 
 void ConfigDialog::warnThresholdChanged( double val )
@@ -1246,6 +1325,24 @@ void ConfigDialog::warnRxTxToggled( bool on )
         return;
 
     settings->warnTotalTraffic = on;
+    if (!mLock) changed( true );
+}
+
+
+
+/******************************************
+ *                                        *
+ * Interface tab - Statistics             *
+ *                                        *
+ ******************************************/
+
+void ConfigDialog::checkBoxStatisticsToggled( bool on )
+{
+    InterfaceSettings* settings = getItemSettings();
+    if ( !settings )
+        return;
+
+    settings->activateStatistics = on;
     if (!mLock) changed( true );
 }
 

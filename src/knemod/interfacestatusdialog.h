@@ -56,6 +56,7 @@ public slots:
      */
     void statisticsChanged();
     void updateDialog();
+    void configChanged();
 
 protected:
     bool event( QEvent *e );

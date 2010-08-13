@@ -17,30 +17,29 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef SQLSTORAGE_H
-#define SQLSTORAGE_H
+#ifndef STATSCONFIG_H
+#define STATSCONFIG_H
 
-#include "storagedata.h"
-#include <QSqlDatabase>
+#include <KDialog>
+#include "data.h"
+#include "ui_statscfg.h"
 
-class SqlStorage
+class StatsConfig : public KDialog
 {
-    public:
-        SqlStorage( QString ifaceName );
-        ~SqlStorage();
-        bool dbExists();
-        bool createDb();
-        bool loadStats( StorageData *gd, QHash<int, StatisticsModel*> *models, QList<StatsRule> *rules );
-        bool saveStats( StorageData *gd, QHash<int, StatisticsModel*> *models, QList<StatsRule> *rules = 0, bool fullSave = false );
-        bool clearStats( StorageData *gd );
-
-    private:
-        bool open();
-        void save( StorageData *gd, QHash<int, StatisticsModel*> *models = 0, QList<StatsRule> *rules = 0, bool fullSave = false );
-        QString mDbPath;
-
-        QSqlDatabase db;
-        QString mIfaceName;
+Q_OBJECT
+public:
+    StatsConfig( const InterfaceSettings *settings, const KCalendarSystem *calendar, const StatsRule &rule, bool addRule = true );
+    StatsRule getSettings();
+private:
+    Ui::StatsCfg mDlg;
+    const InterfaceSettings *mSettings;
+    const KCalendarSystem *mCal;
+    bool mAddRule;
+    void setControls( const StatsRule &s );
+private slots:
+    void setDefaults();
+protected:
+    virtual void slotButtonClicked( int button );
 };
 
 #endif

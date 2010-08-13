@@ -17,30 +17,25 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef SQLSTORAGE_H
-#define SQLSTORAGE_H
+#include "data.h"
+#include <KCalendarSystem>
 
-#include "storagedata.h"
-#include <QSqlDatabase>
-
-class SqlStorage
+bool StatsRule::operator==( StatsRule &r )
 {
-    public:
-        SqlStorage( QString ifaceName );
-        ~SqlStorage();
-        bool dbExists();
-        bool createDb();
-        bool loadStats( StorageData *gd, QHash<int, StatisticsModel*> *models, QList<StatsRule> *rules );
-        bool saveStats( StorageData *gd, QHash<int, StatisticsModel*> *models, QList<StatsRule> *rules = 0, bool fullSave = false );
-        bool clearStats( StorageData *gd );
+    if ( startDate != r.startDate ||
+         periodCount != r.periodCount ||
+         periodUnits != r.periodUnits )
+    {
+        return false;
+    }
+    return true;
+}
 
-    private:
-        bool open();
-        void save( StorageData *gd, QHash<int, StatisticsModel*> *models = 0, QList<StatsRule> *rules = 0, bool fullSave = false );
-        QString mDbPath;
-
-        QSqlDatabase db;
-        QString mIfaceName;
-};
-
-#endif
+bool StatsRule::isValid( KCalendarSystem *cal )
+{
+    if ( !cal->isValid( startDate ) )
+        return false;
+    if ( periodUnits < KNemoStats::Day || periodUnits > KNemoStats::Year )
+        return false;
+    return true;
+}

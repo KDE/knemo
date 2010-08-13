@@ -24,7 +24,6 @@
 #include "storage/storagedata.h"
 
 class QTimer;
-class KCalendarSystem;
 class Interface;
 class StatisticsModel;
 class SqlStorage;
@@ -48,6 +47,7 @@ public:
     StatisticsModel* getStatistics( enum KNemoStats::PeriodUnits t ) { return mModels.value( t ); }
     void addRxBytes( unsigned long bytes );
     void addTxBytes( unsigned long bytes );
+    KCalendarSystem *calendar() { return mStorageData.calendar; }
 
 signals:
     void currentEntryChanged();
@@ -57,43 +57,43 @@ public slots:
     void clearStatistics();
 
 private slots:
-    void saveStatistics();
+    void saveStatistics( bool fullSave = false );
+    void checkValidEntry();
 
 private:
-    QString typeToElem( enum KNemoStats::PeriodUnits t );
-    void loadConfig();
-    bool loadStatistics();
+    bool loadStats();
 
-    void syncWithExternal( uint updated );
-
-    void checkRebuild( QString oldType, bool force = false );
-    void doRebuild( const QDate &recalcDate, int groups );
-    QDate setRebuildDate( StatisticsModel* statistics,
-                          const QDate &recalcDate );
-    void amendStats( int, StatisticsModel * );
-
-    void checkValidEntry( QDateTime curDateTime = QDateTime::currentDateTime() );
-    void checkTrafficLimit();
+    bool daysInSpan( const QDate& entry, int span );
+    QDate nextBillPeriodStart( const StatsRule &rule, const QDate& );
 
     void genNewHour( const QDateTime &dateTime );
-    void genNewDay( const QDate & );
-    void genNewWeek( const QDate & );
-    void genNewYear( const QDate & );
-    void genNewMonth( const QDate &, QDate = QDate() );
-    QDate nextMonthDate( const QDate& );
-    bool daysInSpan( const QDate& entry, int span );
+    bool genNewCalendarType( const QDate &, const enum KNemoStats::PeriodUnits );
+    void genNewBillPeriod( const QDate & );
 
-    void checkThreshold( quint64 bytes );
-    void oneUnit( const StatisticsModel* model );
-    void rollingUnit( const StatisticsModel* model, int days );
+    int ruleForDate( const QDate &date );
+    void syncWithExternal( uint updated );
+    QDate prepareRebuild( StatisticsModel* statistics, const QDate &recalcDate );
+    void amendStats( int index, const StatisticsModel *source, StatisticsModel *dest );
 
-    QTimer* mSaveTimer;
+    void rebuildBaseUnits( const StatsRule & rule, const QDate & start, const QDate & end );
+    void rebuildCalendarPeriods( const QDate &requestedStart, bool weekOnly = false );
+    void rebuildBillPeriods( const QDate &requestedStart );
+
+    void prependStatsRule( QList<StatsRule> &rules );
+    void checkRebuild( const QString &oldCalendar, bool force = false );
+
+    void checkThreshold( quint64 currentBytes );
+    void rollingUnit( const StatisticsModel* model, int count );
+    void checkTrafficLimit();
+
     Interface* mInterface;
+    QTimer* mSaveTimer;
+    QTimer* mEntryTimer;
     bool mWarningDone;
-    bool mAllMonths;
-    QDate mBillingStart;
+    int mWeekStartDay;
     StorageData mStorageData;
     QHash<int, StatisticsModel*> mModels;
+    QList<StatsRule> mStatsRules;
     SqlStorage *sql;
 };
 

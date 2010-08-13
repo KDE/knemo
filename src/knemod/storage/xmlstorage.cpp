@@ -30,22 +30,9 @@
 static const char doc_name[]        = "statistics";
 static const char attrib_calendar[] = "calendar";
 static const char attrib_updated[]  = "lastUpdated";
-static const char attrib_span[]     = "span";
 static const char attrib_rx[]       = "rxBytes";
 static const char attrib_tx[]       = "txBytes";
 
-// This will go away soon
-static QString typeToElem( enum KNemoStats::PeriodUnits t )
-{
-    int i = 0;
-    int v = t;
-    while ( v > KNemoStats::Hour )
-    {
-        v = v >> 1;
-        i++;
-    }
-    return periods[i];
-}
 
 XmlStorage::XmlStorage()
 {
@@ -54,7 +41,7 @@ XmlStorage::XmlStorage()
 void XmlStorage::loadGroup( StorageData *sd, const QDomElement& parentItem,
     StatisticsModel* statistics )
 {
-    QDomNode n = parentItem.namedItem( typeToElem( statistics->periodType() ) + "s" );
+    QDomNode n = parentItem.namedItem( periods.at( statistics->periodType() ) + "s" );
     if ( !n.isNull() )
     {
         QDomNode node = n.firstChild();
@@ -66,33 +53,18 @@ void XmlStorage::loadGroup( StorageData *sd, const QDomElement& parentItem,
                 QDate date;
                 QTime time;
 
-                int year = element.attribute( typeToElem( KNemoStats::Year ) ).toInt();
-                int month = element.attribute( typeToElem( KNemoStats::Month ), "1" ).toInt();
-                int day = element.attribute( typeToElem( KNemoStats::Day ), "1" ).toInt();
+                int year = element.attribute( periods.at( KNemoStats::Year ) ).toInt();
+                int month = element.attribute( periods.at( KNemoStats::Month ), "1" ).toInt();
+                int day = element.attribute( periods.at( KNemoStats::Day ), "1" ).toInt();
                 sd->calendar->setDate( date, year, month, day );
 
                 if ( date.isValid() )
                 {
-                    int days = element.attribute( attrib_span ).toInt();
                     switch ( statistics->periodType() )
                     {
                         case KNemoStats::Hour:
-                            time = QTime( element.attribute( typeToElem( KNemoStats::Hour ) ).toInt(), 0 );
+                            time = QTime( element.attribute( periods.at( KNemoStats::Hour ) ).toInt(), 0 );
                             break;
-                        case KNemoStats::Month:
-                            // Old format had no span, so daysInMonth using gregorian
-                            if ( days == 0 )
-                                days = date.daysInMonth();
-                            if ( sd->calendar->day( date ) != 1 ||
-                                 days != sd->calendar->daysInMonth( date ) )
-                            break;
-                        case KNemoStats::Year:
-                            // Old format had no span, so daysInYear using gregorian
-                            if ( days == 0 )
-                                days = date.daysInYear();
-                            break;
-                        case KNemoStats::Day:
-                            days = 1;
                         default:
                             ;;
                     }

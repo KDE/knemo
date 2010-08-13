@@ -68,6 +68,8 @@ private:
     Ui::InterfaceStatisticsDlg ui;
     bool mWasShown;
     bool mSetPos;
+    QWidget *mBillingWidget;
+    QTableView *mBillingView;
     KSharedConfigPtr mConfig;
     Interface* mInterface;
     QHash<QTableView*, QString> mStateKeys;

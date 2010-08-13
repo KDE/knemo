@@ -32,6 +32,8 @@
 #include <KStandardDirs>
 #include <KUrl>
 
+class KCalendarSystem;
+
 /**
  * This file contains data structures used to store information about
  * an interface. It is shared between the daemon and the control center
@@ -66,11 +68,12 @@ namespace KNemoStats
 {
     enum PeriodUnits
     {
-        Hour = 1,
-        Day  = 2,
-        Week = 4,
-        Month = 8,
-        Year = 16
+        Hour = 0,
+        Day,
+        Week,
+        Month,
+        BillPeriod,
+        Year
     };
 };
 
@@ -89,6 +92,7 @@ static const char ICON_RX_TX[] = "transmit-receive";
 static const char confg_general[] = "General";
 static const char confg_interface[] = "Interface_";
 static const char confg_plotter[] = "Plotter_";
+static const char confg_statsRule[] = "StatsRule_";
 
 static const char conf_firstStart[] = "FirstStart";
 static const char conf_autoStart[] = "AutoStart";
@@ -116,14 +120,17 @@ static const char conf_iconFont[] = "IconFont";
 
 // interface statistics
 static const char conf_activateStatistics[] = "ActivateStatistics";
-static const char conf_customBilling[] = "CustomBilling";
 static const char conf_calendar[] = "Calendar";
-static const char conf_billingStart[] = "BillingStart";
-static const char conf_billingMonths[] = "BillingMonths";
+static const char conf_statsRules[] = "StatsRules";
 static const char conf_billingWarnThresh[] = "BillingWarnThreshold";
 static const char conf_billingWarnUnits[] = "BillingWarnUnits";
 static const char conf_billingWarnType[] = "BillingWarnType";
 static const char conf_billingWarnRxTx[] = "BillingWarnRxTx";
+
+// interface billing
+static const char conf_statsStartDate[] = "StartDate";
+static const char conf_statsPeriodUnits[] = "PeriodUnits";
+static const char conf_statsPeriodCount[] = "PeriodCount";
 
 // interface context menu
 static const char conf_numCommands[] = "NumCommands";
@@ -149,6 +156,7 @@ static const char conf_hourState[] = "HourState";
 static const char conf_dayState[] = "DayState";
 static const char conf_weekState[] = "WeekState";
 static const char conf_monthState[] = "MonthState";
+static const char conf_billingState[] = "BillingState";
 static const char conf_yearState[] = "YearState";
 
 enum ToolTipEnums
@@ -278,6 +286,22 @@ struct GeneralSettings
     KUrl statisticsDir;
 };
 
+class StatsRule
+{
+public:
+    StatsRule()
+        :
+        periodCount( 1 ),
+        periodUnits( KNemoStats::Month )
+    {
+    }
+    bool operator==( StatsRule &r );
+    bool isValid( KCalendarSystem *cal );
+    QDate startDate;
+    int periodCount;
+    int periodUnits;
+};
+
 struct InterfaceSettings
 {
     InterfaceSettings()
@@ -301,9 +325,7 @@ struct InterfaceSettings
         warnTotalTraffic( false ),
         hideWhenUnavailable( false ),
         hideWhenDisconnected( false ),
-        activateStatistics( false ),
-        customBilling( false ),
-        billingMonths( 1 )
+        activateStatistics( false )
     {}
 
     QString iconTheme;
@@ -327,9 +349,7 @@ struct InterfaceSettings
     bool hideWhenUnavailable;
     bool hideWhenDisconnected;
     bool activateStatistics;
-    bool customBilling;
-    QDate billingStart;
-    int billingMonths;
+    QList<StatsRule> statsRules;
     QString calendar;
     QString alias;
     QList<InterfaceCommand> commands;
