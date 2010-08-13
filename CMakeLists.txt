@@ -15,8 +15,7 @@ if ( NOT QT_QTSQL_FOUND )
 endif( NOT QT_QTSQL_FOUND )
 
 if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
-    find_package( Libnl )
-    macro_log_feature( LIBNL_FOUND "libnl" "Linux netlink sockets library" "http://people.suug.ch/~tgr/libnl/" TRUE "" "" )
+    find_package( Libnl REQUIRED )
 
     find_package( Libiw )
     macro_log_feature( LIBIW_FOUND "libiw" "Linux Wireless Extensions library" "http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html" FALSE "" "" )
