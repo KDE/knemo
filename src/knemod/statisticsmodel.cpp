@@ -316,19 +316,19 @@ int StatisticsModel::indexOfId( int id ) const
     return -1;
 }
 
-void StatisticsModel::setTraffic( int i, quint64 rx, quint64 tx, KNemoStats::TrafficType trafficType )
+void StatisticsModel::setTraffic( int row, quint64 rx, quint64 tx, KNemoStats::TrafficType trafficType )
 {
-    if ( i < 0 || i >= rowCount() )
+    if ( row < 0 || row >= rowCount() )
         return;
 
-    item( i, RxBytes )->setData( rx, DataRole + trafficType );
-    item( i, TxBytes )->setData( tx, DataRole + trafficType );
-    item( i, TotalBytes )->setData( rx+tx, DataRole + trafficType );
+    item( row, RxBytes )->setData( rx, DataRole + trafficType );
+    item( row, TxBytes )->setData( tx, DataRole + trafficType );
+    item( row, TotalBytes )->setData( rx+tx, DataRole + trafficType );
     if ( trafficType == KNemoStats::AllTraffic )
     {
-        updateText( item( i, RxBytes ) );
-        updateText( item( i, TxBytes ) );
-        updateText( item( i, TotalBytes ) );
+        updateText( item( row, RxBytes ) );
+        updateText( item( row, TxBytes ) );
+        updateText( item( row, TotalBytes ) );
     }
 }
 

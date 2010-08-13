@@ -41,36 +41,112 @@ public:
     };
 
     /**
-     * Clear rows but leave column headers intact
+     * Clear rows
      */
     void clearRows() { removeRows( 0, rowCount() ); }
+
+    /**
+     * Update the text in the date cell.  Handy after a rebuild or if a fancy
+     * short date changes.
+     */
     void updateDateText( int row );
 
+    /**
+     * Return the type of statistics that this model is tracking
+     */
     enum KNemoStats::PeriodUnits periodType() const { return mPeriodType; }
 
-    void setCalendar( const KCalendarSystem * c ) { mCalendar = c; }
+    /**
+     * Set the calendar that the model will use.  This must be done before any
+     * entries are added.
+     */
+    void setCalendar( const KCalendarSystem * calendar ) { mCalendar = calendar; }
+
+    /**
+     * Creates a stats entry for the model.  If id < 0 it will create an id
+     * that matches rowCount().  If days > 0 it will set a period of length
+     * 'days'.  The latter is relevant only for custom billing periods.
+     */
 
     int createEntry( const QDateTime &startDateTime, int id = -1, int days = -1 );
+
+    /**
+     * Return the id of a row.  If row < 0 it will return the id of the last
+     * entry.  An invalid row will return -1.
+     */
     int id( int row = -1 ) const;
+
+    /**
+     * Set the id of a row.  If row < 0 it will set the id of the last entry.
+     */
     void setId( int id, int row = -1 );
+
+    /**
+     * Return the QDate of a row.  If row < 0 it will return the date of the
+     * last entry.  An invalid row will return an invalid QDate.
+     */
     QDate date( int row = -1 ) const;
+
+    /**
+     * Return the QDateTime of a row.  If row < 0 it will return QDateTime of
+     * the last entry.  An invalid row will return an invalid QDateTime.
+     */
     QDateTime dateTime( int row = -1 ) const;
+
+    /**
+     * Return the number of days that an entry spans.  If row < 0 it will
+     * return the day span of the last entry.  An invalid row will return 0.
+     */
     int days( int row = -1 ) const;
+
+    /**
+     * Return a list of all traffic types tracked by this entry. If row < 0 it
+     * will return the types of the last entry.
+     */
     QList<KNemoStats::TrafficType> trafficTypes( int row = -1 ) const;
-    void resetTrafficTypes( int i = -1 );
-    void addTrafficType( int trafficType, int i = -1 );
+
+    /**
+     * Clears the list of traffic types being tracked by the entry in the row.
+     * If row < 0 it will clear the last entry.
+     */
+    void resetTrafficTypes( int row = -1 );
+
+    /**
+     * Set a traffic type as tracked by this entry.  If row < 0 it will add the
+     * type to the list in the last entry.
+     */
+    void addTrafficType( int trafficType, int row = -1 );
+
+    /**
+     * Return the index of the given id.  An invalid id will return -1.
+     */
     int indexOfId( int row ) const;
 
+    /**
+     * These return the rx, tx, total bytes for the entry in row 'row'.  If row
+     * < 0 it will return the bytes of the last entry.
+     */
     quint64 rxBytes( int row = -1, KNemoStats::TrafficType trafficType = KNemoStats::AllTraffic ) const;
     quint64 txBytes( int row = -1, KNemoStats::TrafficType traffictype = KNemoStats::AllTraffic ) const;
     quint64 totalBytes( int row = -1, KNemoStats::TrafficType trafficType = KNemoStats::AllTraffic ) const;
-    void setTraffic( int i, quint64 rx, quint64 tx, KNemoStats::TrafficType trafficType = KNemoStats::AllTraffic );
 
+    /**
+     * Set the traffic for given row and traffic type
+     */
+    void setTraffic( int row, quint64 rx, quint64 tx, KNemoStats::TrafficType trafficType = KNemoStats::AllTraffic );
+
+    /**
+     * Get the formatted text of the traffic levels.  If row < 0 it will return
+     * the traffic of the last entry.
+     */
     QString rxText( int row = -1 ) const;
     QString txText( int row = -1 ) const;
     QString totalText( int row = -1 ) const;
 
-    // Always added to the current entry (last row)
+    /**
+     * These add traffic for the given type and row.  If row < 0 it will add
+     * traffic to the last entry.
+     */
     void addRxBytes( quint64 bytes, KNemoStats::TrafficType trafficType = KNemoStats::AllTraffic, int row = -1 );
     void addTxBytes( quint64 bytes, KNemoStats::TrafficType trafficType = KNemoStats::AllTraffic, int row = -1 );
 

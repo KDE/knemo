@@ -43,14 +43,41 @@ public:
     InterfaceStatistics( Interface* interface );
     virtual ~InterfaceStatistics();
 
+    /**
+     * Called whenever the configuration changes.  This updates statistics
+     * settings and checks whether any of the statistics need to be rebuilt.
+     */
     void configChanged();
+
+    /**
+     * Return a pointer to the StatisticsModel tracking a period unit
+     */
     StatisticsModel* getStatistics( enum KNemoStats::PeriodUnits t ) { return mModels.value( t ); }
+
+    /**
+     * Add received bytes to each of the models
+     */
     void addRxBytes( unsigned long bytes );
+
+    /** Add transmitted bytes to each of the models
+     */
     void addTxBytes( unsigned long bytes );
+
+    /**
+     * Return a pointer to the active calendar
+     */
     KCalendarSystem *calendar() { return mStorageData.calendar; }
 
 signals:
+    /**
+     * Emitted when an entry is updated (i.e. when new bytes are transmitted,
+     * received, or the stats are cleared).
+     */
     void currentEntryChanged();
+
+    /**
+     * Emitted when a traffic threshold has been reached
+     */
     void warnTraffic( QString warnText, quint64 threshold, quint64 current );
 
 public slots:
