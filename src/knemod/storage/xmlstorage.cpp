@@ -76,6 +76,11 @@ void XmlStorage::loadGroup( StorageData *sd, const QDomElement& parentItem,
             node = node.nextSibling();
         }
         statistics->sort( 0 );
+        // Make sure the ids are in order after a sort
+        for ( int i = 0; i < statistics->rowCount(); ++i )
+        {
+            statistics->setId( i, i );
+        }
     }
 }
 
