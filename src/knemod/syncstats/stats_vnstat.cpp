@@ -167,9 +167,7 @@ void StatsVnstat::parseOutput( const QString &output )
             tx += fields[6].toULongLong() * 1024;
             if ( rx != 0 || tx != 0 )
             {
-                int entryIndex = mExternalDays->createEntry();
-                mExternalDays->setDateTime( QDateTime::fromTime_t(fields[2].toUInt()) );
-                mExternalDays->setDays( 1 );
+                int entryIndex = mExternalDays->createEntry( QDateTime::fromTime_t(fields[2].toUInt()), mExternalDays->rowCount(), 1 );
                 mExternalDays->setTraffic( entryIndex, rx, tx );
             }
         }
@@ -181,8 +179,7 @@ void StatsVnstat::parseOutput( const QString &output )
             hour = QDateTime( hour.date(), QTime( hour.time().hour(), 0 ) );
             if ( rx != 0 || tx != 0 )
             {
-                int entryIndex = mExternalHours->createEntry();
-                mExternalHours->setDateTime( hour );
+                int entryIndex = mExternalHours->createEntry( hour );
                 mExternalHours->setTraffic( entryIndex, rx, tx );
             }
         }

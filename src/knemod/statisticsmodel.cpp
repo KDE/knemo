@@ -81,33 +81,29 @@ void StatisticsModel::updateText( QStandardItem * i )
     i->setData( KIO::convertSize( all ), Qt::DisplayRole );
 }
 
-int StatisticsModel::createEntry()
+int StatisticsModel::createEntry( const QDateTime &dateTime, int entryId, int days )
 {
     QList<QStandardItem*> entry;
     QStandardItem * dateItem = new QStandardItem();
     QStandardItem * txItem = new QStandardItem();
     QStandardItem * rxItem = new QStandardItem();
     QStandardItem * totalItem = new QStandardItem();
-    dateItem->setData( rowCount(), IdRole );
+
+    dateItem->setData( dateTime, DataRole );
+    if ( entryId < 0 )
+    {
+        entryId = rowCount();
+    }
+    dateItem->setData( entryId, IdRole );
+    if ( days > 0 )
+    {
+        dateItem->setData( days, SpanRole );
+    }
     entry << dateItem << txItem << rxItem << totalItem;
     appendRow( entry );
     setTraffic( rowCount() - 1, 0, 0 );
-    return ( rowCount() - 1 );
-}
-
-void StatisticsModel::setDateTime( QDateTime dateTime )
-{
-    if ( !rowCount() )
-        return;
-    item( rowCount() - 1, Date )->setData( dateTime, DataRole );
     updateDateText( rowCount() - 1 );
-}
-
-void StatisticsModel::setDays( int days )
-{
-    if ( !rowCount() )
-        return;
-    item( rowCount() - 1, Date )->setData( days, SpanRole );
+    return entryId;
 }
 
 void StatisticsModel::updateDateText( int row )

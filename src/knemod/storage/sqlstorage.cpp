@@ -160,9 +160,7 @@ bool SqlStorage::loadHourArchives( StatisticsModel *hourArchive, const QDate &st
             int id = qry.value( cId ).toInt();
             if ( trafficType == KNemoStats::AllTraffic )
             {
-                hourArchive->createEntry();
-                hourArchive->setId( id );
-                hourArchive->setDateTime( QDateTime::fromString( qry.value( cDt ).toString(), Qt::ISODate ) );
+                hourArchive->createEntry( QDateTime::fromString( qry.value( cDt ).toString(), Qt::ISODate ), id );
             }
             hourArchive->setTraffic( hourArchive->indexOfId( id ), qry.value( cRx ).toULongLong(), qry.value( cTx ).toULongLong(), trafficType );
             hourArchive->addTrafficType( trafficType );
@@ -231,13 +229,12 @@ bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *model
                     int id = qry.value( cId ).toInt();
                     if ( trafficType == KNemoStats::AllTraffic )
                     {
-                        s->createEntry();
-                        s->setId( id );
+                        int days = -1;
                         if ( s->periodType() == KNemoStats::BillPeriod )
                         {
-                            s->setDays( qry.value( cDays ).toInt() );
+                            days = qry.value( cDays ).toInt();
                         }
-                        s->setDateTime( QDateTime::fromString( qry.value( cDt ).toString(), Qt::ISODate ) );
+                        s->createEntry( QDateTime::fromString( qry.value( cDt ).toString(), Qt::ISODate ), id, days );
                     }
                     s->setTraffic( id, qry.value( cRx ).toULongLong(), qry.value( cTx ).toULongLong(), trafficType );
                     s->addTrafficType( trafficType );

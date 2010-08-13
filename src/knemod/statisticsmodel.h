@@ -50,14 +50,12 @@ public:
 
     void setCalendar( const KCalendarSystem * c ) { mCalendar = c; }
 
-    int createEntry();
+    int createEntry( const QDateTime &startDateTime, int id = -1, int days = -1 );
     int id( int row = -1 ) const;
     void setId( int id, int row = -1 );
     QDate date( int row = -1 ) const;
     QDateTime dateTime( int row = -1 ) const;
-    void setDateTime( QDateTime );
     int days( int row = -1 ) const;
-    void setDays( int days );
     QList<KNemoStats::TrafficType> trafficTypes( int row = -1 ) const;
     void resetTrafficTypes( int i = -1 );
     void addTrafficType( int trafficType, int i = -1 );

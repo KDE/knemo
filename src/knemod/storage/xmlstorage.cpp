@@ -69,8 +69,7 @@ void XmlStorage::loadGroup( StorageData *sd, const QDomElement& parentItem,
                             ;;
                     }
 
-                    int entryIndex = statistics->createEntry();
-                    statistics->setDateTime( QDateTime( date, time ) );
+                    int entryIndex = statistics->createEntry( QDateTime( date, time ) );
                     statistics->setTraffic( entryIndex, element.attribute( attrib_rx ).toULongLong(), element.attribute( attrib_tx ).toULongLong() );
                 }
             }

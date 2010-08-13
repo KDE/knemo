@@ -196,8 +196,7 @@ void InterfaceStatistics::genNewHour( const QDateTime &dateTime )
         hours->addTrafficType( KNemoStats::OffpeakTraffic );
     }
 
-    hours->createEntry();
-    hours->setDateTime( dateTime );
+    hours->createEntry( dateTime );
 
     resetWarnings( hours->periodType() );
 }
@@ -240,8 +239,7 @@ bool InterfaceStatistics::genNewCalendarType( const QDate &date, const KNemoStat
             return false;
     }
 
-    mModels.value( stype )->createEntry();
-    mModels.value( stype )->setDateTime( QDateTime( newDate, QTime() ) );
+    mModels.value( stype )->createEntry( QDateTime( newDate, QTime() ) );
     resetWarnings( stype );
 
     return true;
@@ -338,9 +336,7 @@ void InterfaceStatistics::genNewBillPeriod( const QDate &date )
     if ( billing->rowCount() && newDate == billing->date() )
         return;
 
-    billing->createEntry();
-    billing->setDays( days );
-    billing->setDateTime( QDateTime( newDate, QTime() ) );
+    billing->createEntry( QDateTime( newDate, QTime() ), billing->rowCount(), days );
 
     resetWarnings( KNemoStats::BillPeriod );
 }
