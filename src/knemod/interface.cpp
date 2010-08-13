@@ -127,6 +127,14 @@ void Interface::configChanged()
             rule.startDate = statsGroup.readEntry( conf_statsStartDate, QDate() );
             rule.periodUnits = clamp<int>(statsGroup.readEntry( conf_statsPeriodUnits, rule.periodUnits ), KNemoStats::Day, KNemoStats::Year );
             rule.periodCount = clamp<int>(statsGroup.readEntry( conf_statsPeriodCount, rule.periodCount ), 1, 1000 );
+            rule.logOffpeak = statsGroup.readEntry( conf_logOffpeak,rule.logOffpeak );
+            rule.offpeakStartTime = QTime::fromString( statsGroup.readEntry( conf_offpeakStartTime, rule.offpeakStartTime.toString( Qt::ISODate ) ), Qt::ISODate );
+            rule.offpeakEndTime = QTime::fromString( statsGroup.readEntry( conf_offpeakEndTime, rule.offpeakEndTime.toString( Qt::ISODate ) ), Qt::ISODate );
+            rule.weekendIsOffpeak = statsGroup.readEntry( conf_weekendIsOffpeak, rule.weekendIsOffpeak );
+            rule.weekendDayStart = clamp<int>(statsGroup.readEntry( conf_weekendDayStart, rule.weekendDayStart ), 1, testCal->daysInWeek( QDate::currentDate() ) );
+            rule.weekendDayEnd = clamp<int>(statsGroup.readEntry( conf_weekendDayEnd, rule.weekendDayEnd ), 1, testCal->daysInWeek( QDate::currentDate() ) );
+            rule.weekendTimeStart = QTime::fromString( statsGroup.readEntry( conf_weekendTimeStart, rule.weekendTimeStart.toString( Qt::ISODate ) ), Qt::ISODate );
+            rule.weekendTimeEnd = QTime::fromString( statsGroup.readEntry( conf_weekendTimeEnd, rule.weekendTimeEnd.toString( Qt::ISODate ) ), Qt::ISODate );
             if ( rule.isValid( testCal ) )
             {
                 mSettings.statsRules << rule;

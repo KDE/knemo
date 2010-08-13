@@ -389,6 +389,14 @@ void ConfigDialog::load()
                     stats.startDate = statsGroup.readEntry( conf_statsStartDate, QDate() );
                     stats.periodUnits = clamp<int>(statsGroup.readEntry( conf_statsPeriodUnits, stats.periodUnits ), KNemoStats::Day, KNemoStats::Year );
                     stats.periodCount = clamp<int>(statsGroup.readEntry( conf_statsPeriodCount, stats.periodCount ), 1, 1000 );
+                    stats.logOffpeak = statsGroup.readEntry( conf_logOffpeak,stats.logOffpeak );
+                    stats.offpeakStartTime = QTime::fromString( statsGroup.readEntry( conf_offpeakStartTime, stats.offpeakStartTime.toString( Qt::ISODate ) ), Qt::ISODate );
+                    stats.offpeakEndTime = QTime::fromString( statsGroup.readEntry( conf_offpeakEndTime, stats.offpeakEndTime.toString( Qt::ISODate ) ), Qt::ISODate );
+                    stats.weekendIsOffpeak = statsGroup.readEntry( conf_weekendIsOffpeak, stats.weekendIsOffpeak );
+                    stats.weekendDayStart = statsGroup.readEntry( conf_weekendDayStart, stats.weekendDayStart );
+                    stats.weekendDayEnd = statsGroup.readEntry( conf_weekendDayEnd, stats.weekendDayEnd );
+                    stats.weekendTimeStart = QTime::fromString( statsGroup.readEntry( conf_weekendTimeStart, stats.weekendTimeStart.toString( Qt::ISODate ) ), Qt::ISODate );
+                    stats.weekendTimeEnd = QTime::fromString( statsGroup.readEntry( conf_weekendTimeEnd, stats.weekendTimeEnd.toString( Qt::ISODate ) ), Qt::ISODate );
                     settings->statsRules << stats;
                 }
             }
@@ -570,6 +578,20 @@ void ConfigDialog::save()
             statsGroup.writeEntry( conf_statsStartDate, settings->statsRules[i].startDate );
             statsGroup.writeEntry( conf_statsPeriodUnits, settings->statsRules[i].periodUnits );
             statsGroup.writeEntry( conf_statsPeriodCount, settings->statsRules[i].periodCount );
+            statsGroup.writeEntry( conf_logOffpeak, settings->statsRules[i].logOffpeak );
+            if ( settings->statsRules[i].logOffpeak )
+            {
+                statsGroup.writeEntry( conf_offpeakStartTime, settings->statsRules[i].offpeakStartTime.toString( Qt::ISODate ) );
+                statsGroup.writeEntry( conf_offpeakEndTime, settings->statsRules[i].offpeakEndTime.toString( Qt::ISODate ) );
+                statsGroup.writeEntry( conf_weekendIsOffpeak, settings->statsRules[i].weekendIsOffpeak );
+                if ( settings->statsRules[i].weekendIsOffpeak )
+                {
+                    statsGroup.writeEntry( conf_weekendDayStart, settings->statsRules[i].weekendDayStart );
+                    statsGroup.writeEntry( conf_weekendDayEnd, settings->statsRules[i].weekendDayEnd );
+                    statsGroup.writeEntry( conf_weekendTimeStart, settings->statsRules[i].weekendTimeStart.toString( Qt::ISODate ) );
+                    statsGroup.writeEntry( conf_weekendTimeEnd, settings->statsRules[i].weekendTimeEnd.toString( Qt::ISODate ) );
+                }
+            }
         }
         interfaceGroup.writeEntry( conf_billingWarnThresh, settings->warnThreshold );
         if ( settings->warnThreshold > 0 )

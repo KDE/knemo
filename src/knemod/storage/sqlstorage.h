@@ -30,6 +30,7 @@ class SqlStorage
         ~SqlStorage();
         bool dbExists();
         bool createDb();
+        bool loadHourArchives( StatisticsModel *hourArchive, const QDate &startDate, const QDate &endDate );
         bool loadStats( StorageData *gd, QHash<int, StatisticsModel*> *models, QList<StatsRule> *rules );
         bool saveStats( StorageData *gd, QHash<int, StatisticsModel*> *models, QList<StatsRule> *rules = 0, bool fullSave = false );
         bool clearStats( StorageData *gd );
@@ -41,6 +42,7 @@ class SqlStorage
 
         QSqlDatabase db;
         QString mIfaceName;
+        QMap<KNemoStats::TrafficType,QString> mTypeMap;
 };
 
 #endif

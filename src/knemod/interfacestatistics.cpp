@@ -61,6 +61,8 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
     mModels.insert( KNemoStats::Year, s );
     s = new StatisticsModel( KNemoStats::BillPeriod, this );
     mModels.insert( KNemoStats::BillPeriod, s );
+    s = new StatisticsModel( KNemoStats::HourArchive, this );
+    mModels.insert( KNemoStats::HourArchive, s );
 
     foreach ( StatisticsModel *s, mModels )
     {
@@ -114,6 +116,7 @@ bool InterfaceStatistics::loadStats()
         sql->createDb();
         if ( loaded )
         {
+            hoursToArchive( QDateTime::currentDateTime() );
             checkRebuild( mStorageData.calendar->calendarType(), true );
         }
     }
@@ -133,24 +136,51 @@ bool InterfaceStatistics::loadStats()
  * Stats Entry Generators         *
  **********************************/
 
-void InterfaceStatistics::genNewHour( const QDateTime &dateTime )
+void InterfaceStatistics::hoursToArchive( const QDateTime &dateTime )
 {
+    bool removedRow = false;
     StatisticsModel* hours = mModels.value( KNemoStats::Hour );
+    StatisticsModel* hourArchives = mModels.value( KNemoStats::HourArchive );
 
     // Only 24 hours
     while ( hours->rowCount() )
     {
         if ( hours->dateTime( 0 ) <= dateTime.addDays( -1 ) )
         {
-            hours->removeRow( 0 );
-            mStorageData.saveFromId.insert( KNemoStats::Hour, 0 );
+            QList<QStandardItem*> row = hours->takeRow( 0 );
+            hourArchives->appendRow( row );
+            hourArchives->setId( mStorageData.nextHourId );
+            mStorageData.nextHourId++;
+            removedRow = true;
         }
         else
             break;
     }
+    if ( removedRow )
+    {
+        for ( int i = 0; i < hours->rowCount(); ++i )
+        {
+            hours->setId( i, i );
+        }
+        mStorageData.saveFromId.insert( hours->periodType(), 0 );
+        mStorageData.saveFromId.insert( hourArchives->periodType(), hourArchives->id( 0 ) );
+    }
+}
+
+void InterfaceStatistics::genNewHour( const QDateTime &dateTime )
+{
+    hoursToArchive( dateTime );
+
+    StatisticsModel* hours = mModels.value( KNemoStats::Hour );
 
     if ( hours->dateTime() == dateTime )
         return;
+
+    int ruleIndex = ruleForDate( dateTime.date() );
+    if ( ruleIndex >= 0  && isOffpeak( mStatsRules[ruleIndex], dateTime ) )
+    {
+        hours->addTrafficType( KNemoStats::OffpeakTraffic );
+    }
 
     hours->createEntry();
     hours->setDateTime( dateTime );
@@ -385,8 +415,11 @@ void InterfaceStatistics::syncWithExternal( uint updated )
         if ( !hours->rowCount() || hours->dateTime() < syncDateTime )
             genNewHour( syncDateTime );
 
-        hours->addRxBytes( syncHours->rxBytes( i ) );
-        hours->addTxBytes( syncHours->txBytes( i ) );
+        foreach ( KNemoStats::TrafficType t, hours->trafficTypes() )
+        {
+            hours->addRxBytes( syncHours->rxBytes( i ), t );
+            hours->addTxBytes( syncHours->txBytes( i ), t );
+        }
     }
 
     for ( int i = 0; i < syncDays->rowCount(); ++i )
@@ -406,14 +439,24 @@ void InterfaceStatistics::syncWithExternal( uint updated )
 
         foreach( StatisticsModel * s, mModels )
         {
-            if ( s->periodType() == KNemoStats::Hour )
+            if ( s->periodType() == KNemoStats::Hour || s->periodType() == KNemoStats::HourArchive )
                continue;
 
             s->addRxBytes( v->addBytes( s->rxBytes(), syncDays->rxBytes( i ) ) );
             s->addTxBytes( v->addBytes( s->txBytes(), syncDays->txBytes( i ) ) );
             for ( int j = hours->rowCount() - 1; j >= 0; --j )
             {
-                if ( hours->date( j ) < syncDate )
+                if ( hours->date( j ) == syncDate )
+                {
+                    foreach( KNemoStats::TrafficType t, hours->trafficTypes( j ) )
+                    {
+                        if ( t == KNemoStats::AllTraffic )
+                            continue;
+                        s->addRxBytes( hours->rxBytes( j, t ), t );
+                        s->addTxBytes( hours->txBytes( j, t ), t );
+                    }
+                }
+                else if ( hours->date( j ) < syncDate )
                     break;
             }
         }
@@ -433,18 +476,172 @@ void InterfaceStatistics::syncWithExternal( uint updated )
 
             foreach ( StatisticsModel * s, mModels )
             {
-                s->addRxBytes( lag.rxBytes );
-                s->addTxBytes( lag.txBytes );
+                if ( s->periodType() == KNemoStats::HourArchive )
+                    continue;
+                foreach ( KNemoStats::TrafficType t, hours->trafficTypes() )
+                {
+                    s->addRxBytes( lag.rxBytes, t );
+                    s->addTxBytes( lag.txBytes, t );
+                }
             }
         }
     }
     delete v;
 }
 
+bool InterfaceStatistics::isOffpeak( const StatsRule &rules, const QDateTime &curDT )
+{
+    if ( !rules.logOffpeak )
+        return false;
+
+    bool isOffpeak = false;
+    QTime curHour = QTime( curDT.time().hour(), 0 );
+
+    // This block just tests weekly hours
+    if ( rules.offpeakStartTime < rules.offpeakEndTime &&
+         curHour >= rules.offpeakStartTime && curHour < rules.offpeakEndTime )
+    {
+        isOffpeak = true;
+    }
+    else if ( rules.offpeakStartTime > rules.offpeakEndTime &&
+         ( curHour >= rules.offpeakStartTime || curHour < rules.offpeakEndTime ) )
+    {
+        isOffpeak = true;
+    }
+
+    if ( rules.weekendIsOffpeak )
+    {
+        int dow = mStorageData.calendar->dayOfWeek( curDT.date() );
+        if ( rules.weekendDayStart <= rules.weekendDayEnd && rules.weekendDayStart <= dow )
+        {
+            QDateTime dayBegin = curDT.addDays( dow - rules.weekendDayStart );
+            dayBegin = QDateTime( dayBegin.date(), rules.weekendTimeStart );
+            QDateTime end = curDT.addDays( rules.weekendDayEnd - dow );
+            end = QDateTime( end.date(), rules.weekendTimeEnd );
+
+            if ( dayBegin <= curDT && curDT < end )
+                isOffpeak = true;
+        }
+        else if ( rules.weekendDayStart > rules.weekendDayEnd &&
+                ( dow >= rules.weekendDayStart || dow <= rules.weekendDayEnd ) )
+        {
+            QDateTime dayBegin = curDT.addDays( rules.weekendDayStart - dow );
+            dayBegin = QDateTime( dayBegin.date(), rules.weekendTimeStart );
+            QDateTime end = curDT.addDays( mStorageData.calendar->daysInWeek( curDT.date() ) - dow + rules.weekendDayEnd );
+            end = QDateTime( end.date(), rules.weekendTimeEnd );
+
+            if ( dayBegin <= curDT && curDT < end )
+                isOffpeak = true;
+        }
+    }
+
+    return isOffpeak;
+}
+
 
 /**************************************
  * Rebuilding Statistics              *
  **************************************/
+
+int InterfaceStatistics::rebuildHours( StatisticsModel *s, const StatsRule &rules, const QDate &start, const QDate &nextRuleStart )
+{
+    if ( !s->rowCount() )
+        return 0;
+
+    int i = s->rowCount();
+    while ( i > 0 && s->date( i - 1 ) >= start )
+    {
+        i--;
+        if ( nextRuleStart.isValid() && s->date( i ) >= nextRuleStart )
+            continue;
+
+        s->resetTrafficTypes( i );
+        if ( isOffpeak( rules, s->dateTime( i ) ) )
+        {
+            s->setTraffic( i, s->rxBytes( i ), s->txBytes( i ), KNemoStats::OffpeakTraffic );
+            s->addTrafficType( KNemoStats::OffpeakTraffic, i );
+        }
+    }
+    if ( mStorageData.saveFromId.value( s->periodType() ) > s->id( i ) )
+    {
+        mStorageData.saveFromId.insert( s->periodType(), s->id( i ) );
+    }
+
+    return i;
+}
+
+int InterfaceStatistics::rebuildDay( int dayIndex, int hourIndex, StatisticsModel *hours )
+{
+    QMap<KNemoStats::TrafficType, QPair<quint64, quint64> > dayTraffic;
+    StatisticsModel *days = mModels.value( KNemoStats::Day );
+    while ( hourIndex >= 0 && hours->date( hourIndex ) > days->date( dayIndex ).addDays( 1 ) )
+    {
+        --hourIndex;
+    }
+    while ( hourIndex >= 0 && hours->date( hourIndex ) == days->date( dayIndex ) )
+    {
+        foreach ( KNemoStats::TrafficType t, hours->trafficTypes( hourIndex ) )
+        {
+            if ( t == KNemoStats::AllTraffic )
+                continue;
+            quint64 rx = hours->rxBytes( hourIndex, t ) + dayTraffic.value( t ).first;
+            quint64 tx = hours->txBytes( hourIndex, t ) + dayTraffic.value( t ).second;
+            dayTraffic.insert( t, QPair<quint64, quint64>( rx, tx ) );
+        }
+        --hourIndex;
+    }
+    foreach (KNemoStats::TrafficType t, dayTraffic.keys() )
+    {
+        days->setTraffic( dayIndex, dayTraffic.value( t ).first, dayTraffic.value( t ).second, t );
+        days->addTrafficType( t, dayIndex );
+    }
+    return hourIndex;
+}
+
+// A rebuild of hours and days never changes the number of entries
+// We just change what bytes count as off-peak
+void InterfaceStatistics::rebuildBaseUnits( const StatsRule &rules, const QDate &start, const QDate &nextRuleStart )
+{
+    int hIndex = 0;
+    int haIndex = 0;
+
+    StatisticsModel *hours = mModels.value( KNemoStats::Hour );
+    StatisticsModel *hourArchives = mModels.value( KNemoStats::HourArchive );
+    StatisticsModel *days = mModels.value( KNemoStats::Day );
+    sql->loadHourArchives( hourArchives, start, nextRuleStart );
+    if ( hourArchives->rowCount() )
+        mStorageData.saveFromId.insert( hourArchives->periodType(), hourArchives->id( 0 ) );
+
+    rebuildHours( hourArchives, rules, start, nextRuleStart );
+    rebuildHours( hours, rules, start, nextRuleStart );
+
+    if ( hours->rowCount() )
+        hIndex = hours->rowCount() - 1;
+    if ( hourArchives->rowCount() )
+        haIndex = hourArchives->rowCount() - 1;
+
+    if ( !days->rowCount() )
+        return;
+
+    int dayIndex = days->rowCount();
+    while ( dayIndex > 0 && days->date( dayIndex - 1 ) >= start )
+    {
+        dayIndex--;
+        if ( nextRuleStart.isValid() && days->date( dayIndex ) >= nextRuleStart )
+            continue;
+
+        days->resetTrafficTypes( dayIndex );
+        if ( rules.logOffpeak )
+        {
+            haIndex = rebuildDay( dayIndex, haIndex, hourArchives );
+            hIndex = rebuildDay( dayIndex, hIndex, hours );
+        }
+    }
+    if ( mStorageData.saveFromId.value( days->periodType() ) > days->id( dayIndex ) )
+    {
+        mStorageData.saveFromId.insert( days->periodType(), days->id( dayIndex ) );
+    }
+}
 
 /**
  * Given a model with statistics of a certain unit (year, month, week, etc.)
@@ -482,7 +679,7 @@ QDate InterfaceStatistics::prepareRebuild( StatisticsModel* statistics, const QD
             }
         }
 
-        if ( nextPeriodStart >= startDate )
+        if ( nextPeriodStart > startDate )
         {
             if ( statistics->date( i ) < startDate )
             {
@@ -502,8 +699,12 @@ QDate InterfaceStatistics::prepareRebuild( StatisticsModel* statistics, const QD
 
 void InterfaceStatistics::amendStats( int i, const StatisticsModel *source, StatisticsModel* dest )
 {
-    dest->addRxBytes( source->rxBytes( i ) );
-    dest->addTxBytes( source->txBytes( i ) );
+    foreach ( KNemoStats::TrafficType t, source->trafficTypes( i ) )
+    {
+        dest->addRxBytes( source->rxBytes( i, t ), t );
+        dest->addTxBytes( source->txBytes( i, t ), t );
+        dest->addTrafficType( t );
+    }
 }
 
 void InterfaceStatistics::rebuildCalendarPeriods( const QDate &requestedStart, bool weekOnly )
@@ -650,12 +851,17 @@ void InterfaceStatistics::checkRebuild( const QString &oldCalendar, bool force )
     QDate recalcPos;
     for ( int i = 0; i < newRules.count(); ++i )
     {
+
         bool rulesMatch = ( newRules[i] == mStatsRules[j] );
 
+        QDate nextRuleStart;
         if ( !rulesMatch )
         {
+            if ( newRules.count() > i + 1 )
+                nextRuleStart = newRules[i+1].startDate;
             if ( !recalcPos.isValid() )
                 recalcPos = newRules[i].startDate;
+            rebuildBaseUnits( newRules[i], newRules[i].startDate, nextRuleStart );
         }
         else
         {
@@ -678,6 +884,10 @@ void InterfaceStatistics::checkRebuild( const QString &oldCalendar, bool force )
                             recalcPos = mStatsRules[j].startDate;
                     }
                 }
+                if ( first >= 0 )
+                {
+                    rebuildBaseUnits( newRules[i], mStatsRules[first].startDate, newRules[i+1].startDate );
+                }
             }
             // We're out of new rules but there's more old ones
             // so rebuild from next old rule's date using final new rule.
@@ -686,6 +896,7 @@ void InterfaceStatistics::checkRebuild( const QString &oldCalendar, bool force )
 
                 if ( !recalcPos.isValid() )
                     recalcPos = mStatsRules[j+1].startDate;
+                rebuildBaseUnits( newRules[i], recalcPos, nextRuleStart );
             }
             if ( mStatsRules.count() > j + 1 )
                 ++j;
@@ -770,6 +981,7 @@ void InterfaceStatistics::clearStatistics()
 {
     foreach( StatisticsModel * s, mModels )
         s->clearRows();
+    mStorageData.nextHourId = 0;
     foreach ( StatisticsModel *s, mModels )
     {
         mStorageData.saveFromId.insert( s->periodType(), 0 );
@@ -844,7 +1056,12 @@ void InterfaceStatistics::addRxBytes( unsigned long bytes )
 
     foreach( StatisticsModel * s, mModels )
     {
-        s->addRxBytes( bytes );
+        if ( s->periodType() == KNemoStats::HourArchive )
+            continue;
+        foreach ( KNemoStats::TrafficType t, mModels.value( KNemoStats::Hour )->trafficTypes() )
+        {
+            s->addRxBytes( bytes, t );
+        }
     }
 
     checkTrafficLimit();
@@ -858,7 +1075,12 @@ void InterfaceStatistics::addTxBytes( unsigned long bytes )
 
     foreach( StatisticsModel * s, mModels )
     {
-        s->addTxBytes( bytes );
+        if ( s->periodType() == KNemoStats::HourArchive )
+            continue;
+        foreach ( KNemoStats::TrafficType t, mModels.value( KNemoStats::Hour )->trafficTypes() )
+        {
+            s->addTxBytes( bytes, t );
+        }
     }
 
     checkTrafficLimit();

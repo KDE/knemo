@@ -73,8 +73,17 @@ namespace KNemoStats
         Week,
         Month,
         BillPeriod,
-        Year
+        Year,
+        HourArchive
     };
+
+    // Powers of 2
+    enum TrafficType
+    {
+        AllTraffic = 0,
+        OffpeakTraffic = 1
+    };
+
 };
 
 static const char NETLOAD_THEME[] = "netloadtheme";
@@ -131,6 +140,14 @@ static const char conf_billingWarnRxTx[] = "BillingWarnRxTx";
 static const char conf_statsStartDate[] = "StartDate";
 static const char conf_statsPeriodUnits[] = "PeriodUnits";
 static const char conf_statsPeriodCount[] = "PeriodCount";
+static const char conf_logOffpeak[] = "LogOffpeak";
+static const char conf_offpeakStartTime[] = "OffpeakStartTime";
+static const char conf_offpeakEndTime[] = "OffpeakEndTime";
+static const char conf_weekendIsOffpeak[] = "WeekendIsOffpeak";
+static const char conf_weekendDayStart[] = "WeekendDayStart";
+static const char conf_weekendDayEnd[] = "WeekendDayEnd";
+static const char conf_weekendTimeStart[] = "WeekendTimeStart";
+static const char conf_weekendTimeEnd[] = "WeekendTimeEnd";
 
 // interface context menu
 static const char conf_numCommands[] = "NumCommands";
@@ -292,7 +309,15 @@ public:
     StatsRule()
         :
         periodCount( 1 ),
-        periodUnits( KNemoStats::Month )
+        periodUnits( KNemoStats::Month ),
+        logOffpeak( false ),
+        offpeakStartTime( QTime( 23, 0) ),
+        offpeakEndTime( QTime( 7, 0) ),
+        weekendIsOffpeak( false ),
+        weekendDayStart( 5 ),
+        weekendDayEnd( 1 ),
+        weekendTimeStart( QTime( 23, 0) ),
+        weekendTimeEnd( QTime( 7, 0) )
     {
     }
     bool operator==( StatsRule &r );
@@ -300,6 +325,14 @@ public:
     QDate startDate;
     int periodCount;
     int periodUnits;
+    bool logOffpeak;
+    QTime offpeakStartTime;
+    QTime offpeakEndTime;
+    bool weekendIsOffpeak;
+    int weekendDayStart;
+    int weekendDayEnd;
+    QTime weekendTimeStart;
+    QTime weekendTimeEnd;
 };
 
 struct InterfaceSettings

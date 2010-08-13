@@ -24,7 +24,25 @@ bool StatsRule::operator==( StatsRule &r )
 {
     if ( startDate != r.startDate ||
          periodCount != r.periodCount ||
-         periodUnits != r.periodUnits )
+         periodUnits != r.periodUnits ||
+         logOffpeak != r.logOffpeak )
+    {
+        return false;
+    }
+    else if ( logOffpeak &&
+              ( offpeakStartTime != r.offpeakStartTime ||
+                offpeakEndTime != r.offpeakEndTime ||
+                weekendIsOffpeak != r.weekendIsOffpeak )
+            )
+    {
+        return false;
+    }
+    else if ( weekendIsOffpeak &&
+              ( weekendDayStart != r.weekendDayStart ||
+                weekendDayEnd != r.weekendDayEnd ||
+                weekendTimeStart != r.weekendTimeStart ||
+                weekendTimeEnd != r.weekendTimeEnd )
+            )
     {
         return false;
     }
@@ -34,6 +52,10 @@ bool StatsRule::operator==( StatsRule &r )
 bool StatsRule::isValid( KCalendarSystem *cal )
 {
     if ( !cal->isValid( startDate ) )
+        return false;
+    if ( logOffpeak && ( !offpeakStartTime.isValid() || !offpeakEndTime.isValid() ) )
+        return false;
+    if ( weekendIsOffpeak && ( !weekendTimeStart.isValid() || !weekendTimeEnd.isValid() ) )
         return false;
     if ( periodUnits < KNemoStats::Day || periodUnits > KNemoStats::Year )
         return false;

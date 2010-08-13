@@ -63,6 +63,7 @@ private slots:
 private:
     bool loadStats();
 
+    void hoursToArchive( const QDateTime &dateTime );
     bool daysInSpan( const QDate& entry, int span );
     QDate nextBillPeriodStart( const StatsRule &rule, const QDate& );
 
@@ -72,9 +73,12 @@ private:
 
     int ruleForDate( const QDate &date );
     void syncWithExternal( uint updated );
+    bool isOffpeak( const StatsRule & rule, const QDateTime &dt );
     QDate prepareRebuild( StatisticsModel* statistics, const QDate &recalcDate );
     void amendStats( int index, const StatisticsModel *source, StatisticsModel *dest );
 
+    int rebuildHours( StatisticsModel *s, const StatsRule &rules, const QDate &start, const QDate &end );
+    int rebuildDay( int dayIndex, int hourIndex, StatisticsModel *s );
     void rebuildBaseUnits( const StatsRule & rule, const QDate & start, const QDate & end );
     void rebuildCalendarPeriods( const QDate &requestedStart, bool weekOnly = false );
     void rebuildBillPeriods( const QDate &requestedStart );

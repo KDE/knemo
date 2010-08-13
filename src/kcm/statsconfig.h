@@ -38,6 +38,7 @@ private:
     void setControls( const StatsRule &s );
 private slots:
     void setDefaults();
+    void enableItems();
 protected:
     virtual void slotButtonClicked( int button );
 };

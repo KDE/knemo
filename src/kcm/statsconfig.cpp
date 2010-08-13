@@ -32,12 +32,20 @@ StatsConfig::StatsConfig( const InterfaceSettings * settings, const KCalendarSys
     mDlg.setupUi( mainWidget() );
     setButtons( KDialog::Default | KDialog::Ok | KDialog::Cancel );
 
+    for ( int i = 1; i <= mCal->daysInWeek( QDate::currentDate() ); ++i )
+    {
+        mDlg.weekendStartDay->addItem( mCal->weekDayName( i ) );
+        mDlg.weekendStopDay->addItem( mCal->weekDayName( i ) );
+    }
+
     mDlg.periodUnits->addItem( i18n( "Days" ), KNemoStats::Day );
     mDlg.periodUnits->addItem( i18n( "Weeks" ), KNemoStats::Week );
     mDlg.periodUnits->addItem( i18n( "Months" ), KNemoStats::Month );
     //mDlg.periodUnits->addItem( i18n( "Years" ), KNemoStats::Year );
 
     connect( this, SIGNAL( defaultClicked() ), SLOT( setDefaults() ) );
+    connect( mDlg.logOffpeak, SIGNAL( toggled( bool ) ), SLOT( enableItems() ) );
+    connect( mDlg.doWeekend, SIGNAL( toggled( bool ) ), SLOT( enableItems() ) );
 
     QDate dt = rule.startDate;
     if ( !dt.isValid() )
@@ -51,6 +59,14 @@ void StatsConfig::setControls( const StatsRule &s )
     mDlg.periodCount->setValue( s.periodCount );
     int index = mDlg.periodUnits->findData( s.periodUnits );
     mDlg.periodUnits->setCurrentIndex( index );
+    mDlg.logOffpeak->setChecked( s.logOffpeak );
+    mDlg.startTime->setTime( s.offpeakStartTime );
+    mDlg.stopTime->setTime( s.offpeakEndTime );
+    mDlg.doWeekend->setChecked( s.weekendIsOffpeak );
+    mDlg.weekendStartDay->setCurrentIndex( s.weekendDayStart - 1 );
+    mDlg.weekendStopDay->setCurrentIndex( s.weekendDayEnd - 1 );
+    mDlg.weekendStartTime->setTime( s.weekendTimeStart );
+    mDlg.weekendStopTime->setTime( s.weekendTimeEnd );
 }
 
 void StatsConfig::setDefaults()
@@ -66,7 +82,35 @@ StatsRule StatsConfig::getSettings()
     rule.startDate = mDlg.startDate->date();
     rule.periodUnits = mDlg.periodUnits->itemData( mDlg.periodUnits->currentIndex() ).toInt();
     rule.periodCount = mDlg.periodCount->value();
+    rule.logOffpeak = mDlg.logOffpeak->isChecked();
+    rule.offpeakStartTime = mDlg.startTime->time();
+    rule.offpeakEndTime = mDlg.stopTime->time();
+    rule.weekendIsOffpeak = mDlg.doWeekend->isChecked();
+    rule.weekendDayStart = mDlg.weekendStartDay->currentIndex() + 1;
+    rule.weekendDayEnd = mDlg.weekendStopDay->currentIndex() + 1;
+    rule.weekendTimeStart = mDlg.weekendStartTime->time();
+    rule.weekendTimeEnd = mDlg.weekendStopTime->time();
     return rule;
+}
+
+void StatsConfig::enableItems()
+{
+    bool enabledItems;
+    if ( mDlg.logOffpeak->isChecked() && mDlg.doWeekend->isChecked() )
+    {
+        enabledItems = true;
+    }
+    else
+    {
+        enabledItems = false;
+    }
+
+    mDlg.label_9->setEnabled( enabledItems );
+    mDlg.label_10->setEnabled( enabledItems );
+    mDlg.weekendStartDay->setEnabled( enabledItems );
+    mDlg.weekendStopDay->setEnabled( enabledItems );
+    mDlg.weekendStartTime->setEnabled( enabledItems );
+    mDlg.weekendStopTime->setEnabled( enabledItems );
 }
 
 void StatsConfig::slotButtonClicked( int button )

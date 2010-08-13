@@ -38,25 +38,28 @@ StatisticsModel::~StatisticsModel()
 {
 }
 
-void StatisticsModel::addBytes( enum StatsColumn column, quint64 bytes, int row )
+void StatisticsModel::addBytes( enum StatsColumn column, KNemoStats::TrafficType trafficType, quint64 bytes, int row )
 {
     if ( !bytes || !rowCount() )
         return;
     if ( row < 0 )
         row = rowCount() - 1;
 
-    quint64 b = item( row, column )->data( DataRole ).toULongLong() + bytes;
-    item( row, column )->setData( b, DataRole );
-    updateText( item( row, column ) );
+    int role = DataRole + trafficType;
+
+    quint64 b = item( row, column )->data( role ).toULongLong() + bytes;
+    item( row, column )->setData( b, role );
+    if ( trafficType == KNemoStats::AllTraffic )
+        updateText( item( row, column ) );
 }
 
-quint64 StatisticsModel::bytes( enum StatsColumn column, int row ) const
+quint64 StatisticsModel::bytes( enum StatsColumn column, int role, int row ) const
 {
     if ( row < 0 )
         row = rowCount() - 1;
 
     if ( rowCount() && rowCount() > row )
-        return item( row, column )->data( DataRole ).toULongLong();
+        return item( row, column )->data( role ).toULongLong();
     else
         return 0;
 }
@@ -229,19 +232,53 @@ int StatisticsModel::days( int row ) const
         return 0;
 }
 
-quint64 StatisticsModel::rxBytes( int row ) const
+void StatisticsModel::addTrafficType( int trafficType, int row )
 {
-    return bytes( RxBytes, row );
+    if ( row < 0 )
+        row = rowCount() - 1;
+    if ( rowCount() && rowCount() > row )
+    {
+        int types = item( row, Date )->data( TrafficTypeRole ).toInt();
+        item( row, Date )->setData( types | trafficType, TrafficTypeRole );
+    }
 }
 
-quint64 StatisticsModel::txBytes( int row ) const
+void StatisticsModel::resetTrafficTypes( int row )
 {
-    return bytes( TxBytes, row );
+    if ( row < 0 )
+        row = rowCount() - 1;
+    if ( rowCount() && rowCount() > row )
+        item( row, Date )->setData( KNemoStats::AllTraffic, TrafficTypeRole );
 }
 
-quint64 StatisticsModel::totalBytes( int row ) const
+QList<KNemoStats::TrafficType> StatisticsModel::trafficTypes( int row ) const
 {
-    return bytes( TotalBytes, row );
+    if ( row < 0 )
+        row = rowCount() - 1;
+    QList<KNemoStats::TrafficType> typeList;
+    typeList << KNemoStats::AllTraffic;
+    if ( rowCount() && rowCount() > row )
+    {
+       int types = item( row, Date )->data( TrafficTypeRole ).toInt();
+       if ( types & KNemoStats::OffpeakTraffic )
+           typeList << KNemoStats::OffpeakTraffic;
+    }
+    return typeList;
+}
+
+quint64 StatisticsModel::rxBytes( int row, KNemoStats::TrafficType trafficType ) const
+{
+    return bytes( RxBytes, DataRole+trafficType, row );
+}
+
+quint64 StatisticsModel::txBytes( int row, KNemoStats::TrafficType trafficType ) const
+{
+    return bytes( TxBytes, DataRole+trafficType, row );
+}
+
+quint64 StatisticsModel::totalBytes( int row, KNemoStats::TrafficType trafficType ) const
+{
+    return bytes( TotalBytes, DataRole+trafficType, row );
 }
 
 QString StatisticsModel::txText( int row ) const
@@ -259,16 +296,16 @@ QString StatisticsModel::totalText( int row ) const
     return text( TotalBytes, row );
 }
 
-void StatisticsModel::addRxBytes( quint64 bytes, int row )
+void StatisticsModel::addRxBytes( quint64 bytes, KNemoStats::TrafficType trafficType, int row )
 {
-    addBytes( RxBytes, bytes, row );
-    addBytes( TotalBytes, bytes, row );
+    addBytes( RxBytes, trafficType, bytes, row );
+    addBytes( TotalBytes, trafficType, bytes, row );
 }
 
-void StatisticsModel::addTxBytes( quint64 bytes, int row )
+void StatisticsModel::addTxBytes( quint64 bytes, KNemoStats::TrafficType trafficType, int row )
 {
-    addBytes( TxBytes, bytes, row );
-    addBytes( TotalBytes, bytes, row );
+    addBytes( TxBytes, trafficType, bytes, row );
+    addBytes( TotalBytes, trafficType, bytes, row );
 }
 
 int StatisticsModel::indexOfId( int id ) const
@@ -283,17 +320,20 @@ int StatisticsModel::indexOfId( int id ) const
     return -1;
 }
 
-void StatisticsModel::setTraffic( int i, quint64 rx, quint64 tx )
+void StatisticsModel::setTraffic( int i, quint64 rx, quint64 tx, KNemoStats::TrafficType trafficType )
 {
     if ( i < 0 || i >= rowCount() )
         return;
 
-    item( i, RxBytes )->setData( rx, DataRole );
-    item( i, TxBytes )->setData( tx, DataRole );
-    item( i, TotalBytes )->setData( rx+tx, DataRole );
-    updateText( item( i, RxBytes ) );
-    updateText( item( i, TxBytes ) );
-    updateText( item( i, TotalBytes ) );
+    item( i, RxBytes )->setData( rx, DataRole + trafficType );
+    item( i, TxBytes )->setData( tx, DataRole + trafficType );
+    item( i, TotalBytes )->setData( rx+tx, DataRole + trafficType );
+    if ( trafficType == KNemoStats::AllTraffic )
+    {
+        updateText( item( i, RxBytes ) );
+        updateText( item( i, TxBytes ) );
+        updateText( item( i, TotalBytes ) );
+    }
 }
 
 #include "statisticsmodel.moc"

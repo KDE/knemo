@@ -26,9 +26,11 @@ struct StorageData
 {
     StorageData()
         : lastSaved( 0 ),
+        nextHourId( 0 ),
         calendar( 0 )
     {}
     uint lastSaved;
+    int nextHourId;
     QHash<int, int> saveFromId;
     KCalendarSystem* calendar;
 };

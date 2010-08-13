@@ -36,6 +36,7 @@ public:
     {
         IdRole = Qt::UserRole + 1,
         SpanRole,
+        TrafficTypeRole,
         DataRole
     };
 
@@ -57,20 +58,23 @@ public:
     void setDateTime( QDateTime );
     int days( int row = -1 ) const;
     void setDays( int days );
+    QList<KNemoStats::TrafficType> trafficTypes( int row = -1 ) const;
+    void resetTrafficTypes( int i = -1 );
+    void addTrafficType( int trafficType, int i = -1 );
     int indexOfId( int row ) const;
 
-    quint64 rxBytes( int row = -1 ) const;
-    quint64 txBytes( int row = -1 ) const;
-    quint64 totalBytes( int row = -1 ) const;
-    void setTraffic( int i, quint64 rx, quint64 tx );
+    quint64 rxBytes( int row = -1, KNemoStats::TrafficType trafficType = KNemoStats::AllTraffic ) const;
+    quint64 txBytes( int row = -1, KNemoStats::TrafficType traffictype = KNemoStats::AllTraffic ) const;
+    quint64 totalBytes( int row = -1, KNemoStats::TrafficType trafficType = KNemoStats::AllTraffic ) const;
+    void setTraffic( int i, quint64 rx, quint64 tx, KNemoStats::TrafficType trafficType = KNemoStats::AllTraffic );
 
     QString rxText( int row = -1 ) const;
     QString txText( int row = -1 ) const;
     QString totalText( int row = -1 ) const;
 
     // Always added to the current entry (last row)
-    void addRxBytes( quint64 bytes, int row = -1 );
-    void addTxBytes( quint64 bytes, int row = -1 );
+    void addRxBytes( quint64 bytes, KNemoStats::TrafficType trafficType = KNemoStats::AllTraffic, int row = -1 );
+    void addTxBytes( quint64 bytes, KNemoStats::TrafficType trafficType = KNemoStats::AllTraffic, int row = -1 );
 
 private:
     enum StatsColumn
@@ -81,8 +85,8 @@ private:
         TotalBytes
     };
 
-    void addBytes( enum StatsColumn column, quint64 bytes, int row = -1 );
-    quint64 bytes( enum StatsColumn column, int row ) const;
+    void addBytes( enum StatsColumn column, KNemoStats::TrafficType trafficType, quint64 bytes, int row = -1 );
+    quint64 bytes( enum StatsColumn column, int role, int row ) const;
     QString text( enum StatsColumn column, int row ) const;
     void updateText( QStandardItem * i );
 
