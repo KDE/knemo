@@ -253,10 +253,12 @@
  <tabstops>
   <tabstop>trafficType</tabstop>
   <tabstop>trafficDirection</tabstop>
+  <tabstop>threshold</tabstop>
   <tabstop>trafficUnits</tabstop>
   <tabstop>periodCount</tabstop>
   <tabstop>periodUnits</tabstop>
   <tabstop>customTextCheck</tabstop>
+  <tabstop>customTextEdit</tabstop>
  </tabstops>
  <resources/>
  <connections>
