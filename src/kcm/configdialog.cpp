@@ -676,7 +676,14 @@ void ConfigDialog::save()
         {
             QString group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( it ).arg( i );
             KConfigGroup warnGroup( config, group );
-            warnGroup.writeEntry( conf_warnPeriodUnits, settings->warnRules[i].periodUnits );
+            if ( settings->statsRules.count() == 0 && settings->warnRules[i].periodUnits == KNemoStats::BillPeriod )
+            {
+                warnGroup.writeEntry( conf_warnPeriodUnits, static_cast<int>(KNemoStats::Month) );
+            }
+            else
+            {
+                warnGroup.writeEntry( conf_warnPeriodUnits, settings->warnRules[i].periodUnits );
+            }
             warnGroup.writeEntry( conf_warnPeriodCount, settings->warnRules[i].periodCount );
             warnGroup.writeEntry( conf_warnTrafficType, settings->warnRules[i].trafficType );
             warnGroup.writeEntry( conf_warnTrafficDirection, settings->warnRules[i].trafficDirection );
@@ -840,6 +847,33 @@ int ConfigDialog::findIndexFromName( const QString& internalName )
     return -1;
 }
 
+void ConfigDialog::updateWarnText( int oldCount )
+{
+    // If the billing periods go away, the warn period will change to months
+    // This only changes the text displayed in the model, so it can change
+    // back if a billing period reappears.
+    if ( ! statsModel->rowCount() )
+    {
+        QList<WarnRule> warnRules = warnModel->getRules();
+        for ( int i = 0; i < warnRules.count(); ++i )
+        {
+            if ( warnRules[i].periodUnits == KNemoStats::BillPeriod )
+            {
+                warnModel->item( i, 1 )->setData( periodText( warnRules[i].periodCount, KNemoStats::Month ), Qt::DisplayRole );
+            }
+        }
+    }
+    else if ( oldCount == 0 )
+    {
+        QList<WarnRule> warnRules = warnModel->getRules();
+        for ( int i = 0; i < warnRules.count(); ++i )
+        {
+            if ( warnRules[i].periodUnits == KNemoStats::BillPeriod )
+                warnModel->item( i, 1 )->setData( periodText( warnRules[i].periodCount, warnRules[i].periodUnits ), Qt::DisplayRole );
+        }
+    }
+}
+
 void ConfigDialog::updateControls( InterfaceSettings *settings )
 {
     mLock = true;
@@ -863,16 +897,6 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     mDlg->comboHiding->setCurrentIndex( index );
     comboHidingChanged( index );
     mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
-
-    warnModel->removeRows(0, warnModel->rowCount() );
-    foreach( WarnRule warn, settings->warnRules )
-    {
-        warnModel->addWarn( warn );
-    }
-    mDlg->modifyWarn->setEnabled( warnModel->rowCount() );
-    mDlg->removeWarn->setEnabled( warnModel->rowCount() );
-    if ( warnModel->rowCount() )
-        mDlg->warnView->setCurrentIndex( warnModel->indexFromItem ( warnModel->item( 0, 0 ) ) );
 
     QString calType;
     if ( settings->calendar.isEmpty() )
@@ -900,6 +924,20 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     }
     mDlg->modifyStats->setEnabled( statsModel->rowCount() );
     mDlg->removeStats->setEnabled( statsModel->rowCount() );
+
+    warnModel->removeRows(0, warnModel->rowCount() );
+    foreach( WarnRule warn, settings->warnRules )
+    {
+        warnModel->addWarn( warn );
+    }
+    updateWarnText( statsModel->rowCount() );
+
+    mDlg->modifyWarn->setEnabled( warnModel->rowCount() );
+    mDlg->removeWarn->setEnabled( warnModel->rowCount() );
+    if ( warnModel->rowCount() )
+    {
+        mDlg->warnView->setCurrentIndex( warnModel->indexFromItem ( warnModel->item( 0, 0 ) ) );
+    }
 
     mDlg->listViewCommands->clear();
     QList<QTreeWidgetItem *>items;
@@ -1331,6 +1369,7 @@ void ConfigDialog::addStatsClicked()
         return;
 
     StatsRule rule;
+    int oldRuleCount = statsModel->rowCount();
     StatsConfig dlg( settings, mCalendar, rule, true );
     if ( dlg.exec() )
     {
@@ -1341,6 +1380,7 @@ void ConfigDialog::addStatsClicked()
         settings->statsRules = statsModel->getRules();
         mDlg->modifyStats->setEnabled( true );
         mDlg->removeStats->setEnabled( true );
+        updateWarnText( oldRuleCount );
         changed( true );
     }
 }
@@ -1382,6 +1422,7 @@ void ConfigDialog::removeStatsClicked()
     settings->statsRules = statsModel->getRules();
     mDlg->modifyStats->setEnabled( statsModel->rowCount() );
     mDlg->removeStats->setEnabled( statsModel->rowCount() );
+    updateWarnText( statsModel->rowCount() );
     changed( true );
 }
 

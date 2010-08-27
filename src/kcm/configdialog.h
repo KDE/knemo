@@ -126,6 +126,7 @@ private:
     QString findNameFromIndex( int index );
     QPixmap textIcon( QString incomingText, QString outgoingText, int status );
     QPixmap barIcon( int status );
+    void updateWarnText( int oldCount );
 
     int mToolTipContent;
     bool mLock;
