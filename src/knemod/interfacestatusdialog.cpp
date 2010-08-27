@@ -365,13 +365,16 @@ void InterfaceStatusDialog::doUnavailable()
 void InterfaceStatusDialog::configChanged()
 {
     bool billText = false;
-    foreach ( StatsRule rule, mInterface->settings().statsRules )
+    if ( mInterface->settings().activateStatistics )
     {
-        if ( rule.periodCount != 1 ||
-             rule.periodUnits != KNemoStats::Month ||
-             mInterface->ifaceStatistics()->calendar()->day( rule.startDate ) != 1 )
+        foreach ( StatsRule rule, mInterface->settings().statsRules )
         {
-            billText = true;
+            if ( rule.periodCount != 1 ||
+                 rule.periodUnits != KNemoStats::Month ||
+                 mInterface->ifaceStatistics()->calendar()->day( rule.startDate ) != 1 )
+            {
+                billText = true;
+            }
         }
     }
 
