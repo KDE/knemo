@@ -75,6 +75,10 @@ void WarnConfig::setControls( const WarnRule &warn )
     mDlg.trafficUnits->setCurrentIndex( index );
     mDlg.periodCount->setValue( warn.periodCount );
     index = mDlg.periodUnits->findData( warn.periodUnits );
+    if ( index < 0 )
+    {
+        index = mDlg.periodUnits->findData( KNemoStats::Month );
+    }
     mDlg.periodUnits->setCurrentIndex( index );
     mDlg.customTextEdit->setPlainText( warn.customText );
     mDlg.customTextCheck->setChecked( !warn.customText.trimmed().isEmpty() );

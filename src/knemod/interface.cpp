@@ -112,7 +112,7 @@ void Interface::configChanged()
             WarnRule warn;
             warn.periodUnits = clamp<int>(warnGroup.readEntry( conf_warnPeriodUnits, warn.periodUnits ), KNemoStats::Hour, KNemoStats::Year );
             warn.periodCount = clamp<int>(warnGroup.readEntry( conf_warnPeriodCount, warn.periodUnits ), 1, 1000 );
-            warn.trafficType = clamp<int>(warnGroup.readEntry( conf_warnTrafficType, warn.trafficType ), KNemoStats::PeakOffpeak, KNemoStats::Offpeak );
+            warn.trafficType = clamp<int>(warnGroup.readEntry( conf_warnTrafficType, warn.trafficType ), KNemoStats::Peak, KNemoStats::PeakOffpeak );
             warn.trafficDirection = clamp<int>(warnGroup.readEntry( conf_warnTrafficDirection, warn.trafficDirection ), KNemoStats::TrafficIn, KNemoStats::TrafficTotal );
             warn.trafficUnits = clamp<int>(warnGroup.readEntry( conf_warnTrafficUnits, warn.trafficUnits ), KNemoStats::UnitB, KNemoStats::UnitG );
             warn.threshold = clamp<double>(warnGroup.readEntry( conf_warnThreshold, warn.threshold ), 0.0, 9999.0 );

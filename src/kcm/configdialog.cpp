@@ -86,6 +86,9 @@ static QString periodText( int c, int u )
         case KNemoStats::Month:
             units = i18np( "%1 month", "%1 months", c );
             break;
+        case KNemoStats::BillPeriod:
+            units = i18np( "%1 billing period", "%1 billing periods", c );
+            break;
         case KNemoStats::Year:
             units = i18np( "%1 year", "%1 years", c );
             break;
@@ -165,6 +168,8 @@ QString WarnModel::ruleText( const WarnRule &warn )
         case KNemoStats::TrafficOut:
            warnDirection = i18n( "outgoing" );
            break;
+        case KNemoStats::TrafficTotal:
+           warnDirection = i18n( "incoming and outgoing" );
     }
     quint64 siz = warn.threshold * pow( 1024, warn.trafficUnits );
     QString text = QString( "%1 %2 traffic > %3" ).arg( warnType ).arg( warnDirection )
@@ -464,7 +469,7 @@ void ConfigDialog::load()
 
                     warn.periodUnits = clamp<int>(warnGroup.readEntry( conf_warnPeriodUnits, warn.periodUnits ), KNemoStats::Hour, KNemoStats::Year );
                     warn.periodCount = clamp<int>(warnGroup.readEntry( conf_warnPeriodCount, warn.periodCount ), 1, 1000 );
-                    warn.trafficType = clamp<int>(warnGroup.readEntry( conf_warnTrafficType, warn.trafficType ), KNemoStats::PeakOffpeak, KNemoStats::Offpeak );
+                    warn.trafficType = clamp<int>(warnGroup.readEntry( conf_warnTrafficType, warn.trafficType ), KNemoStats::Peak, KNemoStats::PeakOffpeak );
                     warn.trafficDirection = clamp<int>(warnGroup.readEntry( conf_warnTrafficDirection, warn.trafficDirection ), KNemoStats::TrafficIn, KNemoStats::TrafficTotal );
                     warn.trafficUnits = clamp<int>(warnGroup.readEntry( conf_warnTrafficUnits, warn.trafficUnits ), KNemoStats::UnitB, KNemoStats::UnitG );
                     warn.threshold = clamp<double>(warnGroup.readEntry( conf_warnThreshold, warn.threshold ), 0.0, 9999.0 );
