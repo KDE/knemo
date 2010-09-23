@@ -154,7 +154,7 @@ void NetlinkBackend::updateAddresses( BackendData *data )
         if ( flags & IFA_F_OPTIMISTIC )
             strFlags += i18n( " optimistic" );
         if ( flags & IFA_F_HOMEADDRESS )
-            strFlags += i18n( " homeaddress" );
+            strFlags += i18nc( "mobile ipv6 home address flag", " homeaddress" );
         if ( flags & IFA_F_DEPRECATED )
             strFlags += i18n( " deprecated" );
         if ( flags & IFA_F_TENTATIVE )

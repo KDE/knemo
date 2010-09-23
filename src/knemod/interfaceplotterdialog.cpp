@@ -79,7 +79,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
       mUseBitrate( generalSettings->useBitrate ),
       mName( name )
 {
-    setCaption( i18n( "%1 Traffic", mName ) );
+    setCaption( i18nc( "interface name", "%1 Traffic", mName ) );
     setButtons( Close );
     setContextMenuPolicy( Qt::DefaultContextMenu );
 
@@ -334,8 +334,8 @@ void InterfacePlotterDialog::configChanged()
     if ( mSettings.showIncoming )
         visibleBeams |= KSignalPlotter::INCOMING_TRAFFIC;
 
-    mSentLabel->setLabel( i18n( "%1 Sent Data", mName ), mSettings.colorOutgoing, mIndicatorSymbol);
-    mReceivedLabel->setLabel( i18n( "%1 Received Data", mName ), mSettings.colorIncoming, mIndicatorSymbol);
+    mSentLabel->setLabel( i18nc( "interface name", "%1 Sent Data", mName ), mSettings.colorOutgoing, mIndicatorSymbol);
+    mReceivedLabel->setLabel( i18nc( "interface name", "%1 Received Data", mName ), mSettings.colorIncoming, mIndicatorSymbol);
 
     mPlotter->setBeamColor( KSignalPlotter::INCOMING_BEAM, mSettings.colorIncoming );
     mPlotter->setBeamColor( KSignalPlotter::OUTGOING_BEAM, mSettings.colorOutgoing );

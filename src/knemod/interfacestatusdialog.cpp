@@ -41,7 +41,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
       mConfig( KGlobal::config() ),
       mInterface( interface )
 {
-    setCaption( i18n( "%1 Interface Status", interface->ifaceName() ) );
+    setCaption( i18nc( "interface name", "%1 Interface Status", interface->ifaceName() ) );
     setButtons( Close );
 
     ui.setupUi( mainWidget() );
@@ -266,19 +266,19 @@ void InterfaceStatusDialog::doUp( const BackendData *data )
         switch ( addrData.scope )
         {
             case RT_SCOPE_UNIVERSE:
-                scope = i18n( "global" );
+                scope = i18nc( "ipv6 address scope", "global" );
                 break;
             case RT_SCOPE_SITE:
-                scope = i18n( "site" );
+                scope = i18nc( "ipv6 address scope", "site" );
                 break;
             case RT_SCOPE_LINK:
-                scope = i18n( "link" );
+                scope = i18nc( "ipv6 address scope", "link" );
                 break;
             case RT_SCOPE_HOST:
-                scope = i18n( "host" );
+                scope = i18nc( "ipv6 address scope", "host" );
                 break;
             case RT_SCOPE_NOWHERE:
-                scope = i18n( "none" );
+                scope = i18nc( "ipv6 address scope", "none" );
                 break;
         }
         scope += addrData.ipv6Flags;

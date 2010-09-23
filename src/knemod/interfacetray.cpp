@@ -303,11 +303,11 @@ void InterfaceTray::setupMappings()
 {
     // Cannot make this data static as the i18n macro doesn't seem
     // to work when called to early i.e. before setting the catalogue.
-    mScope.insert( RT_SCOPE_NOWHERE, i18n( "none" ) );
-    mScope.insert( RT_SCOPE_HOST, i18n( "host" ) );
-    mScope.insert( RT_SCOPE_LINK, i18n( "link" ) );
-    mScope.insert( RT_SCOPE_SITE, i18n( "site" ) );
-    mScope.insert( RT_SCOPE_UNIVERSE, i18n( "global" ) );
+    mScope.insert( RT_SCOPE_NOWHERE, i18nc( "ipv6 address scope", "none" ) );
+    mScope.insert( RT_SCOPE_HOST, i18nc( "ipv6 address scope", "host" ) );
+    mScope.insert( RT_SCOPE_LINK, i18nc( "ipv6 address scope", "link" ) );
+    mScope.insert( RT_SCOPE_SITE, i18nc( "ipv6 address scope", "site" ) );
+    mScope.insert( RT_SCOPE_UNIVERSE, i18nc( "ipv6 address scope", "global" ) );
 }
 
 #include "interfacetray.moc"
