@@ -52,9 +52,9 @@
 #include <KLocale>
 #include <kio/global.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #ifdef __GLIBC__
-#include <unistd.h>
 #include <netinet/ether.h>
 #endif
 
