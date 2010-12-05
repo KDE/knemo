@@ -10,7 +10,8 @@ Version 0.7.0
  * bugfixes:
    - reset traffic counters when an interface becomes unavailable
    - mark pointopoint interfaces as connected only if they have an ip address
-   - fix build on GNU/kFreeBSD
+   - fix build on FreeBSD and GNU/kFreeBSD
+   - netload icon theme shouldn't use the unavailable color as its background
 
 Version 0.6.3
  * save changes to traffic threshold setting
