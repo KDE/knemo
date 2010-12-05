@@ -406,6 +406,7 @@ struct InterfaceSettings
         colorOutgoing( 0xFF7F08 ),
         colorDisabled( 0x888786 ),
         colorUnavailable( 0x888786 ),
+        colorBackground( 0x888786 ),
         dynamicColor( false ),
         colorIncomingMax( 0x96FFFF ),
         colorOutgoingMax( 0xFFC868 ),
@@ -425,6 +426,7 @@ struct InterfaceSettings
     QColor colorOutgoing;
     QColor colorDisabled;
     QColor colorUnavailable;
+    QColor colorBackground;
     bool dynamicColor;
     QColor colorIncomingMax;
     QColor colorOutgoingMax;

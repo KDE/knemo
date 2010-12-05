@@ -425,6 +425,7 @@ void ConfigDialog::load()
             KColorScheme scheme(QPalette::Active, KColorScheme::View);
             settings->colorDisabled = interfaceGroup.readEntry( conf_colorDisabled, scheme.foreground( KColorScheme::InactiveText ).color() );
             settings->colorUnavailable = interfaceGroup.readEntry( conf_colorUnavailable, scheme.foreground( KColorScheme::InactiveText ).color() );
+            settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
             settings->iconFont = interfaceGroup.readEntry( conf_iconFont, s.iconFont );
             settings->dynamicColor = interfaceGroup.readEntry( conf_dynamicColor, s.dynamicColor );
             settings->colorIncomingMax = interfaceGroup.readEntry( conf_colorIncomingMax, s.colorIncomingMax );
@@ -769,6 +770,7 @@ void ConfigDialog::defaults()
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
+        settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->iconFont = KGlobalSettings::generalFont();
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
@@ -996,6 +998,7 @@ void ConfigDialog::buttonNewSelected()
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
+        settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->iconFont = KGlobalSettings::generalFont();
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->setCurrentRow( mDlg->listBoxInterfaces->row( item ) );
@@ -1052,6 +1055,7 @@ void ConfigDialog::buttonAllSelected()
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
+        settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->iconFont = KGlobalSettings::generalFont();
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->addItem( ifname );
@@ -1158,8 +1162,8 @@ QPixmap ConfigDialog::barIcon( int status )
     QLinearGradient outGrad( 3, 0, 10, 0 );
     QLinearGradient topOutGrad( 3, 0, 10, 0 );
 
-    QColor topColor = mDlg->colorUnavailable->color();
-    QColor topColorD = mDlg->colorUnavailable->color().darker();
+    QColor topColor = getItemSettings()->colorBackground;
+    QColor topColorD = getItemSettings()->colorBackground.darker();
     topColor.setAlpha( 128 );
     topColorD.setAlpha( 128 );
     topInGrad.setColorAt(0, topColorD);

@@ -297,8 +297,21 @@ void InterfaceIcon::updateBars( bool doUpdate )
     QPainter p( &barIcon );
     p.setOpacity( 1.0 );
 
-    QColor topColor = mInterface->settings().colorUnavailable;
-    QColor topColorD = mInterface->settings().colorUnavailable.darker();
+    const BackendData * data = mInterface->backendData();
+    QColor topColor;
+    if ( data->status & KNemoIface::Connected )
+    {
+        topColor = mInterface->settings().colorBackground;
+    }
+    else if ( data->status & KNemoIface::Available )
+    {
+        topColor = mInterface->settings().colorDisabled;
+    }
+    else
+    {
+        topColor = mInterface->settings().colorUnavailable;
+    }
+    QColor topColorD = topColor.darker();
     topColor.setAlpha( 128 );
     topColorD.setAlpha( 128 );
     topInGrad.setColorAt(0, topColorD);
