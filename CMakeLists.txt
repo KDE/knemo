@@ -1,6 +1,6 @@
 project( knemo )
 
-set( KNEMO_VERSION 0.6.80+svn )
+set( KNEMO_VERSION 0.7.0 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
