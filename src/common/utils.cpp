@@ -33,6 +33,7 @@
 #include <KSharedConfig>
 #include <KSharedConfigPtr>
 #include <KStandardDirs>
+#include "data.h"
 #include "utils.h"
 
 #ifdef __linux__
@@ -307,5 +308,5 @@ double validatePoll( double val )
             return val;
         }
     }
-    return 1.0;
+    return GeneralSettings().pollInterval;
 }
