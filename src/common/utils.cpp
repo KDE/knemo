@@ -299,11 +299,11 @@ QFont setIconFont( const QString& text, const QFont& font, int iconWidth )
 double validatePoll( double val )
 {
     int siz = sizeof(pollIntervals)/sizeof(double);
-    for ( int i = 1; i < siz; i++ )
+    for ( int i = 0; i < siz; i++ )
     {
-        if ( val < pollIntervals[i] )
+        if ( val <= pollIntervals[i] )
         {
-            val = pollIntervals[i-1];
+            val = pollIntervals[i];
             return val;
         }
     }
