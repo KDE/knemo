@@ -1,3 +1,8 @@
+Version 0.7.1
+ * bugfixes:
+   - fix a warning about K_EXPORT_COMPONENT_FACTORY
+   - fix how the poll interval gets validated
+
 Version 0.7.0
  * statistics changes:
    - statistics are now stored in an SQLite 3 database
