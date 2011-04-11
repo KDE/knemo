@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 #include <QPainter>
+#include <QPixmapCache>
 
 #include <KAction>
 #include <KActionCollection>
@@ -338,6 +339,7 @@ void InterfaceIcon::updateBars( bool doUpdate )
 #else
     mTray->setIcon( barIcon );
 #endif
+    QPixmapCache::clear();
 }
 
 QString InterfaceIcon::compactTrayText(unsigned long data )
@@ -443,6 +445,7 @@ void InterfaceIcon::updateIconText( bool doUpdate )
 #else
     mTray->setIcon( textIcon );
 #endif
+    QPixmapCache::clear();
 }
 
 void InterfaceIcon::updateToolTip()
