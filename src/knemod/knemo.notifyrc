@@ -379,6 +379,7 @@ Name[zh_TW]=超過連線流量限制
 Comment=Traffic for an interface has exceeded a user-defined threshold
 Comment[bg]=Трафикът да мрежовия интерфейс надвишава зададения от потребителя праг
 Comment[bs]=Saobraćaj interfejsa je ispunio korisnički određenu granicu
+Comment[cs]=Přenos přes rozhraní přesáhl uživatelem definovaný práh.
 Comment[da]=Trafikken for et netværkskort har overskredet en brugerdefineret tærskel
 Comment[de]=Der Datenverkehr einer Schnittstelle hat einen benutzerdefinierten Schwellwert überschritten
 Comment[el]=Η κυκλοφορία για μια διεπαφή έχει υπερβεί το ορισμένο από τον χρήστη κατώφλι
