@@ -687,13 +687,11 @@ void KSignalPlotterPrivate::calculateNiceRange()
 {
     double max = mUserMaxValue;
     double min = mUserMinValue;
-    bool minFromUser = true;
     if( mUseAutoRange ) {
         if(!isnan(mMaxValue) && mMaxValue * 0.99 > max)  //Allow max value to go very slightly over the given max, for rounding reasons
             max = mMaxValue;
         if(!isnan(mMinValue) && mMinValue * 0.99 < min) {
             min = mMinValue;
-            minFromUser = false;
         }
     }
 

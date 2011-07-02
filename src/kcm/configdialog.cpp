@@ -766,7 +766,6 @@ void ConfigDialog::defaults()
     else
     {
         InterfaceSettings* settings = new InterfaceSettings();
-        QDate startDate = QDate::currentDate().addDays( 1 - mCalendar->day( QDate::currentDate() ) );
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
