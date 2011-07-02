@@ -191,12 +191,13 @@ void InterfaceStatistics::genNewHour( const QDateTime &dateTime )
         return;
 
     int ruleIndex = ruleForDate( dateTime.date() );
+
+    hours->createEntry( dateTime );
+
     if ( ruleIndex >= 0  && isOffpeak( mStatsRules[ruleIndex], dateTime ) )
     {
         hours->addTrafficType( KNemoStats::OffpeakTraffic );
     }
-
-    hours->createEntry( dateTime );
 
     resetWarnings( hours->periodType() );
 }
@@ -976,6 +977,16 @@ void InterfaceStatistics::checkValidEntry()
         // The fancy short date may need updating
         for ( int i = 0; i < hours->rowCount(); ++i )
             hours->updateDateText( i );
+    }
+
+    foreach ( StatisticsModel * s, mModels )
+    {
+        if ( s->periodType() == KNemoStats::HourArchive || s->periodType() == KNemoStats::Hour )
+            continue;
+        foreach ( KNemoStats::TrafficType t, hours->trafficTypes() )
+        {
+            s->addTrafficType( t );
+        }
     }
 
     QDateTime ndt = curDateTime.addSecs( 3600 - curDateTime.time().minute()*60 - curDateTime.time().second() );
