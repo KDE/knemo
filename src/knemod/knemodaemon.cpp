@@ -199,8 +199,7 @@ void KNemoDaemon::createAboutData()
                       KAboutData::License_GPL_V2,
                       KLocalizedString(),
                       ki18n( "Copyright (C) 2004, 2005, 2006 Percy Leonhardt\nCopyright (C) 2009, 2010 John Stamp\n\nSignal plotter taken from KSysGuard\nCopyright (C) 2006 - 2009 John Tapsell" ),
-                      "http://extragear.kde.org/apps/knemo/",
-                      "jstamp@users.sourceforge.net");
+                      "http://extragear.kde.org/apps/knemo/");
 
     mAboutData->addAuthor( ki18n( "Percy Leonhardt" ), ki18n( "Original Author" ),
                     "percy@eris23.de" );
