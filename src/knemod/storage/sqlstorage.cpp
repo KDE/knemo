@@ -163,7 +163,7 @@ bool SqlStorage::loadHourArchives( StatisticsModel *hourArchive, const QDate &st
                 hourArchive->createEntry( QDateTime::fromString( qry.value( cDt ).toString(), Qt::ISODate ), id );
             }
             hourArchive->setTraffic( hourArchive->indexOfId( id ), qry.value( cRx ).toULongLong(), qry.value( cTx ).toULongLong(), trafficType );
-            hourArchive->addTrafficType( trafficType );
+            hourArchive->addTrafficType( trafficType, hourArchive->indexOfId( id ) );
         }
     }
 
@@ -237,7 +237,7 @@ bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *model
                         s->createEntry( QDateTime::fromString( qry.value( cDt ).toString(), Qt::ISODate ), id, days );
                     }
                     s->setTraffic( id, qry.value( cRx ).toULongLong(), qry.value( cTx ).toULongLong(), trafficType );
-                    s->addTrafficType( trafficType );
+                    s->addTrafficType( trafficType, id );
                 }
                 if ( trafficType == KNemoStats::AllTraffic && s->rowCount() )
                 {
