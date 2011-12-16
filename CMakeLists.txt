@@ -14,15 +14,18 @@ if ( NOT QT_QTSQL_FOUND )
     message( FATAL_ERROR "The QtSql development package could not be found. Please install libQtSql." )
 endif( NOT QT_QTSQL_FOUND )
 
+option (NO_WIRELESS_SUPPORT "Disable support for wireless devices." FALSE )
 if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
     find_package( Libnl REQUIRED )
 
-    find_package( Libiw )
-    macro_log_feature( LIBIW_FOUND "libiw" "Linux Wireless Extensions library" "http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html" FALSE "" "" )
+    if ( NOT NO_WIRELESS_SUPPORT )
+        find_package( Libiw )
+        macro_log_feature( LIBIW_FOUND "libiw" "Linux Wireless Extensions library" "http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html" FALSE "" "" )
 
-    if ( LIBIW_FOUND )
-        set ( HAVE_LIBIW 1 )
-    endif ( LIBIW_FOUND )
+        if ( LIBIW_FOUND )
+            set ( HAVE_LIBIW 1 )
+        endif ( LIBIW_FOUND )
+    endif ( NOT NO_WIRELESS_SUPPORT )
 
 endif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
 
