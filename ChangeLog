@@ -1,3 +1,6 @@
+Version 0.7.3
+ * By request, add a configure switch to disable wireless support.
+
 Version 0.7.2
  * fix loading/calculating off-peak traffic
  * use bugs.kde.org for bug reports
