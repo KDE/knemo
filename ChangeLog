@@ -1,3 +1,12 @@
+Version 0.7.4
+ * Fix bugs in the BSD backend, thanks to Alberto Villa
+   - KDE bug #301546: Wrong traffic reported on FreeBSD
+   - KDE bug #301577: Broken link state awareness on FreeBSD
+   - KDE bug #301697: Wrong encryption state for mixed WEP connections on
+     FreeBSD
+   - KDE bug #301699: Default gateway undetected on FreeBSD
+ * Add monochrome icon theme contributed by Vinícius Sabino.
+
 Version 0.7.3
  * By request, add a configure switch to disable wireless support.
 
