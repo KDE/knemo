@@ -1,4 +1,5 @@
 add_subdirectory( modem )
 add_subdirectory( monitor )
+add_subdirectory( monochrome )
 add_subdirectory( network )
 add_subdirectory( wireless )
