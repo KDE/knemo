@@ -429,14 +429,9 @@ void BSDBackend::updateWirelessData( const QString& ifName, BackendData* data )
         data->prevAccessPoint = data->accessPoint;
     }
 
-    if ( get80211val( ifName, IEEE80211_IOC_AUTHMODE, &val) >= 0 )
+    if ( get80211val( ifName, IEEE80211_IOC_PRIVACY, &val ) >= 0 )
     {
-        if ( val == IEEE80211_AUTH_WPA )
-            data->isEncrypted = true;
-    }
-    else if ( get80211val( ifName, IEEE80211_IOC_WEP, &val ) >= 0 && val != IEEE80211_WEP_NOSUP )
-    {
-        if ( val == IEEE80211_WEP_ON )
+        if ( val > 0 )
             data->isEncrypted = true;
     }
 
