@@ -334,7 +334,12 @@ void BSDBackend::updateIfaceData( const QString& ifName, BackendData* data )
                 addrKey = getAddr( ifa, addrVal );
 
                 // Check here too for non-ethernet interfaces
-                if ( ifa->ifa_flags & IFF_RUNNING &&
+                struct ifmediareq ifmr;
+                memset( &ifmr, 0, sizeof( ifmr ) );
+                strncpy( ifmr.ifm_name, ifName.toLatin1(), sizeof( ifmr.ifm_name ) );
+                if ( ioctl( s, SIOCGIFMEDIA, &ifmr ) >= 0 &&
+                     ifmr.ifm_status & IFM_AVALID &&
+                     ifmr.ifm_status & IFM_ACTIVE &&
                      addrVal.scope != RT_SCOPE_LINK &&
                      addrVal.scope != RT_SCOPE_NOWHERE )
                 {
