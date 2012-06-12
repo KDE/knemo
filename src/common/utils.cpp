@@ -211,7 +211,7 @@ QString getSocketRoute( int afType, QString *defaultGateway )
                     ifname = tempname;
                 }
 
-                cp += sizeof( struct sockaddr );
+                cp += SA_SIZE( sa );
             }
     }
     else
