@@ -1,5 +1,15 @@
 [Desktop Entry]
 Name=Monochrome
+Name[pt]=Monocromático
+Name[pt_BR]=Monocromático
+Name[sv]=Monokrom
+Name[uk]=Чорно-біла
+Name[x-test]=xxMonochromexx
 Comment=KNemo Monochrome icon theme (contributed by Vinícius Sabino)
+Comment[pt]=Tema de ícones monocromáticos do KNemo (contribuído por Vinícius Sabino)
+Comment[pt_BR]=Tema de ícones monocromáticos do KNemo (contribuição de Vinícius Sabino)
+Comment[sv]=Knemo monokromt ikontema (bidraget av Vinícius Sabino)
+Comment[uk]=Чорно-біла тема піктограм KNemo (створено Vinícius Sabino)
+Comment[x-test]=xxKNemo Monochrome icon theme (contributed by Vinícius Sabino)xx
 Type=Application
 X-KNemo-Theme=monochrome
