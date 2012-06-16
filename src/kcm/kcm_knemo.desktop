@@ -66,7 +66,7 @@ Comment[et]=KNemo võrgujälgija seadistamine
 Comment[fi]=KNemo-verkonvalvonnan asetukset
 Comment[hu]=A KNemo hálózatfigyelő beállítása
 Comment[it]=Configura il monitor di rete KNemo
-Comment[km]=កំណត់​រចនាសម្ព័ន្ធកម្ម​វិធីតាមដាន​បណ្ដាញ KNemo​
+Comment[km]=កំណត់​រចនាសម្ព័ន្ធកម្មវិធី​ពិនិត្យ​បណ្ដាញ KNemo​
 Comment[lt]=Konfigūruoti KNemo tinklo stebėtoją
 Comment[nb]=Sett opp KNemo nettverksovervåker
 Comment[nds]=Nettwark-Kieker "KNemo" instellen
@@ -95,6 +95,7 @@ X-KDE-Keywords[et]=knemo,võrgujälgija,võrgumonitor,wlani jälgija,wlani monit
 X-KDE-Keywords[ga]=knemo,monatóir líonra,monatóir wlan,monatóir wifi,monatóir ethernet,monatóir líonra gan sreang,tráidire an chórais
 X-KDE-Keywords[hu]=knemo,hálózatfigyelő,wlan-figyelő,wifi-figyelő,ethernet figyelő,vezeték nélküli hálózatfigyelő,paneltálca
 X-KDE-Keywords[it]=Keywords=knemo,monitor di rete,wlan monitor,monitor senza fili,ethernet monitor,vassoio di sistema
+X-KDE-Keywords[km]=knemo,network monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systray
 X-KDE-Keywords[nb]=knemo,nettverksovervåker,wlan-overvåker,wifi-overvåker,ethernet-overvåker,trådløs-overvåker.systemkurv
 X-KDE-Keywords[nl]=knemo,netwerkmonitor,wlan-monitor,wifi-monitor,ethernetmonitor,wireless-monitor,systeemvak
 X-KDE-Keywords[pl]=knemo,monitor sieci,monitor wlan,monitor wifi,monitor ethernet,monitor bezprzewodowy,tacka systemowa
