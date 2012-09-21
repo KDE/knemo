@@ -1,18 +1,8 @@
 To build KNemo you will need a basic build system (g++, make, etc.)  You will
 also need to install cmake and some development packages. On Debian-based
 systems
-   apt-get install cmake kdelibs5-dev libiw-dev libnl-dev
+   apt-get install cmake kdelibs5-dev libiw-dev libnl-3-dev libnl-route-3-dev
 should be sufficient.
-
-KNemo also comes with a simple configure script that should work for a generic
-local install.  If it doesn't suit your needs, you will need to edit the cmake
-settings by hand.
-
-Quick installation steps:
-    ./configure
-    cd build; make; make install
-
-Cmake's equivalent to 'make distclean' is 'rm -rf build'.
 
 
 Notes:
