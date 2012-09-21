@@ -23,18 +23,11 @@
 #include "config-knemo.h"
 
 #include <kdeversion.h>
-
-#ifdef HAVE_KSTATUSNOTIFIERITEM
-  #define PARENT_ICON_CLASS KStatusNotifierItem
-  #include <KStatusNotifierItem>
-#else
-  #define PARENT_ICON_CLASS KSystemTrayIcon
-  #include <KSystemTrayIcon>
-#endif
+#include <KStatusNotifierItem>
 
 #include "interface.h"
 
-class InterfaceTray : public PARENT_ICON_CLASS
+class InterfaceTray : public KStatusNotifierItem
 {
     Q_OBJECT
 public:
@@ -50,13 +43,8 @@ public:
 
     void updateToolTip();
 
-#ifdef HAVE_KSTATUSNOTIFIERITEM
 public Q_SLOTS:
     void activate(const QPoint &pos);
-#else
-protected:
-    bool event( QEvent * );
-#endif
 
 private:
     Interface* mInterface;
@@ -66,11 +54,7 @@ private:
     void setupMappings();
 
 private Q_SLOTS:
-#ifdef HAVE_KSTATUSNOTIFIERITEM
     void togglePlotter();
-#else
-    void iconActivated( QSystemTrayIcon::ActivationReason );
-#endif
     void slotQuit();
 };
 

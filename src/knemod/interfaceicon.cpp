@@ -157,11 +157,7 @@ void InterfaceIcon::updateIconImage( int status )
     {
         iconName += ICON_ERROR;
     }
-#ifdef HAVE_KSTATUSNOTIFIERITEM
     mTray->setIconByName( iconName );
-#else
-    mTray->setIcon( KIcon( iconName ) );
-#endif
 }
 
 int InterfaceIcon::calcHeight( QList<unsigned long>& hist, unsigned int& net_max )
@@ -334,11 +330,7 @@ void InterfaceIcon::updateBars( bool doUpdate )
     p.fillRect( leftRect, outGrad );
     brush = QBrush( topOutGrad );
     p.fillRect( topLeftRect, topOutGrad );
-#ifdef HAVE_KSTATUSNOTIFIERITEM
     mTray->setIconByPixmap( barIcon );
-#else
-    mTray->setIcon( barIcon );
-#endif
     QPixmapCache::clear();
 }
 
@@ -440,11 +432,7 @@ void InterfaceIcon::updateIconText( bool doUpdate )
     p.setFont( rxFont );
     p.setPen( txColor );
     p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, textOutgoing );
-#ifdef HAVE_KSTATUSNOTIFIERITEM
     mTray->setIconByPixmap( textIcon );
-#else
-    mTray->setIcon( textIcon );
-#endif
     QPixmapCache::clear();
 }
 
@@ -558,9 +546,6 @@ void InterfaceIcon::updateTrayStatus()
         else
             updateIconImage( mInterface->ifaceState() );
         updateMenu();
-#ifndef HAVE_KSTATUSNOTIFIERITEM
-        mTray->show();
-#endif
     }
     else if ( mTray != 0L )
     {

@@ -2,4 +2,3 @@
 
 #cmakedefine KNEMO_VERSION "${KNEMO_VERSION}"
 #cmakedefine HAVE_LIBIW 1
-#cmakedefine HAVE_KSTATUSNOTIFIERITEM 1

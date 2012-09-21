@@ -39,23 +39,13 @@
 #include <QHelpEvent>
 
 InterfaceTray::InterfaceTray( Interface* interface, const QString &id, QWidget* parent ) :
-#ifdef HAVE_KSTATUSNOTIFIERITEM
-    PARENT_ICON_CLASS( id, parent )
-#else
-    KSystemTrayIcon( parent )
-#endif
+    KStatusNotifierItem( id, parent )
 {
     mInterface = interface;
-#ifdef HAVE_KSTATUSNOTIFIERITEM
     setToolTipIconByName( "knemo" );
     setCategory(Hardware);
     setStatus(Active);
     connect(this, SIGNAL(secondaryActivateRequested(QPoint)), this, SLOT(togglePlotter()));
-#else
-    Q_UNUSED( id );
-    connect( this, SIGNAL( activated( QSystemTrayIcon::ActivationReason ) ),
-             this, SLOT( iconActivated( QSystemTrayIcon::ActivationReason ) ) );
-#endif
     setupMappings();
     // remove quit action added by KSystemTrayIcon
     actionCollection()->removeAction( actionCollection()->action( KStandardAction::name( KStandardAction::Quit ) ) );
@@ -69,7 +59,6 @@ InterfaceTray::~InterfaceTray()
 void InterfaceTray::updateToolTip()
 {
     QString currentTip;
-#ifdef HAVE_KSTATUSNOTIFIERITEM
     QString title = mInterface->settings().alias;
     if ( title.isEmpty() )
         title = mInterface->ifaceName();
@@ -79,19 +68,6 @@ void InterfaceTray::updateToolTip()
     currentTip = toolTipData();
     if ( currentTip != toolTipSubTitle() )
         setToolTipSubTitle( currentTip );
-#else
-    QPoint pos = QCursor::pos();
-    /* If a tooltip is already visible and the global cursor position is in
-     * our rect then it must be our tooltip, right? */
-    if ( !QToolTip::text().isEmpty() && geometry().contains( pos ) )
-    {
-        /* Sure.  Update its text in case any data changed. */
-        currentTip = toolTipData();
-        if ( currentTip != toolTip() )
-            setToolTip( currentTip );
-        QToolTip::showText( pos, toolTip() );
-    }
-#endif
 }
 
 void InterfaceTray::slotQuit()
@@ -113,7 +89,6 @@ void InterfaceTray::slotQuit()
     kapp->quit();
 }
 
-#ifdef HAVE_KSTATUSNOTIFIERITEM
 void InterfaceTray::activate(const QPoint&)
 {
     mInterface->showStatusDialog( false );
@@ -123,34 +98,6 @@ void InterfaceTray::togglePlotter()
 {
      mInterface->showSignalPlotter( false );
 }
-#else
-void InterfaceTray::iconActivated( QSystemTrayIcon::ActivationReason reason )
-{
-    switch (reason)
-    {
-     case QSystemTrayIcon::Trigger:
-         mInterface->showStatusDialog( false );
-         break;
-     case QSystemTrayIcon::MiddleClick:
-         mInterface->showSignalPlotter( false );
-         break;
-     default:
-         ;
-     }
-}
-
-bool InterfaceTray::event( QEvent *e )
-{
-    if (e->type() == QEvent::ToolTip) {
-         QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
-         setToolTip( toolTipData() );
-         QToolTip::showText(helpEvent->globalPos(), toolTip() );
-         return true;
-    }
-    else
-        return KSystemTrayIcon::event(e);
-}
-#endif
 
 QString InterfaceTray::toolTipData()
 {
@@ -165,14 +112,6 @@ QString InterfaceTray::toolTipData()
 
     tipData = "<table cellspacing='2'>";
 
-#ifndef HAVE_KSTATUSNOTIFIERITEM
-    QString title = mInterface->settings().alias;
-    if ( title.isEmpty() )
-        title = mInterface->ifaceName();
-
-    if ( toolTipContent & ALIAS )
-        tipData += "<tr><th colspan='2' style='text-align:center;'>" + title + "</th></tr>";
-#endif
     if ( toolTipContent & INTERFACE )
         tipData += leftTags + i18n( "Interface" ) + centerTags + mInterface->ifaceName() + rightTags;
 

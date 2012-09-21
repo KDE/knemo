@@ -7,6 +7,7 @@ Version 0.7.4
    - KDE bug #301699: Default gateway undetected on FreeBSD
  * Add monochrome icon theme contributed by Vinícius Sabino.
  * Port to libnl3
+ * Remove support for the legacy system tray icon
 
 Version 0.7.3
  * By request, add a configure switch to disable wireless support.
