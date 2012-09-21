@@ -67,7 +67,6 @@ void parseNetlinkRoute( struct nl_object *object, void * )
     if ( rtfamily == AF_INET ||
          rtfamily == AF_INET6 )
     {
-        struct nl_addr *dst = rtnl_route_get_dst( route );
         struct rtnl_nexthop *nh = NULL;
         struct nl_addr *addr = NULL;
         if ( rtnl_route_get_nnexthops( route ) > 0 )
@@ -76,7 +75,7 @@ void parseNetlinkRoute( struct nl_object *object, void * )
             addr = rtnl_route_nh_get_gateway( nh );
         }
 
-        if ( nl_addr_get_len( dst ) == 0 && addr )
+        if ( addr )
         {
             char gwaddr[ INET6_ADDRSTRLEN ];
             char gwname[ IFNAMSIZ ];
