@@ -23,8 +23,6 @@
 #include <netlink/route/link.h>
 #include <netlink/route/route.h>
 
-#include <net/if.h>
-
 #include <KLocale>
 #include <kio/global.h>
 
@@ -43,13 +41,13 @@ NetlinkBackend::NetlinkBackend()
       routeCache( NULL ),
       iwfd( -1 )
 {
-    rtsock = nl_handle_alloc();
+    rtsock = nl_socket_alloc();
     int c = nl_connect(rtsock, NETLINK_ROUTE);
     if ( c >= 0 )
     {
-        addrCache = rtnl_addr_alloc_cache( rtsock );
-        linkCache = rtnl_link_alloc_cache( rtsock );
-        routeCache = rtnl_route_alloc_cache( rtsock );
+        rtnl_addr_alloc_cache( rtsock, &addrCache );
+        rtnl_link_alloc_cache( rtsock, AF_UNSPEC, &linkCache );
+        rtnl_route_alloc_cache( rtsock, AF_UNSPEC, NL_AUTO_PROVIDE, &routeCache );
     }
 #ifdef HAVE_LIBIW
     iwfd = iw_sockets_open();
@@ -62,7 +60,7 @@ NetlinkBackend::~NetlinkBackend()
     nl_cache_free( linkCache );
     nl_cache_free( routeCache );
     nl_close( rtsock );
-    nl_handle_destroy( rtsock );
+    nl_socket_free( rtsock );
 #ifdef HAVE_LIBIW
     if ( iwfd > 0 )
         close( iwfd );

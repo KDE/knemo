@@ -734,11 +734,11 @@ void ConfigDialog::defaults()
     void *cache = NULL;
 
 #ifdef __linux__
-	nl_handle *rtsock = nl_handle_alloc();
+	struct nl_sock *rtsock = nl_socket_alloc();
 	int c = nl_connect(rtsock, NETLINK_ROUTE);
     if ( c >= 0 )
     {
-	    cache = rtnl_route_alloc_cache( rtsock );
+	    rtnl_route_alloc_cache( rtsock, AF_UNSPEC, NL_AUTO_PROVIDE, reinterpret_cast<nl_cache**>(&cache) );
     }
 #endif
 
@@ -748,7 +748,7 @@ void ConfigDialog::defaults()
 #ifdef __linux__
     nl_cache_free( static_cast<nl_cache*>(cache) );
     nl_close( rtsock );
-    nl_handle_destroy( rtsock );
+    nl_socket_free( rtsock );
 #endif
 
     if ( interface.isEmpty() )
@@ -1012,11 +1012,11 @@ void ConfigDialog::buttonAllSelected()
 
 #ifdef __linux__
     nl_cache * linkCache = NULL;
-    nl_handle *rtsock = nl_handle_alloc();
+    nl_sock *rtsock = nl_socket_alloc();
     int c = nl_connect(rtsock, NETLINK_ROUTE);
     if ( c >= 0 )
     {
-        linkCache = rtnl_link_alloc_cache( rtsock );
+        rtnl_link_alloc_cache( rtsock, AF_UNSPEC, &linkCache );
 
         struct rtnl_link * rtlink;
         for ( rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_first( linkCache ));
@@ -1030,7 +1030,7 @@ void ConfigDialog::buttonAllSelected()
     }
     nl_cache_free( linkCache );
     nl_close( rtsock );
-    nl_handle_destroy( rtsock );
+    nl_socket_free( rtsock );
 #else
     struct ifaddrs *ifaddr;
     struct ifaddrs *ifa;

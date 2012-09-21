@@ -68,7 +68,13 @@ void parseNetlinkRoute( struct nl_object *object, void * )
          rtfamily == AF_INET6 )
     {
         struct nl_addr *dst = rtnl_route_get_dst( route );
-        struct nl_addr *addr = rtnl_route_get_gateway( route );
+        struct rtnl_nexthop *nh = NULL;
+        struct nl_addr *addr = NULL;
+        if ( rtnl_route_get_nnexthops( route ) > 0 )
+        {
+            nh = rtnl_route_nexthop_n ( route, 0 );
+            addr = rtnl_route_nh_get_gateway( nh );
+        }
 
         if ( nl_addr_get_len( dst ) == 0 && addr )
         {
@@ -78,7 +84,7 @@ void parseNetlinkRoute( struct nl_object *object, void * )
             struct in_addr * inad = reinterpret_cast<struct in_addr *>(nl_addr_get_binary_addr( addr ));
             nl_addr2str( addr, gwaddr, sizeof( gwaddr ) );
             inet_ntop( rtfamily, &inad->s_addr, gwaddr, sizeof( gwaddr ) );
-            int oif = rtnl_route_get_oif( route );
+            int oif = rtnl_route_nh_get_ifindex( nh );
             if_indextoname( oif, gwname );
 
             if ( rtfamily == AF_INET )

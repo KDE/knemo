@@ -56,7 +56,7 @@ private:
     void updateWirelessData( int fd, const QString& ifName, BackendData* data );
     void updateWirelessEncData( int fd, const QString& ifName, const iw_range& range, BackendData* data );
 #endif
-    nl_handle * rtsock;
+    nl_sock * rtsock;
     nl_cache *addrCache, *linkCache, *routeCache;
     int iwfd;
 };
