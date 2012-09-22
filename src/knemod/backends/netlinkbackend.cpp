@@ -30,10 +30,6 @@
 #include "utils.h"
 #include "netlinkbackend.h"
 
-#ifdef HAVE_IWLIB
-#include "netlinkbackend_wireless.h"
-#endif
-
 #ifndef IFF_LOWER_UP
 #define IFF_LOWER_UP   0x10000
 #endif
