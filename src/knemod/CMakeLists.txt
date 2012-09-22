@@ -27,6 +27,9 @@ set( knemo_SRCS
 
 if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
     set( knemo_SRCS ${knemo_SRCS} backends/netlinkbackend.cpp )
+    if ( LIBIW_FOUND )
+        set( knemo_SRCS ${knemo_SRCS} backends/netlinkbackend_wireless.cpp )
+    endif( LIBIW_FOUND )
 else ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
     set( knemo_SRCS ${knemo_SRCS} backends/bsdbackend.cpp )
 endif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )

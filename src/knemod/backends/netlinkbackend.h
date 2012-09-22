@@ -24,7 +24,7 @@
 #include <netlink/route/link.h>
 
 #ifdef HAVE_LIBIW
-#include <iwlib.h>
+#include "netlinkbackend_wireless.h"
 #endif
 
 /**
@@ -52,13 +52,11 @@ public:
 private:
     void updateIfaceData( const QString& ifName, BackendData* data );
     void updateAddresses( BackendData* data );
-#ifdef HAVE_LIBIW
-    void updateWirelessData( int fd, const QString& ifName, BackendData* data );
-    void updateWirelessEncData( int fd, const QString& ifName, const iw_range& range, BackendData* data );
-#endif
     nl_sock * rtsock;
     nl_cache *addrCache, *linkCache, *routeCache;
-    int iwfd;
+#ifdef HAVE_LIBIW
+    NetlinkBackend_Wireless wireless;
+#endif
 };
 
 #endif // NETLINKBACKEND_H
