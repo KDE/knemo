@@ -8,6 +8,7 @@ Version 0.7.4
  * Add monochrome icon theme contributed by Vinícius Sabino.
  * Port to libnl3
  * Remove support for the legacy system tray icon
+ * Transition from deprecated KCalendarSystem calls
 
 Version 0.7.3
  * By request, add a configure switch to disable wireless support.

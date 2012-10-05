@@ -217,11 +217,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
       mDlg( new Ui::ConfigDlg() ),
       mCalendar( 0 )
 {
-    if ( KDE::versionMajor() >= 4 && KDE::versionMinor() >= 4 )
-        mDefaultCalendarType = KGlobal::locale()->calendarType();
-    else
-        mDefaultCalendarType = "gregorian";
-
     mConfig = KSharedConfig::openConfig( "knemorc" );
 
     setupToolTipMap();
@@ -433,7 +428,16 @@ void ConfigDialog::load()
             settings->barScale = interfaceGroup.readEntry( conf_barScale, s.barScale );
             settings->inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate );
             settings->outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate );
-            settings->calendar = interfaceGroup.readEntry( conf_calendar, mDefaultCalendarType );
+            if ( interfaceGroup.hasKey( conf_calendar ) )
+            {
+                QString oldSetting = interfaceGroup.readEntry( conf_calendar );
+                settings->calendarSystem = KCalendarSystem::calendarSystem( oldSetting );
+                interfaceGroup.writeEntry( conf_calendarSystem, static_cast<int>(settings->calendarSystem) );
+                interfaceGroup.deleteEntry( conf_calendar );
+                config->sync();
+            }
+            else
+                settings->calendarSystem = static_cast<KLocale::CalendarSystem>(interfaceGroup.readEntry( conf_calendarSystem, static_cast<int>(KLocale::QDateCalendar) ));
             settings->activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
             int statsRuleCount = interfaceGroup.readEntry( conf_statsRules, 0 );
             for ( int i = 0; i < statsRuleCount; ++i )
@@ -648,7 +652,7 @@ void ConfigDialog::save()
             }
         }
         interfaceGroup.writeEntry( conf_activateStatistics, settings->activateStatistics );
-        interfaceGroup.writeEntry( conf_calendar, settings->calendar );
+        interfaceGroup.writeEntry( conf_calendarSystem, static_cast<int>(settings->calendarSystem) );
         interfaceGroup.writeEntry( conf_statsRules, settings->statsRules.count() );
         for ( int i = 0; i < settings->statsRules.count(); i++ )
         {
@@ -899,17 +903,8 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     comboHidingChanged( index );
     mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
 
-    QString calType;
-    if ( settings->calendar.isEmpty() )
-    {
-        calType = mDefaultCalendarType;
-    }
-    else
-    {
-        calType = settings->calendar;
-    }
-    if ( !mCalendar || mCalendar->calendarType() != calType )
-        mCalendar = KCalendarSystem::create( calType );
+    if ( !mCalendar || mCalendar->calendarSystem() != settings->calendarSystem )
+        mCalendar = KCalendarSystem::create( settings->calendarSystem );
 
     statsModel->removeRows(0, statsModel->rowCount() );
     statsModel->setCalendar( mCalendar );

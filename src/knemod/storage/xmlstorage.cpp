@@ -102,7 +102,7 @@ bool XmlStorage::loadStats( QString name, StorageData *sd, QHash<int, Statistics
     QDomElement root = doc.documentElement();
 
     // If unknown or empty calendar it will default to gregorian
-    sd->calendar = KCalendarSystem::create( root.attribute( attrib_calendar ) );
+    sd->calendar = KCalendarSystem::create( KCalendarSystem::calendarSystem( root.attribute( attrib_calendar ) ) );
     foreach( StatisticsModel * s, *models )
     {
         s->setCalendar( sd->calendar );

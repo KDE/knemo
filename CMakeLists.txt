@@ -4,7 +4,7 @@ set( KNEMO_VERSION 0.7.3+svn )
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
-set(KDE_MIN_VERSION "4.3.80")
+set(KDE_MIN_VERSION "4.7.0")
 find_package( KDE4 REQUIRED )
 include( CheckLibraryExists )
 include( FindPackageHandleStandardArgs )

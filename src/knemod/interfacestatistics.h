@@ -113,7 +113,7 @@ private:
     void rebuildBillPeriods( const QDate &requestedStart );
 
     void prependStatsRule( QList<StatsRule> &rules );
-    void checkRebuild( const QString &oldCalendar, bool force = false );
+    void checkRebuild( const KLocale::CalendarSystem oldCalendar, bool force = false );
 
     Interface* mInterface;
     QTimer* mSaveTimer;

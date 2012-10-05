@@ -136,9 +136,6 @@ private:
     StatsRuleModel *statsModel;
     WarnModel *warnModel;
 
-    // Delete this once KCalendarSystem fixed
-    QString mDefaultCalendarType;
-
     KSharedConfigPtr mConfig;
     QMap<QString, InterfaceSettings *> mSettingsMap;
     QMap<quint32, QString> mToolTips;

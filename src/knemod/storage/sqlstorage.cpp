@@ -26,11 +26,15 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
+#include <KMessageBox>
 
 static const QString time_format( "hh:mm:ss" );
 
+static const int current_db_version = 2;
+
 SqlStorage::SqlStorage( QString ifaceName )
-    : mIfaceName( ifaceName )
+    : mValidDbVer( true )
+    , mIfaceName( ifaceName )
 {
     KUrl dir( generalSettings->statisticsDir );
     mDbPath = QString( "%1%2%3.db" ).arg( dir.path() ).arg( statistics_prefix ).arg( mIfaceName );
@@ -40,6 +44,7 @@ SqlStorage::SqlStorage( QString ifaceName )
     mTypeMap.insert( KNemoStats::AllTraffic, "" );
     mTypeMap.insert( KNemoStats::OffpeakTraffic, "_offpeak" );
 
+    migrateDb();
 }
 
 SqlStorage::~SqlStorage()
@@ -172,6 +177,47 @@ bool SqlStorage::loadHourArchives( StatisticsModel *hourArchive, const QDate &st
     return ok;
 }
 
+bool SqlStorage::migrateDb()
+{
+    bool ok = false;
+    if ( !open() )
+        return ok;
+
+    QSqlDatabase::database( mIfaceName ).transaction();
+    QSqlQuery qry( db );
+    qry.exec( "SELECT * FROM general;" );
+    if ( qry.next() )
+    {
+        int dbVersion = qry.value( qry.record().indexOf( "version" ) ).toInt();
+        if ( dbVersion > current_db_version )
+        {
+            mValidDbVer = false;
+            QSqlDatabase::database( mIfaceName ).commit();
+            db.close();
+            KMessageBox::error( NULL, i18n( "The statistics database for interface \"%1\" is incompatible with this version of KNemo.\n\nPlease upgrade to a more recent KNemo release.", mIfaceName ) );
+            return false;
+        }
+        if ( dbVersion < 2 )
+        {
+            int lastSaved = qry.value( qry.record().indexOf( "last_saved" ) ).toInt();
+            QString calendarType = qry.value( qry.record().indexOf( "calendar" ) ).toString();
+            int nextHourId = qry.value( qry.record().indexOf( "next_hour_id" ) ).toInt();
+            QString qryStr = "REPLACE INTO general (id, version, last_saved, calendar, next_hour_id )"
+                             " VALUES (?, ?, ?, ?, ? );";
+            qry.prepare( qryStr );
+            qry.addBindValue( 1 );
+            qry.addBindValue( current_db_version );
+            qry.addBindValue( lastSaved );
+            qry.addBindValue( QVariant( KCalendarSystem::calendarSystem( calendarType ) ).toString() );
+            qry.addBindValue( nextHourId );
+            qry.exec();
+        }
+    }
+    ok = QSqlDatabase::database( mIfaceName ).commit();
+    db.close();
+    return ok;
+}
+
 bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *models, QList<StatsRule> *rules )
 {
     bool ok = false;
@@ -182,19 +228,18 @@ bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *model
     QSqlQuery qry( db );
     QDateTime curDateTime = QDateTime::currentDateTime();
 
-    QString cal;
+    KLocale::CalendarSystem calSystem = KLocale::QDateCalendar;
     qry.exec( "SELECT * FROM general;" );
     if ( qry.next() )
     {
-        //int cVersion = qry.record().indexOf("version");
         int cLastSaved = qry.record().indexOf( "last_saved" );
-        int cCalendar = qry.record().indexOf( "calendar" );
+        int cCalendarSystem = qry.record().indexOf( "calendar" );
         int cNextHourId = qry.record().indexOf( "next_hour_id" );
         sd->lastSaved = qry.value( cLastSaved ).toUInt();
-        cal = qry.value( cCalendar ).toString();
+        calSystem = static_cast<KLocale::CalendarSystem>(qry.value( cCalendarSystem ).toInt());
         sd->nextHourId = qry.value( cNextHourId ).toInt();
     }
-    sd->calendar = KCalendarSystem::create( cal );
+    sd->calendar = KCalendarSystem::create( calSystem );
 
     if ( models )
     {
@@ -341,6 +386,9 @@ bool SqlStorage::clearStats( StorageData *sd )
 
 bool SqlStorage::open()
 {
+    if ( !mValidDbVer )
+        return false;
+
     if ( !db.isValid() )
         return false;
 
@@ -358,9 +406,9 @@ void SqlStorage::save( StorageData *sd, QHash<int, StatisticsModel*> *models, QL
                      " VALUES (?, ?, ?, ?, ? );";
     qry.prepare( qryStr );
     qry.addBindValue( 1 );
-    qry.addBindValue( 1 );
+    qry.addBindValue( current_db_version );
     qry.addBindValue( QDateTime::currentDateTime().toTime_t() );
-    qry.addBindValue( sd->calendar->calendarType() );
+    qry.addBindValue( QVariant( sd->calendar->calendarSystem() ).toString() );
     qry.addBindValue( sd->nextHourId );
     qry.exec();
 

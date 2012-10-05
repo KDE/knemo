@@ -38,9 +38,11 @@ class SqlStorage
     private:
         bool open();
         void save( StorageData *gd, QHash<int, StatisticsModel*> *models = 0, QList<StatsRule> *rules = 0, bool fullSave = false );
+        bool migrateDb();
         QString mDbPath;
 
         QSqlDatabase db;
+        bool mValidDbVer;
         QString mIfaceName;
         QMap<KNemoStats::TrafficType,QString> mTypeMap;
 };

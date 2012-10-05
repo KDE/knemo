@@ -123,16 +123,20 @@ void Interface::configChanged()
         }
     }
 
-    QString defaultCal;
-    if ( KDE::versionMajor() >= 4 && KDE::versionMinor() >= 4 )
-        defaultCal = KGlobal::locale()->calendarType();
+    if ( interfaceGroup.hasKey( conf_calendar ) )
+    {
+        QString oldSetting = interfaceGroup.readEntry( conf_calendar );
+        mSettings.calendarSystem = KCalendarSystem::calendarSystem( oldSetting );
+        interfaceGroup.writeEntry( conf_calendarSystem, static_cast<int>(mSettings.calendarSystem) );
+        interfaceGroup.deleteEntry( conf_calendar );
+        config->sync();
+    }
     else
-        defaultCal = "gregorian";
-    mSettings.calendar = interfaceGroup.readEntry( conf_calendar, defaultCal );
+        mSettings.calendarSystem = static_cast<KLocale::CalendarSystem>(interfaceGroup.readEntry( conf_calendarSystem, static_cast<int>(KLocale::QDateCalendar) ));
 
     mSettings.statsRules.clear();
     int statsRuleCount = interfaceGroup.readEntry( conf_statsRules, 0 );
-    KCalendarSystem *testCal = KCalendarSystem::create( mSettings.calendar );
+    KCalendarSystem *testCal = KCalendarSystem::create( mSettings.calendarSystem );
     for ( int i = 0; i < statsRuleCount; ++i )
     {
         group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( mIfaceName ).arg( i );

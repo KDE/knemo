@@ -29,6 +29,7 @@
 #include <QString>
 
 #include <KGlobalSettings>
+#include <KLocale>
 #include <KStandardDirs>
 #include <KUrl>
 
@@ -153,6 +154,7 @@ static const char conf_iconFont[] = "IconFont";
 // interface statistics
 static const char conf_activateStatistics[] = "ActivateStatistics";
 static const char conf_calendar[] = "Calendar";
+static const char conf_calendarSystem[] = "CalendarSystem";
 static const char conf_statsRules[] = "StatsRules";
 static const char conf_warnRules[] = "WarnRules";
 
@@ -414,7 +416,8 @@ struct InterfaceSettings
         trafficThreshold( 0 ),
         hideWhenUnavailable( false ),
         hideWhenDisconnected( false ),
-        activateStatistics( false )
+        activateStatistics( false ),
+        calendarSystem( KLocale::QDateCalendar )
     {}
 
     QString iconTheme;
@@ -437,7 +440,7 @@ struct InterfaceSettings
     bool activateStatistics;
     QList<StatsRule> statsRules;
     QList<WarnRule> warnRules;
-    QString calendar;
+    KLocale::CalendarSystem calendarSystem;
     QString alias;
     QList<InterfaceCommand> commands;
 };

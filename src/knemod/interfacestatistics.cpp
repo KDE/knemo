@@ -122,13 +122,13 @@ bool InterfaceStatistics::loadStats()
         if ( loaded )
         {
             hoursToArchive( QDateTime::currentDateTime() );
-            checkRebuild( mStorageData.calendar->calendarType(), true );
+            checkRebuild( mStorageData.calendar->calendarSystem(), true );
         }
     }
 
     if ( !mStorageData.calendar )
     {
-        mStorageData.calendar = KCalendarSystem::create( mInterface->settings().calendar );
+        mStorageData.calendar = KCalendarSystem::create( mInterface->settings().calendarSystem );
         foreach( StatisticsModel * s, mModels )
         {
             s->setCalendar( mStorageData.calendar );
@@ -350,19 +350,19 @@ void InterfaceStatistics::configChanged()
     mSaveTimer->stop();
     mWarnTimer->stop();
 
-    QString origCalendarType;
+    KLocale::CalendarSystem origCalendarSystem = KLocale::QDateCalendar;
     if ( mStorageData.calendar )
-       origCalendarType = mStorageData.calendar->calendarType();
+       origCalendarSystem = mStorageData.calendar->calendarSystem();
 
-    if ( mInterface->settings().calendar != origCalendarType )
+    if ( mInterface->settings().calendarSystem != origCalendarSystem )
     {
-        mStorageData.calendar = KCalendarSystem::create( mInterface->settings().calendar );
+        mStorageData.calendar = KCalendarSystem::create( mInterface->settings().calendarSystem );
 
         foreach( StatisticsModel * s, mModels )
         {
             s->setCalendar( mStorageData.calendar );
         }
-        if ( !origCalendarType.isEmpty() )
+        if ( mStorageData.calendar )
         {
             StatisticsModel *hours = mModels.value( KNemoStats::Hour );
             StatisticsModel *days = mModels.value( KNemoStats::Day );
@@ -377,7 +377,7 @@ void InterfaceStatistics::configChanged()
         }
     }
 
-    checkRebuild( origCalendarType );
+    checkRebuild( origCalendarSystem );
 
     if ( generalSettings->saveInterval > 0 )
     {
@@ -818,12 +818,12 @@ void InterfaceStatistics::prependStatsRule( QList<StatsRule> &rules )
     }
 }
 
-void InterfaceStatistics::checkRebuild( const QString &oldCalendar, bool force )
+void InterfaceStatistics::checkRebuild( const KLocale::CalendarSystem oldCalendar, bool force )
 {
     QList<StatsRule> newRules = mInterface->settings().statsRules;
     bool forceWeek = false;
 
-    if ( oldCalendar != mInterface->settings().calendar )
+    if ( oldCalendar != mInterface->settings().calendarSystem )
     {
         StatisticsModel *hours = mModels.value( KNemoStats::Hour );
         StatisticsModel *days = mModels.value( KNemoStats::Day );

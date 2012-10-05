@@ -27,7 +27,7 @@ StatsConfig::StatsConfig( const InterfaceSettings * settings, const KCalendarSys
     mAddRule( addRule )
 {
     // Do this for the sake of KDateEdit
-    KGlobal::locale()->setCalendar( mCal->calendarType() );
+    KGlobal::locale()->setCalendarSystem( mCal->calendarSystem() );
 
     mDlg.setupUi( mainWidget() );
     setButtons( KDialog::Default | KDialog::Ok | KDialog::Cancel );
