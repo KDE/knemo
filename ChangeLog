@@ -9,6 +9,7 @@ Version 0.7.4
  * Port to libnl3
  * Remove support for the legacy system tray icon
  * Transition from deprecated KCalendarSystem calls
+ * Drop embedded plotter code in favor of libksignalplotter
 
 Version 0.7.3
  * By request, add a configure switch to disable wireless support.

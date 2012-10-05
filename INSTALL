@@ -1,7 +1,10 @@
 To build KNemo you will need a basic build system (g++, make, etc.)  You will
 also need to install cmake and some development packages. On Debian-based
 systems
-   apt-get install cmake kdelibs5-dev libiw-dev libnl-3-dev libnl-route-3-dev
+
+   apt-get install cmake kdelibs5-dev kde-workspace-dev libiw-dev libnl-3-dev \
+   libnl-route-3-dev
+
 should be sufficient.
 
 

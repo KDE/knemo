@@ -12,7 +12,6 @@ set( knemo_SRCS
     interfacetray.cpp
     knemodaemon.cpp
     plotterconfigdialog.cpp
-    signalplotter.cpp
     statisticsmodel.cpp
     statisticsview.cpp
     backends/backendbase.cpp
@@ -37,7 +36,13 @@ endif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
 kde4_add_ui_files( knemo_SRCS interfacestatisticsdlg.ui interfacestatusdlg.ui plotterconfigdlg.ui )
 kde4_add_executable( knemo ${knemo_SRCS} )
 
-target_link_libraries( knemo ${KDE4_KIO_LIBS} ${LIBIW_LIBRARIES} ${LIBNL_LIBRARIES} ${QT_QTSQL_LIBRARY} )
+target_link_libraries( knemo
+    ${KDE4_KIO_LIBS}
+    ${LIBIW_LIBRARIES}
+    ${LIBNL_LIBRARIES}
+    ${QT_QTSQL_LIBRARY}
+    ${LIBKSIGNALPLOTTER_LIBRARY}
+)
 
 install( TARGETS knemo ${INSTALL_TARGETS_DEFAULT_ARGS} )
 

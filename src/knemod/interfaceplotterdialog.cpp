@@ -28,8 +28,9 @@
 #include "global.h"
 #include "interfaceplotterdialog.h"
 #include "utils.h"
-#include "signalplotter.h"
+#include <ksysguard/ksignalplotter.h>
 #include "plotterconfigdialog.h"
+#include <math.h>
 
 static const char plot_pixel[] = "Pixel";
 static const char plot_distance[] = "Distance";
@@ -77,11 +78,17 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
       mSetPos( true ),
       mWasShown( false ),
       mUseBitrate( generalSettings->useBitrate ),
+      mMultiplier( 1024 ),
+      mOutgoingVisible( false ),
+      mIncomingVisible( false ),
       mName( name )
 {
     setCaption( i18nc( "interface name", "%1 Traffic", mName ) );
     setButtons( Close );
     setContextMenuPolicy( Qt::DefaultContextMenu );
+
+    mByteUnits << ki18n( "%1 B/s" ) << ki18n( "%1 KiB/s" ) << ki18n( "%1 MiB/s" ) << ki18n( "%1 GiB/s" );
+    mBitUnits << ki18n( "%1 bit/s" ) << ki18n( "%1 kbit/s" ) << ki18n( "%1 Mbit/s" ) << ki18n( "%1 Gbit/s" );
 
     mIndicatorSymbol = '#';
     QFontMetrics fm(font());
@@ -94,8 +101,6 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     mPlotter = new KSignalPlotter( this );
     mPlotter->setShowAxis( true );
     int axisTextWidth = fontMetrics().width(i18nc("Largest axis title", "99999 XXXX"));
-    mPlotter->addBeam( Qt::black );
-    mPlotter->addBeam( Qt::black );
     mPlotter->setMaxAxisTextWidth( axisTextWidth );
     layout->addWidget(mPlotter);
 
@@ -142,6 +147,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
         // the first time it's shown
         resize( 500, 350 );
     }
+    connect( mPlotter, SIGNAL(axisScaleChanged()), this, SLOT(setPlotterUnits()) );
     loadConfig();
 }
 
@@ -229,23 +235,65 @@ void InterfacePlotterDialog::configFinished()
     mConfigDlg = 0;
 }
 
+void InterfacePlotterDialog::setPlotterUnits()
+{
+    qreal value = mPlotter->currentMaximumRangeValue();
+    int units = 0;
+
+    if (value >= pow( mMultiplier, 3)*0.7) //If it's over 0.7GiB, then set the scale to gigabytes
+    {
+        units = 3;
+    }
+    else if (value > pow(mMultiplier,2))
+    {
+        units = 2;
+    }
+    else if (value > mMultiplier)
+    {
+        units = 1;
+    }
+    mPlotter->setScaleDownBy( pow(mMultiplier, units ) );
+    if ( mUseBitrate )
+        mPlotter->setUnit( mBitUnits[units] );
+    else
+        mPlotter->setUnit( mByteUnits[units] );
+}
+
 void InterfacePlotterDialog::useBitrate( bool useBits )
 {
+    // Have to wipe the plotters if we change units
+    if ( mUseBitrate != useBits )
+    {
+        int nb = mPlotter->numBeams();
+        for ( int i = 0; i < nb; i++ )
+        {
+            mPlotter->removeBeam(0);
+        }
+        mOutgoingVisible = false;
+        mIncomingVisible = false;
+    }
+
     mUseBitrate = useBits;
-    mPlotter->useBitrate( mUseBitrate );
+    if ( mUseBitrate )
+        mMultiplier = 1000;
+    else
+        mMultiplier = 1024;
+    addBeams();
     for ( int beamId = 0; beamId < mPlotter->numBeams(); beamId++ )
     {
         QString lastValue = formattedRate( mPlotter->lastValue(beamId), mUseBitrate );
         static_cast<FancyPlotterLabel *>((static_cast<QWidgetItem *>(mLabelLayout->itemAt(beamId)))->widget())->value->setText(lastValue);
     }
+    setPlotterUnits();
 }
 
 void InterfacePlotterDialog::updatePlotter( const double incomingBytes, const double outgoingBytes )
 {
     QList<double> trafficList;
-    // Keep these in order
-    trafficList.append( outgoingBytes );
-    trafficList.append( incomingBytes );
+    if ( mOutgoingVisible )
+       trafficList.append( outgoingBytes );
+    if ( mIncomingVisible )
+        trafficList.append( incomingBytes );
     mPlotter->addSample( trafficList );
 
     for ( int beamId = 0; beamId < mPlotter->numBeams(); beamId++ )
@@ -313,7 +361,6 @@ void InterfacePlotterDialog::configChanged()
     int axisTextWidth = fm.width(i18nc("Largest axis title", "99999 XXXX"));
     mPlotter->setMaxAxisTextWidth( axisTextWidth );
     mPlotter->setFont( pfont );
-    mPlotter->useBitrate( generalSettings->useBitrate );
     if ( !mSettings.automaticDetection )
     {
         mPlotter->setMinimumValue( mSettings.minimumValue );
@@ -327,29 +374,51 @@ void InterfacePlotterDialog::configChanged()
     mPlotter->setUseAutoRange( mSettings.automaticDetection );
     mPlotter->setVerticalLinesScroll( mSettings.verticalLinesScroll );
 
-    // add or remove beams according to user settings
-    int visibleBeams = KSignalPlotter::NONE;
-    if ( mSettings.showOutgoing )
-        visibleBeams |= KSignalPlotter::OUTGOING_TRAFFIC;
-    if ( mSettings.showIncoming )
-        visibleBeams |= KSignalPlotter::INCOMING_TRAFFIC;
-
     mSentLabel->setLabel( i18nc( "interface name", "%1 Sent Data", mName ), mSettings.colorOutgoing, mIndicatorSymbol);
     mReceivedLabel->setLabel( i18nc( "interface name", "%1 Received Data", mName ), mSettings.colorIncoming, mIndicatorSymbol);
 
-    mPlotter->setBeamColor( KSignalPlotter::INCOMING_BEAM, mSettings.colorIncoming );
-    mPlotter->setBeamColor( KSignalPlotter::OUTGOING_BEAM, mSettings.colorOutgoing );
-    mPlotter->setVisibleBeams( visibleBeams );
+    addBeams();
+}
 
-    if ( visibleBeams & KSignalPlotter::INCOMING_TRAFFIC )
-        mReceivedLabel->show();
-    else
-        mReceivedLabel->hide();
-
-    if ( visibleBeams & KSignalPlotter::OUTGOING_TRAFFIC )
-        mSentLabel->show();
-    else
+void InterfacePlotterDialog::addBeams()
+{
+    if ( mSettings.showOutgoing )
+    {
+        if ( !mOutgoingVisible )
+        {
+            mPlotter->addBeam( mSettings.colorOutgoing );
+            mSentLabel->show();
+            mOutgoingVisible = true;
+            if ( mIncomingVisible )
+            {
+                QList<int> newOrder;
+                newOrder << 1 << 0;
+                mPlotter->reorderBeams( newOrder );
+            }
+        }
+    }
+    else if ( mOutgoingVisible == true )
+    {
+        mPlotter->removeBeam( 0 );
         mSentLabel->hide();
+        mOutgoingVisible = false;
+    }
+
+    if ( mSettings.showIncoming )
+    {
+        if ( !mIncomingVisible )
+        {
+            mPlotter->addBeam( mSettings.colorIncoming );
+            mReceivedLabel->show();
+            mIncomingVisible = true;
+        }
+    }
+    else if ( mIncomingVisible == true )
+    {
+        mPlotter->removeBeam( mPlotter->numBeams() - 1 );
+        mReceivedLabel->hide();
+        mIncomingVisible = false;
+    }
 }
 
 #include "interfaceplotterdialog.moc"

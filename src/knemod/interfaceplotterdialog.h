@@ -49,26 +49,32 @@ protected:
 private slots:
     void configFinished();
     void saveConfig();
+    void setPlotterUnits();
 
 private:
     void showContextMenu( const QPoint& );
     void loadConfig();
     void configChanged();
     void configPlotter();
+    void addBeams();
 
     KSharedConfigPtr mConfig;
     PlotterConfigDialog *mConfigDlg;
     bool mSetPos;
     bool mWasShown;
     bool mUseBitrate;
+    int mMultiplier;
+    bool mOutgoingVisible;
+    bool mIncomingVisible;
     PlotterSettings mSettings;
     QString mName;
     KSignalPlotter *mPlotter;
     FancyPlotterLabel *mReceivedLabel;
     FancyPlotterLabel *mSentLabel;
     QBoxLayout *mLabelLayout;
-    QString mUnit;
     QChar mIndicatorSymbol;
+    QList<KLocalizedString> mByteUnits;
+    QList<KLocalizedString> mBitUnits;
 };
 
 #endif
