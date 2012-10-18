@@ -64,13 +64,13 @@
 
 BSDBackend::BSDBackend()
 {
-    s = socket( AF_INET, SOCK_DGRAM, 0 );
+    m_fd = socket( AF_INET, SOCK_DGRAM, 0 );
 }
 
 BSDBackend::~BSDBackend()
 {
-    if ( s >= 0 )
-        close( s );
+    if ( m_fd >= 0 )
+        close( m_fd );
 }
 
 BackendBase* BSDBackend::createInstance()
@@ -94,7 +94,8 @@ QStringList BSDBackend::ifaceList()
 
 void BSDBackend::update()
 {
-    getifaddrs( &ifaddr );
+    struct ifaddrs *ifap;
+    getifaddrs( &ifap );
 
     QString ip4DefGw, ip6DefGw;
     getDefaultRoute( AF_INET, &ip4DefGw );
@@ -115,9 +116,9 @@ void BSDBackend::update()
         interface->ip6DefaultGateway = ip6DefGw;
         interface->interfaceType = KNemoIface::Ethernet;
 
-        updateIfaceData( key, interface );
+        updateIfaceData( ifap, key, interface );
 
-        if ( s >= 0 )
+        if ( m_fd >= 0 )
         {
             char essidData[ 32 ];
             int len;
@@ -129,7 +130,7 @@ void BSDBackend::update()
         }
     }
 
-    freeifaddrs( ifaddr );
+    freeifaddrs( ifap );
     updateComplete();
 }
 
@@ -280,13 +281,12 @@ int BSDBackend::getSubnet( struct ifaddrs * ifa )
     return len;
 }
 
-void BSDBackend::updateIfaceData( const QString& ifName, BackendData* data )
+void BSDBackend::updateIfaceData( struct ifaddrs * ifap, const QString& ifName, BackendData* data )
 {
     struct ifaddrs *ifa;
     unsigned long rx_bytes = 0, tx_bytes = 0;
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
     {
-        bool allUp = false;
         QString ifaddrName( ifa->ifa_name );
         if ( ifName != ifaddrName )
             continue;
@@ -296,35 +296,33 @@ void BSDBackend::updateIfaceData( const QString& ifName, BackendData* data )
         if ( ifa->ifa_flags & IFF_UP )
             data->status |= KNemoIface::Up;
 
-        // stats
-        struct if_data * stats;
-        if ( ifa->ifa_data )
-        {
-            stats = static_cast<if_data *>(ifa->ifa_data);
-            if ( stats->ifi_type == IFT_PPP )
-                data->interfaceType = KNemoIface::PPP;
-            if ( stats->ifi_link_state == LINK_STATE_UP && ifa->ifa_flags & IFF_UP )
-                allUp = true;
-        }
+        if ( ifa->ifa_flags & IFF_POINTOPOINT )
+            data->interfaceType = KNemoIface::PPP;
 
-        // mac address, interface type
+
         if ( ifa->ifa_addr )
         {
             if ( ifa->ifa_addr->sa_family == AF_LINK )
             {
-                // Mac address
-                unsigned char macBuffer[6];
-                char macstr[19];
-                memset( macBuffer, 0, sizeof(macBuffer) );
-                memset( macstr, 0, sizeof(macstr) );
                 const struct sockaddr_dl* sdl = reinterpret_cast<struct sockaddr_dl*>(ifa->ifa_addr);
-                if ( sdl->sdl_type == IFT_ETHER && sdl->sdl_alen == ETHER_ADDR_LEN )
-                     memcpy( macBuffer, LLADDR( sdl ), 6 );
-                snprintf( macstr, sizeof(macstr), "%02x:%02x:%02x:%02x:%02x:%02x",
-                          macBuffer[0], macBuffer[1], macBuffer[2],
-                          macBuffer[3], macBuffer[4], macBuffer[5] );
-                data->hwAddress = macstr;
+                if (sdl != NULL && sdl->sdl_alen > 0)
+                {
+                    if ( ( sdl->sdl_type == IFT_ETHER ||
+                           sdl->sdl_type == IFT_L2VLAN ||
+                           sdl->sdl_type == IFT_BRIDGE )
+                         && sdl->sdl_alen == ETHER_ADDR_LEN )
+                        data->hwAddress = ether_ntoa((struct ether_addr *)LLADDR(sdl));
+                }
+                if ( ifa->ifa_data )
+                {
+                    struct if_data * stats = static_cast<if_data *>(ifa->ifa_data);
+                    data->rxPackets += stats->ifi_ipackets;
+                    data->txPackets += stats->ifi_opackets;
+                    rx_bytes += stats->ifi_ibytes;
+                    tx_bytes += stats->ifi_obytes;
+                }
             }
+            // inet address
             else if ( ifa->ifa_addr->sa_family == AF_INET ||
                       ifa->ifa_addr->sa_family == AF_INET6 )
             {
@@ -337,7 +335,7 @@ void BSDBackend::updateIfaceData( const QString& ifName, BackendData* data )
                 struct ifmediareq ifmr;
                 memset( &ifmr, 0, sizeof( ifmr ) );
                 strncpy( ifmr.ifm_name, ifName.toLatin1(), sizeof( ifmr.ifm_name ) );
-                if ( ioctl( s, SIOCGIFMEDIA, &ifmr ) >= 0 &&
+                if ( ioctl( m_fd, SIOCGIFMEDIA, &ifmr ) >= 0 &&
                      ifmr.ifm_status & IFM_AVALID &&
                      ifmr.ifm_status & IFM_ACTIVE &&
                      addrVal.scope != RT_SCOPE_LINK &&
@@ -347,25 +345,18 @@ void BSDBackend::updateIfaceData( const QString& ifName, BackendData* data )
                 }
 
                 if ( !addrKey.isEmpty() )
+                {
                     data->addrData.insert( addrKey, addrVal );
 
-                if ( stats )
-                {
-                    // Sum the numbers of all network-level interfaces
-                    // (e.g., when several IP addresses are assigned)
-                    data->rxPackets += stats->ifi_ipackets;
-                    data->txPackets += stats->ifi_opackets;
-                    rx_bytes += stats->ifi_ibytes;
-                    tx_bytes += stats->ifi_obytes;
+                    if ( data->interfaceType == KNemoIface::PPP &&
+                         data->status & KNemoIface::Up )
+                    {
+                        data->status |= KNemoIface::Connected;
+                    }
                 }
             }
         }
 
-        if ( allUp )
-        {
-            if ( data->interfaceType != KNemoIface::PPP || data->addrData.size() )
-                data->status |= KNemoIface::Connected;
-        }
     }
 
     // Traffic stats. No check needed: if there were no stats,
@@ -512,7 +503,7 @@ int BSDBackend::get80211( const QString &ifName, int type, void *data, int len )
     ireq.i_type = type;
     ireq.i_data = data;
     ireq.i_len = len;
-    return ioctl( s, SIOCG80211, &ireq );
+    return ioctl( m_fd, SIOCG80211, &ireq );
 }
 
 int BSDBackend::get80211len( const QString &ifName, int type, void *data, int len, int *plen)
@@ -526,7 +517,7 @@ int BSDBackend::get80211len( const QString &ifName, int type, void *data, int le
     if ( ireq.i_len == len )
     {
         ireq.i_data = data;
-        if ( ioctl( s, SIOCG80211, &ireq ) < 0 )
+        if ( ioctl( m_fd, SIOCG80211, &ireq ) < 0 )
             return -1;
         *plen = ireq.i_len;
     }
@@ -544,7 +535,7 @@ int BSDBackend::get80211id( const QString &ifName, int ix, void *data, size_t le
     ireq.i_data = data;
     ireq.i_len = len;
 
-    if ( ioctl( s, SIOCG80211, &ireq ) < 0 )
+    if ( ioctl( m_fd, SIOCG80211, &ireq ) < 0 )
         return -1;
 
     *plen = ireq.i_len;
@@ -559,7 +550,7 @@ int BSDBackend::get80211val( const QString &ifName, int type, int *val )
     strncpy( ireq.i_name, ifName.toLatin1(), sizeof( ireq.i_name ) );
     ireq.i_type = type;
 
-    if ( ioctl( s, SIOCG80211, &ireq ) < 0 )
+    if ( ioctl( m_fd, SIOCG80211, &ireq ) < 0 )
         return -1;
 
     *val = ireq.i_val;
@@ -573,7 +564,7 @@ enum ieee80211_opmode BSDBackend::get80211opmode( const QString &ifName )
     memset( &ifmr, 0, sizeof( ifmr ) );
     strncpy( ifmr.ifm_name, ifName.toLatin1(), sizeof( ifmr.ifm_name ) );
 
-    if ( ioctl( s, SIOCGIFMEDIA, &ifmr ) >= 0 )
+    if ( ioctl( m_fd, SIOCGIFMEDIA, &ifmr ) >= 0 )
     {
         if ( ifmr.ifm_current & IFM_IEEE80211_ADHOC )
         {

@@ -51,15 +51,12 @@ public:
     virtual QString defaultRouteIface( int afInet );
 
 private:
-    int s;
-    void updateIfaceData( const QString& ifName, BackendData* data );
+    void updateIfaceData( struct ifaddrs * ifap, const QString& ifName, BackendData* data );
     void updateWirelessData( const QString& ifName, BackendData* data );
     QString formattedAddr( struct sockaddr * addr );
     QString getAddr( struct ifaddrs *ifa, AddrData& addrData );
     int getSubnet( struct ifaddrs *ifa );
-    struct ifaddrs *ifaddr;
-    QHash<QByteArray, QStringList>ipv6Hash;
-    QStringList mProcIfInet6;
+    int m_fd;
 
     int get80211( const QString &ifName, int type, void *data, int len );
     int get80211len( const QString &ifName, int type, void *data, int len, int *plen);
