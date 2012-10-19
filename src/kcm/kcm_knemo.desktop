@@ -87,6 +87,7 @@ Comment[zh_CN]=配置 KNemo 网络监视器
 Comment[zh_TW]=設定 KNemo 網路監控
 
 X-KDE-Keywords=knemo,network monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systray
+X-KDE-Keywords[cs]=knemo,síťový monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systémový panel
 X-KDE-Keywords[da]=knemo,netværksovervågning,wlan-overvågning,wifi-overvågning,ethernet-overvågning,trådløs-overvågning,systray,statusområde
 X-KDE-Keywords[de]=knemo,netzwerk-monitor,wlan-monitor,wifi-monitor,ethernet-monitor,wireless-monitor,kontrollleiste,überwachung,netzwerk,drahtlos-monitor
 X-KDE-Keywords[el]=knemo,επόπτης δικτύου,επόπτης wlan,επόπτης wifi,επόπτης ethernet, επόπτης wireless,πλαίσιο συστήματος
