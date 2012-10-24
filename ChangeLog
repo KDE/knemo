@@ -5,6 +5,8 @@ Version 0.7.4
    - KDE bug #301697: Wrong encryption state for mixed WEP connections on
      FreeBSD
    - KDE bug #301699: Default gateway undetected on FreeBSD
+ * Fix another bug in the BSD backend, thanks to help from Viktor Tsymbalyuk
+   - KDE bug #307279: tunnel interfaces status as 'disconnected' on freebsd
  * Add monochrome icon theme contributed by Vinícius Sabino.
  * Port to libnl3
  * Remove support for the legacy system tray icon
