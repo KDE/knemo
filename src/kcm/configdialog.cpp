@@ -1041,12 +1041,12 @@ void ConfigDialog::buttonAllSelected()
     ifaces.removeAll( "lo" );
     ifaces.removeAll( "lo0" );
 
+    const KColorScheme scheme(QPalette::Active, KColorScheme::View);
     foreach ( QString ifname, ifaces )
     {
         if ( mSettingsMap.contains( ifname ) )
             continue;
         InterfaceSettings* settings = new InterfaceSettings();
-        KColorScheme scheme(QPalette::Active, KColorScheme::View);
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
