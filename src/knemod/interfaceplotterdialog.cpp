@@ -289,7 +289,7 @@ void InterfacePlotterDialog::useBitrate( bool useBits )
 
 void InterfacePlotterDialog::updatePlotter( const double incomingBytes, const double outgoingBytes )
 {
-    QList<double> trafficList;
+    QList<qreal> trafficList;
     if ( mOutgoingVisible )
        trafficList.append( outgoingBytes );
     if ( mIncomingVisible )
