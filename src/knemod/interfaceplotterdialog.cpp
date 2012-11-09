@@ -237,6 +237,8 @@ void InterfacePlotterDialog::configFinished()
 
 void InterfacePlotterDialog::setPlotterUnits()
 {
+    // Prevent this being called recursively
+    disconnect( mPlotter, SIGNAL(axisScaleChanged()), this, SLOT(setPlotterUnits()) );
     qreal value = mPlotter->currentMaximumRangeValue();
     int units = 0;
 
@@ -257,6 +259,8 @@ void InterfacePlotterDialog::setPlotterUnits()
         mPlotter->setUnit( mBitUnits[units] );
     else
         mPlotter->setUnit( mByteUnits[units] );
+    // reconnect
+    connect( mPlotter, SIGNAL(axisScaleChanged()), this, SLOT(setPlotterUnits()) );
 }
 
 void InterfacePlotterDialog::useBitrate( bool useBits )
