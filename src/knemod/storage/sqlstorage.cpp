@@ -44,7 +44,15 @@ SqlStorage::SqlStorage( QString ifaceName )
     mTypeMap.insert( KNemoStats::AllTraffic, "" );
     mTypeMap.insert( KNemoStats::OffpeakTraffic, "_offpeak" );
 
-    migrateDb();
+    if ( dbExists() && open() )
+    {
+        // KNemo 0.7.4 didn't create tables on a new db.  This lets us fix it
+        // without forcing the user to intervene.
+        if ( db.tables().isEmpty() )
+            createDb();
+        else
+            migrateDb();
+    }
 }
 
 SqlStorage::~SqlStorage()
