@@ -1,3 +1,9 @@
+Version 0.7.5
+ * Fix building on ARM architecture
+ * Version 0.7.4 failed to create tables in new statistics databases. Fix
+   that.
+ * Possibly fix a plotter crash
+
 Version 0.7.4
  * Fix bugs in the BSD backend, thanks to Alberto Villa
    - KDE bug #301546: Wrong traffic reported on FreeBSD
