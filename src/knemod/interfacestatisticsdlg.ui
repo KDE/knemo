@@ -11,6 +11,9 @@
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <property name="margin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -29,9 +32,6 @@
          <property name="sortingEnabled">
           <bool>true</bool>
          </property>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>
@@ -58,12 +58,6 @@
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderStretchLastSection">
-          <bool>true</bool>
-         </attribute>
         </widget>
        </item>
       </layout>
@@ -86,12 +80,6 @@
          </attribute>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderStretchLastSection">
-          <bool>true</bool>
          </attribute>
         </widget>
        </item>
@@ -116,12 +104,6 @@
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderStretchLastSection">
-          <bool>true</bool>
-         </attribute>
         </widget>
        </item>
       </layout>
@@ -144,12 +126,6 @@
          </attribute>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderStretchLastSection">
-          <bool>true</bool>
          </attribute>
         </widget>
        </item>
