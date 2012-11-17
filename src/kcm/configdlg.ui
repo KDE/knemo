@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>ConfigDlg</class>
  <widget class="QWidget" name="ConfigDlg">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>695</width>
-    <height>485</height>
-   </rect>
-  </property>
   <layout class="QVBoxLayout">
    <property name="margin">
     <number>0</number>
@@ -85,7 +77,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>1</width>
+           <width>0</width>
            <height>0</height>
           </size>
          </property>
@@ -335,8 +327,8 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
-                 <height>1</height>
+                 <width>0</width>
+                 <height>0</height>
                 </size>
                </property>
               </spacer>
@@ -357,8 +349,8 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>1</width>
-               <height>1</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
             </spacer>
@@ -446,8 +438,8 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                     </property>
                     <property name="sizeHint" stdset="0">
                      <size>
-                      <width>41</width>
-                      <height>61</height>
+                      <width>0</width>
+                      <height>0</height>
                      </size>
                     </property>
                    </spacer>
@@ -528,8 +520,8 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                     </property>
                     <property name="sizeHint" stdset="0">
                      <size>
-                      <width>41</width>
-                      <height>61</height>
+                      <width>0</width>
+                      <height>0</height>
                      </size>
                     </property>
                    </spacer>
@@ -548,8 +540,8 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>20</width>
-               <height>40</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
             </spacer>
@@ -630,8 +622,8 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>41</width>
-                 <height>61</height>
+                 <width>0</width>
+                 <height>0</height>
                 </size>
                </property>
               </spacer>
@@ -710,8 +702,8 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>70</width>
-               <height>130</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
             </spacer>
@@ -786,8 +778,8 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>70</width>
-               <height>129</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
             </spacer>
@@ -891,8 +883,8 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>1</width>
-                <height>1</height>
+                <width>0</width>
+                <height>0</height>
                </size>
               </property>
              </spacer>
@@ -958,7 +950,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
             <property name="sizeHint" stdset="0">
              <size>
               <width>0</width>
-              <height>1</height>
+              <height>0</height>
              </size>
             </property>
            </spacer>
@@ -993,8 +985,8 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>31</width>
-           <height>30</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -1007,14 +999,14 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
  </widget>
  <customwidgets>
   <customwidget>
-   <class>KUrlRequester</class>
-   <extends>QFrame</extends>
-   <header>kurlrequester.h</header>
-  </customwidget>
-  <customwidget>
    <class>KFontComboBox</class>
    <extends>KComboBox</extends>
    <header>kfontcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KColorButton</class>
+   <extends>QPushButton</extends>
+   <header>kcolorbutton.h</header>
   </customwidget>
   <customwidget>
    <class>KComboBox</class>
@@ -1022,9 +1014,9 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
    <header>kcombobox.h</header>
   </customwidget>
   <customwidget>
-   <class>KColorButton</class>
-   <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
+   <class>KUrlRequester</class>
+   <extends>QFrame</extends>
+   <header>kurlrequester.h</header>
   </customwidget>
   <customwidget>
    <class>KIntNumInput</class>

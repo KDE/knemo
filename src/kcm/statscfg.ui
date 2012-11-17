@@ -2,15 +2,10 @@
 <ui version="4.0">
  <class>StatsCfg</class>
  <widget class="QWidget" name="StatsCfg">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>384</width>
-    <height>258</height>
-   </rect>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <property name="margin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -34,7 +29,7 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>1</height>
+             <height>0</height>
             </size>
            </property>
           </spacer>
@@ -68,7 +63,7 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>20</height>
+             <height>0</height>
             </size>
            </property>
           </spacer>
@@ -102,8 +97,8 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>20</width>
-           <height>2</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
         </spacer>
@@ -135,7 +130,7 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>2</height>
+             <height>0</height>
             </size>
            </property>
           </spacer>
@@ -175,7 +170,7 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>2</height>
+             <height>0</height>
             </size>
            </property>
           </spacer>
@@ -215,7 +210,7 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>2</height>
+             <height>0</height>
             </size>
            </property>
           </spacer>
@@ -245,7 +240,7 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
-             <height>2</height>
+             <height>0</height>
             </size>
            </property>
           </spacer>
@@ -292,7 +287,7 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
-             <height>2</height>
+             <height>0</height>
             </size>
            </property>
           </spacer>
@@ -333,7 +328,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>20</width>
+           <width>0</width>
            <height>0</height>
           </size>
          </property>
@@ -350,7 +345,7 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>20</width>
+       <width>0</width>
        <height>0</height>
       </size>
      </property>
