@@ -2,7 +2,7 @@
    Copyright (C) 2004, 2006 Percy Leonhardt <percy@eris23.de>
    Copyright (C) 2009, 2010 John Stamp <jstamp@users.sourceforge.net>
 
-   Portions adapted from FancyPlotter.cc in KSysGuard
+   Portions adapted from FancyPlotter.cpp in KSysGuard
    Copyright (c) 1999 - 2002 Chris Schlaeger <cs@kde.org>
 
    KNemo is free software; you can redistribute it and/or modify
@@ -47,34 +47,110 @@ static const char plot_verticalLinesScroll[] = "VerticalLinesScroll";
 static const char plot_colorIncoming[] = "ColorIncoming";
 static const char plot_colorOutgoing[] = "ColorOutgoing";
 
-class FancyPlotterLabel : public QWidget
-{
-public:
-    FancyPlotterLabel(QWidget *parent) : QWidget(parent)
-    {
-        QBoxLayout *layout = new QHBoxLayout(this);
-        label = new QLabel(this);
-        layout->addWidget(label);
-        value = new QLabel(this);
-        layout->addWidget(value);
-        layout->addStretch(1);
+class FancyPlotterLabel : public QLabel {
+  public:
+    FancyPlotterLabel(QWidget *parent) : QLabel(parent) {
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        longHeadingWidth = 0;
+        shortHeadingWidth = 0;
+        textMargin = 0;
+        setLayoutDirection(Qt::LeftToRight); //We do this because we organise the strings ourselves.. is this going to muck it up though for RTL languages?
     }
-    void setLabel(const QString &name, const QColor &color, const QChar &indicatorSymbol)
-    {
+    ~FancyPlotterLabel() {
+    }
+    void setLabel(const QString &name, const QColor &color) {
+        labelName = name;
+
+        if(indicatorSymbol.isNull()) {
+            if(fontMetrics().inFont(QChar(0x25CF)))
+                indicatorSymbol = QChar(0x25CF);
+            else
+                indicatorSymbol = '#';
+        }
+        changeLabel(color);
+
+    }
+    void setValueText(const QString &value) {
+        //value can have multiple strings, separated with the 0x9c character
+        valueText = value.split(QChar(0x9c));
+        resizeEvent(NULL);
+        update();
+    }
+    virtual void resizeEvent( QResizeEvent * ) {
+        QFontMetrics fm = fontMetrics();
+
+        if(valueText.isEmpty()) {
+            if(longHeadingWidth < width())
+                setText(longHeadingText);
+            else
+                setText(shortHeadingText);
+            return;
+        }
+        QString value = valueText.first();
+
+        int textWidth = fm.boundingRect(value).width();
+        if(textWidth + longHeadingWidth < width())
+            setBothText(longHeadingText, value);
+        else if(textWidth + shortHeadingWidth < width())
+            setBothText(shortHeadingText, value);
+        else {
+            int valueTextCount = valueText.count();
+            int i;
+            for(i = 1; i < valueTextCount; ++i) {
+                textWidth = fm.boundingRect(valueText.at(i)).width();
+                if(textWidth + shortHeadingWidth <= width()) {
+                    break;
+                }
+            }
+            if(i < valueTextCount)
+                setBothText(shortHeadingText, valueText.at(i));
+            else
+                setText(noHeadingText + valueText.last()); //This just sets the color of the text
+        }
+    }
+    void changeLabel(const QColor &_color) {
+        color = _color;
+
         if ( kapp->layoutDirection() == Qt::RightToLeft )
-	            label->setText(QString("<qt>: ") + name + " <font color=\"" + color.name() + "\">" + indicatorSymbol + "</font>");
+            longHeadingText = QString(": ") + labelName + " <font color=\"" + color.name() + "\">" + indicatorSymbol + "</font>";
         else
-            label->setText(QString("<qt><font color=\"") + color.name() + "\">" + indicatorSymbol + "</font> " + name + ":");
+            longHeadingText = QString("<qt><font color=\"") + color.name() + "\">" + indicatorSymbol + "</font> " + labelName + " :";
+        shortHeadingText = QString("<qt><font color=\"") + color.name() + "\">" + indicatorSymbol + "</font>";
+        noHeadingText = QString("<qt><font color=\"") + color.name() + "\">";
+
+        textMargin = fontMetrics().width('x') + margin()*2 + frameWidth()*2;
+        longHeadingWidth = fontMetrics().boundingRect(labelName + " :" + indicatorSymbol + " x").width() + textMargin;
+        shortHeadingWidth = fontMetrics().boundingRect(indicatorSymbol).width() + textMargin;
+        setMinimumWidth(shortHeadingWidth);
+        update();
     }
-    QLabel *label;
-    QLabel *value;
+  private:
+    void setBothText(const QString &heading, const QString & value) {
+        if(QApplication::layoutDirection() == Qt::LeftToRight)
+            setText(heading + ' ' + value);
+        else
+            setText("<qt>" + value + ' ' + heading);
+    }
+    int textMargin;
+    QString longHeadingText;
+    QString shortHeadingText;
+    QString noHeadingText;
+    int longHeadingWidth;
+    int shortHeadingWidth;
+    QList<QString> valueText;
+    QString labelName;
+    QColor color;
+    static QChar indicatorSymbol;
 };
+
+QChar FancyPlotterLabel::indicatorSymbol;
 
 
 InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     : KDialog(),
       mConfig( KGlobal::config() ),
       mConfigDlg( 0 ),
+      mLabelsWidget( NULL ),
       mSetPos( true ),
       mWasShown( false ),
       mUseBitrate( generalSettings->useBitrate ),
@@ -95,26 +171,29 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     if (fm.inFont(QChar(0x25CF)))
         mIndicatorSymbol = QChar(0x25CF);
     
-    QBoxLayout *layout = new QVBoxLayout();
-    mainWidget()->setLayout( layout );
+    QBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
+    mainWidget()->setLayout( layout );
     mPlotter = new KSignalPlotter( this );
-    mPlotter->setShowAxis( true );
     int axisTextWidth = fontMetrics().width(i18nc("Largest axis title", "99999 XXXX"));
     mPlotter->setMaxAxisTextWidth( axisTextWidth );
+    mPlotter->setShowAxis( true );
+    mPlotter->setUseAutoRange( true );
     layout->addWidget(mPlotter);
 
     /* Create a set of labels underneath the graph. */
-    QBoxLayout *outerLabelLayout = new QHBoxLayout;
+    mLabelsWidget = new QWidget;
+    layout->addWidget(mLabelsWidget);
+    QBoxLayout *outerLabelLayout = new QHBoxLayout(mLabelsWidget);
     outerLabelLayout->setSpacing(0);
-    layout->addLayout(outerLabelLayout);
- 
+    outerLabelLayout->setContentsMargins(0,0,0,0);
+
     /* create a spacer to fill up the space up to the start of the graph */
-    outerLabelLayout->addItem(new QSpacerItem(axisTextWidth, 0, QSizePolicy::Preferred));
+    outerLabelLayout->addItem(new QSpacerItem(axisTextWidth + 10, 0, QSizePolicy::Preferred));
 
     mLabelLayout = new QHBoxLayout;
     outerLabelLayout->addLayout(mLabelLayout);
-
     mReceivedLabel = new FancyPlotterLabel( this );
     mSentLabel = new FancyPlotterLabel( this );
 
@@ -196,6 +275,15 @@ bool InterfacePlotterDialog::event( QEvent *e )
     }
 
     return KDialog::event( e );
+}
+
+void InterfacePlotterDialog::resizeEvent( QResizeEvent* )
+{
+    bool showLabels = true;;
+
+    if( mainWidget()->height() <= mLabelsWidget->sizeHint().height() + mPlotter->minimumHeight() )
+        showLabels = false;
+    mLabelsWidget->setVisible(showLabels);
 }
 
 void InterfacePlotterDialog::showContextMenu( const QPoint &pos )
@@ -286,7 +374,7 @@ void InterfacePlotterDialog::useBitrate( bool useBits )
     for ( int beamId = 0; beamId < mPlotter->numBeams(); beamId++ )
     {
         QString lastValue = formattedRate( mPlotter->lastValue(beamId), mUseBitrate );
-        static_cast<FancyPlotterLabel *>((static_cast<QWidgetItem *>(mLabelLayout->itemAt(beamId)))->widget())->value->setText(lastValue);
+        static_cast<FancyPlotterLabel *>((static_cast<QWidgetItem *>(mLabelLayout->itemAt(beamId)))->widget())->setText(lastValue);
     }
     setPlotterUnits();
 }
@@ -303,7 +391,7 @@ void InterfacePlotterDialog::updatePlotter( const double incomingBytes, const do
     for ( int beamId = 0; beamId < mPlotter->numBeams(); beamId++ )
     {
         QString lastValue = formattedRate( mPlotter->lastValue(beamId), mUseBitrate );
-        static_cast<FancyPlotterLabel *>((static_cast<QWidgetItem *>(mLabelLayout->itemAt(beamId)))->widget())->value->setText(lastValue);
+        static_cast<FancyPlotterLabel *>((static_cast<QWidgetItem *>(mLabelLayout->itemAt(beamId)))->widget())->setValueText(lastValue);
     }
 }
 
@@ -378,8 +466,8 @@ void InterfacePlotterDialog::configChanged()
     mPlotter->setUseAutoRange( mSettings.automaticDetection );
     mPlotter->setVerticalLinesScroll( mSettings.verticalLinesScroll );
 
-    mSentLabel->setLabel( i18nc( "interface name", "%1 Sent Data", mName ), mSettings.colorOutgoing, mIndicatorSymbol);
-    mReceivedLabel->setLabel( i18nc( "interface name", "%1 Received Data", mName ), mSettings.colorIncoming, mIndicatorSymbol);
+    mSentLabel->setLabel( i18nc( "network traffic", "Sending" ), mSettings.colorOutgoing);
+    mReceivedLabel->setLabel( i18nc( "network traffic", "Receiving" ), mSettings.colorIncoming);
 
     addBeams();
 }

@@ -45,6 +45,7 @@ public:
 
 protected:
     bool event( QEvent *e );
+    void resizeEvent( QResizeEvent* );
 
 private slots:
     void configFinished();
@@ -60,6 +61,7 @@ private:
 
     KSharedConfigPtr mConfig;
     PlotterConfigDialog *mConfigDlg;
+    QWidget *mLabelsWidget;
     bool mSetPos;
     bool mWasShown;
     bool mUseBitrate;
