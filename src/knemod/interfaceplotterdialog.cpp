@@ -406,8 +406,8 @@ void InterfacePlotterDialog::loadConfig()
     mSettings.pixel = clamp<int>(plotterGroup.readEntry( plot_pixel, s.pixel ), 1, 50 );
     mSettings.distance = clamp<int>(plotterGroup.readEntry( plot_distance, s.distance ), 10, 120 );
     mSettings.fontSize = clamp<int>(plotterGroup.readEntry( plot_fontSize, s.fontSize ), 5, 24 );
-    mSettings.minimumValue = clamp<double>(plotterGroup.readEntry( plot_minimumValue, s.minimumValue ), 0.0, 49999.0 );
-    mSettings.maximumValue = clamp<double>(plotterGroup.readEntry( plot_maximumValue, s.maximumValue ), 0.0, 50000.0 );
+    mSettings.minimumValue = clamp<double>(plotterGroup.readEntry( plot_minimumValue, s.minimumValue ), 0.0, pow(1024.0, 3) - 1 );
+    mSettings.maximumValue = clamp<double>(plotterGroup.readEntry( plot_maximumValue, s.maximumValue ), 0.0, pow(1024.0, 3) );
     mSettings.labels = plotterGroup.readEntry( plot_labels, s.labels );
     mSettings.showIncoming = plotterGroup.readEntry( plot_showIncoming, s.showIncoming );
     mSettings.showOutgoing = plotterGroup.readEntry( plot_showOutgoing, s.showOutgoing );
@@ -455,8 +455,14 @@ void InterfacePlotterDialog::configChanged()
     mPlotter->setFont( pfont );
     if ( !mSettings.automaticDetection )
     {
-        mPlotter->setMinimumValue( mSettings.minimumValue );
-        mPlotter->setMaximumValue( mSettings.maximumValue );
+        mPlotter->setMinimumValue( mSettings.minimumValue * mMultiplier );
+        mPlotter->setMaximumValue( mSettings.maximumValue * mMultiplier );
+    }
+    else
+    {
+        // Don't want the disabled settings to be used as hints
+        mPlotter->setMinimumValue( 0 );
+        mPlotter->setMaximumValue( 1 );
     }
     mPlotter->setHorizontalScale( mSettings.pixel );
     mPlotter->setVerticalLinesDistance( mSettings.distance );
