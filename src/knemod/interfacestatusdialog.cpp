@@ -42,7 +42,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
       mInterface( interface )
 {
     setCaption( i18nc( "interface name", "%1 Interface Status", interface->ifaceName() ) );
-    setButtons( Close );
+    setButtons( None );
 
     ui.setupUi( mainWidget() );
     configChanged();

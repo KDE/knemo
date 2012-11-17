@@ -84,7 +84,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
       mName( name )
 {
     setCaption( i18nc( "interface name", "%1 Traffic", mName ) );
-    setButtons( Close );
+    setButtons( None );
     setContextMenuPolicy( Qt::DefaultContextMenu );
 
     mByteUnits << ki18n( "%1 B/s" ) << ki18n( "%1 KiB/s" ) << ki18n( "%1 MiB/s" ) << ki18n( "%1 GiB/s" );
