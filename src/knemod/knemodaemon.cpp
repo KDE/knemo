@@ -23,6 +23,8 @@
 #include <QTimer>
 
 #include <KAboutData>
+#include <KAction>
+#include <KActionCollection>
 #include <KConfigGroup>
 #include <KLocale>
 #include <KMessageBox>
@@ -50,6 +52,13 @@ KNemoDaemon::KNemoDaemon()
     QDBusConnection::sessionBus().registerObject("/knemo", this, QDBusConnection::ExportScriptableSlots);
     mPollTimer = new QTimer();
     connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );
+
+    KActionCollection* ac = new KActionCollection( this );
+    KAction* action = new KAction( i18n( "Toggle Traffic Plotters" ), this );
+    ac->addAction( "toggleTrafficPlotters", action );
+    connect( action, SIGNAL( triggered() ), SLOT( togglePlotters() ) );
+    action->setGlobalShortcut( KShortcut() );
+
     readConfig();
 }
 
@@ -187,6 +196,22 @@ QString KNemoDaemon::getSelectedInterface()
 void KNemoDaemon::updateInterfaces()
 {
     backend->update();
+}
+
+void KNemoDaemon::togglePlotters()
+{
+    bool showPlotters = false;
+    foreach ( QString key, mInterfaceHash.keys() )
+    {
+        // If only some of the plotters are visible, show them all
+        if ( !mInterfaceHash.value( key )->plotterVisible() )
+            showPlotters = true;
+    }
+
+    foreach ( QString key, mInterfaceHash.keys() )
+    {
+        mInterfaceHash.value( key )->toggleSignalPlotter( showPlotters );
+    }
 }
 
 static const char * const description =

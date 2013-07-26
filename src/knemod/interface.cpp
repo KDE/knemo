@@ -400,6 +400,23 @@ void Interface::warnTraffic( QString warnText, quint64 threshold, quint64 curren
     KNotification::event( "exceededTraffic", warnText );
 }
 
+void Interface::toggleSignalPlotter( bool show )
+{
+    if ( !mPlotterDialog )
+        return;
+    if ( show )
+        mPlotterDialog->show();
+    else
+        mPlotterDialog->hide();
+}
+
+bool Interface::plotterVisible()
+{
+    if ( !mPlotterDialog || !mPlotterDialog->isVisible() )
+        return false;
+    return true;
+}
+
 // taken from ksystemtray.cpp
 void Interface::activateOrHide( QWidget* widget, bool onlyActivate )
 {

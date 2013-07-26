@@ -108,6 +108,8 @@ public:
         return mTxRateStr;
     }
 
+    bool plotterVisible();
+
     /**
      * Called from reparseConfiguration() when the user changed
      * the settings.
@@ -134,6 +136,8 @@ public slots:
      * outgoing traffic.
      */
     void showSignalPlotter( bool fromContextMenu );
+
+    void toggleSignalPlotter( bool show );
 
     /*
      * Called when the user selects the appropriate entry in the context menu.

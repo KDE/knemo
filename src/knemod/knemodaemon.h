@@ -89,6 +89,8 @@ private slots:
      */
     void updateInterfaces();
 
+    void togglePlotters();
+
 private:
     KSharedConfigPtr mConfig;
     bool mHaveInterfaces;
