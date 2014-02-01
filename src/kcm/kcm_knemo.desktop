@@ -12,6 +12,7 @@ X-KDE-Weight=60
 
 Name=Network Monitor
 Name[bg]=Наблюдение на мрежата
+Name[bs]=Nadzornik mreže
 Name[cs]=Monitor sítě
 Name[da]=Netværksovervågning
 Name[de]=Netzwerkmonitor
@@ -58,6 +59,7 @@ Name[zh_CN]=网络监视器
 Name[zh_TW]= 網路監控
 Comment=Configure the KNemo network monitor
 Comment[bg]=Настройки на мрежовото наблюдение KNemo
+Comment[bs]=Podesi KNemo nadzor mreže
 Comment[cs]=Nastavení monitoru sítě KNemo
 Comment[da]=Indstil KNemo netværksovervågning
 Comment[de]=Den Netzwerkmonitor KNemo einrichten
@@ -94,6 +96,7 @@ Comment[zh_CN]=配置 KNemo 网络监视器
 Comment[zh_TW]=設定 KNemo 網路監控
 
 X-KDE-Keywords=knemo,network monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systray
+X-KDE-Keywords[bs]=knemo,nadzor mreže, wlan nadzor, wifi nadzor, ethernet nadzor, bežićni nadzor, traka
 X-KDE-Keywords[cs]=knemo,síťový monitor,wlan monitor,wifi monitor,ethernet monitor,wireless monitor,systémový panel
 X-KDE-Keywords[da]=knemo,netværksovervågning,wlan-overvågning,wifi-overvågning,ethernet-overvågning,trådløs-overvågning,systray,statusområde
 X-KDE-Keywords[de]=knemo,netzwerk-monitor,wlan-monitor,wifi-monitor,ethernet-monitor,wireless-monitor,kontrollleiste,überwachung,netzwerk,drahtlos-monitor
