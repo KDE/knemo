@@ -150,31 +150,35 @@ void StatsRuleModel::modifyRule( const QModelIndex &index, const StatsRule &s )
 
 QString WarnModel::ruleText( const WarnRule &warn )
 {
-    QString warnType;
-    switch ( warn.trafficType )
-    {
-        case KNemoStats::Peak:
-           warnType = i18n( "peak" );
-           break;
-        case KNemoStats::Offpeak:
-           warnType = i18n( "off-peak" );
-    }
-    QString warnDirection;
+    QString warnText;
+    quint64 siz = warn.threshold * pow( 1024, warn.trafficUnits );
     switch ( warn.trafficDirection )
     {
         case KNemoStats::TrafficIn:
-           warnDirection = i18n( "incoming" );
-           break;
+            if ( warn.trafficType == KNemoStats::Peak )
+                warnText = i18n( "peak incoming traffic > %1" ).arg( KIO::convertSize( siz ) );
+            else if ( warn.trafficType == KNemoStats::Offpeak )
+                warnText = i18n( "off-peak incoming traffic > %1" ).arg( KIO::convertSize( siz ) );
+            else
+                warnText = i18n( "incoming traffic > %1" ).arg( KIO::convertSize( siz ) );
+            break;
         case KNemoStats::TrafficOut:
-           warnDirection = i18n( "outgoing" );
-           break;
+            if ( warn.trafficType == KNemoStats::Peak )
+                warnText = i18n( "peak outgoing traffic > %1" ).arg( KIO::convertSize( siz ) );
+            else if ( warn.trafficType == KNemoStats::Offpeak )
+                warnText = i18n( "off-peak outgoing traffic > %1" ).arg( KIO::convertSize( siz ) );
+            else
+                warnText = i18n( "outgoing traffic > %1" ).arg( KIO::convertSize( siz ) );
+            break;
         case KNemoStats::TrafficTotal:
-           warnDirection = i18n( "incoming and outgoing" );
+            if ( warn.trafficType == KNemoStats::Peak )
+                warnText = i18n( "peak incoming and outgoing traffic > %1" ).arg( KIO::convertSize( siz ) );
+            else if ( warn.trafficType == KNemoStats::Offpeak )
+                warnText = i18n( "off-peak incoming and outgoing traffic > %1" ).arg( KIO::convertSize( siz ) );
+            else
+                warnText = i18n( "incoming and outgoing traffic > %1" ).arg( KIO::convertSize( siz ) );
     }
-    quint64 siz = warn.threshold * pow( 1024, warn.trafficUnits );
-    QString text = QString( "%1 %2 traffic > %3" ).arg( warnType ).arg( warnDirection )
-        .arg( KIO::convertSize( siz ) );
-    return text.simplified();
+    return warnText;
 }
 
 QList<WarnRule> WarnModel::getRules()
