@@ -46,7 +46,7 @@ NetlinkBackend::NetlinkBackend()
     {
         rtnl_addr_alloc_cache( rtsock, &addrCache );
         rtnl_link_alloc_cache( rtsock, AF_UNSPEC, &linkCache );
-        rtnl_route_alloc_cache( rtsock, AF_UNSPEC, NL_AUTO_PROVIDE, &routeCache );
+        rtnl_route_alloc_cache( rtsock, AF_UNSPEC, 0, &routeCache );
     }
 #ifdef HAVE_LIBIW
     wireless.openSocket();
