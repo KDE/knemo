@@ -82,11 +82,11 @@ signals:
 
 public slots:
     void clearStatistics();
+    void checkValidEntry();
 
 private slots:
     void saveStatistics( bool fullSave = false );
     void checkWarnings();
-    void checkValidEntry();
 
 private:
     bool loadStats();

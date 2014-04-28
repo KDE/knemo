@@ -233,6 +233,12 @@ void Interface::processUpdate()
 
         if ( mIfaceStatistics )
         {
+            // We only check once an hour if we need to create a new stats entry.
+            // However, the timer will be out of sync if we're resuming from suspend,
+            // so we just check if we need to readjust when an interface becomes connected.
+            if ( mPreviousIfaceState < KNemoIface::Connected )
+                mIfaceStatistics->checkValidEntry();
+
             mIfaceStatistics->addRxBytes( mBackendData->incomingBytes );
             mIfaceStatistics->addTxBytes( mBackendData->outgoingBytes );
         }
