@@ -151,7 +151,7 @@
             <bool>false</bool>
            </property>
            <property name="displayFormat">
-            <string>h:00 AP</string>
+            <string extracomment="(qtdt-format) This should always be the beginning of an individual hour">h:00 AP</string>
            </property>
           </widget>
          </item>
@@ -191,7 +191,7 @@
             <bool>false</bool>
            </property>
            <property name="displayFormat">
-            <string>h:00 AP</string>
+            <string extracomment="(qtdt-format) This should always be the beginning of an individual hour">h:00 AP</string>
            </property>
           </widget>
          </item>
@@ -268,7 +268,7 @@
             <bool>false</bool>
            </property>
            <property name="displayFormat">
-            <string>h:00 AP</string>
+            <string extracomment="(qtdt-format) This should always be the beginning of an individual hour">h:00 AP</string>
            </property>
           </widget>
          </item>
@@ -315,7 +315,7 @@
             <bool>false</bool>
            </property>
            <property name="displayFormat">
-            <string>h:00 AP</string>
+            <string extracomment="(qtdt-format) This should always be the beginning of an individual hour">h:00 AP</string>
            </property>
           </widget>
          </item>
