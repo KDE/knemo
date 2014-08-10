@@ -2,6 +2,7 @@
 Name=Modem
 Name[bg]=Модем
 Name[bs]=Modem
+Name[ca]=Mòdem
 Name[cs]=Modem
 Name[da]=Modem
 Name[de]=Modem
@@ -46,6 +47,7 @@ Name[zh_TW]=數據機
 Comment=KNemo modem icon theme
 Comment[bg]=Набор икони в стил "модем" за KNemo
 Comment[bs]=Modemska tema ikona K‑nema
+Comment[ca]=Tema d'icona pel mòdem al KNemo
 Comment[cs]=KNemo set ikon - modem
 Comment[da]=KNemo ikontema til modem
 Comment[de]=KNemo-Symbol-Design „Modem“
