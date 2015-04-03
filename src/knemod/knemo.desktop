@@ -11,6 +11,7 @@ X-KDE-autostart-condition=knemorc:General:AutoStart:true
 Categories=Qt;KDE;Network;
 
 Name=KNemo
+Name[ast]=KNemo
 Name[be]=KNemo
 Name[bg]=KNemo
 Name[bs]=KNemo
