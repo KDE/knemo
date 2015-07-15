@@ -126,7 +126,8 @@ void Interface::configChanged()
     if ( interfaceGroup.hasKey( conf_calendar ) )
     {
         QString oldSetting = interfaceGroup.readEntry( conf_calendar );
-        mSettings.calendarSystem = KCalendarSystem::calendarSystem( oldSetting );
+        // FIXME
+        //mSettings.calendarSystem = KCalendarSystem::calendarSystem( oldSetting );
         interfaceGroup.writeEntry( conf_calendarSystem, static_cast<int>(mSettings.calendarSystem) );
         interfaceGroup.deleteEntry( conf_calendar );
         config->sync();
