@@ -25,7 +25,7 @@
 
 #include <KCalendarSystem>
 #include <KColorScheme>
-#include <KInputDialog>
+#include <QInputDialog>
 #include <kio/global.h>
 #include <KMessageBox>
 #include <KPluginFactory>
@@ -983,8 +983,9 @@ void ConfigDialog::interfaceSelected( int row )
 void ConfigDialog::buttonNewSelected()
 {
     bool ok = false;
-    QString ifname = KInputDialog::getText( i18n( "Add new interface" ),
+    QString ifname = QInputDialog::getText( this, i18n( "Add new interface" ),
                                             i18n( "Please enter the name of the interface to be monitored.\nIt should be something like 'eth1', 'wlan2' or 'ppp0'." ),
+                                            QLineEdit::Normal,
                                             QString::null,
                                             &ok );
 
