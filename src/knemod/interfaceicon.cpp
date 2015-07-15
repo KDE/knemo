@@ -31,7 +31,7 @@
 #include <KHelpMenu>
 #include <QIcon>
 #include <KLocale>
-#include <KMenu>
+#include <QMenu>
 #include <KProcess>
 #include <KStandardDirs>
 
@@ -459,7 +459,7 @@ void InterfaceIcon::updateToolTip()
 void InterfaceIcon::updateMenu()
 {
     // Remove all old entries.
-    KMenu* menu = static_cast<KMenu*>(mTray->contextMenu());
+    QMenu* menu = mTray->contextMenu();
     QList<QAction *> actions = menu->actions();
     foreach ( QAction* action, commandActions->actions() )
         menu->removeAction( action );
@@ -526,14 +526,15 @@ void InterfaceIcon::updateTrayStatus()
                 ( !hideWhenUnavailable && !hideWhenDisconnected ) ) )
     {
         mTray = new InterfaceTray( mInterface, ifaceName );
-        KMenu* menu = static_cast<KMenu*>(mTray->contextMenu());
+        QMenu* menu = mTray->contextMenu();
 
         menu->removeAction( menu->actions().at( 0 ) );
-        menu->addTitle( QIcon::fromTheme( "knemo" ), i18n( "KNemo - %1", title ) );
+        // FIXME: title for QMenu?
+        //menu->addTitle( QIcon::fromTheme( "knemo" ), i18n( "KNemo - %1", title ) );
         menu->addAction( statusAction );
         menu->addAction( plotterAction );
         menu->addAction( configAction );
-        KHelpMenu* helpMenu( new KHelpMenu( menu, KNemoDaemon::aboutData(), false ) );
+        KHelpMenu* helpMenu( new KHelpMenu( menu, KAboutData::applicationData(), false ) );
         menu->addMenu( helpMenu->menu() )->setIcon( QIcon::fromTheme( "help-contents" ) );
 
         connect( menu, SIGNAL( triggered( QAction * ) ),
