@@ -24,6 +24,7 @@
 #include <QColor>
 #include <QDate>
 #include <QFont>
+#include <QFontDatabase>
 #include <QList>
 #include <QMap>
 #include <QString>
@@ -411,7 +412,7 @@ struct InterfaceSettings
         barScale( false ),
         inMaxRate( 4 ),
         outMaxRate( 4 ),
-        iconFont( KGlobalSettings::generalFont() ),
+        iconFont( QFontDatabase::systemFont( QFontDatabase::GeneralFont ) ),
         numCommands( 0 ),
         trafficThreshold( 0 ),
         hideWhenUnavailable( false ),

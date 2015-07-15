@@ -643,7 +643,7 @@ void ConfigDialog::save()
             {
                 interfaceGroup.writeEntry( conf_barScale, settings->barScale );
             }
-            if ( settings->iconTheme == TEXT_THEME && settings->iconFont != KGlobalSettings::generalFont() )
+            if ( settings->iconTheme == TEXT_THEME && settings->iconFont != QFontDatabase::systemFont( QFontDatabase::GeneralFont ) )
             {
                 interfaceGroup.writeEntry( conf_iconFont, settings->iconFont );
             }
@@ -778,7 +778,7 @@ void ConfigDialog::defaults()
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->iconFont = KGlobalSettings::generalFont();
+        settings->iconFont = QFontDatabase::systemFont( QFontDatabase::GeneralFont );
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
@@ -998,7 +998,7 @@ void ConfigDialog::buttonNewSelected()
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->iconFont = KGlobalSettings::generalFont();
+        settings->iconFont = QFontDatabase::systemFont( QFontDatabase::GeneralFont );
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->setCurrentRow( mDlg->listBoxInterfaces->row( item ) );
         mDlg->pushButtonDelete->setEnabled( true );
@@ -1055,7 +1055,7 @@ void ConfigDialog::buttonAllSelected()
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->iconFont = KGlobalSettings::generalFont();
+        settings->iconFont = QFontDatabase::systemFont( QFontDatabase::GeneralFont );
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->addItem( ifname );
     }

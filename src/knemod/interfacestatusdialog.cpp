@@ -236,7 +236,7 @@ void InterfaceStatusDialog::doUp( const BackendData *data )
         else
             ui.comboBoxIP->removeItem( i );
     }
-    QFont f = KGlobalSettings::generalFont();
+    QFont f = QFontDatabase::systemFont( QFontDatabase::GeneralFont );
     QFontMetrics fm( f );
     int w = 0;
     int keyCounter = 0;
