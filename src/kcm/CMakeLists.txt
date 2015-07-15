@@ -5,7 +5,7 @@ set( kcm_knemo_SRCS
     themeconfig.cpp
     statsconfig.cpp
     warnconfig.cpp
-    kdateedit.cpp
+    dateeditwidget.cpp
     kdatepickerpopup.cpp
     ../common/data.cpp
     ../common/utils.cpp

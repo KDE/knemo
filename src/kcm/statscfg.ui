@@ -42,7 +42,7 @@
           </widget>
          </item>
          <item>
-          <widget class="KDateEdit" name="startDate">
+          <widget class="DateEditWidget" name="startDate">
            <property name="whatsThis">
             <string>&lt;p&gt;By default, this shows the start date of the current month or billing period. If you change the date, KNemo will recalculate billing periods from that date forward. Any billing periods before that date will remain unmodified.&lt;/p&gt;&lt;p&gt;If you set an erroneous date, just select an earlier good billing date, and KNemo will repair it.&lt;/p&gt;</string>
            </property>
@@ -360,9 +360,9 @@
    <header>knuminput.h</header>
   </customwidget>
   <customwidget>
-   <class>KDateEdit</class>
+   <class>DateEditWidget</class>
    <extends>QComboBox</extends>
-   <header>kdateedit.h</header>
+   <header>dateeditwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
