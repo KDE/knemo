@@ -24,7 +24,7 @@
 #include <QPainter>
 #include <QPixmapCache>
 
-#include <KAction>
+#include <QAction>
 #include <KActionCollection>
 #include <KColorScheme>
 #include <KConfigGroup>
@@ -55,12 +55,12 @@ InterfaceIcon::InterfaceIcon( Interface* interface )
       barOutgoing( 0 )
 {
     commandActions = new KActionCollection( this );
-    statusAction = new KAction( i18n( "Show &Status Dialog" ), this );
-    plotterAction = new KAction( QIcon::fromTheme( "utilities-system-monitor" ),
+    statusAction = new QAction( i18n( "Show &Status Dialog" ), this );
+    plotterAction = new QAction( QIcon::fromTheme( "utilities-system-monitor" ),
                        i18n( "Show &Traffic Plotter" ), this );
-    statisticsAction = new KAction( QIcon::fromTheme( "view-statistics" ),
+    statisticsAction = new QAction( QIcon::fromTheme( "view-statistics" ),
                           i18n( "Show St&atistics" ), this );
-    configAction = new KAction( QIcon::fromTheme( "configure" ),
+    configAction = new QAction( QIcon::fromTheme( "configure" ),
                        i18n( "&Configure KNemo..." ), this );
 
     connect( statusAction, SIGNAL( triggered() ),

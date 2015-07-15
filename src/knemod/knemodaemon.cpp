@@ -22,9 +22,10 @@
 #include <QtDBus/QDBusConnection>
 #include <QTimer>
 
-#include <KAction>
+#include <QAction>
 #include <KActionCollection>
 #include <KConfigGroup>
+#include <KGlobalAccel>
 #include <KLocale>
 #include <KMessageBox>
 #include <KStandardDirs>
@@ -52,10 +53,10 @@ KNemoDaemon::KNemoDaemon()
     connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );
 
     KActionCollection* ac = new KActionCollection( this );
-    KAction* action = new KAction( i18n( "Toggle Traffic Plotters" ), this );
+    QAction* action = new QAction( i18n( "Toggle Traffic Plotters" ), this );
     ac->addAction( "toggleTrafficPlotters", action );
     connect( action, SIGNAL( triggered() ), SLOT( togglePlotters() ) );
-    action->setGlobalShortcut( KShortcut() );
+    KGlobalAccel::setGlobalShortcut( action, QKeySequence() );
 
     readConfig();
 }

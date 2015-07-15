@@ -23,7 +23,6 @@
 
 class Interface;
 class InterfaceTray;
-class KAction;
 class KActionCollection;
 class KProcess;
 class QAction;
@@ -116,10 +115,10 @@ private:
     InterfaceTray* mTray;
     QList<KProcess*> processList;
     KActionCollection* commandActions;
-    KAction* statusAction;
-    KAction* plotterAction;
-    KAction* statisticsAction;
-    KAction* configAction;
+    QAction* statusAction;
+    QAction* plotterAction;
+    QAction* statisticsAction;
+    QAction* configAction;
     QString textIncoming;
     QString textOutgoing;
     QColor colorIncoming;
