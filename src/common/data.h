@@ -27,6 +27,7 @@
 #include <QFontDatabase>
 #include <QList>
 #include <QMap>
+#include <QStandardPaths>
 #include <QString>
 
 #include <KGlobalSettings>
@@ -322,7 +323,7 @@ struct GeneralSettings
         pollInterval( 1.0 ),
         saveInterval( 60 ),
         useBitrate( false ),
-        statisticsDir( KGlobal::dirs()->saveLocation( "data", "knemo/" ) )
+        statisticsDir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/knemo" )
     {}
     int toolTipContent;
     double pollInterval;
