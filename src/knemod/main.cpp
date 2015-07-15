@@ -23,27 +23,35 @@
 
 #include "knemodaemon.h"
 #include <KCmdLineArgs>
-#include <KUniqueApplication>
+#include <KDBusService>
+#include <KLocalizedString>
+#include <QApplication>
+#include <QCommandLineParser>
+#include <QSessionManager>
 
 extern "C" int main(int argc, char *argv[] )
 {
 
-    KNemoDaemon::createAboutData();
-    KCmdLineArgs::init( argc, argv, KNemoDaemon::aboutData() );
-    KUniqueApplication::addCmdLineOptions();
+    KLocalizedString::setApplicationDomain("knemo");
+    QApplication app(argc, argv);
 
-    if ( !KUniqueApplication::start() )
-    {
-        fprintf( stderr, "KNemo is already running!\n" );
-        exit( 0 );
-    }
-    KUniqueApplication app;
-    app.disableSessionManagement();
-    app.setQuitOnLastWindowClosed( false );
+    QCoreApplication::setApplicationName(i18n("KNemo"));
+    QCoreApplication::setOrganizationDomain("kde.org");
+
+    auto disableSessionManagement = [] (QSessionManager &sm) {
+        sm.setRestartHint(QSessionManager::RestartNever);
+    };
+    QObject::connect(&app, &QGuiApplication::commitDataRequest, disableSessionManagement);
+    QObject::connect(&app, &QGuiApplication::saveStateRequest, disableSessionManagement);
+
+    QCommandLineParser parser;
+    parser.addVersionOption();
+    parser.addHelpOption();
+    parser.process(app);
+
+    KDBusService service(KDBusService::Unique);
 
     KNemoDaemon knemo;
 
-    int ret = app.exec();
-    KNemoDaemon::destroyAboutData();
-    return ret;
+    return app.exec();
 }
