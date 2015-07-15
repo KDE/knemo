@@ -1,21 +1,46 @@
 project( knemo )
 
+cmake_minimum_required(VERSION 2.8.12)
+
+find_package (ECM REQUIRED NO_MODULE)
+set (CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/modules)
+
 set( KNEMO_VERSION 0.7.6+svn )
 
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
+include(KDEInstallDirs)
+include(KDEFrameworkCompilerSettings)
+include (KDECMakeSettings)
+include(FeatureSummary)
+include(ECMInstallIcons)
 
-set(KDE_MIN_VERSION "4.7.0")
-find_package( KDE4 REQUIRED )
+find_package(Qt5 REQUIRED COMPONENTS
+    Core
+    DBus
+    Sql
+    Widgets
+)
+
+find_package(KF5 REQUIRED COMPONENTS
+    Config
+    ConfigWidgets
+    CoreAddons
+    GlobalAccel
+    GuiAddons
+    DBusAddons
+    I18n
+    KCMUtils
+    KDELibs4Support
+    KIO
+    Notifications
+    NotifyConfig
+    SysGuard
+    WidgetsAddons
+    WindowSystem
+    XmlGui
+)
+
 include( CheckLibraryExists )
 include( FindPackageHandleStandardArgs )
-include(MacroOptionalAddSubdirectory)
-
-set( QT_USE_QTSQL TRUE )
-if ( NOT QT_QTSQL_FOUND )
-    message( FATAL_ERROR "The QtSql development package could not be found. Please install libQtSql." )
-endif( NOT QT_QTSQL_FOUND )
-
-find_package(LibKSignalPlotter REQUIRED)
 
 option (NO_WIRELESS_SUPPORT "Disable support for wireless devices." FALSE )
 if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
@@ -23,7 +48,7 @@ if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
 
     if ( NOT NO_WIRELESS_SUPPORT )
         find_package( Libiw )
-        macro_log_feature( LIBIW_FOUND "libiw" "Linux Wireless Extensions library" "http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html" FALSE "" "" )
+        set_package_properties( "libiw" PROPERTIES DESCRIPTION "Linux Wireless Extensions library" URL "http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html" TYPE RECOMMENDED )
 
         if ( LIBIW_FOUND )
             set ( HAVE_LIBIW 1 )
@@ -36,11 +61,9 @@ configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config-knemo.h.cmake
                 ${CMAKE_CURRENT_BINARY_DIR}/config-knemo.h
 )
 
-macro_display_feature_log()
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
 set( CMAKE_INCLUDE_CURRENT_DIR TRUE )
-
-add_definitions( ${QT_DEFINITIONS} ${KDE4_DEFINITIONS} )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 

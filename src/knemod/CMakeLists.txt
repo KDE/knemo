@@ -1,4 +1,4 @@
-include_directories( ${KDE4_INCLUDES} ../common )
+include_directories( ../common )
 
 set( knemo_SRCS
     main.cpp
@@ -33,22 +33,36 @@ else ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
     set( knemo_SRCS ${knemo_SRCS} backends/bsdbackend.cpp )
 endif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
 
-kde4_add_ui_files( knemo_SRCS interfacestatisticsdlg.ui interfacestatusdlg.ui plotterconfigdlg.ui )
-kde4_add_executable( knemo ${knemo_SRCS} )
-
-target_link_libraries( knemo
-    ${KDE4_KIO_LIBS}
-    ${LIBIW_LIBRARIES}
-    ${LIBNL_LIBRARIES}
-    ${QT_QTSQL_LIBRARY}
-    ${LIBKSIGNALPLOTTER_LIBRARY}
+ki18n_wrap_ui( knemo_SRCS
+    interfacestatisticsdlg.ui
+    interfacestatusdlg.ui
+    plotterconfigdlg.ui
 )
 
-install( TARGETS knemo ${INSTALL_TARGETS_DEFAULT_ARGS} )
+add_executable( knemo ${knemo_SRCS} )
 
-install( FILES knemo.notifyrc DESTINATION ${DATA_INSTALL_DIR}/knemo )
-install( PROGRAMS knemo.desktop DESTINATION ${XDG_APPS_INSTALL_DIR} )
-install( FILES knemo.desktop DESTINATION ${AUTOSTART_INSTALL_DIR} )
+target_link_libraries( knemo
+    PUBLIC
+    Qt5::Sql
+    KF5::KIOWidgets
+    KF5::DBusAddons
+    KF5::GlobalAccel
+    KF5::KDELibs4Support
+    KF5::Notifications
+    KF5::SignalPlotter
+    KF5::XmlGui
+    KF5::WindowSystem
+    KF5::I18n
+    ${LIBNL_LIBRARIES}
+    ${LIBIW_LIBRARIES}
+)
+
+
+install( TARGETS knemo ${KDE_INSTALL_TARGETS_DEFAULT_ARGS} )
+
+install( FILES knemo.notifyrc DESTINATION ${KDE_INSTALL_KNOTIFY5RCDIR} )
+install( PROGRAMS knemo.desktop DESTINATION ${KDE_INSTALL_APPDIR} )
+install( FILES knemo.desktop DESTINATION ${KDE_INSTALL_AUTOSTARTDIR} )
 
 add_subdirectory( icons )
 add_subdirectory( themes )
