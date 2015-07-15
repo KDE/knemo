@@ -19,6 +19,7 @@
 
 #include "statsconfig.h"
 #include <KCalendarSystem>
+#include <KGlobal>
 #include <KMessageBox>
 
 StatsConfig::StatsConfig( const InterfaceSettings * settings, const KCalendarSystem *calendar, const StatsRule &rule, bool addRule ) : KDialog(),

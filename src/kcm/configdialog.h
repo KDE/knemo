@@ -25,6 +25,7 @@
 
 #include "data.h"
 #include "ui_configdlg.h"
+#include <QStandardItemModel>
 
 class QTreeWidgetItem;
 class KCalendarSystem;
