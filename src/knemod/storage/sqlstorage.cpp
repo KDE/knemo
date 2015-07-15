@@ -36,7 +36,7 @@ SqlStorage::SqlStorage( QString ifaceName )
     : mValidDbVer( true )
     , mIfaceName( ifaceName )
 {
-    KUrl dir( generalSettings->statisticsDir );
+    QUrl dir( generalSettings->statisticsDir );
     mDbPath = QString( "%1%2%3.db" ).arg( dir.path() ).arg( statistics_prefix ).arg( mIfaceName );
     QStringList drivers = QSqlDatabase::drivers();
     if ( drivers.contains( "QSQLITE" ) )

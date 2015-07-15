@@ -31,7 +31,7 @@
 #include <KGlobalSettings>
 #include <KLocale>
 #include <KStandardDirs>
-#include <KUrl>
+#include <QUrl>
 
 class KCalendarSystem;
 
@@ -327,7 +327,7 @@ struct GeneralSettings
     double pollInterval;
     int saveInterval;
     bool useBitrate;
-    KUrl statisticsDir;
+    QUrl statisticsDir;
 };
 
 class StatsRule

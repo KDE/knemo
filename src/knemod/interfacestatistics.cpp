@@ -75,7 +75,7 @@ InterfaceStatistics::InterfaceStatistics( Interface* interface )
     connect( mWarnTimer, SIGNAL( timeout() ), this, SLOT( checkWarnings() ) );
     connect( mEntryTimer, SIGNAL( timeout() ), this, SLOT( checkValidEntry() ) );
 
-    KUrl dir( generalSettings->statisticsDir );
+    QUrl dir( generalSettings->statisticsDir );
     sql = new SqlStorage( mInterface->ifaceName() );
     loadStats();
     syncWithExternal( mStorageData.lastSaved );
@@ -103,7 +103,7 @@ void InterfaceStatistics::saveStatistics( bool fullSave )
 
 bool InterfaceStatistics::loadStats()
 {
-    KUrl dir( generalSettings->statisticsDir );
+    QUrl dir( generalSettings->statisticsDir );
     if ( !dir.isLocalFile() )
         return 0;
 
