@@ -25,10 +25,10 @@
 
 #include <KCalendarSystem>
 #include <KColorScheme>
-#include <KGenericFactory>
 #include <KInputDialog>
 #include <kio/global.h>
 #include <KMessageBox>
+#include <KPluginFactory>
 #include <KNotifyConfigWidget>
 #include <KStandardDirs>
 #include <math.h>
@@ -53,7 +53,7 @@
 #endif
 
 
-K_PLUGIN_FACTORY(KNemoFactory, registerPlugin<ConfigDialog>();)
+K_PLUGIN_FACTORY(KNemoFactory, registerPlugin<ConfigDialog>("knemo");)
 K_EXPORT_PLUGIN(KNemoFactory("kcm_knemo"))
 
 Q_DECLARE_METATYPE( KNemoTheme )
@@ -216,7 +216,7 @@ void WarnModel::modifyWarn( const QModelIndex &index, const WarnRule &warn )
 
 
 ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
-    : KCModule( KNemoFactory::componentData(), parent, args ),
+    : KCModule( parent, args ),
       mLock( false ),
       mDlg( new Ui::ConfigDlg() ),
       mCalendar( 0 )
