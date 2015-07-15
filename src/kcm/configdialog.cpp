@@ -281,15 +281,15 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     for ( size_t i = 0; i < sizeof(pollIntervals)/sizeof(double); i++ )
         mDlg->comboBoxPoll->addItem( i18n( "%1 sec", pollIntervals[i] ), pollIntervals[i] );
 
-    mDlg->pushButtonNew->setIcon( SmallIcon( "list-add" ) );
-    mDlg->pushButtonAll->setIcon( SmallIcon( "document-new" ) );
-    mDlg->pushButtonDelete->setIcon( SmallIcon( "list-remove" ) );
-    mDlg->pushButtonAddCommand->setIcon( SmallIcon( "list-add" ) );
-    mDlg->pushButtonRemoveCommand->setIcon( SmallIcon( "list-remove" ) );
-    mDlg->pushButtonUp->setIcon( SmallIcon( "arrow-up" ) );
-    mDlg->pushButtonDown->setIcon( SmallIcon( "arrow-down" ) );
-    mDlg->pushButtonAddToolTip->setIcon( SmallIcon( "arrow-right" ) );
-    mDlg->pushButtonRemoveToolTip->setIcon( SmallIcon( "arrow-left" ) );
+    mDlg->pushButtonNew->setIcon( QIcon::fromTheme( "list-add" ) );
+    mDlg->pushButtonAll->setIcon( QIcon::fromTheme( "document-new" ) );
+    mDlg->pushButtonDelete->setIcon( QIcon::fromTheme( "list-remove" ) );
+    mDlg->pushButtonAddCommand->setIcon( QIcon::fromTheme( "list-add" ) );
+    mDlg->pushButtonRemoveCommand->setIcon( QIcon::fromTheme( "list-remove" ) );
+    mDlg->pushButtonUp->setIcon( QIcon::fromTheme( "arrow-up" ) );
+    mDlg->pushButtonDown->setIcon( QIcon::fromTheme( "arrow-down" ) );
+    mDlg->pushButtonAddToolTip->setIcon( QIcon::fromTheme( "arrow-right" ) );
+    mDlg->pushButtonRemoveToolTip->setIcon( QIcon::fromTheme( "arrow-left" ) );
 
     mDlg->themeColorBox->setEnabled( false );
 
@@ -1294,12 +1294,12 @@ void ConfigDialog::iconThemeChanged( int set )
             iconName = "network-";
         else
             iconName = "knemo-" + settings->iconTheme + "-";
-        mDlg->pixmapError->setPixmap( KIcon( iconName + ICON_ERROR ).pixmap( 22 ) );
-        mDlg->pixmapDisconnected->setPixmap( KIcon( iconName + ICON_OFFLINE ).pixmap( 22 ) );
-        mDlg->pixmapConnected->setPixmap( KIcon( iconName + ICON_IDLE ).pixmap( 22 ) );
-        mDlg->pixmapIncoming->setPixmap( KIcon( iconName + ICON_RX ).pixmap( 22 ) );
-        mDlg->pixmapOutgoing->setPixmap( KIcon( iconName + ICON_TX ).pixmap( 22 ) );
-        mDlg->pixmapTraffic->setPixmap( KIcon( iconName + ICON_RX_TX ).pixmap( 22 ) );
+        mDlg->pixmapError->setPixmap( QIcon::fromTheme( iconName + ICON_ERROR ).pixmap( 22 ) );
+        mDlg->pixmapDisconnected->setPixmap( QIcon::fromTheme( iconName + ICON_OFFLINE ).pixmap( 22 ) );
+        mDlg->pixmapConnected->setPixmap( QIcon::fromTheme( iconName + ICON_IDLE ).pixmap( 22 ) );
+        mDlg->pixmapIncoming->setPixmap( QIcon::fromTheme( iconName + ICON_RX ).pixmap( 22 ) );
+        mDlg->pixmapOutgoing->setPixmap( QIcon::fromTheme( iconName + ICON_TX ).pixmap( 22 ) );
+        mDlg->pixmapTraffic->setPixmap( QIcon::fromTheme( iconName + ICON_RX_TX ).pixmap( 22 ) );
         mDlg->themeColorBox->setEnabled( false );
     }
     if (!mLock) changed( true );

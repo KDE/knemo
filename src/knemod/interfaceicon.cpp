@@ -29,7 +29,7 @@
 #include <KColorScheme>
 #include <KConfigGroup>
 #include <KHelpMenu>
-#include <KIcon>
+#include <QIcon>
 #include <KLocale>
 #include <KMenu>
 #include <KProcess>
@@ -56,11 +56,11 @@ InterfaceIcon::InterfaceIcon( Interface* interface )
 {
     commandActions = new KActionCollection( this );
     statusAction = new KAction( i18n( "Show &Status Dialog" ), this );
-    plotterAction = new KAction( KIcon( "utilities-system-monitor" ),
+    plotterAction = new KAction( QIcon::fromTheme( "utilities-system-monitor" ),
                        i18n( "Show &Traffic Plotter" ), this );
-    statisticsAction = new KAction( KIcon( "view-statistics" ),
+    statisticsAction = new KAction( QIcon::fromTheme( "view-statistics" ),
                           i18n( "Show St&atistics" ), this );
-    configAction = new KAction( KIcon( "configure" ),
+    configAction = new KAction( QIcon::fromTheme( "configure" ),
                        i18n( "&Configure KNemo..." ), this );
 
     connect( statusAction, SIGNAL( triggered() ),
@@ -529,12 +529,12 @@ void InterfaceIcon::updateTrayStatus()
         KMenu* menu = static_cast<KMenu*>(mTray->contextMenu());
 
         menu->removeAction( menu->actions().at( 0 ) );
-        menu->addTitle( KIcon( "knemo" ), i18n( "KNemo - %1", title ) );
+        menu->addTitle( QIcon::fromTheme( "knemo" ), i18n( "KNemo - %1", title ) );
         menu->addAction( statusAction );
         menu->addAction( plotterAction );
         menu->addAction( configAction );
         KHelpMenu* helpMenu( new KHelpMenu( menu, KNemoDaemon::aboutData(), false ) );
-        menu->addMenu( helpMenu->menu() )->setIcon( KIcon( "help-contents" ) );
+        menu->addMenu( helpMenu->menu() )->setIcon( QIcon::fromTheme( "help-contents" ) );
 
         connect( menu, SIGNAL( triggered( QAction * ) ),
                  this, SLOT( menuTriggered( QAction * ) ) );
