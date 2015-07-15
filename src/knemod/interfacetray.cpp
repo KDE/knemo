@@ -28,7 +28,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <kio/global.h>
-#include <KActionCollection>
+#include <QAction>
 #include <KApplication>
 #include <KConfigGroup>
 #include <KLocale>
@@ -47,9 +47,12 @@ InterfaceTray::InterfaceTray( Interface* interface, const QString &id, QWidget* 
     setStatus(Active);
     connect(this, SIGNAL(secondaryActivateRequested(QPoint)), this, SLOT(togglePlotter()));
     setupMappings();
-    // remove quit action added by KSystemTrayIcon
-    actionCollection()->removeAction( actionCollection()->action( KStandardAction::name( KStandardAction::Quit ) ) );
-    KStandardAction::quit( this, SLOT( slotQuit() ), actionCollection() );
+    QAction *quitAction = new QAction(this);
+    quitAction->setText(KStatusNotifierItem::tr("Quit"));
+    quitAction->setIcon(QIcon::fromTheme("application-exit"));
+    QObject::connect(quitAction, SIGNAL(triggered()), this, SLOT(slotQuit()));
+    // Replace the standard quit action
+    addAction("quit", quitAction);
 }
 
 InterfaceTray::~InterfaceTray()
