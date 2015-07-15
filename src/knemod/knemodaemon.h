@@ -25,7 +25,6 @@
 #include <KApplication>
 
 class QTimer;
-class KAboutData;
 class Interface;
 class BackendBase;
 
@@ -55,10 +54,6 @@ public:
 
     // tell the control center module which interface the user selected
     static QString sSelectedInterface;
-
-    static void createAboutData();
-    static void destroyAboutData();
-    static KAboutData* aboutData();
 
 
 public Q_SLOTS:

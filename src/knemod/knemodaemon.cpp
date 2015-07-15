@@ -22,7 +22,6 @@
 #include <QtDBus/QDBusConnection>
 #include <QTimer>
 
-#include <KAboutData>
 #include <KAction>
 #include <KActionCollection>
 #include <KConfigGroup>
@@ -30,7 +29,6 @@
 #include <KMessageBox>
 #include <KStandardDirs>
 
-#include "config-knemo.h"
 #include "global.h"
 #include "knemodaemon.h"
 #include "interface.h"
@@ -212,43 +210,6 @@ void KNemoDaemon::togglePlotters()
     {
         mInterfaceHash.value( key )->toggleSignalPlotter( showPlotters );
     }
-}
-
-static const char * const description =
-    I18N_NOOP( "The KDE Network Monitor" );
-
-void KNemoDaemon::createAboutData()
-{
-    mAboutData = new KAboutData( "knemo", 0, ki18n( "KNemo" ), KNEMO_VERSION,
-                      ki18n( description ),
-                      KAboutData::License_GPL_V2,
-                      KLocalizedString(),
-                      ki18n( "Copyright (C) 2004, 2005, 2006 Percy Leonhardt\nCopyright (C) 2009, 2010 John Stamp\n\nSignal plotter taken from KSysGuard\nCopyright (C) 2006 - 2009 John Tapsell" ),
-                      "http://extragear.kde.org/apps/knemo/");
-
-    mAboutData->addAuthor( ki18n( "Percy Leonhardt" ), ki18n( "Original Author" ),
-                    "percy@eris23.de" );
-    mAboutData->addAuthor( ki18n( "John Stamp" ), ki18n( "Current maintainer" ),
-                    "jstamp@users.sourceforge.net" );
-    mAboutData->addCredit( ki18n( "Michael Olbrich" ), ki18n( "Threshold support" ),
-                    "michael.olbrich@gmx.net" );
-    mAboutData->addCredit( ki18n( "Chris Schlaeger" ), ki18n( "Signal plotter" ),
-                    "cs@kde.org" );
-    mAboutData->addCredit( ki18n( "John Tapsell" ), ki18n( "Signal plotter" ),
-                    "tapsell@kde.org" );
-}
-
-void KNemoDaemon::destroyAboutData()
-{
-    delete mAboutData;
-    mAboutData = NULL;
-}
-
-KAboutData* KNemoDaemon::mAboutData;
-
-KAboutData* KNemoDaemon::aboutData()
-{
-    return mAboutData;
 }
 
 #include "knemodaemon.moc"
