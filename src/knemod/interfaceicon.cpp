@@ -86,7 +86,7 @@ InterfaceIcon::~InterfaceIcon()
 
 void InterfaceIcon::configChanged()
 {
-    KConfigGroup cg( KGlobal::mainComponent().config(), "System Tray" );
+    KConfigGroup cg( KSharedConfig::openConfig(), "System Tray" );
     iconWidth = cg.readEntry( "systrayIconWidth", 22 );
 
     barWidth = iconWidth/3;

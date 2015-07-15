@@ -35,7 +35,7 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
     : KDialog( parent ),
       mWasShown( false ),
       mSetPos( true ),
-      mConfig( KGlobal::config() ),
+      mConfig( KSharedConfig::openConfig() ),
       mInterface( interface )
 {
     setCaption( i18n( "%1 Statistics", interface->ifaceName() ) );

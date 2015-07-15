@@ -148,7 +148,7 @@ QChar FancyPlotterLabel::indicatorSymbol;
 
 InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     : KDialog(),
-      mConfig( KGlobal::config() ),
+      mConfig( KSharedConfig::openConfig() ),
       mConfigDlg( 0 ),
       mLabelsWidget( NULL ),
       mSetPos( true ),
@@ -397,7 +397,7 @@ void InterfacePlotterDialog::updatePlotter( const double incomingBytes, const do
 
 void InterfacePlotterDialog::loadConfig()
 {
-    KSharedConfigPtr config = KGlobal::config();
+    KSharedConfigPtr config = KSharedConfig::openConfig();
     // Set the plotter widgets
     QString group = confg_plotter + mName;
     // Plotter
@@ -422,7 +422,7 @@ void InterfacePlotterDialog::loadConfig()
 
 void InterfacePlotterDialog::saveConfig()
 {
-    KSharedConfigPtr config = KGlobal::config();
+    KSharedConfigPtr config = KSharedConfig::openConfig();
     // Set the plotter widgets
     QString group = confg_plotter + mName;
     // Plotter

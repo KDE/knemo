@@ -38,7 +38,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     : KDialog( parent ),
       mWasShown( false ),
       mSetPos( true ),
-      mConfig( KGlobal::config() ),
+      mConfig( KSharedConfig::openConfig() ),
       mInterface( interface )
 {
     setCaption( i18nc( "interface name", "%1 Interface Status", interface->ifaceName() ) );

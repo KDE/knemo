@@ -70,7 +70,7 @@ Interface::~Interface()
 
 void Interface::configChanged()
 {
-    KSharedConfigPtr config = KGlobal::config();
+    KSharedConfigPtr config = KSharedConfig::openConfig();
     QString group( confg_interface );
     group += mIfaceName;
     KConfigGroup interfaceGroup( config, group );

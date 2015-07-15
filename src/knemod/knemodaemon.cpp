@@ -44,7 +44,7 @@ GeneralSettings *generalSettings = NULL;
 
 KNemoDaemon::KNemoDaemon()
     : QObject(),
-      mConfig( KGlobal::config() ),
+      mConfig( KSharedConfig::openConfig() ),
       mHaveInterfaces( false )
 {
     generalSettings = new GeneralSettings();
