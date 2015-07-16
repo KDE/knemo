@@ -22,6 +22,7 @@
 
 #include <KCalendarSystem>
 #include <KColorScheme>
+#include <KConfigGroup>
 #include <KNotification>
 #include <KWindowSystem>
 #include <kdeversion.h>

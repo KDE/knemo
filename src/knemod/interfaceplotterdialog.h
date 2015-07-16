@@ -21,7 +21,7 @@
 #ifndef INTERFACEPLOTTERDIALOG_H
 #define INTERFACEPLOTTERDIALOG_H
 
-#include <KDialog>
+#include <QDialog>
 #include <KSharedConfig>
 
 #include "plotterconfigdialog.h"
@@ -30,7 +30,7 @@ class FancyPlotterLabel;
 class KSignalPlotter;
 class QBoxLayout;
 
-class InterfacePlotterDialog : public KDialog
+class InterfacePlotterDialog : public QDialog
 {
 Q_OBJECT
 public:

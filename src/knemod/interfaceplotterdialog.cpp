@@ -24,6 +24,7 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QApplication>
+#include <KConfigGroup>
 
 #include "global.h"
 #include "interfaceplotterdialog.h"
@@ -147,7 +148,7 @@ QChar FancyPlotterLabel::indicatorSymbol;
 
 
 InterfacePlotterDialog::InterfacePlotterDialog( QString name )
-    : KDialog(),
+    : QDialog(),
       mConfig( KSharedConfig::openConfig() ),
       mConfigDlg( 0 ),
       mLabelsWidget( NULL ),
@@ -159,8 +160,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
       mIncomingVisible( false ),
       mName( name )
 {
-    setCaption( i18nc( "interface name", "%1 Traffic", mName ) );
-    setButtons( None );
+    setWindowTitle( i18nc( "interface name", "%1 Traffic", mName ) );
     setContextMenuPolicy( Qt::DefaultContextMenu );
 
     mByteUnits << ki18n( "%1 B/s" ) << ki18n( "%1 KiB/s" ) << ki18n( "%1 MiB/s" ) << ki18n( "%1 GiB/s" );
@@ -174,7 +174,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     QBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
-    mainWidget()->setLayout( layout );
+    setLayout( layout );
     mPlotter = new KSignalPlotter( this );
     int axisTextWidth = fontMetrics().width(i18nc("Largest axis title", "99999 XXXX"));
     mPlotter->setMaxAxisTextWidth( axisTextWidth );
@@ -274,14 +274,14 @@ bool InterfacePlotterDialog::event( QEvent *e )
             ;;
     }
 
-    return KDialog::event( e );
+    return QDialog::event( e );
 }
 
 void InterfacePlotterDialog::resizeEvent( QResizeEvent* )
 {
     bool showLabels = true;;
 
-    if( mainWidget()->height() <= mLabelsWidget->sizeHint().height() + mPlotter->minimumHeight() )
+    if( this->height() <= mLabelsWidget->sizeHint().height() + mPlotter->minimumHeight() )
         showLabels = false;
     mLabelsWidget->setVisible(showLabels);
 }
@@ -312,7 +312,7 @@ void InterfacePlotterDialog::configPlotter()
         return;
 
     mConfigDlg = new PlotterConfigDialog( this, mName, &mSettings );
-    connect( mConfigDlg, SIGNAL( finished() ), this, SLOT( configFinished() ) );
+    connect( mConfigDlg, SIGNAL( finished(int) ), this, SLOT( configFinished() ) );
     connect( mConfigDlg, SIGNAL( saved() ), this, SLOT( saveConfig() ) );
     mConfigDlg->show();
 }
@@ -320,7 +320,7 @@ void InterfacePlotterDialog::configPlotter()
 void InterfacePlotterDialog::configFinished()
 {
     // FIXME
-    // mConfigDlg->delayedDestruct();
+    mConfigDlg->close();
     mConfigDlg = 0;
 }
 
@@ -398,7 +398,7 @@ void InterfacePlotterDialog::updatePlotter( const double incomingBytes, const do
 
 void InterfacePlotterDialog::loadConfig()
 {
-    KSharedConfigPtr config = KSharedConfig::openConfig();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     // Set the plotter widgets
     QString group = confg_plotter + mName;
     // Plotter
@@ -423,7 +423,7 @@ void InterfacePlotterDialog::loadConfig()
 
 void InterfacePlotterDialog::saveConfig()
 {
-    KSharedConfigPtr config = KSharedConfig::openConfig();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     // Set the plotter widgets
     QString group = confg_plotter + mName;
     // Plotter
