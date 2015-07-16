@@ -2,8 +2,9 @@ To build KNemo you will need a basic build system (g++, make, etc.)  You will
 also need to install cmake and some development packages. On Debian-based
 systems
 
-   apt-get install cmake kdelibs5-dev kde-workspace-dev libiw-dev libnl-3-dev \
-   libnl-route-3-dev
+   apt-get install cmake extra-cmake-modules libkf5kcmutils-dev \
+   libkf5kdelibs4support-dev libkf5notifyconfig-dev libkf5notifications-dev \
+   libkf5sysguard-dev libiw-dev libnl-3-dev libnl-route-3-dev
 
 should be sufficient.
 
@@ -11,7 +12,7 @@ should be sufficient.
 Notes:
 
 KNemo saves statistics in an SQLite 3 database.  It will complain loudly if it
-cannot find Qt4's SQLite 3 database driver.
+cannot find Qt5's SQLite 3 database driver.
 
 If you cannot open the KNemo config dialog after you install, you probably need
 to modify your environment.  Assuming you installed KNemo in /usr/local, add
