@@ -32,7 +32,6 @@
 #include <QFontMetrics>
 #include <QStandardPaths>
 #include <KConfigGroup>
-#include <KGlobalSettings>
 #include <KSharedConfig>
 #include "data.h"
 #include "utils.h"
@@ -257,7 +256,7 @@ QList<KNemoTheme> findThemes()
     QList<KNemoTheme> iconThemes;
     foreach ( QString themeFile, themelist )
     {
-        KSharedConfigPtr conf = KSharedConfig::openConfig( themeFile );
+        KSharedConfig::Ptr conf = KSharedConfig::openConfig( themeFile );
         KConfigGroup cfg( conf, QLatin1String("Desktop Entry") );
         KNemoTheme theme;
         theme.name = cfg.readEntry(QLatin1String("Name"));

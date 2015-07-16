@@ -33,6 +33,7 @@
 #include <KConfigGroup>
 #include <KLocalizedString>
 #include <KMessageBox>
+#include <KSharedConfig>
 #include <KStandardAction>
 
 #include <QToolTip>
@@ -79,7 +80,7 @@ void InterfaceTray::slotQuit()
                                                      i18n("Automatically Start KNemo?"), KGuiItem(i18n("Start")),
                                                      KGuiItem(i18n("Do Not Start")), KStandardGuiItem::cancel(), QLatin1String("StartAutomatically"));
 
-    KSharedConfigPtr config = KSharedConfig::openConfig();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     KConfigGroup generalGroup( config, confg_general );
     if ( autoStart == KMessageBox::Yes ) {
         generalGroup.writeEntry( conf_autoStart, true );

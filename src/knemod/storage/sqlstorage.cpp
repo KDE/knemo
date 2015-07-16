@@ -26,6 +26,8 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
+
+#include <KLocalizedString>
 #include <KMessageBox>
 
 static const QString time_format( QLatin1String("hh:mm:ss") );

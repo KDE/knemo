@@ -30,6 +30,8 @@
 #include <QStylePainter>
 #include <QTimer>
 
+#include <KLocalizedString>
+
 
 class StatsTip : public QLabel
 {
@@ -151,7 +153,7 @@ StatisticsView::~StatisticsView()
 void StatisticsView::setModel( QAbstractItemModel *m )
 {
     QTableView::setModel( m );
-    horizontalHeader()->setMovable( true );
+    horizontalHeader()->setSectionsMovable( true );
     connect( selectionModel(), SIGNAL( selectionChanged ( const QItemSelection &, const QItemSelection & ) ),
              this, SLOT( updateSum() ) );
 }

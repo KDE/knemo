@@ -18,7 +18,6 @@
 */
 
 #include <QString>
-#include <KGlobal>
 #include <QDebug>
 #include <KLocalizedString>
 #include <kio/global.h>

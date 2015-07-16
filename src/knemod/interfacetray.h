@@ -22,7 +22,6 @@
 
 #include "config-knemo.h"
 
-#include <kdeversion.h>
 #include <KStatusNotifierItem>
 
 #include "interface.h"

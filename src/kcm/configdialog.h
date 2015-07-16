@@ -26,6 +26,7 @@
 #include "data.h"
 #include "ui_configdlg.h"
 #include <QStandardItemModel>
+#include <KSharedConfig>
 
 class QTreeWidgetItem;
 class KCalendarSystem;
@@ -137,7 +138,7 @@ private:
     StatsRuleModel *statsModel;
     WarnModel *warnModel;
 
-    KSharedConfigPtr mConfig;
+    KSharedConfig::Ptr mConfig;
     QMap<QString, InterfaceSettings *> mSettingsMap;
     QMap<quint32, QString> mToolTips;
     QList<QString> mDeletedIfaces;

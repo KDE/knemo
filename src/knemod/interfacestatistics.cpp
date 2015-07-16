@@ -22,7 +22,6 @@
 
 #include <KCalendarSystem>
 #include <KConfigGroup>
-#include <KGlobal>
 
 #include <cmath>
 #include <unistd.h>

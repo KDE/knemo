@@ -25,7 +25,6 @@
 #include <KConfigGroup>
 #include <KNotification>
 #include <KWindowSystem>
-#include <kdeversion.h>
 #include <kio/global.h>
 
 #include "backends/backendbase.h"
@@ -71,7 +70,7 @@ Interface::~Interface()
 
 void Interface::configChanged()
 {
-    KSharedConfigPtr config = KSharedConfig::openConfig();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     QString group( confg_interface );
     group += mIfaceName;
     KConfigGroup interfaceGroup( config, group );

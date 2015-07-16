@@ -22,6 +22,7 @@
 #define INTERFACESTATUSDIALOG_H
 
 #include <QDialog>
+#include <KSharedConfig>
 
 #include "ui_interfacestatusdlg.h"
 

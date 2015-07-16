@@ -59,7 +59,7 @@ private:
     void configPlotter();
     void addBeams();
 
-    KSharedConfigPtr mConfig;
+    KSharedConfig::Ptr mConfig;
     PlotterConfigDialog *mConfigDlg;
     QWidget *mLabelsWidget;
     bool mSetPos;
