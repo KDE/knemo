@@ -1,10 +1,11 @@
 [Desktop Entry]
-Exec=kcmshell4 kcm_knemo
+Exec=kcmshell5 kcm_knemo
 Icon=knemo
 Type=Service
 X-KDE-ServiceTypes=KCModule
 
 X-KDE-Library=kcm_knemo
+X-KDE-PluginKeyword=knemo
 X-KDE-ParentApp=kcontrol
 
 X-KDE-System-Settings-Parent-Category=network-settings
