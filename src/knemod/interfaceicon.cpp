@@ -32,6 +32,7 @@
 #include <QIcon>
 #include <KLocale>
 #include <QMenu>
+#include <KAboutData>
 #include <KProcess>
 #include <KStandardDirs>
 

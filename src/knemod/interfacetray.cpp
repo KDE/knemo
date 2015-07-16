@@ -29,7 +29,7 @@
 #include <netdb.h>
 #include <kio/global.h>
 #include <QAction>
-#include <KApplication>
+#include <QApplication>
 #include <KConfigGroup>
 #include <KLocale>
 #include <KMessageBox>
@@ -89,7 +89,7 @@ void InterfaceTray::slotQuit()
         return;
     config->sync();
 
-    kapp->quit();
+    qApp->quit();
 }
 
 void InterfaceTray::activate(const QPoint&)

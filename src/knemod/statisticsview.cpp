@@ -21,7 +21,7 @@
 #include "statisticsmodel.h"
 #include <kio/global.h>
 
-#include <KApplication>
+#include <QApplication>
 #include <QDesktopWidget>
 #include <QEvent>
 #include <QHeaderView>
@@ -54,8 +54,8 @@ StatsTip::StatsTip() : QLabel( 0, Qt::ToolTip )
 
     setForegroundRole(QPalette::ToolTipText);
     setBackgroundRole(QPalette::ToolTipBase);
-    setStyleSheet( kapp->styleSheet() );
-    setPalette( kapp->palette() );
+    setStyleSheet( qApp->styleSheet() );
+    setPalette( qApp->palette() );
     ensurePolished();
     setMargin( 1 + style()->pixelMetric(QStyle::PM_ToolTipLabelFrameWidth, 0, this ) );
 }

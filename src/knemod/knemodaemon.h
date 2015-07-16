@@ -22,7 +22,8 @@
 #define KNEMODAEMON_H
 
 #include <QHash>
-#include <KApplication>
+#include <QApplication>
+#include <KSharedConfig>
 
 class QTimer;
 class Interface;
@@ -87,7 +88,7 @@ private slots:
     void togglePlotters();
 
 private:
-    KSharedConfigPtr mConfig;
+    KSharedConfig::Ptr mConfig;
     bool mHaveInterfaces;
 
     // every time this timer expires we will
@@ -97,8 +98,6 @@ private:
     QString mBackendName;
     // a list of all interfaces the user wants to monitor
     QHash<QString, Interface *> mInterfaceHash;
-
-    static KAboutData* mAboutData;
 };
 
 #endif // KNEMODAEMON_H

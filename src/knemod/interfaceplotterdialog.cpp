@@ -23,7 +23,7 @@
 
 #include <QMenu>
 #include <QMouseEvent>
-#include <KApplication>
+#include <QApplication>
 
 #include "global.h"
 #include "interfaceplotterdialog.h"
@@ -111,7 +111,7 @@ class FancyPlotterLabel : public QLabel {
     void changeLabel(const QColor &_color) {
         color = _color;
 
-        if ( kapp->layoutDirection() == Qt::RightToLeft )
+        if ( qApp->layoutDirection() == Qt::RightToLeft )
             longHeadingText = QString(": ") + labelName + " <font color=\"" + color.name() + "\">" + indicatorSymbol + "</font>";
         else
             longHeadingText = QString("<qt><font color=\"") + color.name() + "\">" + indicatorSymbol + "</font> " + labelName + " :";
