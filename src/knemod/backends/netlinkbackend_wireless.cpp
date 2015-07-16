@@ -51,7 +51,7 @@ realloc:
     wrq.u.data.pointer = buffer;
     wrq.u.data.flags = 0;
     wrq.u.data.length = buflen;
-    if ( iw_get_ext( fd, ifName.toLatin1(), SIOCGIWSCAN, &wrq ) < 0 )
+    if ( iw_get_ext( fd, ifName.toLatin1().constData(), SIOCGIWSCAN, &wrq ) < 0 )
     {
         /* Check if buffer was too small (WE-17 only) */
         if( (errno == E2BIG) && (range.we_version_compiled > 16) )
@@ -125,10 +125,10 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
     struct iwreq wrq;
     char buffer[ 128 ];
     struct iw_range range;
-    bool has_range = ( iw_get_range_info( fd, ifName.toLatin1(), &range ) >= 0 );
+    bool has_range = ( iw_get_range_info( fd, ifName.toLatin1().constData(), &range ) >= 0 );
 
     struct wireless_info info;
-    if ( iw_get_stats( fd, ifName.toLatin1(), &(info.stats), 0, 0 ) >= 0 )
+    if ( iw_get_stats( fd, ifName.toLatin1().constData(), &(info.stats), 0, 0 ) >= 0 )
     {
         if ( has_range )
         {
@@ -141,7 +141,7 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
             data->linkQuality = QString::number( info.stats.qual.qual );
     }
 
-    if ( iw_get_ext( fd, ifName.toLatin1(), SIOCGIWFREQ, &wrq ) >= 0 )
+    if ( iw_get_ext( fd, ifName.toLatin1().constData(), SIOCGIWFREQ, &wrq ) >= 0 )
     {
         int channel = -1;
         double freq = iw_freq2float( &( wrq.u.freq ) );
@@ -166,7 +166,7 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
     wrq.u.essid.pointer = static_cast<caddr_t>(essid);
     wrq.u.essid.length = IW_ESSID_MAX_SIZE + 1;
     wrq.u.essid.flags = 0;
-    if ( iw_get_ext( fd, ifName.toLatin1(), SIOCGIWESSID, &wrq ) >= 0 )
+    if ( iw_get_ext( fd, ifName.toLatin1().constData(), SIOCGIWESSID, &wrq ) >= 0 )
     {
         if ( wrq.u.data.flags > 0 )
         {
@@ -178,7 +178,7 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
         }
     }
 
-    if ( iw_get_ext( fd, ifName.toLatin1(), SIOCGIWAP, &wrq ) >= 0 )
+    if ( iw_get_ext( fd, ifName.toLatin1().constData(), SIOCGIWAP, &wrq ) >= 0 )
     {
         char ap_addr[128];
         iw_ether_ntop( reinterpret_cast<const ether_addr *>(wrq.u.ap_addr.sa_data), ap_addr );
@@ -191,7 +191,7 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
     wrq.u.essid.pointer = static_cast<caddr_t>(essid);
     wrq.u.essid.length = IW_ESSID_MAX_SIZE + 1;
     wrq.u.essid.flags = 0;
-    if ( iw_get_ext( fd, ifName.toLatin1(), SIOCGIWNICKN, &wrq ) >= 0 )
+    if ( iw_get_ext( fd, ifName.toLatin1().constData(), SIOCGIWNICKN, &wrq ) >= 0 )
     {
         if ( wrq.u.data.length > 1 )
         {
@@ -203,7 +203,7 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
         }
     }
 
-    if ( iw_get_ext( fd, ifName.toLatin1(), SIOCGIWRATE, &wrq ) >= 0 )
+    if ( iw_get_ext( fd, ifName.toLatin1().constData(), SIOCGIWRATE, &wrq ) >= 0 )
     {
         iwparam bitrate;
         memcpy (&(bitrate), &(wrq.u.bitrate), sizeof (iwparam));
@@ -211,7 +211,7 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
         data->bitRate = buffer;
     }
 
-    if ( iw_get_ext( fd, ifName.toLatin1(), SIOCGIWMODE, &wrq ) >= 0 )
+    if ( iw_get_ext( fd, ifName.toLatin1().constData(), SIOCGIWMODE, &wrq ) >= 0 )
     {
         int mode = wrq.u.mode;
         if ( mode < IW_NUM_OPER_MODE && mode >= 0 )
@@ -255,7 +255,7 @@ void NetlinkBackend_Wireless::update(QString key, BackendData *interface )
     if ( iwfd > 0 )
     {
         struct wireless_config wc;
-        if ( iw_get_basic_config( iwfd, key.toLatin1(), &wc ) >= 0 )
+        if ( iw_get_basic_config( iwfd, key.toLatin1().constData(), &wc ) >= 0 )
         {
             interface->isWireless = true;
             updateWirelessData( iwfd, key, interface );
