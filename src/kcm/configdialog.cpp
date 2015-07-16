@@ -433,17 +433,7 @@ void ConfigDialog::load()
             settings->barScale = interfaceGroup.readEntry( conf_barScale, s.barScale );
             settings->inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate );
             settings->outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate );
-            if ( interfaceGroup.hasKey( conf_calendar ) )
-            {
-                QString oldSetting = interfaceGroup.readEntry( conf_calendar );
-                // FIXME
-                //settings->calendarSystem = KCalendarSystem::calendarSystem( oldSetting );
-                interfaceGroup.writeEntry( conf_calendarSystem, static_cast<int>(settings->calendarSystem) );
-                interfaceGroup.deleteEntry( conf_calendar );
-                config->sync();
-            }
-            else
-                settings->calendarSystem = static_cast<KLocale::CalendarSystem>(interfaceGroup.readEntry( conf_calendarSystem, static_cast<int>(KLocale::QDateCalendar) ));
+            settings->calendarSystem = static_cast<KLocale::CalendarSystem>(interfaceGroup.readEntry( conf_calendarSystem, static_cast<int>(KLocale::QDateCalendar) ));
             settings->activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
             int statsRuleCount = interfaceGroup.readEntry( conf_statsRules, 0 );
             for ( int i = 0; i < statsRuleCount; ++i )

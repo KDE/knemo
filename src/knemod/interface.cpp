@@ -123,17 +123,7 @@ void Interface::configChanged()
         }
     }
 
-    if ( interfaceGroup.hasKey( conf_calendar ) )
-    {
-        QString oldSetting = interfaceGroup.readEntry( conf_calendar );
-        // FIXME
-        //mSettings.calendarSystem = KCalendarSystem::calendarSystem( oldSetting );
-        interfaceGroup.writeEntry( conf_calendarSystem, static_cast<int>(mSettings.calendarSystem) );
-        interfaceGroup.deleteEntry( conf_calendar );
-        config->sync();
-    }
-    else
-        mSettings.calendarSystem = static_cast<KLocale::CalendarSystem>(interfaceGroup.readEntry( conf_calendarSystem, static_cast<int>(KLocale::QDateCalendar) ));
+    mSettings.calendarSystem = static_cast<KLocale::CalendarSystem>(interfaceGroup.readEntry( conf_calendarSystem, static_cast<int>(KLocale::QDateCalendar) ));
 
     mSettings.statsRules.clear();
     int statsRuleCount = interfaceGroup.readEntry( conf_statsRules, 0 );

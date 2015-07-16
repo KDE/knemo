@@ -217,8 +217,8 @@ bool SqlStorage::migrateDb()
             qry.addBindValue( 1 );
             qry.addBindValue( current_db_version );
             qry.addBindValue( lastSaved );
-            // FIXME
-            //qry.addBindValue( QVariant( KCalendarSystem::calendarSystem( calendarType ) ).toString() );
+            // If still using calendar names, use the default calendar
+            qry.addBindValue( QVariant( KLocale::QDateCalendar ).toString() );
             qry.addBindValue( nextHourId );
             qry.exec();
         }

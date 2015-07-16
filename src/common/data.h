@@ -153,7 +153,6 @@ static const QLatin1String conf_iconFont("IconFont");
 
 // interface statistics
 static const QLatin1String conf_activateStatistics("ActivateStatistics");
-static const QLatin1String conf_calendar("Calendar");
 static const QLatin1String conf_calendarSystem("CalendarSystem");
 static const QLatin1String conf_statsRules("StatsRules");
 static const QLatin1String conf_warnRules("WarnRules");
