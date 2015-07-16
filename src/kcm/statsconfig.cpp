@@ -143,4 +143,4 @@ void StatsConfig::accept()
     }
 }
 
-#include "statsconfig.moc"
+#include "moc_statsconfig.cpp"

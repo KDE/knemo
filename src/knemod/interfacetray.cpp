@@ -252,4 +252,4 @@ void InterfaceTray::setupMappings()
     mScope.insert( RT_SCOPE_UNIVERSE, i18nc( "ipv6 address scope", "global" ) );
 }
 
-#include "interfacetray.moc"
+#include "moc_interfacetray.cpp"

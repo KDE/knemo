@@ -43,4 +43,4 @@ ExternalStats::~ExternalStats()
     delete mExternalDays;
 }
 
-#include "externalstats.moc"
+#include "moc_externalstats.cpp"

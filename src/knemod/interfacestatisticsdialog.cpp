@@ -214,4 +214,4 @@ void InterfaceStatisticsDialog::setCurrentSel()
 }
 
 
-#include "interfacestatisticsdialog.moc"
+#include "moc_interfacestatisticsdialog.cpp"

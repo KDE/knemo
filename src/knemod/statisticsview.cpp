@@ -257,4 +257,4 @@ bool StatisticsView::viewportEvent( QEvent * e )
     return QTableView::viewportEvent( e );
 }
 
-#include "statisticsview.moc"
+#include "moc_statisticsview.cpp"

@@ -154,5 +154,5 @@ void PlotterConfigDialog::changed()
     ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
 }
 
-#include "plotterconfigdialog.moc"
+#include "moc_plotterconfigdialog.cpp"
 

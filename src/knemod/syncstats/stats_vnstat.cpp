@@ -188,4 +188,4 @@ void StatsVnstat::parseOutput( const QString &output )
     mExternalDays->sort( 0 );
 }
 
-#include "stats_vnstat.moc"
+#include "moc_stats_vnstat.cpp"

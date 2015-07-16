@@ -410,4 +410,4 @@ void InterfaceStatusDialog::statisticsChanged()
     ui.textLabelYearTotal->setText( statistics->totalText() );
 }
 
-#include "interfacestatusdialog.moc"
+#include "moc_interfacestatusdialog.cpp"

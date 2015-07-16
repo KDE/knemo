@@ -339,4 +339,4 @@ void StatisticsModel::setTraffic( int row, quint64 rx, quint64 tx, KNemoStats::T
     }
 }
 
-#include "statisticsmodel.moc"
+#include "moc_statisticsmodel.cpp"

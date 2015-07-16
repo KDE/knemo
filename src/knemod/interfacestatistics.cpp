@@ -1120,4 +1120,4 @@ void InterfaceStatistics::addTxBytes( unsigned long bytes )
     emit currentEntryChanged();
 }
 
-#include "interfacestatistics.moc"
+#include "moc_interfacestatistics.cpp"

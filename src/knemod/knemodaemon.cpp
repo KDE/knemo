@@ -213,4 +213,4 @@ void KNemoDaemon::togglePlotters()
     }
 }
 
-#include "knemodaemon.moc"
+#include "moc_knemodaemon.cpp"

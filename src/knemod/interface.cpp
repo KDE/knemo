@@ -476,4 +476,4 @@ void Interface::activateOrHide( QWidget* widget, bool onlyActivate )
     }
 }
 
-#include "interface.moc"
+#include "moc_interface.cpp"

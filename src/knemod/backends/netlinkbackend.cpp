@@ -244,4 +244,4 @@ void NetlinkBackend::updateIfaceData( const QString& ifName, BackendData* data )
         data->status = KNemoIface::Unavailable;
 }
 
-#include "netlinkbackend.moc"
+#include "moc_netlinkbackend.cpp"

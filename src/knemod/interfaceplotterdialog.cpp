@@ -520,4 +520,4 @@ void InterfacePlotterDialog::addBeams()
     }
 }
 
-#include "interfaceplotterdialog.moc"
+#include "moc_interfaceplotterdialog.cpp"

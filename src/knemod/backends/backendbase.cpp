@@ -112,4 +112,4 @@ void BackendBase::incBytes( KNemoIface::Type type,
     prevDataBytes = bytes;
 }
 
-#include "backendbase.moc"
+#include "moc_backendbase.cpp"

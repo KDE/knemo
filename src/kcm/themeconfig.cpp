@@ -92,4 +92,4 @@ InterfaceSettings ThemeConfig::settings()
     return mSettings;
 }
 
-#include "themeconfig.moc"
+#include "moc_themeconfig.cpp"

@@ -136,4 +136,4 @@ void WarnConfig::accept()
         QDialog::accept();
 }
 
-#include "warnconfig.moc"
+#include "moc_warnconfig.cpp"

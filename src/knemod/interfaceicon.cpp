@@ -604,4 +604,4 @@ void InterfaceIcon::showGraph()
     mInterface->showSignalPlotter( true );
 }
 
-#include "interfaceicon.moc"
+#include "moc_interfaceicon.cpp"
