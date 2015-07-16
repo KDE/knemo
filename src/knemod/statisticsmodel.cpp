@@ -22,6 +22,7 @@
 #include <QStringList>
 #include <KLocale>
 #include <kio/global.h>
+#include <QLocale>
 
 StatisticsModel::StatisticsModel( enum KNemoStats::PeriodUnits t, QObject *parent ) :
     QStandardItemModel( parent ),
@@ -111,14 +112,20 @@ void StatisticsModel::updateDateText( int row )
     if ( row < 0 || !rowCount() || !mCalendar )
         return;
 
+    QLocale locale;
     QString dateStr;
     QDateTime dt = dateTime( row );
     int dy = days( row );
     switch ( mPeriodType )
     {
         case KNemoStats::Hour:
-            dateStr = KGlobal::locale()->formatTime( dt.time() );
-            dateStr += " " + mCalendar->formatDate( dt.date(), KLocale::FancyShortDate );
+            dateStr = locale.toString( dt.time(), QLocale::ShortFormat );
+            if ( dt.date() == QDate::currentDate() )
+            {
+                dateStr += " " + i18n("Today");
+            } else {
+                dateStr += " " + i18n("Yesterday");
+            }
             break;
         case KNemoStats::Month:
             dateStr = QString( "%1 %2" )
