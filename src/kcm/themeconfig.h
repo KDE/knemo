@@ -30,7 +30,7 @@ Q_OBJECT
 public:
     ThemeConfig( const InterfaceSettings s );
     InterfaceSettings settings();
-private slots:
+private Q_SLOTS:
     void setDefaults( QAbstractButton* );
     void updateRateGroup();
 private:

@@ -56,11 +56,11 @@ InterfaceIcon::InterfaceIcon( Interface* interface )
 {
     commandActions = new KActionCollection( this );
     statusAction = new QAction( i18n( "Show &Status Dialog" ), this );
-    plotterAction = new QAction( QIcon::fromTheme( "utilities-system-monitor" ),
+    plotterAction = new QAction( QIcon::fromTheme( QLatin1String("utilities-system-monitor") ),
                        i18n( "Show &Traffic Plotter" ), this );
-    statisticsAction = new QAction( QIcon::fromTheme( "view-statistics" ),
+    statisticsAction = new QAction( QIcon::fromTheme( QLatin1String("view-statistics") ),
                           i18n( "Show St&atistics" ), this );
-    configAction = new QAction( QIcon::fromTheme( "configure" ),
+    configAction = new QAction( QIcon::fromTheme( QLatin1String("configure") ),
                        i18n( "&Configure KNemo..." ), this );
 
     connect( statusAction, SIGNAL( triggered() ),
@@ -127,9 +127,9 @@ void InterfaceIcon::updateIconImage( int status )
 
     QString iconName;
     if ( mInterface->settings().iconTheme == SYSTEM_THEME )
-        iconName = "network-";
+        iconName = QStringLiteral("network-");
     else
-        iconName = "knemo-" + mInterface->settings().iconTheme + "-";
+        iconName = QLatin1String("knemo-") + mInterface->settings().iconTheme + QLatin1Char('-');
 
     // Now set the correct icon depending on the status of the interface.
     if ( ( status & KNemoIface::RxTraffic ) &&
@@ -475,11 +475,11 @@ void InterfaceIcon::updateMenu()
         {
             QAction *action = new QAction( command.menuText, this );
             action->setData( QVariant::fromValue( command ) );
-            commandActions->addAction( QString( "command%1" ).arg( i ), action );
+            commandActions->addAction( QString::fromLatin1( "command%1" ).arg( i ), action );
             ++i;
         }
         QAction* sep = menu->addSeparator();
-        commandActions->addAction( "sep", sep );
+        commandActions->addAction( QLatin1String("sep"), sep );
         menu->insertActions( statusAction, commandActions->actions() );
     }
 
@@ -530,12 +530,12 @@ void InterfaceIcon::updateTrayStatus()
 
         menu->removeAction( menu->actions().at( 0 ) );
         // FIXME: title for QMenu?
-        //menu->addTitle( QIcon::fromTheme( "knemo" ), i18n( "KNemo - %1", title ) );
+        //menu->addTitle( QIcon::fromTheme( QLatin1String("knemo") ), i18n( "KNemo - %1", title ) );
         menu->addAction( statusAction );
         menu->addAction( plotterAction );
         menu->addAction( configAction );
         KHelpMenu* helpMenu( new KHelpMenu( menu, KAboutData::applicationData(), false ) );
-        menu->addMenu( helpMenu->menu() )->setIcon( QIcon::fromTheme( "help-contents" ) );
+        menu->addMenu( helpMenu->menu() )->setIcon( QIcon::fromTheme( QLatin1String("help-contents") ) );
 
         connect( menu, SIGNAL( triggered( QAction * ) ),
                  this, SLOT( menuTriggered( QAction * ) ) );
@@ -561,7 +561,7 @@ void InterfaceIcon::showConfigDialog()
     KNemoDaemon::sSelectedInterface = mInterface->ifaceName();
 
     KProcess process;
-    process << "kcmshell4" << "kcm_knemo";
+    process << QLatin1String("kcmshell5") << QLatin1String("kcm_knemo");
     process.startDetached();
 }
 
@@ -573,7 +573,7 @@ void InterfaceIcon::menuTriggered( QAction *action )
     InterfaceCommand command = action->data().value<InterfaceCommand>();
     KProcess *process = new KProcess( this );
     if ( command.runAsRoot )
-        *process << QStandardPaths::findExecutable("kdesu") << command.command;
+        *process << QStandardPaths::findExecutable(QLatin1String("kdesu")) << command.command;
     else
         process->setShellCommand( command.command );
 

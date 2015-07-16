@@ -19,6 +19,7 @@
 */
 
 #include <QDBusInterface>
+#include <QDBusMessage>
 #include <QPainter>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
@@ -53,7 +54,7 @@
 #endif
 
 
-K_PLUGIN_FACTORY(KNemoFactory, registerPlugin<ConfigDialog>("knemo");)
+K_PLUGIN_FACTORY(KNemoFactory, registerPlugin<ConfigDialog>(QLatin1String("knemo"));)
 K_EXPORT_PLUGIN(KNemoFactory("kcm_knemo"))
 
 Q_DECLARE_METATYPE( KNemoTheme )
@@ -221,7 +222,7 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
       mDlg( new Ui::ConfigDlg() ),
       mCalendar( 0 )
 {
-    mConfig = KSharedConfig::openConfig( "knemorc" );
+    mConfig = KSharedConfig::openConfig( QLatin1String("knemorc") );
 
     setupToolTipMap();
 
@@ -281,15 +282,15 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     for ( size_t i = 0; i < sizeof(pollIntervals)/sizeof(double); i++ )
         mDlg->comboBoxPoll->addItem( i18n( "%1 sec", pollIntervals[i] ), pollIntervals[i] );
 
-    mDlg->pushButtonNew->setIcon( QIcon::fromTheme( "list-add" ) );
-    mDlg->pushButtonAll->setIcon( QIcon::fromTheme( "document-new" ) );
-    mDlg->pushButtonDelete->setIcon( QIcon::fromTheme( "list-remove" ) );
-    mDlg->pushButtonAddCommand->setIcon( QIcon::fromTheme( "list-add" ) );
-    mDlg->pushButtonRemoveCommand->setIcon( QIcon::fromTheme( "list-remove" ) );
-    mDlg->pushButtonUp->setIcon( QIcon::fromTheme( "arrow-up" ) );
-    mDlg->pushButtonDown->setIcon( QIcon::fromTheme( "arrow-down" ) );
-    mDlg->pushButtonAddToolTip->setIcon( QIcon::fromTheme( "arrow-right" ) );
-    mDlg->pushButtonRemoveToolTip->setIcon( QIcon::fromTheme( "arrow-left" ) );
+    mDlg->pushButtonNew->setIcon( QIcon::fromTheme( QLatin1String("list-add") ) );
+    mDlg->pushButtonAll->setIcon( QIcon::fromTheme( QLatin1String("document-new") ) );
+    mDlg->pushButtonDelete->setIcon( QIcon::fromTheme( QLatin1String("list-remove") ) );
+    mDlg->pushButtonAddCommand->setIcon( QIcon::fromTheme( QLatin1String("list-add") ) );
+    mDlg->pushButtonRemoveCommand->setIcon( QIcon::fromTheme( QLatin1String("list-remove") ) );
+    mDlg->pushButtonUp->setIcon( QIcon::fromTheme( QLatin1String("arrow-up") ) );
+    mDlg->pushButtonDown->setIcon( QIcon::fromTheme( QLatin1String("arrow-down") ) );
+    mDlg->pushButtonAddToolTip->setIcon( QIcon::fromTheme( QLatin1String("arrow-right") ) );
+    mDlg->pushButtonRemoveToolTip->setIcon( QIcon::fromTheme( QLatin1String("arrow-left") ) );
 
     mDlg->themeColorBox->setEnabled( false );
 
@@ -447,7 +448,7 @@ void ConfigDialog::load()
             int statsRuleCount = interfaceGroup.readEntry( conf_statsRules, 0 );
             for ( int i = 0; i < statsRuleCount; ++i )
             {
-                group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( interface ).arg( i );
+                group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_statsRule ).arg( interface ).arg( i );
                 if ( config->hasGroup( group ) )
                 {
                     KConfigGroup statsGroup( config, group );
@@ -471,7 +472,7 @@ void ConfigDialog::load()
             int warnRuleCount = interfaceGroup.readEntry( conf_warnRules, 0 );
             for ( int i = 0; i < warnRuleCount; ++i )
             {
-                group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( interface ).arg( i );
+                group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_warnRule ).arg( interface ).arg( i );
                 if ( config->hasGroup( group ) )
                 {
                     KConfigGroup warnGroup( config, group );
@@ -494,11 +495,11 @@ void ConfigDialog::load()
             {
                 QString entry;
                 InterfaceCommand cmd;
-                entry = QString( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
+                entry = QString::fromLatin1( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
                 cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
-                entry = QString( "%1%2" ).arg( conf_command ).arg( i + 1 );
+                entry = QString::fromLatin1( "%1%2" ).arg( conf_command ).arg( i + 1 );
                 cmd.command = interfaceGroup.readEntry( entry );
-                entry = QString( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
+                entry = QString::fromLatin1( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
                 cmd.menuText = interfaceGroup.readEntry( entry );
                 settings->commands.append( cmd );
             }
@@ -517,7 +518,7 @@ void ConfigDialog::load()
     // this call to the daemon will deliver the interface the menu
     // belongs to. This way we can preselect the appropriate entry in the list.
     QString selectedInterface = QString::null;
-    QDBusMessage reply = QDBusInterface("org.kde.knemo", "/knemo", "org.kde.knemo").call("getSelectedInterface");
+    QDBusMessage reply = QDBusInterface(QLatin1String("org.kde.knemo"), QLatin1String("/knemo"), QLatin1String("org.kde.knemo")).call(QLatin1String("getSelectedInterface"));
     if ( reply.arguments().count() )
     {
         selectedInterface = reply.arguments().first().toString();
@@ -661,7 +662,7 @@ void ConfigDialog::save()
         interfaceGroup.writeEntry( conf_statsRules, settings->statsRules.count() );
         for ( int i = 0; i < settings->statsRules.count(); i++ )
         {
-            QString group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( it ).arg( i );
+            QString group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_statsRule ).arg( it ).arg( i );
             KConfigGroup statsGroup( config, group );
             statsGroup.writeEntry( conf_statsStartDate, settings->statsRules[i].startDate );
             statsGroup.writeEntry( conf_statsPeriodUnits, settings->statsRules[i].periodUnits );
@@ -684,7 +685,7 @@ void ConfigDialog::save()
         interfaceGroup.writeEntry( conf_warnRules, settings->warnRules.count() );
         for ( int i = 0; i < settings->warnRules.count(); i++ )
         {
-            QString group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( it ).arg( i );
+            QString group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_warnRule ).arg( it ).arg( i );
             KConfigGroup warnGroup( config, group );
             if ( settings->statsRules.count() == 0 && settings->warnRules[i].periodUnits == KNemoStats::BillPeriod )
             {
@@ -706,11 +707,11 @@ void ConfigDialog::save()
         for ( int i = 0; i < settings->commands.size(); i++ )
         {
             QString entry;
-            entry = QString( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
+            entry = QString::fromLatin1( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
             interfaceGroup.writeEntry( entry, settings->commands[i].runAsRoot );
-            entry = QString( "%1%2" ).arg( conf_command ).arg( i + 1 );
+            entry = QString::fromLatin1( "%1%2" ).arg( conf_command ).arg( i + 1 );
             interfaceGroup.writeEntry( entry, settings->commands[i].command );
-            entry = QString( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
+            entry = QString::fromLatin1( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
             interfaceGroup.writeEntry( entry, settings->commands[i].menuText );
         }
     }
@@ -726,7 +727,7 @@ void ConfigDialog::save()
     generalGroup.writeEntry( conf_interfaces, list );
 
     config->sync();
-    QDBusMessage reply = QDBusInterface("org.kde.knemo", "/knemo", "org.kde.knemo").call("reparseConfiguration");
+    QDBusMessage reply = QDBusInterface(QLatin1String("org.kde.knemo"), QLatin1String("/knemo"), QLatin1String("org.kde.knemo")).call(QLatin1String("reparseConfiguration"));
 }
 
 void ConfigDialog::defaults()
@@ -1025,7 +1026,7 @@ void ConfigDialog::buttonAllSelected()
               rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_next( reinterpret_cast<struct nl_object *>(rtlink) ))
             )
         {
-            QString ifname( rtnl_link_get_name( rtlink ) );
+            QString ifname( QLatin1String(rtnl_link_get_name( rtlink )) );
             ifaces << ifname;
         }
     }
@@ -1044,8 +1045,8 @@ void ConfigDialog::buttonAllSelected()
     freeifaddrs( ifaddr );
 #endif
 
-    ifaces.removeAll( "lo" );
-    ifaces.removeAll( "lo0" );
+    ifaces.removeAll( QLatin1String("lo") );
+    ifaces.removeAll( QLatin1String("lo0") );
 
     const KColorScheme scheme(QPalette::Active, KColorScheme::View);
     foreach ( QString ifname, ifaces )
@@ -1265,13 +1266,17 @@ void ConfigDialog::iconThemeChanged( int set )
     {
         if ( curTheme.internalName == TEXT_THEME )
         {
+            QString f1 = QStringLiteral("0.0K");
+            QString f2 = QStringLiteral("123K");
+            QString f3 = QStringLiteral("12K");
+
             settings->iconTheme = TEXT_THEME;
-            mDlg->pixmapError->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Unavailable ) );
-            mDlg->pixmapDisconnected->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Available ) );
-            mDlg->pixmapConnected->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Connected ) );
-            mDlg->pixmapIncoming->setPixmap( textIcon( "123K", "0.0K", KNemoIface::Connected ) );
-            mDlg->pixmapOutgoing->setPixmap( textIcon( "0.0K", "12K", KNemoIface::Connected ) );
-            mDlg->pixmapTraffic->setPixmap( textIcon( "123K", "12K", KNemoIface::Connected ) );
+            mDlg->pixmapError->setPixmap( textIcon( f1, f1, KNemoIface::Unavailable ) );
+            mDlg->pixmapDisconnected->setPixmap( textIcon( f1, f1, KNemoIface::Available ) );
+            mDlg->pixmapConnected->setPixmap( textIcon( f1, f1, KNemoIface::Connected ) );
+            mDlg->pixmapIncoming->setPixmap( textIcon( f2, f1, KNemoIface::Connected ) );
+            mDlg->pixmapOutgoing->setPixmap( textIcon( f1, f3, KNemoIface::Connected ) );
+            mDlg->pixmapTraffic->setPixmap( textIcon( f2, f3, KNemoIface::Connected ) );
             mDlg->iconFontLabel->setEnabled( true );
             mDlg->iconFont->setEnabled( true );
         }
@@ -1293,9 +1298,9 @@ void ConfigDialog::iconThemeChanged( int set )
         settings->iconTheme = findNameFromIndex( set );
         QString iconName;
         if ( settings->iconTheme == SYSTEM_THEME )
-            iconName = "network-";
+            iconName = QLatin1String("network-");
         else
-            iconName = "knemo-" + settings->iconTheme + "-";
+            iconName = QLatin1String("knemo-") + settings->iconTheme + QLatin1Char('-');
         mDlg->pixmapError->setPixmap( QIcon::fromTheme( iconName + ICON_ERROR ).pixmap( 22 ) );
         mDlg->pixmapDisconnected->setPixmap( QIcon::fromTheme( iconName + ICON_OFFLINE ).pixmap( 22 ) );
         mDlg->pixmapConnected->setPixmap( QIcon::fromTheme( iconName + ICON_IDLE ).pixmap( 22 ) );
@@ -1806,7 +1811,7 @@ void ConfigDialog::buttonRemoveToolTipSelected()
 
 void ConfigDialog::buttonNotificationsSelected()
 {
-    KNotifyConfigWidget::configure( this, "knemo" );
+    KNotifyConfigWidget::configure( this, QLatin1String("knemo") );
 }
 
 #include "configdialog.moc"

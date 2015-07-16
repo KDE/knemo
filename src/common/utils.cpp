@@ -89,13 +89,13 @@ void parseNetlinkRoute( struct nl_object *object, void * )
 
             if ( rtfamily == AF_INET )
             {
-                ipv4gw = gwaddr;
-                ipv4gwi = gwname;
+                ipv4gw = QLatin1String(gwaddr);
+                ipv4gwi = QLatin1String(gwname);
             }
             else if ( rtfamily == AF_INET6 )
             {
-                ipv6gw = gwaddr;
-                ipv6gwi = gwname;
+                ipv6gw = QLatin1String(gwaddr);
+                ipv6gwi = QLatin1String(gwname);
             }
         }
     }
@@ -245,12 +245,12 @@ QString getDefaultRoute( int afType, QString *defaultGateway, void *data )
 
 QList<KNemoTheme> findThemes()
 {
-    const QStringList dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, "knemo/themes", QStandardPaths::LocateDirectory);
+    const QStringList dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("knemo/themes"), QStandardPaths::LocateDirectory);
     QStringList themelist;
     Q_FOREACH (const QString& dir, dirs) {
-        const QStringList fileNames = QDir(dir).entryList(QStringList() << "*.desktop");
+        const QStringList fileNames = QDir(dir).entryList(QStringList() << QLatin1String("*.desktop"));
         Q_FOREACH (const QString& file, fileNames) {
-            themelist.append(dir + '/' + file);
+            themelist.append(dir + QLatin1Char('/') + file);
         }
     }
 
@@ -258,11 +258,11 @@ QList<KNemoTheme> findThemes()
     foreach ( QString themeFile, themelist )
     {
         KSharedConfigPtr conf = KSharedConfig::openConfig( themeFile );
-        KConfigGroup cfg( conf, "Desktop Entry" );
+        KConfigGroup cfg( conf, QLatin1String("Desktop Entry") );
         KNemoTheme theme;
-        theme.name = cfg.readEntry("Name");
-        theme.comment = cfg.readEntry("Comment");
-        theme.internalName = cfg.readEntry( "X-KNemo-Theme" );
+        theme.name = cfg.readEntry(QLatin1String("Name"));
+        theme.comment = cfg.readEntry(QLatin1String("Comment"));
+        theme.internalName = cfg.readEntry( QLatin1String("X-KNemo-Theme") );
         iconThemes << theme;
     }
     return iconThemes;

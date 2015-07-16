@@ -66,9 +66,9 @@ class PlotterConfigDialog : public QDialog
     public:
         PlotterConfigDialog( QWidget *parent, const QString& iface, PlotterSettings* settings );
         virtual ~PlotterConfigDialog();
-    signals:
+    Q_SIGNALS:
         void saved();
-    private slots:
+    private Q_SLOTS:
         void changed();
         void defaults(QAbstractButton*);
         void save();

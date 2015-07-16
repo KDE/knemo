@@ -38,7 +38,7 @@ extern "C" int main(int argc, char *argv[] )
 
     KLocalizedString::setApplicationDomain("knemo");
 
-    KAboutData aboutData( "knemo", i18n( "KNemo" ), KNEMO_VERSION,
+    KAboutData aboutData( QLatin1String("knemo"), i18n( "KNemo" ), QLatin1String(KNEMO_VERSION),
                           i18n( description ),
                           KAboutLicense::GPL_V2,
                           QString(),
@@ -46,19 +46,19 @@ extern "C" int main(int argc, char *argv[] )
                           QLatin1String("http://extragear.kde.org/apps/knemo/"));
 
     aboutData.addAuthor( i18n( "Percy Leonhardt" ), i18n( "Original Author" ),
-                    "percy@eris23.de" );
+                    QLatin1String("percy@eris23.de") );
     aboutData.addAuthor( i18n( "John Stamp" ), i18n( "Current maintainer" ),
-                    "jstamp@users.sourceforge.net" );
-    aboutData.addCredit( i18n( "Michael Olbrich" ), i18n( "Threshold support" ),
-                    "michael.olbrich@gmx.net" );
+                    QLatin1String("jstamp@users.sourceforge.net") );
+    aboutData.addCredit( i18n( "Michael Olbrich") ), i18n( "Threshold support" ),
+                    QLatin1String("michael.olbrich@gmx.net" );
     aboutData.addCredit( i18n( "Chris Schlaeger" ), i18n( "Signal plotter" ),
-                    "cs@kde.org" );
+                    QLatin1String("cs@kde.org") );
     aboutData.addCredit( i18n( "John Tapsell" ), i18n( "Signal plotter" ),
-                    "tapsell@kde.org" );
+                    QLatin1String("tapsell@kde.org") );
     QApplication app(argc, argv);
 
     QCoreApplication::setApplicationName(i18n("KNemo"));
-    QCoreApplication::setOrganizationDomain("kde.org");
+    QCoreApplication::setOrganizationDomain(QLatin1String("kde.org"));
 
     auto disableSessionManagement = [] (QSessionManager &sm) {
         sm.setRestartHint(QSessionManager::RestartNever);

@@ -35,7 +35,7 @@ private:
     const InterfaceSettings *mSettings;
     bool mAddRule;
     void setControls( const WarnRule &warn );
-private slots:
+private Q_SLOTS:
     void accept();
     void setDefaults(QAbstractButton* button);
     void thresholdChanged( double );

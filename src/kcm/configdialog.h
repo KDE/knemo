@@ -87,7 +87,7 @@ public:
     void save();
     void defaults();
 
-private slots:
+private Q_SLOTS:
     void buttonNewSelected();
     void buttonAllSelected();
     void buttonDeleteSelected();

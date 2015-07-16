@@ -28,7 +28,7 @@
 #include <QtSql/QSqlRecord>
 #include <KMessageBox>
 
-static const QString time_format( "hh:mm:ss" );
+static const QString time_format( QLatin1String("hh:mm:ss") );
 
 static const int current_db_version = 2;
 
@@ -37,12 +37,12 @@ SqlStorage::SqlStorage( QString ifaceName )
     , mIfaceName( ifaceName )
 {
     QUrl dir( generalSettings->statisticsDir );
-    mDbPath = QString( "%1%2%3.db" ).arg( dir.path() ).arg( statistics_prefix ).arg( mIfaceName );
+    mDbPath = QString::fromLatin1( "%1%2%3.db" ).arg( dir.path() ).arg( statistics_prefix ).arg( mIfaceName );
     QStringList drivers = QSqlDatabase::drivers();
-    if ( drivers.contains( "QSQLITE" ) )
-        db = QSqlDatabase::addDatabase( "QSQLITE", mIfaceName );
-    mTypeMap.insert( KNemoStats::AllTraffic, "" );
-    mTypeMap.insert( KNemoStats::OffpeakTraffic, "_offpeak" );
+    if ( drivers.contains( QLatin1String("QSQLITE") ) )
+        db = QSqlDatabase::addDatabase( QLatin1String("QSQLITE"), mIfaceName );
+    mTypeMap.insert( KNemoStats::AllTraffic, QLatin1String("") );
+    mTypeMap.insert( KNemoStats::OffpeakTraffic, QLatin1String("_offpeak") );
 
     if ( dbExists() && open() )
     {
@@ -75,18 +75,18 @@ bool SqlStorage::createDb()
 
     QSqlDatabase::database( mIfaceName ).transaction();
     QSqlQuery qry( db );
-    QString qryStr = "CREATE TABLE IF NOT EXISTS general (id INTEGER PRIMARY KEY, version INTEGER,"
-                     " last_saved BIGINT, calendar TEXT, next_hour_id INTEGER );";
+    QString qryStr = QLatin1String("CREATE TABLE IF NOT EXISTS general (id INTEGER PRIMARY KEY, version INTEGER,") +
+                     QLatin1String(" last_saved BIGINT, calendar TEXT, next_hour_id INTEGER );");
     qry.exec( qryStr );
 
-    qryStr = "CREATE TABLE IF NOT EXISTS stats_rules (id INTEGER PRIMARY KEY, start_date DATETIME,"
-             " period_units INTEGER, period_count INTEGER );";
+    qryStr = QLatin1String("CREATE TABLE IF NOT EXISTS stats_rules (id INTEGER PRIMARY KEY, start_date DATETIME,") +
+             QLatin1String(" period_units INTEGER, period_count INTEGER );");
     qry.exec( qryStr );
 
-    qryStr = "CREATE TABLE IF NOT EXISTS stats_rules_offpeak (id INTEGER PRIMARY KEY,"
-             " offpeak_start_time TEXT, offpeak_end_time TEXT,"
-             " weekend_is_offpeak BOOLEAN, weekend_start_time TEXT, weekend_end_time TEXT,"
-             " weekend_start_day INTEGER, weekend_end_day INTEGER );";
+    qryStr = QLatin1String("CREATE TABLE IF NOT EXISTS stats_rules_offpeak (id INTEGER PRIMARY KEY,") +
+             QLatin1String(" offpeak_start_time TEXT, offpeak_end_time TEXT,") +
+             QLatin1String(" weekend_is_offpeak BOOLEAN, weekend_start_time TEXT, weekend_end_time TEXT,") +
+             QLatin1String(" weekend_start_day INTEGER, weekend_end_day INTEGER );");
     qry.exec( qryStr );
 
     for ( int i = KNemoStats::Hour; i <= KNemoStats::HourArchive; ++i )
@@ -94,13 +94,13 @@ bool SqlStorage::createDb()
         foreach ( KNemoStats::TrafficType j, mTypeMap.keys() )
         {
             QString dateTimeStr;
-            qryStr = "CREATE TABLE IF NOT EXISTS %1s%2 (id INTEGER PRIMARY KEY,%3"
-                     " rx BIGINT, tx BIGINT );";
+            qryStr = QLatin1String("CREATE TABLE IF NOT EXISTS %1s%2 (id INTEGER PRIMARY KEY,%3") +
+                     QLatin1String(" rx BIGINT, tx BIGINT );");
             if ( j == KNemoStats::AllTraffic )
             {
-                dateTimeStr = " datetime DATETIME,";
+                dateTimeStr = QLatin1String(" datetime DATETIME,");
                 if ( i == KNemoStats::BillPeriod  )
-                    dateTimeStr += " days INTEGER,";
+                    dateTimeStr += QLatin1String(" days INTEGER,");
             }
             qryStr = qryStr.arg( periods.at( i ) ).arg( mTypeMap.value( j ) ).arg( dateTimeStr );
             qry.exec( qryStr );
@@ -131,21 +131,21 @@ bool SqlStorage::loadHourArchives( StatisticsModel *hourArchive, const QDate &st
     {
         if ( trafficType == KNemoStats::AllTraffic )
         {
-            searchCol = "datetime";
+            searchCol = QLatin1String("datetime");
             startVal = startDateTime.toString( Qt::ISODate );
             endVal = nextStartDateTime.toString( Qt::ISODate );
         }
         else
         {
-            searchCol = "id";
+            searchCol = QLatin1String("id");
             startVal = QString::number( hourArchive->id( 0 ) );
             endVal = QString::number( hourArchive->id()+1 );
         }
 
-        QString qryStr = "SELECT * FROM %1s%2 WHERE %3 >= '%4'";
+        QString qryStr = QLatin1String("SELECT * FROM %1s%2 WHERE %3 >= '%4'");
         if ( nextStartDate.isValid() )
         {
-            qryStr += " AND datetime < '%5'";
+            qryStr += QLatin1String(" AND datetime < '%5'");
             qryStr = qryStr.arg( periods.at( KNemoStats::HourArchive ) )
                            .arg( mTypeMap.value( trafficType ) )
                            .arg( searchCol )
@@ -159,14 +159,14 @@ bool SqlStorage::loadHourArchives( StatisticsModel *hourArchive, const QDate &st
                            .arg( searchCol )
                            .arg( startVal );
         }
-        qryStr += " ORDER BY id;";
+        qryStr += QLatin1String(" ORDER BY id;");
         qry.exec( qryStr );
-        int cId = qry.record().indexOf( "id" );
-        int cRx = qry.record().indexOf( "rx" );
-        int cTx = qry.record().indexOf( "tx" );
+        int cId = qry.record().indexOf( QLatin1String("id") );
+        int cRx = qry.record().indexOf( QLatin1String("rx") );
+        int cTx = qry.record().indexOf( QLatin1String("tx") );
         int cDt = 0;
         if ( trafficType == KNemoStats::AllTraffic )
-            cDt = qry.record().indexOf( "datetime" );
+            cDt = qry.record().indexOf( QLatin1String("datetime") );
 
         while ( qry.next() )
         {
@@ -193,10 +193,10 @@ bool SqlStorage::migrateDb()
 
     QSqlDatabase::database( mIfaceName ).transaction();
     QSqlQuery qry( db );
-    qry.exec( "SELECT * FROM general;" );
+    qry.exec( QLatin1String("SELECT * FROM general;") );
     if ( qry.next() )
     {
-        int dbVersion = qry.value( qry.record().indexOf( "version" ) ).toInt();
+        int dbVersion = qry.value( qry.record().indexOf( QLatin1String("version") ) ).toInt();
         if ( dbVersion > current_db_version )
         {
             mValidDbVer = false;
@@ -207,11 +207,10 @@ bool SqlStorage::migrateDb()
         }
         if ( dbVersion < 2 )
         {
-            int lastSaved = qry.value( qry.record().indexOf( "last_saved" ) ).toInt();
-            QString calendarType = qry.value( qry.record().indexOf( "calendar" ) ).toString();
-            int nextHourId = qry.value( qry.record().indexOf( "next_hour_id" ) ).toInt();
-            QString qryStr = "REPLACE INTO general (id, version, last_saved, calendar, next_hour_id )"
-                             " VALUES (?, ?, ?, ?, ? );";
+            int lastSaved = qry.value( qry.record().indexOf( QLatin1String("last_saved") ) ).toInt();
+            int nextHourId = qry.value( qry.record().indexOf( QLatin1String("next_hour_id") ) ).toInt();
+            QString qryStr = QLatin1String("REPLACE INTO general (id, version, last_saved, calendar, next_hour_id )") +
+                             QLatin1String(" VALUES (?, ?, ?, ?, ? );");
             qry.prepare( qryStr );
             qry.addBindValue( 1 );
             qry.addBindValue( current_db_version );
@@ -238,12 +237,12 @@ bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *model
     QDateTime curDateTime = QDateTime::currentDateTime();
 
     KLocale::CalendarSystem calSystem = KLocale::QDateCalendar;
-    qry.exec( "SELECT * FROM general;" );
+    qry.exec( QLatin1String("SELECT * FROM general;") );
     if ( qry.next() )
     {
-        int cLastSaved = qry.record().indexOf( "last_saved" );
-        int cCalendarSystem = qry.record().indexOf( "calendar" );
-        int cNextHourId = qry.record().indexOf( "next_hour_id" );
+        int cLastSaved = qry.record().indexOf( QLatin1String("last_saved") );
+        int cCalendarSystem = qry.record().indexOf( QLatin1String("calendar") );
+        int cNextHourId = qry.record().indexOf( QLatin1String("next_hour_id") );
         sd->lastSaved = qry.value( cLastSaved ).toUInt();
         calSystem = static_cast<KLocale::CalendarSystem>(qry.value( cCalendarSystem ).toInt());
         sd->nextHourId = qry.value( cNextHourId ).toInt();
@@ -261,20 +260,20 @@ bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *model
                 continue;
             foreach ( KNemoStats::TrafficType trafficType, mTypeMap.keys() )
             {
-                qry.exec( QString( "SELECT * FROM %1s%2 ORDER BY id;" )
+                qry.exec( QString::fromLatin1( "SELECT * FROM %1s%2 ORDER BY id;" )
                         .arg( periods.at( s->periodType() ) )
                         .arg( mTypeMap.value( trafficType ) ) );
-                int cId = qry.record().indexOf( "id" );
-                int cRx = qry.record().indexOf( "rx" );
-                int cTx = qry.record().indexOf( "tx" );
+                int cId = qry.record().indexOf( QLatin1String("id") );
+                int cRx = qry.record().indexOf( QLatin1String("rx") );
+                int cTx = qry.record().indexOf( QLatin1String("tx") );
                 int cDt = 0;
                 int cDays = 0;
                 if ( trafficType == KNemoStats::AllTraffic )
                 {
-                    cDt = qry.record().indexOf( "datetime" );
+                    cDt = qry.record().indexOf( QLatin1String("datetime") );
                     if ( s->periodType() == KNemoStats::BillPeriod )
                     {
-                        cDays = qry.record().indexOf( "days" );
+                        cDays = qry.record().indexOf( QLatin1String("days") );
                     }
                 }
 
@@ -303,10 +302,10 @@ bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *model
 
     if ( rules )
     {
-        qry.exec( "SELECT * FROM stats_rules ORDER BY id;" );
-        int cDt = qry.record().indexOf( "start_date" );
-        int cType = qry.record().indexOf( "period_units" );
-        int cUnits = qry.record().indexOf( "period_count" );
+        qry.exec( QLatin1String("SELECT * FROM stats_rules ORDER BY id;") );
+        int cDt = qry.record().indexOf( QLatin1String("start_date") );
+        int cType = qry.record().indexOf( QLatin1String("period_units") );
+        int cUnits = qry.record().indexOf( QLatin1String("period_count") );
         while ( qry.next() )
         {
             StatsRule entry;
@@ -316,15 +315,15 @@ bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *model
             *rules << entry;
         }
 
-        qry.exec( "SELECT * FROM stats_rules_offpeak ORDER BY id;" );
-        int cId = qry.record().indexOf( "id" );
-        int cOpStartTime = qry.record().indexOf( "offpeak_start_time" );
-        int cOpEndTime = qry.record().indexOf( "offpeak_end_time" );
-        int cWeekendIsOffpeak = qry.record().indexOf( "weekend_is_offpeak" );
-        int cWStartTime = qry.record().indexOf( "weekend_start_time" );
-        int cWEndTime = qry.record().indexOf( "weekend_end_time" );
-        int cWStartDay = qry.record().indexOf( "weekend_start_day" );
-        int cWEndDay = qry.record().indexOf( "weekend_end_day" );
+        qry.exec( QLatin1String("SELECT * FROM stats_rules_offpeak ORDER BY id;") );
+        int cId = qry.record().indexOf( QLatin1String("id") );
+        int cOpStartTime = qry.record().indexOf( QLatin1String("offpeak_start_time") );
+        int cOpEndTime = qry.record().indexOf( QLatin1String("offpeak_end_time") );
+        int cWeekendIsOffpeak = qry.record().indexOf( QLatin1String("weekend_is_offpeak") );
+        int cWStartTime = qry.record().indexOf( QLatin1String("weekend_start_time") );
+        int cWEndTime = qry.record().indexOf( QLatin1String("weekend_end_time") );
+        int cWStartDay = qry.record().indexOf( QLatin1String("weekend_start_day") );
+        int cWEndDay = qry.record().indexOf( QLatin1String("weekend_end_day") );
         while ( qry.next() )
         {
             int id = qry.value( cId ).toInt();
@@ -342,7 +341,7 @@ bool SqlStorage::loadStats( StorageData *sd, QHash<int, StatisticsModel*> *model
         }
     }
     ok = QSqlDatabase::database( mIfaceName ).commit();
-    qry.exec( "VACUUM;" );
+    qry.exec( QLatin1String("VACUUM;") );
     db.close();
     return ok;
 }
@@ -361,7 +360,7 @@ bool SqlStorage::saveStats( StorageData *sd, QHash<int, StatisticsModel*> *model
     if ( fullSave )
     {
         QSqlQuery qry( db );
-        qry.exec( "VACUUM;" );
+        qry.exec( QLatin1String("VACUUM;") );
     }
     db.close();
     return ok;
@@ -382,12 +381,12 @@ bool SqlStorage::clearStats( StorageData *sd )
             if ( i == KNemoStats::AllTraffic &&
                  ( period == periods.at( KNemoStats::Hour ) || period == periods.at( KNemoStats::HourArchive ) ) )
                 continue;
-            qry.exec( QString( "DELETE FROM %1s%2;" ).arg( period ).arg( mTypeMap.value( i ) ) );
+            qry.exec( QString::fromLatin1( "DELETE FROM %1s%2;" ).arg( period ).arg( mTypeMap.value( i ) ) );
         }
     }
     save( sd );
     ok = QSqlDatabase::database( mIfaceName ).commit();
-    qry.exec( "VACUUM;" );
+    qry.exec( QLatin1String("VACUUM;") );
 
     db.close();
     return ok;
@@ -411,8 +410,8 @@ bool SqlStorage::open()
 void SqlStorage::save( StorageData *sd, QHash<int, StatisticsModel*> *models, QList<StatsRule> *rules, bool fullSave )
 {
     QSqlQuery qry( db );
-    QString qryStr = "REPLACE INTO general (id, version, last_saved, calendar, next_hour_id )"
-                     " VALUES (?, ?, ?, ?, ? );";
+    QString qryStr = QLatin1String("REPLACE INTO general (id, version, last_saved, calendar, next_hour_id )") +
+                     QLatin1String(" VALUES (?, ?, ?, ?, ? );");
     qry.prepare( qryStr );
     qry.addBindValue( 1 );
     qry.addBindValue( current_db_version );
@@ -442,7 +441,7 @@ void SqlStorage::save( StorageData *sd, QHash<int, StatisticsModel*> *models, QL
                    )
                 {
                     int deleteFrom = sd->saveFromId.value( s->periodType() );
-                    qryStr = QString( "DELETE FROM %1s%2 WHERE id >= '%3';" )
+                    qryStr = QString::fromLatin1( "DELETE FROM %1s%2 WHERE id >= '%3';" )
                                 .arg( periods.at( s->periodType() ) )
                                 .arg( mTypeMap.value( trafficType ) )
                                 .arg( deleteFrom );
@@ -458,16 +457,16 @@ void SqlStorage::save( StorageData *sd, QHash<int, StatisticsModel*> *models, QL
                 QString dateTimeStr2;
                 if ( trafficType == KNemoStats::AllTraffic )
                 {
-                    dateTimeStr = " datetime,";
-                    dateTimeStr2 = " ?,";
+                    dateTimeStr = QLatin1String(" datetime,");
+                    dateTimeStr2 = QLatin1String(" ?,");
                     if ( s->periodType() == KNemoStats::BillPeriod )
                     {
-                        dateTimeStr += " days,";
-                        dateTimeStr2 += " ?,";
+                        dateTimeStr += QLatin1String(" days,");
+                        dateTimeStr2 += QLatin1String(" ?,");
                     }
                 }
-                qryStr = "REPLACE INTO %1s%2 (id,%3 rx, tx )"
-                             " VALUES (?,%4 ?, ? );";
+                qryStr = QLatin1String("REPLACE INTO %1s%2 (id,%3 rx, tx )") +
+                             QLatin1String(" VALUES (?,%4 ?, ? );");
                 qryStr = qryStr
                             .arg( periods.at( s->periodType() ) )
                             .arg( mTypeMap.value( trafficType ) )
@@ -506,15 +505,15 @@ void SqlStorage::save( StorageData *sd, QHash<int, StatisticsModel*> *models, QL
 
     if ( fullSave && rules )
     {
-        qryStr = QString( "DELETE FROM stats_rules WHERE id >= '%1';" ).arg( rules->count() );
+        qryStr = QString::fromLatin1( "DELETE FROM stats_rules WHERE id >= '%1';" ).arg( rules->count() );
         qry.exec( qryStr );
-        qryStr = QString( "DELETE FROM stats_rules_offpeak WHERE id >= '%1';" ).arg( rules->count() );
+        qryStr = QString::fromLatin1( "DELETE FROM stats_rules_offpeak WHERE id >= '%1';" ).arg( rules->count() );
         qry.exec( qryStr );
 
         if ( rules->count() )
         {
-            qryStr = "REPLACE INTO stats_rules (id, start_date, period_units, period_count )"
-                     " VALUES( ?, ?, ?, ? );";
+            qryStr = QLatin1String("REPLACE INTO stats_rules (id, start_date, period_units, period_count )") +
+                     QLatin1String(" VALUES( ?, ?, ?, ? );");
             qry.prepare( qryStr );
 
             for ( int i = 0; i < rules->count(); ++i )
@@ -526,10 +525,10 @@ void SqlStorage::save( StorageData *sd, QHash<int, StatisticsModel*> *models, QL
                 qry.exec();
             }
 
-            qryStr = "REPLACE INTO stats_rules_offpeak (id,"
-                     " offpeak_start_time, offpeak_end_time, weekend_is_offpeak,"
-                     " weekend_start_time, weekend_end_time, weekend_start_day, weekend_end_day )"
-                     " VALUES( ?, ?, ?, ?, ?, ?, ?, ? );";
+            qryStr = QLatin1String("REPLACE INTO stats_rules_offpeak (id,") +
+                     QLatin1String(" offpeak_start_time, offpeak_end_time, weekend_is_offpeak,") +
+                     QLatin1String(" weekend_start_time, weekend_end_time, weekend_start_day, weekend_end_day )") +
+                     QLatin1String(" VALUES( ?, ?, ?, ?, ?, ?, ?, ? );");
             qry.prepare( qryStr );
 
             for ( int i = 0; i < rules->count(); ++i )

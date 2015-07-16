@@ -47,13 +47,13 @@ KNemoDaemon::KNemoDaemon()
 {
     generalSettings = new GeneralSettings();
     backend = BackendFactory::backend();
-    QDBusConnection::sessionBus().registerObject("/knemo", this, QDBusConnection::ExportScriptableSlots);
+    QDBusConnection::sessionBus().registerObject(QLatin1String("/knemo"), this, QDBusConnection::ExportScriptableSlots);
     mPollTimer = new QTimer();
     connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );
 
     KActionCollection* ac = new KActionCollection( this );
     QAction* action = new QAction( i18n( "Toggle Traffic Plotters" ), this );
-    ac->addAction( "toggleTrafficPlotters", action );
+    ac->addAction( QLatin1String("toggleTrafficPlotters"), action );
     connect( action, SIGNAL( triggered() ), SLOT( togglePlotters() ) );
     KGlobalAccel::setGlobalShortcut( action, QKeySequence() );
 
@@ -165,7 +165,7 @@ void KNemoDaemon::readConfig()
     if ( statsActivated )
     {
         QStringList drivers = QSqlDatabase::drivers();
-        if ( !drivers.contains( "QSQLITE" ) )
+        if ( !drivers.contains( QLatin1String("QSQLITE") ) )
         {
             KMessageBox::sorry( 0, i18n( "The Qt4 SQLite database plugin is not available.\n"
                                          "Please install it to store traffic statistics." ) );

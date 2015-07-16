@@ -183,9 +183,9 @@ void StatisticsView::showSum( const QPoint &p )
     QString opStr = i18n( "Off-Peak:" );
     QString tStr = i18n( "Total:" );
     if ( mOffpeak )
-        sumString = "<table><tr><td>%1</td><td>%2</td></tr><tr><td>%3</td><td>%4</td></tr><tr><td><b>%5</b></td><td><b>%6</b></td></tr></table>";
+        sumString = QStringLiteral("<table><tr><td>%1</td><td>%2</td></tr><tr><td>%3</td><td>%4</td></tr><tr><td><b>%5</b></td><td><b>%6</b></td></tr></table>");
     else
-        sumString = "<table><tr><td>%1</td><td>%2</td></tr></table>";
+        sumString = QStringLiteral("<table><tr><td>%1</td><td>%2</td></tr></table>");
 
 
     if ( selectionModel()->selectedIndexes().count() > 0 && selectionModel()->isSelected( indexAt( p ) ) )

@@ -50,10 +50,10 @@ public:
      */
     virtual ~InterfaceIcon();
 
-signals:
+Q_SIGNALS:
     void statisticsSelected();
 
-public slots:
+public Q_SLOTS:
     /*
      * Creates or deletes the tray icon
      */
@@ -72,7 +72,7 @@ public slots:
 
     void configChanged();
 
-private slots:
+private Q_SLOTS:
     /*
      * Called when the user selects 'Configure KNemo' from the context menu
      */

@@ -53,10 +53,10 @@ public:
 
     void configChanged();
 
-signals:
+Q_SIGNALS:
     void clearStatistics();
 
-public slots:
+public Q_SLOTS:
     void confirmReset(QAbstractButton* button);
 
 protected:
@@ -74,7 +74,7 @@ private:
     Interface* mInterface;
     QHash<QTableView*, QString> mStateKeys;
 
-private slots:
+private Q_SLOTS:
     void setCurrentSel();
 };
 

@@ -97,7 +97,7 @@ realloc:
                 switch ( iwe.cmd )
                 {
                     case SIOCGIWAP:
-                        if ( data->accessPoint == iw_sawap_ntop( &iwe.u.ap_addr, reinterpret_cast<char *>(buffer) ) )
+                        if ( data->accessPoint == QLatin1String(iw_sawap_ntop( &iwe.u.ap_addr, reinterpret_cast<char *>(buffer) )) )
                             foundAP = true;
                         break;
                     case SIOCGIWENCODE:
@@ -133,9 +133,9 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
         if ( has_range )
         {
             if ( range.max_qual.qual > 0 )
-                data->linkQuality = QString( "%1%" ).arg( 100 * info.stats.qual.qual / range.max_qual.qual );
+                data->linkQuality = QString::fromLatin1( "%1%" ).arg( 100 * info.stats.qual.qual / range.max_qual.qual );
             else
-                data->linkQuality = "0";
+                data->linkQuality = QLatin1String("0");
         }
         else
             data->linkQuality = QString::number( info.stats.qual.qual );
@@ -156,7 +156,7 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
                 channel = iw_freq_to_channel( freq, &range );
             }
             iw_print_freq_value( buffer, sizeof( buffer ), freq );
-            data->frequency = buffer;
+            data->frequency = QLatin1String(buffer);
             data->channel = QString::number( channel );
         }
     }
@@ -170,11 +170,11 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
     {
         if ( wrq.u.data.flags > 0 )
         {
-            data->essid = essid;
+            data->essid = QLatin1String(essid);
         }
         else
         {
-            data->essid = "any";
+            data->essid = QLatin1String("any");
         }
     }
 
@@ -182,7 +182,7 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
     {
         char ap_addr[128];
         iw_ether_ntop( reinterpret_cast<const ether_addr *>(wrq.u.ap_addr.sa_data), ap_addr );
-        data->accessPoint = ap_addr;
+        data->accessPoint = QLatin1String(ap_addr);
     }
     else
         data->accessPoint.clear();
@@ -195,7 +195,7 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
     {
         if ( wrq.u.data.length > 1 )
         {
-            data->nickName = essid;
+            data->nickName = QLatin1String(essid);
         }
         else
         {
@@ -208,7 +208,7 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
         iwparam bitrate;
         memcpy (&(bitrate), &(wrq.u.bitrate), sizeof (iwparam));
         iw_print_bitrate( buffer, sizeof( buffer ), wrq.u.bitrate.value );
-        data->bitRate = buffer;
+        data->bitRate = QLatin1String(buffer);
     }
 
     if ( iw_get_ext( fd, ifName.toLatin1().constData(), SIOCGIWMODE, &wrq ) >= 0 )
@@ -216,7 +216,7 @@ void updateWirelessData( int fd, const QString& ifName, BackendData* data )
         int mode = wrq.u.mode;
         if ( mode < IW_NUM_OPER_MODE && mode >= 0 )
         {
-            data->mode = iw_operation_mode[mode];
+            data->mode = QLatin1String(iw_operation_mode[mode]);
         }
         else
         {

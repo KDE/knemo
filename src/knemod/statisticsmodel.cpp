@@ -122,13 +122,13 @@ void StatisticsModel::updateDateText( int row )
             dateStr = locale.toString( dt.time(), QLocale::ShortFormat );
             if ( dt.date() == QDate::currentDate() )
             {
-                dateStr += " " + i18n("Today");
+                dateStr += QLatin1Char(' ') + i18n("Today");
             } else {
-                dateStr += " " + i18n("Yesterday");
+                dateStr += QLatin1Char(' ') + i18n("Yesterday");
             }
             break;
         case KNemoStats::Month:
-            dateStr = QString( "%1 %2" )
+            dateStr = QString::fromUtf8( "%1 %2" )
                         .arg( mCalendar->monthName( dt.date(), KCalendarSystem::ShortName ) )
                         .arg( mCalendar->year( dt.date() ) );
             break;
@@ -140,14 +140,14 @@ void StatisticsModel::updateDateText( int row )
             // Starts on the first of the month, lasts exactly one month
             if ( mCalendar->day( dt.date() ) == 1 &&
                  dy == mCalendar->daysInMonth( dt.date() ) )
-                dateStr = QString( "%1 %2" )
+                dateStr = QString::fromUtf8( "%1 %2" )
                             .arg( mCalendar->monthName( dt.date(), KCalendarSystem::ShortName ) )
                             .arg( mCalendar->year( dt.date() ) );
             // Format for complex period
             else
             {
                 QDate endDate = dt.date().addDays( dy - 1 );
-                dateStr = QString( "%1 %2 - %4 %5 %6" )
+                dateStr = QString::fromUtf8( "%1 %2 - %4 %5 %6" )
                             .arg( mCalendar->day( dt.date() ) )
                             .arg( mCalendar->monthName( dt.date(), KCalendarSystem::ShortName ) )
                             .arg( mCalendar->day( endDate ) )

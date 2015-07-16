@@ -79,7 +79,7 @@ private:
      */
     void readConfig();
 
-private slots:
+private Q_SLOTS:
     /**
      * trigger the backend to update the interface informations
      */

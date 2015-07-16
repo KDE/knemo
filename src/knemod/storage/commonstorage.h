@@ -18,6 +18,6 @@
 */
 
 // This must match number and order of KNemoStats::PeriodUnits
-static const QStringList periods = (QStringList() << "hour" << "day" << "week" << "month" << "bill_period" << "year" << "hour_archive");
-static const char statistics_prefix[] = "statistics_";
+static const QStringList periods = (QStringList() << QLatin1String("hour") << QLatin1String("day") << QLatin1String("week") << QLatin1String("month") << QLatin1String("bill_period") << QLatin1String("year") << QLatin1String("hour_archive"));
+static const QLatin1String statistics_prefix("statistics_");
 

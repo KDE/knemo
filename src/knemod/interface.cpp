@@ -45,7 +45,7 @@ Interface::Interface( const QString &ifname,
       mIfaceName( ifname ),
       mRealSec( 0.0 ),
       mUptime( 0 ),
-      mUptimeString( "00:00:00" ),
+      mUptimeString( QStringLiteral("00:00:00") ),
       mRxRate( 0 ),
       mTxRate( 0 ),
       mIcon( this ),
@@ -107,7 +107,7 @@ void Interface::configChanged()
     int warnRuleCount = interfaceGroup.readEntry( conf_warnRules, 0 );
     for ( int i = 0; i < warnRuleCount; ++i )
     {
-        group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( mIfaceName ).arg( i );
+        group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_warnRule ).arg( mIfaceName ).arg( i );
         if ( config->hasGroup( group ) )
         {
             KConfigGroup warnGroup( config, group );
@@ -141,7 +141,7 @@ void Interface::configChanged()
     KCalendarSystem *testCal = KCalendarSystem::create( mSettings.calendarSystem );
     for ( int i = 0; i < statsRuleCount; ++i )
     {
-        group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( mIfaceName ).arg( i );
+        group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_statsRule ).arg( mIfaceName ).arg( i );
         if ( config->hasGroup( group ) )
         {
             KConfigGroup statsGroup( config, group );
@@ -171,11 +171,11 @@ void Interface::configChanged()
     {
         QString entry;
         InterfaceCommand cmd;
-        entry = QString( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
+        entry = QString::fromLatin1( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
         cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
-        entry = QString( "%1%2" ).arg( conf_command ).arg( i + 1 );
+        entry = QString::fromLatin1( "%1%2" ).arg( conf_command ).arg( i + 1 );
         cmd.command = interfaceGroup.readEntry( entry );
-        entry = QString( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
+        entry = QString::fromLatin1( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
         cmd.menuText = interfaceGroup.readEntry( entry );
         mSettings.commands.append( cmd );
     }
@@ -255,14 +255,14 @@ void Interface::processUpdate()
             else
                 connectedStr = i18n( "%1 is connected", title );
             if ( mPreviousIfaceState != KNemoIface::UnknownState )
-                KNotification::event( "connected", connectedStr );
+                KNotification::event( QLatin1String("connected"), connectedStr );
         }
     }
     else if ( mIfaceState & KNemoIface::Available )
     {
         if ( mPreviousIfaceState & KNemoIface::Connected )
         {
-            KNotification::event( "disconnected", i18n( "%1 has disconnected", title ) );
+            KNotification::event( QLatin1String("disconnected"), i18n( "%1 has disconnected", title ) );
             if ( mBackendData->interfaceType == KNemoIface::PPP )
                 backend->clearTraffic( mIfaceName );
             resetUptime();
@@ -270,13 +270,13 @@ void Interface::processUpdate()
         else if ( mPreviousIfaceState < KNemoIface::Available )
         {
             if ( mPreviousIfaceState != KNemoIface::UnknownState )
-                KNotification::event( "available", i18n( "%1 is available", title ) );
+                KNotification::event( QLatin1String("available"), i18n( "%1 is available", title ) );
         }
     }
     else if ( mIfaceState == KNemoIface::Unavailable &&
               mPreviousIfaceState > KNemoIface::Unavailable )
     {
-        KNotification::event( "unavailable", i18n( "%1 is unavailable", title ) );
+        KNotification::event( QLatin1String("unavailable"), i18n( "%1 is unavailable", title ) );
         backend->clearTraffic( mIfaceName );
         resetUptime();
     }
@@ -296,7 +296,7 @@ void Interface::resetUptime()
 {
     mUptime = 0;
     mRealSec = 0.0;
-    mUptimeString = "00:00:00";
+    mUptimeString = QStringLiteral("00:00:00");
     mRxRate = 0;
     mTxRate = 0;
     mRxRateStr = formattedRate( mRxRate, generalSettings->useBitrate );
@@ -391,10 +391,10 @@ void Interface::warnTraffic( QString warnText, quint64 threshold, quint64 curren
 {
     if ( !warnText.isEmpty() )
     {
-        warnText = warnText.replace( QRegExp("%i"), mIfaceName );
-        warnText = warnText.replace( QRegExp("%a"), mSettings.alias );
-        warnText = warnText.replace( QRegExp("%t"), KIO::convertSize( threshold ) );
-        warnText = warnText.replace( QRegExp("%c"), KIO::convertSize( threshold ) );
+        warnText = warnText.replace( QRegExp(QLatin1String("%i")), mIfaceName );
+        warnText = warnText.replace( QRegExp(QLatin1String("%a")), mSettings.alias );
+        warnText = warnText.replace( QRegExp(QLatin1String("%t")), KIO::convertSize( threshold ) );
+        warnText = warnText.replace( QRegExp(QLatin1String("%c")), KIO::convertSize( threshold ) );
     }
     else
     {
@@ -405,7 +405,7 @@ void Interface::warnTraffic( QString warnText, quint64 threshold, quint64 curren
                                 KIO::convertSize( threshold ),
                                 KIO::convertSize( current ) );
     }
-    KNotification::event( "exceededTraffic", warnText );
+    KNotification::event( QLatin1String("exceededTraffic"), warnText );
 }
 
 void Interface::toggleSignalPlotter( bool show )

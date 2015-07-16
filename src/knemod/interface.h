@@ -116,7 +116,7 @@ public:
      */
     void configChanged();
 
-public slots:
+public Q_SLOTS:
     /**
      * Called when the backend emits the updateComplete signal.
      * This looks for changes in interface data or state.
@@ -144,7 +144,7 @@ public slots:
      */
     void showStatisticsDialog();
 
-private slots:
+private Q_SLOTS:
     /**
      * Emit a notification when traffic exceeds a threshold
      */

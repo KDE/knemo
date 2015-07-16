@@ -205,7 +205,7 @@ void InterfaceStatusDialog::doConnected( const BackendData *data )
         ui.textLabelAccessPoint->setText( data->accessPoint );
         ui.textLabelNickName->setText( data->nickName );
         ui.textLabelMode->setText( data->mode );
-        ui.textLabelFreqChannel->setText( data->frequency + " [" + data->channel + "]" );
+        ui.textLabelFreqChannel->setText( data->frequency + QLatin1String(" [") + data->channel + QLatin1Char(']') );
         ui.textLabelBitRate->setText( data->bitRate );
         ui.textLabelLinkQuality->setText( data->linkQuality );
         if ( data->isEncrypted == true )

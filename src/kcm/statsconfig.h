@@ -36,7 +36,7 @@ private:
     const KCalendarSystem *mCal;
     bool mAddRule;
     void setControls( const StatsRule &s );
-private slots:
+private Q_SLOTS:
     void setDefaults( QAbstractButton* );
     void enableItems();
     void accept();

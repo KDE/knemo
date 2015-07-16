@@ -42,17 +42,17 @@ InterfaceTray::InterfaceTray( Interface* interface, const QString &id, QWidget* 
     KStatusNotifierItem( id, parent )
 {
     mInterface = interface;
-    setToolTipIconByName( "knemo" );
+    setToolTipIconByName( QLatin1String("knemo") );
     setCategory(Hardware);
     setStatus(Active);
     connect(this, SIGNAL(secondaryActivateRequested(QPoint)), this, SLOT(togglePlotter()));
     setupMappings();
     QAction *quitAction = new QAction(this);
     quitAction->setText(KStatusNotifierItem::tr("Quit"));
-    quitAction->setIcon(QIcon::fromTheme("application-exit"));
+    quitAction->setIcon(QIcon::fromTheme(QLatin1String("application-exit")));
     QObject::connect(quitAction, SIGNAL(triggered()), this, SLOT(slotQuit()));
     // Replace the standard quit action
-    addAction("quit", quitAction);
+    addAction(QLatin1String("quit"), quitAction);
 }
 
 InterfaceTray::~InterfaceTray()
@@ -77,7 +77,7 @@ void InterfaceTray::slotQuit()
 {
     int autoStart = KMessageBox::questionYesNoCancel(0, i18n("Should KNemo start automatically when you login?"),
                                                      i18n("Automatically Start KNemo?"), KGuiItem(i18n("Start")),
-                                                     KGuiItem(i18n("Do Not Start")), KStandardGuiItem::cancel(), "StartAutomatically");
+                                                     KGuiItem(i18n("Do Not Start")), KStandardGuiItem::cancel(), QLatin1String("StartAutomatically"));
 
     KSharedConfigPtr config = KSharedConfig::openConfig();
     KConfigGroup generalGroup( config, confg_general );
@@ -109,11 +109,11 @@ QString InterfaceTray::toolTipData()
     const BackendData * data = mInterface->backendData();
     if ( !data )
         return QString();
-    QString leftTags = "<tr><td style='padding-right:1em; white-space:nowrap;'>";
-    QString centerTags = "</td><td style='white-space:nowrap;'>";
-    QString rightTags = "</td></tr>";
+    QString leftTags = QStringLiteral("<tr><td style='padding-right:1em; white-space:nowrap;'>");
+    QString centerTags = QStringLiteral("</td><td style='white-space:nowrap;'>");
+    QString rightTags = QStringLiteral("</td></tr>");
 
-    tipData = "<table cellspacing='2'>";
+    tipData = QStringLiteral("<table cellspacing='2'>");
 
     if ( toolTipContent & INTERFACE )
         tipData += leftTags + i18n( "Interface" ) + centerTags + mInterface->ifaceName() + rightTags;
@@ -237,7 +237,7 @@ QString InterfaceTray::toolTipData()
             }
         }
     }
-    tipData += "</table>";
+    tipData += QLatin1String("</table>");
     return tipData;
 }
 

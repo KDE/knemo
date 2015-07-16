@@ -27,11 +27,11 @@
 #include <KCalendarSystem>
 
 // xml storage
-static const char doc_name[]        = "statistics";
-static const char attrib_calendar[] = "calendar";
-static const char attrib_updated[]  = "lastUpdated";
-static const char attrib_rx[]       = "rxBytes";
-static const char attrib_tx[]       = "txBytes";
+static const QLatin1String doc_name("statistics");
+static const QLatin1String attrib_calendar("calendar");
+static const QLatin1String attrib_updated("lastUpdated");
+static const QLatin1String attrib_rx("rxBytes");
+static const QLatin1String attrib_tx("txBytes");
 
 
 XmlStorage::XmlStorage()
@@ -41,7 +41,7 @@ XmlStorage::XmlStorage()
 void XmlStorage::loadGroup( StorageData *sd, const QDomElement& parentItem,
     StatisticsModel* statistics )
 {
-    QDomNode n = parentItem.namedItem( periods.at( statistics->periodType() ) + "s" );
+    QDomNode n = parentItem.namedItem( periods.at( statistics->periodType() ) + QLatin1Char('s') );
     if ( !n.isNull() )
     {
         QDomNode node = n.firstChild();
@@ -54,8 +54,8 @@ void XmlStorage::loadGroup( StorageData *sd, const QDomElement& parentItem,
                 QTime time;
 
                 int year = element.attribute( periods.at( KNemoStats::Year ) ).toInt();
-                int month = element.attribute( periods.at( KNemoStats::Month ), "1" ).toInt();
-                int day = element.attribute( periods.at( KNemoStats::Day ), "1" ).toInt();
+                int month = element.attribute( periods.at( KNemoStats::Month ), QLatin1String("1") ).toInt();
+                int day = element.attribute( periods.at( KNemoStats::Day ), QLatin1String("1") ).toInt();
                 sd->calendar->setDate( date, year, month, day );
 
                 if ( date.isValid() )

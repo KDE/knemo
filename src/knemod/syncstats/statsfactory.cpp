@@ -24,7 +24,7 @@
 ExternalStats * StatsFactory::stats( Interface * iface, KCalendarSystem * calendar )
 {
     ExternalStats * s = NULL;
-    if ( ! QStandardPaths::findExecutable("vnstat").isEmpty() )
+    if ( ! QStandardPaths::findExecutable(QLatin1String("vnstat")).isEmpty() )
     {
         s = new StatsVnstat( iface, calendar );
     }

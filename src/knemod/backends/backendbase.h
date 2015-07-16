@@ -58,7 +58,7 @@ public:
     void clearTraffic( const QString& iface );
     void updatePackets( const QString& iface );
 
-signals:
+Q_SIGNALS:
     /**
      * Emit this signal when you have completed the
      * update. It will trigger the interfaces to check

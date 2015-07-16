@@ -47,7 +47,7 @@ protected:
     bool event( QEvent *e );
     void resizeEvent( QResizeEvent* );
 
-private slots:
+private Q_SLOTS:
     void configFinished();
     void saveConfig();
     void setPlotterUnits();

@@ -66,7 +66,7 @@ class FancyPlotterLabel : public QLabel {
             if(fontMetrics().inFont(QChar(0x25CF)))
                 indicatorSymbol = QChar(0x25CF);
             else
-                indicatorSymbol = '#';
+                indicatorSymbol = QLatin1Char('#');
         }
         changeLabel(color);
 
@@ -113,14 +113,14 @@ class FancyPlotterLabel : public QLabel {
         color = _color;
 
         if ( qApp->layoutDirection() == Qt::RightToLeft )
-            longHeadingText = QString(": ") + labelName + " <font color=\"" + color.name() + "\">" + indicatorSymbol + "</font>";
+            longHeadingText = QLatin1String(": ") + labelName + QLatin1String(" <font color=\"") + color.name() + QLatin1String("\">") + indicatorSymbol + QLatin1String("</font>");
         else
-            longHeadingText = QString("<qt><font color=\"") + color.name() + "\">" + indicatorSymbol + "</font> " + labelName + " :";
-        shortHeadingText = QString("<qt><font color=\"") + color.name() + "\">" + indicatorSymbol + "</font>";
-        noHeadingText = QString("<qt><font color=\"") + color.name() + "\">";
+            longHeadingText = QLatin1String("<qt><font color=\"") + color.name() + QLatin1String("\">") + indicatorSymbol + QLatin1String("</font> ") + labelName + QLatin1String(" :");
+        shortHeadingText = QLatin1String("<qt><font color=\"") + color.name() + QLatin1String("\">") + indicatorSymbol + QLatin1String("</font>");
+        noHeadingText = QLatin1String("<qt><font color=\"") + color.name() + QLatin1String("\">");
 
-        textMargin = fontMetrics().width('x') + margin()*2 + frameWidth()*2;
-        longHeadingWidth = fontMetrics().boundingRect(labelName + " :" + indicatorSymbol + " x").width() + textMargin;
+        textMargin = fontMetrics().width(QLatin1Char('x')) + margin()*2 + frameWidth()*2;
+        longHeadingWidth = fontMetrics().boundingRect(labelName + QLatin1String(" :") + indicatorSymbol + QLatin1String(" x")).width() + textMargin;
         shortHeadingWidth = fontMetrics().boundingRect(indicatorSymbol).width() + textMargin;
         setMinimumWidth(shortHeadingWidth);
         update();
@@ -128,9 +128,9 @@ class FancyPlotterLabel : public QLabel {
   private:
     void setBothText(const QString &heading, const QString & value) {
         if(QApplication::layoutDirection() == Qt::LeftToRight)
-            setText(heading + ' ' + value);
+            setText(heading + QLatin1Char(' ') + value);
         else
-            setText("<qt>" + value + ' ' + heading);
+            setText(QLatin1String("<qt>") + value + QLatin1Char(' ') + heading);
     }
     int textMargin;
     QString longHeadingText;
@@ -166,7 +166,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     mByteUnits << ki18n( "%1 B/s" ) << ki18n( "%1 KiB/s" ) << ki18n( "%1 MiB/s" ) << ki18n( "%1 GiB/s" );
     mBitUnits << ki18n( "%1 bit/s" ) << ki18n( "%1 kbit/s" ) << ki18n( "%1 Mbit/s" ) << ki18n( "%1 Gbit/s" );
 
-    mIndicatorSymbol = '#';
+    mIndicatorSymbol = QLatin1Char('#');
     QFontMetrics fm(font());
     if (fm.inFont(QChar(0x25CF)))
         mIndicatorSymbol = QChar(0x25CF);

@@ -50,7 +50,7 @@ public:
      */
     virtual ~InterfaceStatusDialog();
 
-public slots:
+public Q_SLOTS:
     /**
      * Update the statistics tab when data changed
      */
