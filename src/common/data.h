@@ -30,7 +30,6 @@
 #include <QStandardPaths>
 #include <QString>
 
-#include <KGlobalSettings>
 #include <KLocale>
 #include <QUrl>
 

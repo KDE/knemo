@@ -30,7 +30,7 @@
 #include <KConfigGroup>
 #include <KHelpMenu>
 #include <QIcon>
-#include <KLocale>
+#include <KLocalizedString>
 #include <QMenu>
 #include <KAboutData>
 #include <KProcess>

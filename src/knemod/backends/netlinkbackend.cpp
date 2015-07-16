@@ -23,7 +23,7 @@
 #include <netlink/route/link.h>
 #include <netlink/route/route.h>
 
-#include <KLocale>
+#include <KLocalizedString>
 #include <kio/global.h>
 
 #include "config-knemo.h"

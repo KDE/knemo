@@ -26,7 +26,7 @@
 #include <KActionCollection>
 #include <KConfigGroup>
 #include <KGlobalAccel>
-#include <KLocale>
+#include <KLocalizedString>
 #include <KMessageBox>
 
 #include "global.h"

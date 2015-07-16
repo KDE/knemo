@@ -31,7 +31,7 @@
 #include <QAction>
 #include <QApplication>
 #include <KConfigGroup>
-#include <KLocale>
+#include <KLocalizedString>
 #include <KMessageBox>
 #include <KStandardAction>
 

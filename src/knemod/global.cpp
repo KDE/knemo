@@ -20,7 +20,7 @@
 #include <QString>
 #include <KGlobal>
 #include <QDebug>
-#include <KLocale>
+#include <KLocalizedString>
 #include <kio/global.h>
 #include "global.h"
 
@@ -41,7 +41,8 @@ QString formattedRate( quint64 data, bool useBits )
     int precision = 0;
     if ( units )
         precision = 1;
-    QString formattedNum = KGlobal::locale()->formatNumber( bits, precision );
+    QLocale locale;
+    QString formattedNum = locale.toString( bits, 'g', precision );
     switch (units)
     {
         case 0:

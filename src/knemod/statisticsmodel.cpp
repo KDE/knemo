@@ -20,7 +20,7 @@
 #include "statisticsmodel.h"
 #include "global.h"
 #include <QStringList>
-#include <KLocale>
+#include <KLocalizedString>
 #include <kio/global.h>
 #include <QLocale>
 
