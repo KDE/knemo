@@ -28,11 +28,12 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <net/if.h>
+#include <QDir>
 #include <QFontMetrics>
+#include <QStandardPaths>
+#include <KConfigGroup>
 #include <KGlobalSettings>
 #include <KSharedConfig>
-#include <KSharedConfigPtr>
-#include <KStandardDirs>
 #include "data.h"
 #include "utils.h"
 
@@ -244,9 +245,14 @@ QString getDefaultRoute( int afType, QString *defaultGateway, void *data )
 
 QList<KNemoTheme> findThemes()
 {
-    KStandardDirs themes;
-    themes.addResourceType("knemo_themes", "data", "knemo/themes");
-    QStringList themelist = themes.findAllResources( "knemo_themes", "*.desktop" );
+    const QStringList dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, "knemo/themes", QStandardPaths::LocateDirectory);
+    QStringList themelist;
+    Q_FOREACH (const QString& dir, dirs) {
+        const QStringList fileNames = QDir(dir).entryList(QStringList() << "*.desktop");
+        Q_FOREACH (const QString& file, fileNames) {
+            themelist.append(dir + '/' + file);
+        }
+    }
 
     QList<KNemoTheme> iconThemes;
     foreach ( QString themeFile, themelist )

@@ -31,7 +31,6 @@
 #include <KMessageBox>
 #include <KPluginFactory>
 #include <KNotifyConfigWidget>
-#include <KStandardDirs>
 #include <math.h>
 
 #include "ui_configdlg.h"

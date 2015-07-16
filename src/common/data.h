@@ -32,7 +32,6 @@
 
 #include <KGlobalSettings>
 #include <KLocale>
-#include <KStandardDirs>
 #include <QUrl>
 
 class KCalendarSystem;

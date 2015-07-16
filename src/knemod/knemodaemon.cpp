@@ -28,7 +28,6 @@
 #include <KGlobalAccel>
 #include <KLocale>
 #include <KMessageBox>
-#include <KStandardDirs>
 
 #include "global.h"
 #include "knemodaemon.h"

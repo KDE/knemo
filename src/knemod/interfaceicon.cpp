@@ -34,7 +34,6 @@
 #include <QMenu>
 #include <KAboutData>
 #include <KProcess>
-#include <KStandardDirs>
 
 #include "global.h"
 #include "utils.h"
@@ -574,7 +573,7 @@ void InterfaceIcon::menuTriggered( QAction *action )
     InterfaceCommand command = action->data().value<InterfaceCommand>();
     KProcess *process = new KProcess( this );
     if ( command.runAsRoot )
-        *process << KStandardDirs::findExe("kdesu") << command.command;
+        *process << QStandardPaths::findExecutable("kdesu") << command.command;
     else
         process->setShellCommand( command.command );
 
