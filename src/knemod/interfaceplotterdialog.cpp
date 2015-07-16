@@ -319,7 +319,8 @@ void InterfacePlotterDialog::configPlotter()
 
 void InterfacePlotterDialog::configFinished()
 {
-    mConfigDlg->delayedDestruct();
+    // FIXME
+    // mConfigDlg->delayedDestruct();
     mConfigDlg = 0;
 }
 

@@ -22,7 +22,7 @@
          </widget>
         </item>
         <item>
-         <widget class="KIntSpinBox" name="spinBoxTrafficThreshold">
+         <widget class="QSpinBox" name="spinBoxTrafficThreshold">
           <property name="whatsThis">
            <string>If you are on a network with a lot of low-level traffic, you can increase this value so the tray icon does not constantly report activity.</string>
           </property>
@@ -87,7 +87,7 @@
          </widget>
         </item>
         <item>
-         <widget class="KIntSpinBox" name="rxMaxRate">
+         <widget class="QSpinBox" name="rxMaxRate">
           <property name="whatsThis">
            <string>&lt;p&gt;The maximum incoming rate for this connection.&lt;/p&gt;&lt;p&gt;This does &lt;b&gt;not&lt;/b&gt; affect the actual traffic rate, only how KNemo displays it.&lt;/p&gt;</string>
           </property>
@@ -134,7 +134,7 @@
          </widget>
         </item>
         <item>
-         <widget class="KIntSpinBox" name="txMaxRate">
+         <widget class="QSpinBox" name="txMaxRate">
           <property name="whatsThis">
            <string>&lt;p&gt;The maximum outgoing rate for this connection.&lt;/p&gt;&lt;p&gt;This does &lt;b&gt;not&lt;/b&gt; affect the actual traffic rate, only how KNemo displays it.&lt;/p&gt;</string>
           </property>
@@ -187,6 +187,13 @@
      </property>
     </spacer>
    </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -194,11 +201,6 @@
    <class>KColorButton</class>
    <extends>QPushButton</extends>
    <header>kcolorbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KIntSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>knuminput.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

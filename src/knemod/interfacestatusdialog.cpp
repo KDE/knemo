@@ -22,7 +22,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <QAbstractItemView>
-#include <KGlobalSettings>
+#include <KConfigGroup>
 
 #ifdef __linux__
   #include <netlink/netlink.h>
@@ -35,16 +35,15 @@
 #include "statisticsmodel.h"
 
 InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* parent )
-    : KDialog( parent ),
+    : QDialog( parent ),
       mWasShown( false ),
       mSetPos( true ),
       mConfig( KSharedConfig::openConfig() ),
       mInterface( interface )
 {
-    setCaption( i18nc( "interface name", "%1 Interface Status", interface->ifaceName() ) );
-    setButtons( None );
+    setWindowTitle( i18nc( "interface name", "%1 Interface Status", interface->ifaceName() ) );
 
-    ui.setupUi( mainWidget() );
+    ui.setupUi( this );
     configChanged();
 
     // FreeBSD doesn't have these
@@ -120,7 +119,7 @@ bool InterfaceStatusDialog::event( QEvent *e )
         updateDialog();
     }
 
-    return KDialog::event( e );
+    return QDialog::event( e );
 }
 
 void InterfaceStatusDialog::updateDialog()

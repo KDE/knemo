@@ -19,11 +19,10 @@
 
 #include "themeconfig.h"
 
-ThemeConfig::ThemeConfig( const InterfaceSettings s ) : KDialog(),
+ThemeConfig::ThemeConfig( const InterfaceSettings s ) : QDialog(),
     mSettings( s )
 {
-    mDlg.setupUi( mainWidget() );
-    setButtons( KDialog::Default | KDialog::Ok | KDialog::Cancel );
+    mDlg.setupUi( this );
 
     if ( mSettings.iconTheme != NETLOAD_THEME )
         mDlg.checkBarScale->hide();
@@ -45,24 +44,28 @@ ThemeConfig::ThemeConfig( const InterfaceSettings s ) : KDialog(),
     mDlg.colorOutgoingMax->setColor( mSettings.colorOutgoingMax );
     updateRateGroup();
 
-    connect( this, SIGNAL( defaultClicked() ), SLOT( setDefaults() ) );
+    connect( mDlg.buttonBox, SIGNAL( accepted() ), SLOT( accept() ) );
+    connect( mDlg.buttonBox, SIGNAL( rejected() ), SLOT( reject() ) );
+    connect( mDlg.buttonBox, SIGNAL( clicked( QAbstractButton* ) ), SLOT( setDefaults( QAbstractButton* ) ) );
     connect( mDlg.checkBarScale, SIGNAL( toggled( bool ) ), SLOT( updateRateGroup() ) );
     connect( mDlg.checkDynColor, SIGNAL( toggled( bool ) ), SLOT( updateRateGroup() ) );
 }
 
-void ThemeConfig::setDefaults()
+void ThemeConfig::setDefaults( QAbstractButton* button )
 {
-    InterfaceSettings s;
+    if (static_cast<QPushButton*>(button) == mDlg.buttonBox->button(QDialogButtonBox::RestoreDefaults) ) {
+        InterfaceSettings s;
 
-    mDlg.spinBoxTrafficThreshold->setValue( s.trafficThreshold );
+        mDlg.spinBoxTrafficThreshold->setValue( s.trafficThreshold );
 
-    mDlg.txMaxRate->setValue( s.outMaxRate );
-    mDlg.rxMaxRate->setValue( s.inMaxRate );
+        mDlg.txMaxRate->setValue( s.outMaxRate );
+        mDlg.rxMaxRate->setValue( s.inMaxRate );
 
-    mDlg.checkBarScale->setChecked( s.barScale );
-    mDlg.checkDynColor->setChecked( s.dynamicColor );
-    mDlg.colorIncomingMax->setColor( s.colorIncomingMax );
-    mDlg.colorOutgoingMax->setColor( s.colorOutgoingMax );
+        mDlg.checkBarScale->setChecked( s.barScale );
+        mDlg.checkDynColor->setChecked( s.dynamicColor );
+        mDlg.colorIncomingMax->setColor( s.colorIncomingMax );
+        mDlg.colorOutgoingMax->setColor( s.colorOutgoingMax );
+    }
 }
 
 void ThemeConfig::updateRateGroup()

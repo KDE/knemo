@@ -21,7 +21,7 @@
 #ifndef PLOTTERCONFIGDIALOG_H
 #define PLOTTERCONFIGDIALOG_H
 
-#include <KDialog>
+#include <QDialog>
 #include <QColor>
 #include "ui_plotterconfigdlg.h"
 
@@ -60,7 +60,7 @@ struct PlotterSettings
     QColor colorOutgoing;
 };
 
-class PlotterConfigDialog : public KDialog
+class PlotterConfigDialog : public QDialog
 {
     Q_OBJECT
     public:
@@ -70,7 +70,7 @@ class PlotterConfigDialog : public KDialog
         void saved();
     private slots:
         void changed();
-        void defaults();
+        void defaults(QAbstractButton*);
         void save();
     private:
         void load();

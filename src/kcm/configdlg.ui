@@ -3,7 +3,16 @@
  <class>ConfigDlg</class>
  <widget class="QWidget" name="ConfigDlg">
   <layout class="QVBoxLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -308,7 +317,7 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                  <widget class="KColorButton" name="colorUnavailable"/>
                 </item>
                 <item>
-                 <widget class="KFontComboBox" name="iconFont"/>
+                 <widget class="QFontComboBox" name="iconFont"/>
                 </item>
                </layout>
               </item>
@@ -918,12 +927,15 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="KIntNumInput" name="numInputSaveInterval">
+           <widget class="QSpinBox" name="numInputSaveInterval">
             <property name="whatsThis">
              <string>Save interface statistics every &lt;i&gt;n&lt;/i&gt; seconds. If 0, KNemo will only save statistics when it closes.</string>
             </property>
-            <property name="value">
-             <number>60</number>
+            <property name="specialValueText">
+             <string>At shutdown</string>
+            </property>
+            <property name="suffix">
+             <string> sec</string>
             </property>
             <property name="minimum">
              <number>0</number>
@@ -931,11 +943,8 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
             <property name="maximum">
              <number>300</number>
             </property>
-            <property name="suffix">
-             <string> sec</string>
-            </property>
-            <property name="specialValueText">
-             <string>At shutdown</string>
+            <property name="value">
+             <number>60</number>
             </property>
            </widget>
           </item>
@@ -999,29 +1008,15 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
  </widget>
  <customwidgets>
   <customwidget>
-   <class>KFontComboBox</class>
-   <extends>KComboBox</extends>
-   <header>kfontcombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>KColorButton</class>
    <extends>QPushButton</extends>
    <header>kcolorbutton.h</header>
   </customwidget>
   <customwidget>
-   <class>KComboBox</class>
-   <extends>QComboBox</extends>
-   <header>kcombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>KUrlRequester</class>
    <extends>QFrame</extends>
    <header>kurlrequester.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KIntNumInput</class>
-   <extends>QWidget</extends>
-   <header>knuminput.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -1065,19 +1060,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
   <tabstop>numInputSaveInterval</tabstop>
   <tabstop>lineEditStatisticsDir</tabstop>
  </tabstops>
- <includes>
-  <include location="local">knuminput.h</include>
-  <include location="local">knuminput.h</include>
-  <include location="local">knuminput.h</include>
-  <include location="local">knuminput.h</include>
-  <include location="local">knuminput.h</include>
-  <include location="local">knuminput.h</include>
-  <include location="local">knuminput.h</include>
-  <include location="local">knuminput.h</include>
-  <include location="local">knuminput.h</include>
-  <include location="local">knuminput.h</include>
-  <include location="local">knuminput.h</include>
- </includes>
  <resources/>
  <connections>
   <connection>

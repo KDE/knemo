@@ -3,7 +3,16 @@
  <class>Form</class>
  <widget class="QWidget" name="Form">
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -46,7 +55,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="KDoubleNumInput" name="spinBoxMinValue">
+           <widget class="QDoubleSpinBox" name="spinBoxMinValue">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -55,9 +64,6 @@
             </property>
             <property name="singleStep">
              <double>10.000000000000000</double>
-            </property>
-            <property name="maxValue" stdset="0">
-             <number>49999</number>
             </property>
            </widget>
           </item>
@@ -78,21 +84,18 @@
            </widget>
           </item>
           <item row="1" column="3">
-           <widget class="KDoubleNumInput" name="spinBoxMaxValue">
+           <widget class="QDoubleSpinBox" name="spinBoxMaxValue">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="minimum">
+             <double>1.000000000000000</double>
             </property>
             <property name="maximum">
              <double>50000.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>10.000000000000000</double>
-            </property>
-            <property name="maxValue" stdset="0">
-             <number>50000</number>
-            </property>
-            <property name="minValue" stdset="0">
-             <number>1</number>
             </property>
            </widget>
           </item>
@@ -116,7 +119,7 @@
            </widget>
           </item>
           <item>
-           <widget class="KIntSpinBox" name="spinBoxPixel">
+           <widget class="QSpinBox" name="spinBoxPixel">
             <property name="minimum">
              <number>1</number>
             </property>
@@ -125,12 +128,6 @@
             </property>
             <property name="value">
              <number>6</number>
-            </property>
-            <property name="maxValue" stdset="0">
-             <number>50</number>
-            </property>
-            <property name="minValue" stdset="0">
-             <number>1</number>
             </property>
            </widget>
           </item>
@@ -215,7 +212,7 @@
              </widget>
             </item>
             <item>
-             <widget class="KIntSpinBox" name="spinBoxDistance">
+             <widget class="QSpinBox" name="spinBoxDistance">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -227,12 +224,6 @@
               </property>
               <property name="value">
                <number>30</number>
-              </property>
-              <property name="maxValue" stdset="0">
-               <number>120</number>
-              </property>
-              <property name="minValue" stdset="0">
-               <number>10</number>
               </property>
              </widget>
             </item>
@@ -287,21 +278,9 @@
              </widget>
             </item>
             <item>
-             <widget class="KIntSpinBox" name="spinBoxFontSize">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+             <widget class="QSpinBox" name="spinBoxFontSize">
               <property name="value">
                <number>8</number>
-              </property>
-              <property name="maxValue" stdset="0">
-               <number>0</number>
-              </property>
-              <property name="minValue" stdset="0">
-               <number>0</number>
               </property>
              </widget>
             </item>
@@ -389,23 +368,20 @@
      </widget>
     </widget>
    </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>KDoubleNumInput</class>
-   <extends>QWidget</extends>
-   <header>knuminput.h</header>
-  </customwidget>
-  <customwidget>
    <class>KColorButton</class>
    <extends>QPushButton</extends>
    <header>kcolorbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KIntSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>knuminput.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -434,12 +410,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>168</x>
-     <y>98</y>
+     <x>207</x>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
-     <x>235</x>
-     <y>132</y>
+     <x>197</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>
@@ -450,12 +426,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>299</x>
-     <y>98</y>
+     <x>289</x>
+     <y>80</y>
     </hint>
     <hint type="destinationlabel">
-     <x>457</x>
-     <y>132</y>
+     <x>441</x>
+     <y>107</y>
     </hint>
    </hints>
   </connection>
@@ -466,12 +442,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>59</x>
-     <y>102</y>
+     <x>109</x>
+     <y>67</y>
     </hint>
     <hint type="destinationlabel">
-     <x>456</x>
-     <y>106</y>
+     <x>109</x>
+     <y>67</y>
     </hint>
    </hints>
   </connection>
@@ -482,12 +458,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>59</x>
-     <y>102</y>
+     <x>103</x>
+     <y>67</y>
     </hint>
     <hint type="destinationlabel">
-     <x>94</x>
-     <y>118</y>
+     <x>109</x>
+     <y>67</y>
     </hint>
    </hints>
   </connection>
@@ -498,12 +474,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>132</x>
-     <y>98</y>
+     <x>111</x>
+     <y>78</y>
     </hint>
     <hint type="destinationlabel">
-     <x>130</x>
-     <y>132</y>
+     <x>94</x>
+     <y>106</y>
     </hint>
    </hints>
   </connection>
@@ -514,12 +490,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>303</x>
-     <y>98</y>
+     <x>316</x>
+     <y>93</y>
     </hint>
     <hint type="destinationlabel">
-     <x>354</x>
-     <y>132</y>
+     <x>343</x>
+     <y>123</y>
     </hint>
    </hints>
   </connection>
@@ -530,12 +506,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>59</x>
-     <y>102</y>
+     <x>103</x>
+     <y>67</y>
     </hint>
     <hint type="destinationlabel">
-     <x>387</x>
-     <y>106</y>
+     <x>109</x>
+     <y>67</y>
     </hint>
    </hints>
   </connection>
@@ -550,8 +526,8 @@
      <y>62</y>
     </hint>
     <hint type="destinationlabel">
-     <x>340</x>
-     <y>63</y>
+     <x>109</x>
+     <y>67</y>
     </hint>
    </hints>
   </connection>
@@ -562,12 +538,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>64</x>
-     <y>92</y>
+     <x>66</x>
+     <y>74</y>
     </hint>
     <hint type="destinationlabel">
-     <x>340</x>
-     <y>93</y>
+     <x>109</x>
+     <y>74</y>
     </hint>
    </hints>
   </connection>

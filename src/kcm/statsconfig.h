@@ -20,11 +20,11 @@
 #ifndef STATSCONFIG_H
 #define STATSCONFIG_H
 
-#include <KDialog>
+#include <QDialog>
 #include "data.h"
 #include "ui_statscfg.h"
 
-class StatsConfig : public KDialog
+class StatsConfig : public QDialog
 {
 Q_OBJECT
 public:
@@ -37,10 +37,9 @@ private:
     bool mAddRule;
     void setControls( const StatsRule &s );
 private slots:
-    void setDefaults();
+    void setDefaults( QAbstractButton* );
     void enableItems();
-protected:
-    virtual void slotButtonClicked( int button );
+    void accept();
 };
 
 #endif

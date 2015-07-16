@@ -25,6 +25,7 @@
 
 #include <KCalendarSystem>
 #include <KColorScheme>
+#include <KConfigGroup>
 #include <QInputDialog>
 #include <kio/global.h>
 #include <KMessageBox>

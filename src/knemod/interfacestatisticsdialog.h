@@ -21,7 +21,7 @@
 #ifndef INTERFACESTATISTICSDIALOG_H
 #define INTERFACESTATISTICSDIALOG_H
 
-#include <KDialog>
+#include <QDialog>
 #include "ui_interfacestatisticsdlg.h"
 
 class StatisticsModel;
@@ -36,7 +36,7 @@ class Interface;
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
-class InterfaceStatisticsDialog : public KDialog
+class InterfaceStatisticsDialog : public QDialog
 {
     Q_OBJECT
 public:
@@ -57,7 +57,7 @@ signals:
     void clearStatistics();
 
 public slots:
-    void confirmReset();
+    void confirmReset(QAbstractButton* button);
 
 protected:
     bool event( QEvent *e );
@@ -70,7 +70,7 @@ private:
     bool mSetPos;
     QWidget *mBillingWidget;
     StatisticsView *mBillingView;
-    KSharedConfigPtr mConfig;
+    KSharedConfig::Ptr mConfig;
     Interface* mInterface;
     QHash<QTableView*, QString> mStateKeys;
 
