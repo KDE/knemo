@@ -42,24 +42,25 @@ extern "C" int main(int argc, char *argv[] )
                           i18n( description ),
                           KAboutLicense::GPL_V2,
                           QString(),
-                          i18n( "Copyright (C) 2004, 2005, 2006 Percy Leonhardt\nCopyright (C) 2009, 2010 John Stamp\n\nSignal plotter taken from KSysGuard\nCopyright (C) 2006 - 2009 John Tapsell" ),
+                          i18n( "Copyright (C) 2004, 2005, 2006 Percy Leonhardt\nCopyright (C) 2009, 2010, 2015 John Stamp\n\nDate picker taken from Akonadi Contact\nCopyright (C) 2004 Bram Schoenmakers\nCopyright (C) 2009 Tobias Koenig" ),
                           QLatin1String("http://extragear.kde.org/apps/knemo/"));
 
+    aboutData.addAuthor( i18n( "John Stamp" ), i18n( "Current maintainer" ),
+                    QLatin1String("jstamp@mehercule.net") );
     aboutData.addAuthor( i18n( "Percy Leonhardt" ), i18n( "Original Author" ),
                     QLatin1String("percy@eris23.de") );
-    aboutData.addAuthor( i18n( "John Stamp" ), i18n( "Current maintainer" ),
-                    QLatin1String("jstamp@users.sourceforge.net") );
-    aboutData.addCredit( i18n( "Michael Olbrich") ), i18n( "Threshold support" ),
-                    QLatin1String("michael.olbrich@gmx.net" );
-    aboutData.addCredit( i18n( "Chris Schlaeger" ), i18n( "Signal plotter" ),
-                    QLatin1String("cs@kde.org") );
-    aboutData.addCredit( i18n( "John Tapsell" ), i18n( "Signal plotter" ),
-                    QLatin1String("tapsell@kde.org") );
+    aboutData.addCredit( i18n( "Michael Olbrich" ), i18n( "Threshold support" ),
+                    QLatin1String("michael.olbrich@gmx.net") );
+    aboutData.addCredit( i18n( "Bram Schoenmakers" ), i18n( "Date picker" ),
+                    QLatin1String("bramschoenmakers@kde.nl") );
+    aboutData.addCredit( i18n( "Tobias Koenig" ), i18n( "Date picker" ),
+                    QLatin1String("tokoe@kde.org") );
     QApplication app(argc, argv);
 
     QCoreApplication::setApplicationName(i18n("KNemo"));
     QCoreApplication::setOrganizationDomain(QLatin1String("kde.org"));
 
+    KAboutData::setApplicationData(aboutData);
     auto disableSessionManagement = [] (QSessionManager &sm) {
         sm.setRestartHint(QSessionManager::RestartNever);
     };
@@ -69,7 +70,9 @@ extern "C" int main(int argc, char *argv[] )
     QCommandLineParser parser;
     parser.addVersionOption();
     parser.addHelpOption();
+    aboutData.setupCommandLine(&parser);
     parser.process(app);
+    aboutData.processCommandLine(&parser);
 
     KDBusService service(KDBusService::Unique);
 
