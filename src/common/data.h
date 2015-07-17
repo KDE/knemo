@@ -31,7 +31,7 @@
 #include <QString>
 
 #include <KLocale>
-#include <QUrl>
+#include <QDir>
 
 class KCalendarSystem;
 
@@ -191,7 +191,6 @@ static const QLatin1String conf_toolTipContent("ToolTipContent");
 // general
 static const QLatin1String conf_pollInterval("PollInterval");
 static const QLatin1String conf_saveInterval("SaveInterval");
-static const QLatin1String conf_statisticsDir("StatisticsDir");
 static const QLatin1String conf_useBitrate("UseBitrate");
 static const QLatin1String conf_plotterPos("PlotterPos");
 static const QLatin1String conf_plotterSize("PlotterSize");
@@ -326,7 +325,7 @@ struct GeneralSettings
     double pollInterval;
     int saveInterval;
     bool useBitrate;
-    QUrl statisticsDir;
+    QDir statisticsDir;
 };
 
 class StatsRule

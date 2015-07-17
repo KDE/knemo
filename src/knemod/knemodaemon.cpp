@@ -88,7 +88,7 @@ void KNemoDaemon::readConfig()
     generalSettings->pollInterval = validatePoll( generalSettings->pollInterval );
     generalSettings->useBitrate = generalGroup.readEntry( conf_useBitrate, g.useBitrate );
     generalSettings->saveInterval = clamp<int>(generalGroup.readEntry( conf_saveInterval, g.saveInterval ), 0, 300 );
-    generalSettings->statisticsDir = generalGroup.readEntry( conf_statisticsDir, g.statisticsDir );
+    generalSettings->statisticsDir = g.statisticsDir;
     generalSettings->toolTipContent = generalGroup.readEntry( conf_toolTipContent, g.toolTipContent );
     // If we already have an Interfaces key--even if its empty--then we
     // shouldn't try to set up a default interface

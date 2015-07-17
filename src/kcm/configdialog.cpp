@@ -400,7 +400,6 @@ void ConfigDialog::load()
         mDlg->comboBoxPoll->setCurrentIndex( index );
     mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( conf_saveInterval, g.saveInterval ), 0, 300 ) );
     mDlg->useBitrate->setChecked( generalGroup.readEntry( conf_useBitrate, g.useBitrate ) );
-    mDlg->lineEditStatisticsDir->setUrl( generalGroup.readEntry( conf_statisticsDir, g.statisticsDir ) );
     mToolTipContent = generalGroup.readEntry( conf_toolTipContent, g.toolTipContent );
 
     QStringList list = generalGroup.readEntry( conf_interfaces, QStringList() );
@@ -712,7 +711,6 @@ void ConfigDialog::save()
     generalGroup.writeEntry( conf_pollInterval, mDlg->comboBoxPoll->itemData( mDlg->comboBoxPoll->currentIndex() ).value<double>() );
     generalGroup.writeEntry( conf_saveInterval, mDlg->numInputSaveInterval->value() );
     generalGroup.writeEntry( conf_useBitrate, mDlg->useBitrate->isChecked() );
-    generalGroup.writeEntry( conf_statisticsDir,  mDlg->lineEditStatisticsDir->url().url() );
     generalGroup.writeEntry( conf_toolTipContent, mToolTipContent );
     generalGroup.writeEntry( conf_interfaces, list );
 
@@ -787,7 +785,6 @@ void ConfigDialog::defaults()
         mDlg->comboBoxPoll->setCurrentIndex( index );
     mDlg->numInputSaveInterval->setValue( g.saveInterval );
     mDlg->useBitrate->setChecked( g.useBitrate );
-    mDlg->lineEditStatisticsDir->setUrl( g.statisticsDir );
 
     // Default tool tips
     mToolTipContent = g.toolTipContent;

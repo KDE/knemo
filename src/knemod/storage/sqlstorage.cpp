@@ -38,8 +38,10 @@ SqlStorage::SqlStorage( QString ifaceName )
     : mValidDbVer( true )
     , mIfaceName( ifaceName )
 {
-    QUrl dir( generalSettings->statisticsDir );
-    mDbPath = QString::fromLatin1( "%1%2%3.db" ).arg( dir.path() ).arg( statistics_prefix ).arg( mIfaceName );
+    if ( !generalSettings->statisticsDir.exists() )
+        QDir().mkpath( generalSettings->statisticsDir.absolutePath() );
+
+    mDbPath = generalSettings->statisticsDir.absoluteFilePath( statistics_prefix + mIfaceName + QLatin1String(".db") );
     QStringList drivers = QSqlDatabase::drivers();
     if ( drivers.contains( QLatin1String("QSQLITE") ) )
         db = QSqlDatabase::addDatabase( QLatin1String("QSQLITE"), mIfaceName );

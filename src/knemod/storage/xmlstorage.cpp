@@ -86,9 +86,8 @@ void XmlStorage::loadGroup( StorageData *sd, const QDomElement& parentItem,
 
 bool XmlStorage::loadStats( QString name, StorageData *sd, QHash<int, StatisticsModel*> *models )
 {
-    QUrl dir( generalSettings->statisticsDir );
     QDomDocument doc( doc_name );
-    QFile file( dir.path() + statistics_prefix + name );
+    QFile file( generalSettings->statisticsDir.absoluteFilePath( statistics_prefix + name ) );
 
     if ( !file.open( QIODevice::ReadOnly ) )
         return false;
