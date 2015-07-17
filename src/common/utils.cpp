@@ -29,6 +29,7 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <QDir>
+#include <QUrl>
 #include <QFontMetrics>
 #include <QStandardPaths>
 #include <KConfigGroup>
@@ -335,7 +336,10 @@ void migrateKde4Conf()
         // look in knemorc; find configured stats path (or KDE4 default); migrate stats.
         KConfigGroup generalGroup( KSharedConfig::openConfig(), confg_general );
         Kdelibs4Migration dataMigrator;
-        const QString sourceBasePath = generalGroup.readEntry( QLatin1String("StatisticsDir"), dataMigrator.saveLocation("data", QLatin1String("knemo")) );
+        QString sourceBasePath = generalGroup.readEntry( QLatin1String("StatisticsDir"), dataMigrator.saveLocation("data", QLatin1String("knemo")) );
+        QUrl testUrl(sourceBasePath);
+        if ( testUrl.isLocalFile() )
+            sourceBasePath = testUrl.toLocalFile();
         const QString targetBasePath = GeneralSettings().statisticsDir.absolutePath() + QLatin1Char('/');
 
         QDir sourceDir(sourceBasePath);
