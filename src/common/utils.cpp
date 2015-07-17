@@ -32,6 +32,8 @@
 #include <QFontMetrics>
 #include <QStandardPaths>
 #include <KConfigGroup>
+#include <Kdelibs4ConfigMigrator>
+#include <Kdelibs4Migration>
 #include <KSharedConfig>
 #include "data.h"
 #include "utils.h"
@@ -319,4 +321,31 @@ double validatePoll( double val )
         }
     }
     return GeneralSettings().pollInterval;
+}
+
+void migrateKde4Conf()
+{
+    // Kdelibs4Migration
+    QStringList configFiles;
+    configFiles << QLatin1String("knemorc") << QLatin1String("knemo.notifyrc");
+    Kdelibs4ConfigMigrator migrator(QLatin1String("knemo")); // the same name defined in the aboutData
+    migrator.setConfigFiles(configFiles);
+
+    if (migrator.migrate()) {
+        // look in knemorc; find configured stats path (or KDE4 default); migrate stats.
+        KConfigGroup generalGroup( KSharedConfig::openConfig(), confg_general );
+        Kdelibs4Migration dataMigrator;
+        const QString sourceBasePath = generalGroup.readEntry( QLatin1String("StatisticsDir"), dataMigrator.saveLocation("data", "knemo") );
+        const QString targetBasePath = GeneralSettings().statisticsDir.absolutePath() + QLatin1Char('/');
+
+        QDir sourceDir(sourceBasePath);
+        if(sourceDir.exists()) {
+            QStringList fileNames = sourceDir.entryList(QDir::Files);
+            if (QDir().mkpath(targetBasePath)) {
+                foreach (const QString &fileName, fileNames) {
+                    QFile::copy(sourceBasePath + fileName, targetBasePath + fileName);
+                }
+            }
+        }
+    }
 }

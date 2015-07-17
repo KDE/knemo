@@ -52,4 +52,6 @@ QFont setIconFont( const QString& text, const QFont& font, int iconWidth );
 
 double validatePoll( double val );
 
+void migrateKde4Conf();
+
 #endif

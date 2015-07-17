@@ -45,6 +45,8 @@ KNemoDaemon::KNemoDaemon()
       mConfig( KSharedConfig::openConfig() ),
       mHaveInterfaces( false )
 {
+    migrateKde4Conf();
+
     generalSettings = new GeneralSettings();
     backend = BackendFactory::backend();
     QDBusConnection::sessionBus().registerObject(QLatin1String("/knemo"), this, QDBusConnection::ExportScriptableSlots);

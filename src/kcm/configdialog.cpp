@@ -222,6 +222,8 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
       mDlg( new Ui::ConfigDlg() ),
       mCalendar( 0 )
 {
+    migrateKde4Conf();
+
     mConfig = KSharedConfig::openConfig( QLatin1String("knemorc") );
 
     setupToolTipMap();
