@@ -420,7 +420,7 @@ void Interface::activateOrHide( QWidget* widget, bool onlyActivate )
     if ( !widget )
 	return;
 
-    KWindowInfo info1 = KWindowSystem::windowInfo( widget->winId(), NET::XAWMState | NET::WMState );
+    KWindowInfo info1 = KWindowInfo( widget->winId(), NET::XAWMState | NET::WMState );
     // mapped = visible (but possibly obscured)
     bool mapped = (info1.mappingState() == NET::Visible) && !info1.isMinimized();
 //    - not mapped -> show, raise, focus
@@ -442,7 +442,7 @@ void Interface::activateOrHide( QWidget* widget, bool onlyActivate )
             WId id = it.previous();
             if( id == widget->winId() )
                 break;
-            KWindowInfo info2 = KWindowSystem::windowInfo( id,
+            KWindowInfo info2 = KWindowInfo( id,
                 NET::WMGeometry | NET::XAWMState | NET::WMState | NET::WMWindowType );
             if( info2.mappingState() != NET::Visible )
                 continue; // not visible on current desktop -> ignore
