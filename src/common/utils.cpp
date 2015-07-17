@@ -335,7 +335,7 @@ void migrateKde4Conf()
         // look in knemorc; find configured stats path (or KDE4 default); migrate stats.
         KConfigGroup generalGroup( KSharedConfig::openConfig(), confg_general );
         Kdelibs4Migration dataMigrator;
-        const QString sourceBasePath = generalGroup.readEntry( QLatin1String("StatisticsDir"), dataMigrator.saveLocation("data", "knemo") );
+        const QString sourceBasePath = generalGroup.readEntry( QLatin1String("StatisticsDir"), dataMigrator.saveLocation("data", QLatin1String("knemo")) );
         const QString targetBasePath = GeneralSettings().statisticsDir.absolutePath() + QLatin1Char('/');
 
         QDir sourceDir(sourceBasePath);
