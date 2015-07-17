@@ -18,7 +18,7 @@ ki18n_wrap_ui( kcm_knemo_SRCS
     warncfg.ui
 )
 
-add_library( kcm_knemo ${kcm_knemo_SRCS} )
+add_library( kcm_knemo MODULE ${kcm_knemo_SRCS} )
 
 target_link_libraries( kcm_knemo
     Qt5::DBus
