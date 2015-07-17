@@ -224,8 +224,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
 {
     migrateKde4Conf();
 
-    mConfig = KSharedConfig::openConfig( QLatin1String("knemorc") );
-
     setupToolTipMap();
 
     QWidget *main = new QWidget( this );
@@ -389,7 +387,7 @@ void ConfigDialog::load()
 {
     mSettingsMap.clear();
     mDlg->listBoxInterfaces->clear();
-    KConfig *config = mConfig.data();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig( QLatin1String("knemorc") );
 
     KConfigGroup generalGroup( config, confg_general );
     bool startKNemo = generalGroup.readEntry( conf_autoStart, true );
@@ -543,7 +541,7 @@ void ConfigDialog::load()
 
 void ConfigDialog::save()
 {
-    KConfig *config = mConfig.data();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig( QLatin1String("knemorc") );
 
     QStringList list;
 
@@ -799,7 +797,7 @@ void ConfigDialog::checkBoxStartKNemoToggled( bool on )
 {
     if ( on )
     {
-        KConfig *config = mConfig.data();
+        KSharedConfig::Ptr config = KSharedConfig::openConfig( QLatin1String("knemorc") );
         KConfigGroup generalGroup( config, confg_general );
         if ( generalGroup.readEntry( conf_firstStart, true ) )
         {

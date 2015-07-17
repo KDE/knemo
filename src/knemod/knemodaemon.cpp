@@ -28,6 +28,7 @@
 #include <KGlobalAccel>
 #include <KLocalizedString>
 #include <KMessageBox>
+#include <KSharedConfig>
 
 #include "global.h"
 #include "knemodaemon.h"
@@ -42,7 +43,6 @@ GeneralSettings *generalSettings = NULL;
 
 KNemoDaemon::KNemoDaemon()
     : QObject(),
-      mConfig( KSharedConfig::openConfig() ),
       mHaveInterfaces( false )
 {
     migrateKde4Conf();
@@ -78,8 +78,8 @@ KNemoDaemon::~KNemoDaemon()
 void KNemoDaemon::readConfig()
 {
     mPollTimer->stop();
-    KConfig *config = mConfig.data();
 
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     // For when reparseConfiguration() is called
     config->reparseConfiguration();
 

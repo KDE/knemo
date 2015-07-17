@@ -22,7 +22,6 @@
 #define INTERFACESTATUSDIALOG_H
 
 #include <QDialog>
-#include <KSharedConfig>
 
 #include "ui_interfacestatusdlg.h"
 
@@ -75,7 +74,6 @@ private:
     bool mWasShown;
     bool mSetPos;
 
-    KSharedConfig::Ptr mConfig;
     Interface* mInterface;
 };
 

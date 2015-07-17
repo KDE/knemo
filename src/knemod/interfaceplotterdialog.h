@@ -22,7 +22,6 @@
 #define INTERFACEPLOTTERDIALOG_H
 
 #include <QDialog>
-#include <KSharedConfig>
 
 #include "plotterconfigdialog.h"
 
@@ -59,7 +58,6 @@ private:
     void configPlotter();
     void addBeams();
 
-    KSharedConfig::Ptr mConfig;
     PlotterConfigDialog *mConfigDlg;
     QWidget *mLabelsWidget;
     bool mSetPos;

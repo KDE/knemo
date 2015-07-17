@@ -21,8 +21,6 @@
 #include "plotterconfigdialog.h"
 #include "global.h"
 
-#include <KConfig>
-
 PlotterConfigDialog::PlotterConfigDialog( QWidget * parent, const QString& iface, PlotterSettings* settings ) : QDialog( parent ),
       mName( iface ),
       mSettings( settings )

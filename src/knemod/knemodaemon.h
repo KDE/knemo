@@ -23,7 +23,6 @@
 
 #include <QHash>
 #include <QApplication>
-#include <KSharedConfig>
 
 class QTimer;
 class Interface;
@@ -88,7 +87,6 @@ private Q_SLOTS:
     void togglePlotters();
 
 private:
-    KSharedConfig::Ptr mConfig;
     bool mHaveInterfaces;
 
     // every time this timer expires we will

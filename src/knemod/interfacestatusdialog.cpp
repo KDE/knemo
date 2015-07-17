@@ -23,6 +23,7 @@
 #include <netdb.h>
 #include <QAbstractItemView>
 #include <KConfigGroup>
+#include <KSharedConfig>
 
 #ifdef __linux__
   #include <netlink/netlink.h>
@@ -38,7 +39,6 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     : QDialog( parent ),
       mWasShown( false ),
       mSetPos( true ),
-      mConfig( KSharedConfig::openConfig() ),
       mInterface( interface )
 {
     setWindowTitle( i18nc( "interface name", "%1 Interface Status", interface->ifaceName() ) );
@@ -68,7 +68,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     }
 
     // Restore window size and position.
-    KConfig *config = mConfig.data();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
     if ( interfaceGroup.hasKey( conf_statusPos ) )
     {
@@ -92,7 +92,7 @@ InterfaceStatusDialog::~InterfaceStatusDialog()
 {
     if ( mWasShown )
     {
-        KConfig *config = mConfig.data();
+        KSharedConfig::Ptr config = KSharedConfig::openConfig();
         KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
         interfaceGroup.writeEntry( conf_statusPos, pos() );
         interfaceGroup.writeEntry( conf_statusSize, size() );

@@ -25,6 +25,7 @@
 #include <QMouseEvent>
 #include <QApplication>
 #include <KConfigGroup>
+#include <KSharedConfig>
 
 #include "global.h"
 #include "interfaceplotterdialog.h"
@@ -149,7 +150,6 @@ QChar FancyPlotterLabel::indicatorSymbol;
 
 InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     : QDialog(),
-      mConfig( KSharedConfig::openConfig() ),
       mConfigDlg( 0 ),
       mLabelsWidget( NULL ),
       mSetPos( true ),
@@ -201,7 +201,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     mLabelLayout->addWidget( mReceivedLabel );
 
     // Restore window size and position.
-    KConfig *config = mConfig.data();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     KConfigGroup interfaceGroup( config, confg_interface + mName );
     if ( interfaceGroup.hasKey( conf_plotterPos ) )
     {
@@ -236,7 +236,7 @@ InterfacePlotterDialog::~InterfacePlotterDialog()
     {
         // If the dialog was never shown, then the position
         // will be wrong
-        KConfig *config = mConfig.data();
+        KSharedConfig::Ptr config = KSharedConfig::openConfig();
         KConfigGroup interfaceGroup( config, confg_interface + mName );
         interfaceGroup.writeEntry( conf_plotterSize, size() );
         interfaceGroup.writeEntry( conf_plotterPos, pos() );

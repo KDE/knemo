@@ -38,7 +38,6 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
     : QDialog( parent ),
       mWasShown( false ),
       mSetPos( true ),
-      mConfig( KSharedConfig::openConfig() ),
       mInterface( interface )
 {
     setWindowTitle( i18n( "%1 Statistics", interface->ifaceName() ) );
@@ -63,7 +62,7 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
 
     configChanged();
 
-    KConfig *config = mConfig.data();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
 
     InterfaceStatistics *stat = mInterface->ifaceStatistics();
@@ -101,7 +100,7 @@ InterfaceStatisticsDialog::~InterfaceStatisticsDialog()
 {
     if ( mWasShown )
     {
-        KConfig *config = mConfig.data();
+        KSharedConfig::Ptr config = KSharedConfig::openConfig();
         KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
 
         interfaceGroup.writeEntry( conf_statisticsPos, pos() );
