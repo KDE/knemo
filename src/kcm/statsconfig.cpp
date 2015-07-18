@@ -20,7 +20,6 @@
 #include "statsconfig.h"
 #include <QPushButton>
 #include <KCalendarSystem>
-#include <KGlobal>
 #include <KMessageBox>
 
 StatsConfig::StatsConfig( const InterfaceSettings * settings, const KCalendarSystem *calendar, const StatsRule &rule, bool addRule ) : QDialog(),
@@ -29,7 +28,7 @@ StatsConfig::StatsConfig( const InterfaceSettings * settings, const KCalendarSys
     mAddRule( addRule )
 {
     // Do this for the sake of KDateEdit
-    KGlobal::locale()->setCalendarSystem( mCal->calendarSystem() );
+    KLocale::global()->setCalendarSystem( mCal->calendarSystem() );
 
     mDlg.setupUi( this );
 
