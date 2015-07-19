@@ -23,6 +23,8 @@
 #include <netlink/route/link.h>
 #include <netlink/route/route.h>
 
+#include <net/if.h>
+
 #include <KLocalizedString>
 #include <kio/global.h>
 
