@@ -23,7 +23,9 @@
 #include <netlink/route/link.h>
 #include <netlink/route/route.h>
 
+#if LIBNL_CURRENT >= 221
 #include <net/if.h>
+#endif
 
 #include <KLocalizedString>
 #include <kio/global.h>
