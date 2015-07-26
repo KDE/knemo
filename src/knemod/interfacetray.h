@@ -50,6 +50,7 @@ private:
     QMap<int, QString> mScope;
 
     QString toolTipData();
+    QString formatTip( const QString& field, const QString& data, bool insertBreak );
     void setupMappings();
 
 private Q_SLOTS:

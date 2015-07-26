@@ -34,7 +34,6 @@
 #include <KLocalizedString>
 #include <KMessageBox>
 #include <KSharedConfig>
-#include <KStandardAction>
 
 #include <QToolTip>
 #include <QHelpEvent>
@@ -103,40 +102,46 @@ void InterfaceTray::togglePlotter()
      mInterface->showSignalPlotter( false );
 }
 
+QString InterfaceTray::formatTip( const QString& field, const QString& data, bool insertBreak )
+{
+    QString ltip;
+    if (insertBreak)
+        ltip = QLatin1String("<br>");
+    return ltip += i18nc( "field: value", "<b>%1:</b> %2", field, data );
+}
+
 QString InterfaceTray::toolTipData()
 {
     QString tipData;
+    QString tipVal;
     int toolTipContent = generalSettings->toolTipContent;
     const BackendData * data = mInterface->backendData();
     if ( !data )
         return QString();
-    QString leftTags = QStringLiteral("<tr><td style='padding-right:1em; white-space:nowrap;'>");
-    QString centerTags = QStringLiteral("</td><td style='white-space:nowrap;'>");
-    QString rightTags = QStringLiteral("</td></tr>");
 
-    tipData = QStringLiteral("<table cellspacing='2'>");
+    tipData = QLatin1String("");
+    tipVal = QLatin1String("");
 
     if ( toolTipContent & INTERFACE )
-        tipData += leftTags + i18n( "Interface" ) + centerTags + mInterface->ifaceName() + rightTags;
+        tipData = formatTip( i18n( "Interface" ), mInterface->ifaceName(), !tipData.isEmpty() );
 
     if ( toolTipContent & STATUS )
     {
-        tipData += leftTags + i18n( "Status" ) + centerTags;
         if ( data->status & KNemoIface::Connected )
-            tipData += i18n( "Connected" );
+            tipVal = i18n( "Connected" );
         else if ( data->status & KNemoIface::Up )
-            tipData += i18n( "Disconnected" );
+            tipVal = i18n( "Disconnected" );
         else if ( data->status & KNemoIface::Available )
-            tipData += i18n( "Down" );
+            tipVal += i18n( "Down" );
         else
-            tipData += i18n( "Unavailable" );
-        tipData += rightTags;
+            tipVal += i18n( "Unavailable" );
+        tipData += formatTip( i18n( "Status" ), tipVal, !tipData.isEmpty() );
     }
 
     if ( data->status & KNemoIface::Connected &&
          toolTipContent & UPTIME )
     {
-            tipData += leftTags + i18n( "Connection time" ) + centerTags + mInterface->uptimeString() + rightTags ;
+            tipData += formatTip( i18n( "Connection time"), mInterface->uptimeString(), !tipData.isEmpty() );
     }
 
     if ( data->status & KNemoIface::Up )
@@ -144,8 +149,6 @@ QString InterfaceTray::toolTipData()
         QStringList keys = data->addrData.keys();
         QString ip4Tip;
         QString ip6Tip;
-        QString ptpaddress = i18n( "PtP Address" );
-        QString scope = i18n( "Scope & Flags" );
         foreach ( QString key, keys )
         {
             AddrData addrData = data->addrData.value( key );
@@ -153,22 +156,22 @@ QString InterfaceTray::toolTipData()
             if ( addrData.afType == AF_INET )
             {
                 if ( toolTipContent & IP_ADDRESS )
-                    ip4Tip += leftTags + i18n( "IPv4 Address" ) + centerTags + key + rightTags;
+                    ip4Tip += formatTip( i18n( "IPv4 Address"), key, !tipData.isEmpty() );
                 if ( toolTipContent & SCOPE )
-                    ip4Tip += leftTags + scope + centerTags + mScope.value( addrData.scope ) + addrData.ipv6Flags + rightTags;
+                    ip4Tip += formatTip( i18n( "Scope & Flags"), mScope.value( addrData.scope ) + addrData.ipv6Flags, !tipData.isEmpty() );
                 if ( toolTipContent & BCAST_ADDRESS && !addrData.hasPeer )
-                    ip4Tip += leftTags + i18n( "Broadcast Address" ) + centerTags + addrData.broadcastAddress + rightTags;
+                    ip4Tip += formatTip( i18n( "Broadcast Address"), addrData.broadcastAddress, !tipData.isEmpty() );
                 else if ( toolTipContent & PTP_ADDRESS && addrData.hasPeer )
-                    ip4Tip += leftTags + ptpaddress + centerTags + addrData.broadcastAddress + rightTags;
+                    ip4Tip += formatTip( i18n( "PtP Address"), addrData.broadcastAddress, !tipData.isEmpty() );
             }
             else
             {
                 if ( toolTipContent & IP_ADDRESS )
-                    ip6Tip += leftTags + i18n( "IPv6 Address" ) + centerTags + key + rightTags;
+                    ip6Tip += formatTip( i18n( "IPv6 Address"), key, !tipData.isEmpty() );
                 if ( toolTipContent & SCOPE )
-                    ip6Tip += leftTags + scope + centerTags + mScope.value( addrData.scope ) + rightTags;
+                    ip4Tip += formatTip( i18n( "Scope & Flags"), mScope.value( addrData.scope ), !tipData.isEmpty() );
                 if ( toolTipContent & PTP_ADDRESS && addrData.hasPeer )
-                    ip6Tip += leftTags + ptpaddress + centerTags + addrData.broadcastAddress + rightTags;
+                    ip4Tip += formatTip( i18n( "PtP Address"), addrData.broadcastAddress, !tipData.isEmpty() );
             }
         }
         tipData += ip4Tip + ip6Tip;
@@ -178,9 +181,9 @@ QString InterfaceTray::toolTipData()
             if ( toolTipContent & GATEWAY )
             {
                 if ( !data->ip4DefaultGateway.isEmpty() )
-                    tipData += leftTags + i18n( "IPv4 Default Gateway" ) + centerTags + data->ip4DefaultGateway + rightTags;
+                    tipData += formatTip( i18n( "IPv4 Default Gateway"), data->ip4DefaultGateway, !tipData.isEmpty() );
                 if ( !data->ip6DefaultGateway.isEmpty() )
-                    tipData += leftTags + i18n( "IPv6 Default Gateway" ) + centerTags + data->ip6DefaultGateway + rightTags;
+                    tipData += formatTip( i18n( "IPv6 Default Gateway"), data->ip6DefaultGateway, !tipData.isEmpty() );
             }
         }
     }
@@ -188,57 +191,56 @@ QString InterfaceTray::toolTipData()
     if ( data->status & KNemoIface::Available )
     {
         if ( toolTipContent & HW_ADDRESS )
-            tipData += leftTags + i18n( "MAC Address" ) + centerTags + data->hwAddress + rightTags;
+            tipData += formatTip( i18n( "MAC Address"), data->hwAddress, !tipData.isEmpty() );
         if ( toolTipContent & RX_PACKETS )
-            tipData += leftTags + i18n( "Packets Received" ) + centerTags + QString::number( data->rxPackets ) + rightTags;
+            tipData += formatTip( i18n( "Packets Received"), QString::number( data->rxPackets ), !tipData.isEmpty() );
         if ( toolTipContent & TX_PACKETS )
-            tipData += leftTags + i18n( "Packets Sent" ) + centerTags + QString::number( data->txPackets ) + rightTags;
+            tipData += formatTip( i18n( "Packets Sent"), QString::number( data->txPackets ), !tipData.isEmpty() );
         if ( toolTipContent & RX_BYTES )
-            tipData += leftTags + i18n( "Bytes Received" ) + centerTags + data->rxString + rightTags;
+            tipData += formatTip( i18n( "Bytes Received"), data->rxString, !tipData.isEmpty() );
         if ( toolTipContent & TX_BYTES )
-            tipData += leftTags + i18n( "Bytes Sent" ) + centerTags + data->txString + rightTags;
+            tipData += formatTip( i18n( "Bytes Sent"), data->txString, !tipData.isEmpty() );
     }
 
     if ( data->status & KNemoIface::Connected )
     {
         if ( toolTipContent & DOWNLOAD_SPEED )
-            tipData += leftTags + i18n( "Download Speed" ) + centerTags + mInterface->rxRateStr() + rightTags;
+            tipData += formatTip( i18n( "Download Speed"), mInterface->rxRateStr(), !tipData.isEmpty() );
         if ( toolTipContent & UPLOAD_SPEED )
-            tipData += leftTags + i18n( "Upload Speed" ) + centerTags + mInterface->txRateStr() + rightTags;
+            tipData += formatTip( i18n( "Upload Speed"), mInterface->txRateStr(), !tipData.isEmpty() );
     }
 
     if ( data->status & KNemoIface::Connected && data->isWireless )
     {
         if ( toolTipContent & ESSID )
-            tipData += leftTags + i18n( "ESSID" ) + centerTags + data->essid + rightTags;
+            tipData += formatTip( i18n( "ESSID"), data->essid, !tipData.isEmpty() );
         if ( toolTipContent & MODE )
-            tipData += leftTags + i18n( "Mode" ) + centerTags + data->mode + rightTags;
+            tipData += formatTip( i18n( "Mode"), data->mode, !tipData.isEmpty() );
         if ( toolTipContent & FREQUENCY )
-            tipData += leftTags + i18n( "Frequency" ) + centerTags + data->frequency + rightTags;
+            tipData += formatTip( i18n( "Frequency"), data->frequency, !tipData.isEmpty() );
         if ( toolTipContent & BIT_RATE )
-            tipData += leftTags + i18n( "Bit Rate" ) + centerTags + data->bitRate + rightTags;
+            tipData += formatTip( i18n( "Bit Rate"), data->bitRate, !tipData.isEmpty() );
         if ( toolTipContent & ACCESS_POINT )
-            tipData += leftTags + i18n( "Access Point" ) + centerTags + data->accessPoint + rightTags;
+            tipData += formatTip( i18n( "Access Point"), data->accessPoint, !tipData.isEmpty() );
         if ( toolTipContent & LINK_QUALITY )
-            tipData += leftTags + i18n( "Link Quality" ) + centerTags + data->linkQuality + rightTags;
+            tipData += formatTip( i18n( "Link Quality"), data->linkQuality, !tipData.isEmpty() );
 #ifdef __linux__
         if ( toolTipContent & NICK_NAME )
-            tipData += leftTags + i18n( "Nickname" ) + centerTags + data->nickName + rightTags;
+            tipData += formatTip( i18n( "Nickname"), data->nickName, !tipData.isEmpty() );
 #endif
         if ( toolTipContent & ENCRYPTION )
         {
-            QString encryption = i18n( "Encryption" );
             if ( data->isEncrypted == true )
             {
-                tipData += leftTags + encryption + centerTags + i18n( "active" ) + rightTags;
+                tipVal = i18n( "active" );
             }
             else
             {
-                tipData += leftTags + encryption + centerTags + i18n( "off" ) + rightTags;
+                tipVal = i18n( "off" );
             }
+            tipData += formatTip( i18n( "Encryption"), tipVal, !tipData.isEmpty() );
         }
     }
-    tipData += QLatin1String("</table>");
     return tipData;
 }
 
