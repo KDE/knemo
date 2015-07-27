@@ -285,16 +285,10 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     mDlg->pushButtonNew->setIcon( QIcon::fromTheme( QLatin1String("list-add") ) );
     mDlg->pushButtonAll->setIcon( QIcon::fromTheme( QLatin1String("document-new") ) );
     mDlg->pushButtonDelete->setIcon( QIcon::fromTheme( QLatin1String("list-remove") ) );
-    mDlg->pushButtonAddCommand->setIcon( QIcon::fromTheme( QLatin1String("list-add") ) );
-    mDlg->pushButtonRemoveCommand->setIcon( QIcon::fromTheme( QLatin1String("list-remove") ) );
-    mDlg->pushButtonUp->setIcon( QIcon::fromTheme( QLatin1String("arrow-up") ) );
-    mDlg->pushButtonDown->setIcon( QIcon::fromTheme( QLatin1String("arrow-down") ) );
     mDlg->pushButtonAddToolTip->setIcon( QIcon::fromTheme( QLatin1String("arrow-right") ) );
     mDlg->pushButtonRemoveToolTip->setIcon( QIcon::fromTheme( QLatin1String("arrow-left") ) );
 
     mDlg->themeColorBox->setEnabled( false );
-
-    //mDlg->listViewCommands->setSorting( -1 );
 
     setButtons( KCModule::Default | KCModule::Apply );
 
@@ -346,20 +340,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( modifyWarnClicked() ) );
     connect( mDlg->removeWarn, SIGNAL( clicked() ),
              this, SLOT( removeWarnClicked() ) );
-
-    // Interface - Context Menu
-    connect( mDlg->listViewCommands, SIGNAL( currentItemChanged( QTreeWidgetItem*, QTreeWidgetItem* ) ),
-             this, SLOT( listViewCommandsSelectionChanged( QTreeWidgetItem*, QTreeWidgetItem* ) ) );
-    connect( mDlg->listViewCommands, SIGNAL( itemChanged( QTreeWidgetItem*, int ) ),
-             this, SLOT( listViewCommandsChanged( QTreeWidgetItem*, int ) ) );
-    connect( mDlg->pushButtonAddCommand, SIGNAL( clicked() ),
-             this, SLOT( buttonAddCommandSelected() ) );
-    connect( mDlg->pushButtonRemoveCommand, SIGNAL( clicked() ),
-             this, SLOT( buttonRemoveCommandSelected() ) );
-    connect( mDlg->pushButtonUp, SIGNAL( clicked() ),
-             this, SLOT( buttonCommandUpSelected() ) );
-    connect( mDlg->pushButtonDown, SIGNAL( clicked() ),
-             this, SLOT( buttonCommandDownSelected() ) );
 
     // ToolTip
     connect( mDlg->pushButtonAddToolTip, SIGNAL( clicked() ),
@@ -477,20 +457,6 @@ void ConfigDialog::load()
 
                     settings->warnRules << warn;
                 }
-            }
-
-            int numCommands = interfaceGroup.readEntry( conf_numCommands, s.numCommands );
-            for ( int i = 0; i < numCommands; i++ )
-            {
-                QString entry;
-                InterfaceCommand cmd;
-                entry = QString::fromLatin1( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
-                cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
-                entry = QString::fromLatin1( "%1%2" ).arg( conf_command ).arg( i + 1 );
-                cmd.command = interfaceGroup.readEntry( entry );
-                entry = QString::fromLatin1( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
-                cmd.menuText = interfaceGroup.readEntry( entry );
-                settings->commands.append( cmd );
             }
         }
         mSettingsMap.insert( interface, settings );
@@ -690,18 +656,6 @@ void ConfigDialog::save()
             warnGroup.writeEntry( conf_warnTrafficUnits, settings->warnRules[i].trafficUnits );
             warnGroup.writeEntry( conf_warnThreshold, settings->warnRules[i].threshold );
             warnGroup.writeEntry( conf_warnCustomText, settings->warnRules[i].customText.trimmed() );
-        }
-
-        interfaceGroup.writeEntry( conf_numCommands, settings->commands.size() );
-        for ( int i = 0; i < settings->commands.size(); i++ )
-        {
-            QString entry;
-            entry = QString::fromLatin1( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
-            interfaceGroup.writeEntry( entry, settings->commands[i].runAsRoot );
-            entry = QString::fromLatin1( "%1%2" ).arg( conf_command ).arg( i + 1 );
-            interfaceGroup.writeEntry( entry, settings->commands[i].command );
-            entry = QString::fromLatin1( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
-            interfaceGroup.writeEntry( entry, settings->commands[i].menuText );
         }
     }
 
@@ -928,32 +882,6 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
         mDlg->warnView->setCurrentIndex( warnModel->indexFromItem ( warnModel->item( 0, 0 ) ) );
     }
 
-    mDlg->listViewCommands->clear();
-    QList<QTreeWidgetItem *>items;
-    foreach ( InterfaceCommand command, settings->commands )
-    {
-        QTreeWidgetItem* item = new QTreeWidgetItem();
-        enum Qt::CheckState checkState = Qt::Unchecked;
-        if ( command.runAsRoot )
-            checkState = Qt::Checked;
-        item->setCheckState( 0, checkState );
-        item->setFlags( item->flags() | Qt::ItemIsEditable );
-        item->setText( 1, command.menuText );
-        item->setText( 2, command.command );
-        items << item;
-    }
-    if ( items.count() > 0 )
-    {
-        mDlg->listViewCommands->addTopLevelItems( items );
-        mDlg->listViewCommands->setCurrentItem( items[0] );
-        mDlg->pushButtonRemoveCommand->setEnabled( true );
-        setUpDownButtons( items[0] );
-    }
-    else
-    {
-        mDlg->pushButtonRemoveCommand->setEnabled( false );
-        setUpDownButtons( NULL );
-    }
     mLock = false;
 }
 
@@ -1493,184 +1421,6 @@ void ConfigDialog::checkBoxStatisticsToggled( bool on )
         return;
 
     settings->activateStatistics = on;
-    if (!mLock) changed( true );
-}
-
-
-
-/******************************************
- *                                        *
- * Interface tab - Context Menu           *
- *                                        *
- ******************************************/
-
-void ConfigDialog::buttonAddCommandSelected()
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    InterfaceCommand cmd;
-    cmd.runAsRoot = false;
-    cmd.menuText = QString();
-    cmd.command = QString();
-    settings->commands.append( cmd );
-
-    QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setCheckState( 0, Qt::Unchecked );
-    item->setFlags( item->flags() | Qt::ItemIsEditable );
-    mDlg->listViewCommands->addTopLevelItem( item );
-    mDlg->listViewCommands->setCurrentItem( item );
-
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::buttonRemoveCommandSelected()
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    if ( !mDlg->listViewCommands->currentItem() )
-        return;
-
-    QTreeWidgetItem *item = mDlg->listViewCommands->currentItem();
-    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
-    mDlg->listViewCommands->takeTopLevelItem( index );
-    delete item;
-
-    QList<InterfaceCommand> cmds;
-    QTreeWidgetItemIterator i( mDlg->listViewCommands );
-    while ( QTreeWidgetItem * item = *i )
-    {
-        InterfaceCommand cmd;
-        cmd.runAsRoot = item->checkState( 0 );
-        cmd.menuText = item->text( 1 );
-        cmd.command = item->text( 2 );
-        cmds.append( cmd );
-        ++i;
-    }
-
-    settings->commands = cmds;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::setUpDownButtons( QTreeWidgetItem* item )
-{
-    if ( !item )
-    {
-        mDlg->pushButtonUp->setEnabled( false );
-        mDlg->pushButtonDown->setEnabled( false );
-        return;
-    }
-
-    if (mDlg->listViewCommands->indexOfTopLevelItem( item ) == 0 )
-        mDlg->pushButtonUp->setEnabled( false );
-    else
-        mDlg->pushButtonUp->setEnabled( true );
-
-    if (mDlg->listViewCommands->indexOfTopLevelItem( item ) == mDlg->listViewCommands->topLevelItemCount() - 1 )
-        mDlg->pushButtonDown->setEnabled( false );
-    else
-        mDlg->pushButtonDown->setEnabled( true );
-}
-
-void ConfigDialog::buttonCommandUpSelected()
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    if ( !mDlg->listViewCommands->currentItem() )
-        return;
-
-    QTreeWidgetItem* item = mDlg->listViewCommands->currentItem();
-    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
-    if ( index == 0 )
-        return;
-
-    mDlg->listViewCommands->takeTopLevelItem( index );
-    mDlg->listViewCommands->insertTopLevelItem( index - 1, item );
-    mDlg->listViewCommands->setCurrentItem( item );
-    setUpDownButtons( item );
-
-    QList<InterfaceCommand> cmds;
-    QTreeWidgetItemIterator i( mDlg->listViewCommands );
-    while ( QTreeWidgetItem * item = *i )
-    {
-        InterfaceCommand cmd;
-        cmd.runAsRoot = item->checkState( 0 );
-        cmd.menuText = item->text( 1 );
-        cmd.command = item->text( 2 );
-        cmds.append( cmd );
-        ++i;
-    }
-
-    settings->commands = cmds;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::buttonCommandDownSelected()
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    if ( !mDlg->listViewCommands->currentItem() )
-        return;
-
-    QTreeWidgetItem* item = mDlg->listViewCommands->currentItem();
-    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
-    if ( index == mDlg->listViewCommands->topLevelItemCount() - 1 )
-        return;
-
-    mDlg->listViewCommands->takeTopLevelItem( index );
-    mDlg->listViewCommands->insertTopLevelItem( index + 1, item );
-    mDlg->listViewCommands->setCurrentItem( item );
-    setUpDownButtons( item );
-
-    QList<InterfaceCommand> cmds;
-    QTreeWidgetItemIterator i( mDlg->listViewCommands );
-    while ( QTreeWidgetItem * item = *i )
-    {
-        InterfaceCommand cmd;
-        cmd.runAsRoot = item->checkState( 0 );
-        cmd.menuText = item->text( 1 );
-        cmd.command = item->text( 2 );
-        cmds.append( cmd );
-        ++i;
-    }
-
-    settings->commands = cmds;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::listViewCommandsSelectionChanged( QTreeWidgetItem* item, QTreeWidgetItem* )
-{
-    mDlg->pushButtonRemoveCommand->setEnabled( item != NULL );
-    setUpDownButtons( item );
-}
-
-void ConfigDialog::listViewCommandsChanged( QTreeWidgetItem* item, int column )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    int row = mDlg->listViewCommands->indexOfTopLevelItem( item );
-    InterfaceCommand& cmd = settings->commands[row];
-    switch ( column )
-    {
-        case 0:
-            cmd.runAsRoot = item->checkState( 0 );
-            break;
-        case 1:
-            cmd.menuText = item->text( 1 );
-            break;
-        case 2:
-            cmd.command = item->text( 2 );
-    }
-
     if (!mLock) changed( true );
 }
 

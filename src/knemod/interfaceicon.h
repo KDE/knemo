@@ -24,7 +24,6 @@
 class Interface;
 class InterfaceTray;
 class KActionCollection;
-class KProcess;
 class QAction;
 
 /**
@@ -79,17 +78,6 @@ private Q_SLOTS:
     void showConfigDialog();
 
     /*
-     * Called when the user setup custom commands and selects one
-     * in the context menu
-     */
-    void menuTriggered( QAction * );
-
-    /*
-     * Called when a custom command finishes
-     */
-    void processFinished();
-
-    /*
      * Returns a string with a compact transfer rate
      * This should not be more than 4 chars, including the units
      */
@@ -113,7 +101,6 @@ private:
     Interface* mInterface;
     // the real tray icon
     InterfaceTray* mTray;
-    QList<KProcess*> processList;
     KActionCollection* commandActions;
     QAction* statusAction;
     QAction* plotterAction;

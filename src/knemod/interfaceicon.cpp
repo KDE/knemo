@@ -45,8 +45,6 @@
 #define SHRINK_MAX 0.75
 #define HISTSIZE_STORE 0.5
 
-Q_DECLARE_METATYPE(InterfaceCommand)
-
 InterfaceIcon::InterfaceIcon( Interface* interface )
     : QObject(),
       mInterface( interface ),
@@ -54,7 +52,6 @@ InterfaceIcon::InterfaceIcon( Interface* interface )
       barIncoming( 0 ),
       barOutgoing( 0 )
 {
-    commandActions = new KActionCollection( this );
     statusAction = new QAction( i18n( "Show &Status Dialog" ), this );
     plotterAction = new QAction( QIcon::fromTheme( QLatin1String("utilities-system-monitor") ),
                        i18n( "Show &Traffic Plotter" ), this );
@@ -75,12 +72,6 @@ InterfaceIcon::InterfaceIcon( Interface* interface )
 
 InterfaceIcon::~InterfaceIcon()
 {
-    // Prevent the "Destroyed while process is still running" message
-    foreach( KProcess* process, processList )
-    {
-        process->kill();
-        process->waitForFinished( 2000 );
-    }
     delete mTray;
 }
 
@@ -458,30 +449,9 @@ void InterfaceIcon::updateToolTip()
 
 void InterfaceIcon::updateMenu()
 {
-    // Remove all old entries.
     QMenu* menu = mTray->contextMenu();
-    QList<QAction *> actions = menu->actions();
-    foreach ( QAction* action, commandActions->actions() )
-        menu->removeAction( action );
-    commandActions->clear();
 
     InterfaceSettings& settings = mInterface->settings();
-
-    // If the user wants custom commands, add them.
-    if ( settings.commands.size() > 0 )
-    {
-        int i = 0;
-        foreach ( InterfaceCommand command, settings.commands )
-        {
-            QAction *action = new QAction( command.menuText, this );
-            action->setData( QVariant::fromValue( command ) );
-            commandActions->addAction( QString::fromLatin1( "command%1" ).arg( i ), action );
-            ++i;
-        }
-        QAction* sep = menu->addSeparator();
-        commandActions->addAction( QLatin1String("sep"), sep );
-        menu->insertActions( statusAction, commandActions->actions() );
-    }
 
     if ( settings.activateStatistics )
         menu->insertAction( configAction, statisticsAction );
@@ -563,29 +533,6 @@ void InterfaceIcon::showConfigDialog()
     KProcess process;
     process << QLatin1String("kcmshell5") << QLatin1String("kcm_knemo");
     process.startDetached();
-}
-
-void InterfaceIcon::menuTriggered( QAction *action )
-{
-    if ( !action->data().canConvert<InterfaceCommand>() )
-        return;
-
-    InterfaceCommand command = action->data().value<InterfaceCommand>();
-    KProcess *process = new KProcess( this );
-    if ( command.runAsRoot )
-        *process << QStandardPaths::findExecutable(QLatin1String("kdesu")) << command.command;
-    else
-        process->setShellCommand( command.command );
-
-    processList << process;
-    connect( process, SIGNAL( finished( int, QProcess::ExitStatus ) ), this, SLOT( processFinished() ) );
-    process->start();
-}
-
-void InterfaceIcon::processFinished()
-{
-    processList.removeAll( static_cast<KProcess*>(sender()) );
-    static_cast<KProcess*>(sender())->deleteLater();
 }
 
 void InterfaceIcon::showStatistics()

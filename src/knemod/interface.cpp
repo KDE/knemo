@@ -154,21 +154,6 @@ void Interface::configChanged()
         }
     }
 
-    mSettings.commands.clear();
-    int numCommands = interfaceGroup.readEntry( conf_numCommands, s.numCommands );
-    for ( int i = 0; i < numCommands; i++ )
-    {
-        QString entry;
-        InterfaceCommand cmd;
-        entry = QString::fromLatin1( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
-        cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
-        entry = QString::fromLatin1( "%1%2" ).arg( conf_command ).arg( i + 1 );
-        cmd.command = interfaceGroup.readEntry( entry );
-        entry = QString::fromLatin1( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
-        cmd.menuText = interfaceGroup.readEntry( entry );
-        mSettings.commands.append( cmd );
-    }
-
     // This prevents needless regeneration of icon when first shown in tray
     if ( mIfaceState == KNemoIface::UnknownState )
     {

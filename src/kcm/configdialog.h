@@ -91,11 +91,6 @@ private Q_SLOTS:
     void buttonNewSelected();
     void buttonAllSelected();
     void buttonDeleteSelected();
-    void buttonAddCommandSelected();
-    void buttonRemoveCommandSelected();
-    void setUpDownButtons( QTreeWidgetItem* item );
-    void buttonCommandUpSelected();
-    void buttonCommandDownSelected();
     void buttonAddToolTipSelected();
     void buttonRemoveToolTipSelected();
     void buttonNotificationsSelected();
@@ -114,8 +109,6 @@ private Q_SLOTS:
     void addWarnClicked();
     void modifyWarnClicked();
     void removeWarnClicked();
-    void listViewCommandsSelectionChanged( QTreeWidgetItem *current, QTreeWidgetItem *previous );
-    void listViewCommandsChanged( QTreeWidgetItem* item, int column );
     void moveTips( QListWidget *from, QListWidget *to );
 
 private:

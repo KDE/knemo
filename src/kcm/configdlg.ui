@@ -557,110 +557,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tab_3">
-          <attribute name="title">
-           <string>Context Menu</string>
-          </attribute>
-          <layout class="QGridLayout" name="gridLayout_4">
-           <item row="0" column="0">
-            <widget class="QTreeWidget" name="listViewCommands">
-             <property name="whatsThis">
-              <string>In this area you can add the custom entries for your context menu: &lt;ol&gt;&lt;li&gt;push the &lt;b&gt;Add&lt;/b&gt; button to add a new entry in the list;&lt;/li&gt;&lt;li&gt;edit the entry by double clicking in the &lt;b&gt;Menu text&lt;/b&gt; and &lt;b&gt;Command&lt;/b&gt; columns.&lt;/li&gt;&lt;/ol&gt;If you need to execute the command as root user check the corresponding &lt;b&gt;Root&lt;/b&gt; check box.</string>
-             </property>
-             <property name="rootIsDecorated">
-              <bool>false</bool>
-             </property>
-             <property name="itemsExpandable">
-              <bool>false</bool>
-             </property>
-             <property name="columnCount">
-              <number>3</number>
-             </property>
-             <column>
-              <property name="text">
-               <string>Root</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Menu text</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>Command</string>
-              </property>
-             </column>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <layout class="QVBoxLayout">
-             <item>
-              <widget class="QPushButton" name="pushButtonAddCommand">
-               <property name="toolTip">
-                <string>Add a new entry</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="shortcut">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButtonRemoveCommand">
-               <property name="toolTip">
-                <string>Remove the selected entry</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="shortcut">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="spacer6_2">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Expanding</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButtonUp">
-               <property name="toolTip">
-                <string>Move the selected entry up</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButtonDown">
-               <property name="toolTip">
-                <string>Move the selected entry down</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
         </widget>
        </item>
       </layout>
@@ -1022,11 +918,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
   <tabstop>addWarn</tabstop>
   <tabstop>modifyWarn</tabstop>
   <tabstop>removeWarn</tabstop>
-  <tabstop>listViewCommands</tabstop>
-  <tabstop>pushButtonAddCommand</tabstop>
-  <tabstop>pushButtonRemoveCommand</tabstop>
-  <tabstop>pushButtonUp</tabstop>
-  <tabstop>pushButtonDown</tabstop>
   <tabstop>listBoxAvailable</tabstop>
   <tabstop>pushButtonAddToolTip</tabstop>
   <tabstop>pushButtonRemoveToolTip</tabstop>

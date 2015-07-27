@@ -179,12 +179,6 @@ static const QLatin1String conf_warnTrafficUnits("TrafficUnits");
 static const QLatin1String conf_warnThreshold("Threshold");
 static const QLatin1String conf_warnCustomText("CustomText");
 
-// interface context menu
-static const QLatin1String conf_numCommands("NumCommands");
-static const QLatin1String conf_runAsRoot("RunAsRoot");
-static const QLatin1String conf_command("Command");
-static const QLatin1String conf_menuText("MenuText");
-
 // tooltip
 static const QLatin1String conf_toolTipContent("ToolTipContent");
 
@@ -305,13 +299,6 @@ struct BackendData
     bool isEncrypted;
 };
 
-struct InterfaceCommand
-{
-    bool runAsRoot;
-    QString command;
-    QString menuText;
-};
-
 struct GeneralSettings
 {
     GeneralSettings()
@@ -410,7 +397,6 @@ struct InterfaceSettings
         inMaxRate( 4 ),
         outMaxRate( 4 ),
         iconFont( QFontDatabase::systemFont( QFontDatabase::GeneralFont ) ),
-        numCommands( 0 ),
         trafficThreshold( 0 ),
         hideWhenUnavailable( false ),
         hideWhenDisconnected( false ),
@@ -431,7 +417,6 @@ struct InterfaceSettings
     unsigned int inMaxRate;
     unsigned int outMaxRate;
     QFont iconFont;
-    int numCommands;
     unsigned int trafficThreshold;
     bool hideWhenUnavailable;
     bool hideWhenDisconnected;
@@ -440,7 +425,6 @@ struct InterfaceSettings
     QList<WarnRule> warnRules;
     KLocale::CalendarSystem calendarSystem;
     QString alias;
-    QList<InterfaceCommand> commands;
 };
 
 #ifndef __linux__
