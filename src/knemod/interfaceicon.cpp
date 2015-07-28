@@ -507,9 +507,6 @@ void InterfaceIcon::updateTrayStatus()
         KHelpMenu* helpMenu( new KHelpMenu( menu, KAboutData::applicationData(), false ) );
         menu->addMenu( helpMenu->menu() )->setIcon( QIcon::fromTheme( QLatin1String("help-contents") ) );
 
-        connect( menu, SIGNAL( triggered( QAction * ) ),
-                 this, SLOT( menuTriggered( QAction * ) ) );
-
         if ( mInterface->settings().iconTheme == TEXT_THEME )
             updateIconText();
         else if ( mInterface->settings().iconTheme == NETLOAD_THEME )
