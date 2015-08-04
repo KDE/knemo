@@ -8,3 +8,8 @@ ecm_install_icons(
     sc-status-knemo-network-transmit.svg
     DESTINATION ${ICON_INSTALL_DIR}
     THEME oxygen )
+
+install(
+    FILES
+    knemo.svgz
+    DESTINATION ${DATA_INSTALL_DIR}/plasma/desktoptheme/oxygen/icons )

@@ -13,3 +13,8 @@ install(
     knemo-wireless-transmit-receive.svg
     knemo-wireless-transmit.svg
     DESTINATION ${ICON_INSTALL_DIR}/breeze/status/panel )
+
+install(
+    FILES
+    knemo.svgz
+    DESTINATION ${DATA_INSTALL_DIR}/plasma/desktoptheme/default/icons )
