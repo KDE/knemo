@@ -137,6 +137,7 @@ static const QLatin1String conf_alias("Alias");
 // interface icon
 static const QLatin1String conf_hideWhenNotAvail("HideWhenNotAvailable");
 static const QLatin1String conf_hideWhenNotExist("HideWhenNotExisting");
+static const QLatin1String conf_hideAlways("HideAlways");
 static const QLatin1String conf_trafficThreshold("TrafficThreshold");
 static const QLatin1String conf_iconTheme("IconSet");
 static const QLatin1String conf_colorIncoming("ColorIncoming");
@@ -400,6 +401,7 @@ struct InterfaceSettings
         trafficThreshold( 0 ),
         hideWhenUnavailable( false ),
         hideWhenDisconnected( false ),
+        hideAlways( false ),
         activateStatistics( false ),
         calendarSystem( KLocale::QDateCalendar )
     {}
@@ -420,6 +422,7 @@ struct InterfaceSettings
     unsigned int trafficThreshold;
     bool hideWhenUnavailable;
     bool hideWhenDisconnected;
+    bool hideAlways;
     bool activateStatistics;
     QList<StatsRule> statsRules;
     QList<WarnRule> warnRules;

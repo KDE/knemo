@@ -42,8 +42,7 @@ BackendBase *backend = NULL;
 GeneralSettings *generalSettings = NULL;
 
 KNemoDaemon::KNemoDaemon()
-    : QObject(),
-      mHaveInterfaces( false )
+    : QObject()
 {
     migrateKde4Conf();
 
@@ -92,10 +91,6 @@ void KNemoDaemon::readConfig()
     generalSettings->saveInterval = clamp<int>(generalGroup.readEntry( conf_saveInterval, g.saveInterval ), 0, 300 );
     generalSettings->statisticsDir = g.statisticsDir;
     generalSettings->toolTipContent = generalGroup.readEntry( conf_toolTipContent, g.toolTipContent );
-    // If we already have an Interfaces key--even if its empty--then we
-    // shouldn't try to set up a default interface
-    if ( generalGroup.hasKey( conf_interfaces ) )
-        mHaveInterfaces = true;
     QStringList interfaceList = generalGroup.readEntry( conf_interfaces, QStringList() );
 
     // Remove interfaces that are no longer monitored
@@ -117,16 +112,15 @@ void KNemoDaemon::readConfig()
         }
     }
 
-    if ( !mHaveInterfaces )
+    // If an interface has the default route, add it even if it's not
+    // explicitly configured.  It will just use the default settings.
+    // This should minimize user confusion.
+    QString ifaceName = backend->defaultRouteIface( AF_INET );
+    if ( ifaceName.isEmpty() )
+        ifaceName = backend->defaultRouteIface( AF_INET6 );
+    if ( !ifaceName.isEmpty() )
     {
-        QString ifaceName = backend->defaultRouteIface( AF_INET );
-        if ( ifaceName.isEmpty() )
-            ifaceName = backend->defaultRouteIface( AF_INET6 );
-        if ( !ifaceName.isEmpty() )
-        {
-            interfaceList << ifaceName;
-            mHaveInterfaces = true;
-        }
+        interfaceList << ifaceName;
     }
 
     // Add/update those that do need to be monitored

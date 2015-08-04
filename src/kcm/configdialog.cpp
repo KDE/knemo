@@ -397,6 +397,7 @@ void ConfigDialog::load()
             settings->alias = interfaceGroup.readEntry( conf_alias ).trimmed();
             settings->hideWhenDisconnected = interfaceGroup.readEntry( conf_hideWhenNotAvail, s.hideWhenDisconnected );
             settings->hideWhenUnavailable = interfaceGroup.readEntry( conf_hideWhenNotExist, s.hideWhenUnavailable );
+            settings->hideAlways = interfaceGroup.readEntry( conf_hideAlways, s.hideAlways );
             settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
             settings->iconTheme = interfaceGroup.readEntry( conf_iconTheme, s.iconTheme );
             settings->colorIncoming = interfaceGroup.readEntry( conf_colorIncoming, s.colorIncoming );
@@ -578,8 +579,14 @@ void ConfigDialog::save()
         if ( !yearState.isNull() )
             interfaceGroup.writeEntry( conf_yearState, yearState );
 
-        interfaceGroup.writeEntry( conf_hideWhenNotAvail, settings->hideWhenDisconnected );
-        interfaceGroup.writeEntry( conf_hideWhenNotExist, settings->hideWhenUnavailable );
+        if ( settings->hideAlways )
+        {
+            interfaceGroup.writeEntry( conf_hideAlways, settings->hideAlways );
+        } else {
+            interfaceGroup.writeEntry( conf_hideWhenNotAvail, settings->hideWhenDisconnected );
+            interfaceGroup.writeEntry( conf_hideWhenNotExist, settings->hideWhenUnavailable );
+        }
+        interfaceGroup.writeEntry( conf_hideAlways, settings->hideAlways );
         interfaceGroup.writeEntry( conf_trafficThreshold, settings->trafficThreshold );
         interfaceGroup.writeEntry( conf_iconTheme, settings->iconTheme );
         if ( settings->iconTheme == TEXT_THEME ||
@@ -840,7 +847,9 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     mDlg->colorUnavailable->setColor( settings->colorUnavailable );
     mDlg->iconFont->setCurrentFont( settings->iconFont );
     iconThemeChanged( index );
-    if ( settings->hideWhenDisconnected )
+    if ( settings->hideAlways )
+        index = 3;
+    else if ( settings->hideWhenDisconnected )
         index = 1;
     else if ( settings->hideWhenUnavailable )
         index = 2;
@@ -1148,14 +1157,22 @@ void ConfigDialog::comboHidingChanged( int val )
         case 0:
             settings->hideWhenDisconnected = false;
             settings->hideWhenUnavailable = false;
+            settings->hideAlways = false;
             break;
         case 1:
             settings->hideWhenDisconnected = true;
             settings->hideWhenUnavailable = true;
+            settings->hideAlways = false;
             break;
         case 2:
             settings->hideWhenDisconnected = false;
             settings->hideWhenUnavailable = true;
+            settings->hideAlways = false;
+            break;
+        case 3:
+            settings->hideWhenDisconnected = false;
+            settings->hideWhenUnavailable = false;
+            settings->hideAlways = true;
             break;
     }
 

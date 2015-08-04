@@ -466,6 +466,7 @@ void InterfaceIcon::updateTrayStatus()
     int currentStatus = data->status;
     bool hideWhenUnavailable = mInterface->settings().hideWhenUnavailable;
     bool hideWhenDisconnected = mInterface->settings().hideWhenDisconnected;
+    bool hideAlways = mInterface->settings().hideAlways;
 
     QString title = mInterface->settings().alias;
     if ( title.isEmpty() )
@@ -477,7 +478,8 @@ void InterfaceIcon::updateTrayStatus()
      *   and the other option is not selected
      */
     if ( mTray != 0L &&
-         ( ( (currentStatus < KNemoIface::Connected ) && hideWhenDisconnected ) ||
+         ( ( hideAlways ) ||
+           ( (currentStatus < KNemoIface::Connected ) && hideWhenDisconnected ) ||
            ( (currentStatus < KNemoIface::Available ) && hideWhenUnavailable && !hideWhenDisconnected ) ) )
     {
         delete mTray;

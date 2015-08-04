@@ -87,8 +87,6 @@ private Q_SLOTS:
     void togglePlotters();
 
 private:
-    bool mHaveInterfaces;
-
     // every time this timer expires we will
     // gather new informations from the backend
     QTimer* mPollTimer;

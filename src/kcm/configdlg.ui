@@ -165,6 +165,11 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                  <string>Hide when unavailable</string>
                 </property>
                </item>
+               <item>
+                <property name="text">
+                 <string>Always hide</string>
+                </property>
+               </item>
               </widget>
              </item>
             </layout>
