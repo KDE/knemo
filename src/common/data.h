@@ -61,7 +61,8 @@ namespace KNemoIface {
         Up           =  4,
         Connected    =  8,
         RxTraffic    = 16,
-        TxTraffic    = 32
+        TxTraffic    = 32,
+        MaxState     = 256
     };
 }
 
@@ -135,9 +136,7 @@ static const QLatin1String conf_interfaces("Interfaces");
 static const QLatin1String conf_alias("Alias");
 
 // interface icon
-static const QLatin1String conf_hideWhenNotAvail("HideWhenNotAvailable");
-static const QLatin1String conf_hideWhenNotExist("HideWhenNotExisting");
-static const QLatin1String conf_hideAlways("HideAlways");
+static const QLatin1String conf_minVisibleState("MinVisibleState");
 static const QLatin1String conf_trafficThreshold("TrafficThreshold");
 static const QLatin1String conf_iconTheme("IconSet");
 static const QLatin1String conf_colorIncoming("ColorIncoming");
@@ -399,9 +398,7 @@ struct InterfaceSettings
         outMaxRate( 4 ),
         iconFont( QFontDatabase::systemFont( QFontDatabase::GeneralFont ) ),
         trafficThreshold( 0 ),
-        hideWhenUnavailable( false ),
-        hideWhenDisconnected( false ),
-        hideAlways( false ),
+        minVisibleState( KNemoIface::UnknownState ),
         activateStatistics( false ),
         calendarSystem( KLocale::QDateCalendar )
     {}
@@ -420,9 +417,7 @@ struct InterfaceSettings
     unsigned int outMaxRate;
     QFont iconFont;
     unsigned int trafficThreshold;
-    bool hideWhenUnavailable;
-    bool hideWhenDisconnected;
-    bool hideAlways;
+    int minVisibleState;
     bool activateStatistics;
     QList<StatsRule> statsRules;
     QList<WarnRule> warnRules;

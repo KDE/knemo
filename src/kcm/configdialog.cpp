@@ -395,9 +395,7 @@ void ConfigDialog::load()
         {
             KConfigGroup interfaceGroup( config, group );
             settings->alias = interfaceGroup.readEntry( conf_alias ).trimmed();
-            settings->hideWhenDisconnected = interfaceGroup.readEntry( conf_hideWhenNotAvail, s.hideWhenDisconnected );
-            settings->hideWhenUnavailable = interfaceGroup.readEntry( conf_hideWhenNotExist, s.hideWhenUnavailable );
-            settings->hideAlways = interfaceGroup.readEntry( conf_hideAlways, s.hideAlways );
+            settings->minVisibleState = interfaceGroup.readEntry( conf_minVisibleState, s.minVisibleState );
             settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
             settings->iconTheme = interfaceGroup.readEntry( conf_iconTheme, s.iconTheme );
             settings->colorIncoming = interfaceGroup.readEntry( conf_colorIncoming, s.colorIncoming );
@@ -579,14 +577,7 @@ void ConfigDialog::save()
         if ( !yearState.isNull() )
             interfaceGroup.writeEntry( conf_yearState, yearState );
 
-        if ( settings->hideAlways )
-        {
-            interfaceGroup.writeEntry( conf_hideAlways, settings->hideAlways );
-        } else {
-            interfaceGroup.writeEntry( conf_hideWhenNotAvail, settings->hideWhenDisconnected );
-            interfaceGroup.writeEntry( conf_hideWhenNotExist, settings->hideWhenUnavailable );
-        }
-        interfaceGroup.writeEntry( conf_hideAlways, settings->hideAlways );
+        interfaceGroup.writeEntry( conf_minVisibleState, settings->minVisibleState );
         interfaceGroup.writeEntry( conf_trafficThreshold, settings->trafficThreshold );
         interfaceGroup.writeEntry( conf_iconTheme, settings->iconTheme );
         if ( settings->iconTheme == TEXT_THEME ||
@@ -847,14 +838,21 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     mDlg->colorUnavailable->setColor( settings->colorUnavailable );
     mDlg->iconFont->setCurrentFont( settings->iconFont );
     iconThemeChanged( index );
-    if ( settings->hideAlways )
-        index = 3;
-    else if ( settings->hideWhenDisconnected )
-        index = 1;
-    else if ( settings->hideWhenUnavailable )
-        index = 2;
-    else
-        index = 0;
+    switch ( settings->minVisibleState )
+    {
+        case KNemoIface::Connected:
+            index = 1;
+            break;
+        case KNemoIface::Available:
+            index = 2;
+            break;
+        case KNemoIface::MaxState:
+            index = 3;
+            break;
+        default:
+            index = 0;
+    }
+
     mDlg->comboHiding->setCurrentIndex( index );
     comboHidingChanged( index );
     mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
@@ -1155,24 +1153,20 @@ void ConfigDialog::comboHidingChanged( int val )
     switch ( val )
     {
         case 0:
-            settings->hideWhenDisconnected = false;
-            settings->hideWhenUnavailable = false;
-            settings->hideAlways = false;
+            // Do not hide
+            settings->minVisibleState = KNemoIface::UnknownState;
             break;
         case 1:
-            settings->hideWhenDisconnected = true;
-            settings->hideWhenUnavailable = true;
-            settings->hideAlways = false;
+            // Hide when disconnected
+            settings->minVisibleState = KNemoIface::Connected;
             break;
         case 2:
-            settings->hideWhenDisconnected = false;
-            settings->hideWhenUnavailable = true;
-            settings->hideAlways = false;
+            // Hide when unavailable
+            settings->minVisibleState = KNemoIface::Available;
             break;
         case 3:
-            settings->hideWhenDisconnected = false;
-            settings->hideWhenUnavailable = false;
-            settings->hideAlways = true;
+            // Always hide
+            settings->minVisibleState = KNemoIface::MaxState;
             break;
     }
 

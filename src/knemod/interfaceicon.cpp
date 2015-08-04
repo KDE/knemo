@@ -464,38 +464,18 @@ void InterfaceIcon::updateTrayStatus()
     const QString ifaceName( mInterface->ifaceName() );
     const BackendData * data = mInterface->backendData();
     int currentStatus = data->status;
-    bool hideWhenUnavailable = mInterface->settings().hideWhenUnavailable;
-    bool hideWhenDisconnected = mInterface->settings().hideWhenDisconnected;
-    bool hideAlways = mInterface->settings().hideAlways;
+    int minVisibleState = mInterface->settings().minVisibleState;
 
     QString title = mInterface->settings().alias;
     if ( title.isEmpty() )
         title = ifaceName;
 
-    /* Remove the icon if
-     * - the interface is not available and the option to hide it is selected
-     * - the interface does not exist, the option to hide it is selected
-     *   and the other option is not selected
-     */
-    if ( mTray != 0L &&
-         ( ( hideAlways ) ||
-           ( (currentStatus < KNemoIface::Connected ) && hideWhenDisconnected ) ||
-           ( (currentStatus < KNemoIface::Available ) && hideWhenUnavailable && !hideWhenDisconnected ) ) )
+    if ( mTray != 0L && currentStatus < minVisibleState )
     {
         delete mTray;
         mTray = 0L;
     }
-    /* Create the icon if
-     * - the interface is available
-     * - the interface is not available and the option to hide it is not
-     *   selected and the interface does exist
-     * - the interface does not exist and the option to hide it is not selected
-     *   and the other option is not selected
-     */
-    else if ( mTray == 0L &&
-              ( currentStatus & KNemoIface::Connected ||
-                ( currentStatus & KNemoIface::Available && !hideWhenDisconnected ) ||
-                ( !hideWhenUnavailable && !hideWhenDisconnected ) ) )
+    else if ( mTray == 0L && currentStatus >= minVisibleState )
     {
         mTray = new InterfaceTray( mInterface, ifaceName );
         QMenu* menu = mTray->contextMenu();
