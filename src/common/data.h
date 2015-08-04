@@ -384,8 +384,7 @@ struct WarnRule
 struct InterfaceSettings
 {
     InterfaceSettings()
-      : iconTheme( QLatin1String("monitor") ),
-        colorIncoming( 0x1889FF ),
+      : colorIncoming( 0x1889FF ),
         colorOutgoing( 0xFF7F08 ),
         colorDisabled( 0x888786 ),
         colorUnavailable( 0x888786 ),

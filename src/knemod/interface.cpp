@@ -77,14 +77,27 @@ void Interface::configChanged()
     InterfaceSettings s;
     mSettings.alias = interfaceGroup.readEntry( conf_alias ).trimmed();
     mSettings.iconTheme = interfaceGroup.readEntry( conf_iconTheme, s.iconTheme );
+
+    // If the theme is not configured, use a sensible default
+    if (mSettings.iconTheme.isEmpty()) {
+        if ( mBackendData->isWireless ) {
+            mSettings.iconTheme = QLatin1String("wireless");
+        } else {
+            mSettings.iconTheme = QLatin1String("network");
+        }
+    }
+
+    // Let's check that the theme is available
     QStringList themeNames;
     QList<KNemoTheme> themes = findThemes();
-    // Let's check that it's available
     foreach( KNemoTheme theme, themes )
         themeNames << theme.internalName;
     themeNames << NETLOAD_THEME;
+
+    // If that's not available, default to the text theme
     if ( !themeNames.contains( mSettings.iconTheme ) )
         mSettings.iconTheme = TEXT_THEME;
+
     mSettings.colorIncoming = interfaceGroup.readEntry( conf_colorIncoming, s.colorIncoming );
     mSettings.colorOutgoing = interfaceGroup.readEntry( conf_colorOutgoing, s.colorOutgoing );
     KColorScheme scheme(QPalette::Active, KColorScheme::View);
