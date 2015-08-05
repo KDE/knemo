@@ -688,7 +688,7 @@ void ConfigDialog::defaults()
 	int c = nl_connect(rtsock, NETLINK_ROUTE);
     if ( c >= 0 )
     {
-	    rtnl_route_alloc_cache( rtsock, AF_UNSPEC, NL_AUTO_PROVIDE, reinterpret_cast<nl_cache**>(&cache) );
+	    rtnl_route_alloc_cache( rtsock, AF_UNSPEC, 0, reinterpret_cast<nl_cache**>(&cache) );
     }
 #endif
 
