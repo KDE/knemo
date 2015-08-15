@@ -187,66 +187,27 @@ int InterfaceIcon::calcHeight( QList<unsigned long>& hist, unsigned int& net_max
     return ratio*iconWidth;
 }
 
-QColor InterfaceIcon::calcColor( QList<unsigned long>& hist, const QColor& low, const QColor& high, int hival )
+QColor InterfaceIcon::calcColor( const QColor& low )
 {
     const BackendData * data = mInterface->backendData();
 
     if ( data->status & KNemoIface::Connected )
-    {
-        if ( ! mInterface->settings().dynamicColor )
-            return low;
-    }
+        return low;
     else if ( data->status & KNemoIface::Available )
-        return mInterface->settings().colorDisabled;
-    else if ( data->status & KNemoIface::Unavailable )
-        return mInterface->settings().colorUnavailable;
-
-    unsigned long histcalculate = 0;
-    unsigned long rate = 0;
-    if ( mInterface->settings().iconTheme == NETLOAD_THEME )
-    {
-        foreach( unsigned long j, hist )
-        {
-            histcalculate += j;
-        }
-        rate = histcalculate / histSize;
-    }
+        return KColorScheme(QPalette::Active).foreground(KColorScheme::InactiveText).color();
     else
-        rate = hist[0];
-
-    int lowH, lowS, lowV;
-    int hiH, hiS, hiV;
-    int difH, difS, difV;
-
-    low.getHsv( &lowH, &lowS, &lowV );
-    high.getHsv( &hiH, &hiS, &hiV );
-
-    difH = hiH - lowH;
-    difS = hiS - lowS;
-    difV = hiV - lowV;
-
-    qreal percentage = static_cast<qreal>(rate)/hival;
-    if ( percentage > 1.0 )
-        percentage = 1.0;
-    QColor retcolor;
-    retcolor.setHsv( lowH + ( percentage*difH ), lowS + ( percentage*difS), lowV + (percentage*difV ) );
-    return retcolor;
+        return KColorScheme(QPalette::Active).foreground(KColorScheme::NegativeText).color();
 }
 
 void InterfaceIcon::updateBars( bool doUpdate )
 {
     // Has color changed?
-    QColor rxColor = calcColor( inHist, mInterface->settings().colorIncoming, mInterface->settings().colorIncomingMax, mInterface->settings().inMaxRate );
-    QColor txColor = calcColor( outHist, mInterface->settings().colorOutgoing, mInterface->settings().colorOutgoingMax, mInterface->settings().outMaxRate );
+    QColor rxColor = calcColor( KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::ActiveText).color() );
+    QColor txColor = calcColor( KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::NeutralText).color() );
     if ( rxColor != colorIncoming )
     {
         doUpdate = true;
         colorIncoming = rxColor;
-    }
-    if ( txColor != colorOutgoing )
-    {
-        doUpdate = true;
-        colorOutgoing = txColor;
     }
 
     // Has height changed?
@@ -267,11 +228,9 @@ void InterfaceIcon::updateBars( bool doUpdate )
         return;
 
     QPixmap barIcon(iconWidth, iconWidth);
-
-    QLinearGradient inGrad( midMargin, 0, midMargin+barWidth, 0 );
-    QLinearGradient topInGrad( midMargin, 0, midMargin+barWidth, 0 );
-    QLinearGradient outGrad( leftMargin, 0, leftMargin+barWidth, 0 );
-    QLinearGradient topOutGrad( leftMargin, 0, leftMargin+barWidth, 0 );
+    barIcon.fill( Qt::transparent );
+    QPainter p( &barIcon );
+    QColor bgColor;
 
     int top = iconWidth - barOutgoing;
 
@@ -281,46 +240,26 @@ void InterfaceIcon::updateBars( bool doUpdate )
     QRect topRightRect( midMargin, 0, barWidth, top );
     QRect rightRect( midMargin, top, barWidth, iconWidth );
 
-    barIcon.fill( Qt::transparent );
-    QPainter p( &barIcon );
-    p.setOpacity( 1.0 );
-
     const BackendData * data = mInterface->backendData();
-    QColor topColor;
     if ( data->status & KNemoIface::Connected )
     {
-        topColor = mInterface->settings().colorBackground;
+        bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::InactiveText).color();
+        bgColor.setAlpha( 77 );
     }
     else if ( data->status & KNemoIface::Available )
     {
-        topColor = mInterface->settings().colorDisabled;
+        bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::InactiveText).color();
+        rxColor.setAlpha( 153 );
     }
     else
     {
-        topColor = mInterface->settings().colorUnavailable;
+        bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::NegativeText).color();
     }
-    QColor topColorD = topColor.darker();
-    topColor.setAlpha( 128 );
-    topColorD.setAlpha( 128 );
-    topInGrad.setColorAt(0, topColorD);
-    topInGrad.setColorAt(1, topColor );
-    topOutGrad.setColorAt(0, topColorD);
-    topOutGrad.setColorAt(1, topColor );
 
-    inGrad.setColorAt(0, rxColor );
-    inGrad.setColorAt(1, rxColor.darker() );
-    outGrad.setColorAt(0, txColor );
-    outGrad.setColorAt(1, txColor.darker() );
-
-    QBrush brush( inGrad );
-    p.setBrush( brush );
-    p.fillRect( rightRect, inGrad );
-    brush = QBrush( topInGrad );
-    p.fillRect( topRightRect, topInGrad );
-    brush = QBrush( outGrad );
-    p.fillRect( leftRect, outGrad );
-    brush = QBrush( topOutGrad );
-    p.fillRect( topLeftRect, topOutGrad );
+    p.fillRect( leftRect, txColor );
+    p.fillRect( rightRect, rxColor );
+    p.fillRect( topLeftRect, bgColor );
+    p.fillRect( topRightRect, bgColor );
     mTray->setIconByPixmap( barIcon );
     QPixmapCache::clear();
 }
@@ -370,17 +309,12 @@ QString InterfaceIcon::compactTrayText(unsigned long data )
 void InterfaceIcon::updateIconText( bool doUpdate )
 {
     // Has color changed?
-    QColor rxColor = calcColor( inHist, mInterface->settings().colorIncoming, mInterface->settings().colorIncomingMax, mInterface->settings().inMaxRate );
-    QColor txColor = calcColor( outHist, mInterface->settings().colorOutgoing, mInterface->settings().colorOutgoingMax, mInterface->settings().outMaxRate );
+    QColor rxColor = calcColor( KColorScheme(QPalette::Active).foreground(KColorScheme::ActiveText).color() );
+    QColor txColor = calcColor( KColorScheme(QPalette::Active).foreground(KColorScheme::NeutralText).color() );
     if ( rxColor != colorIncoming )
     {
         doUpdate = true;
         colorIncoming = rxColor;
-    }
-    if ( rxColor != colorOutgoing )
-    {
-        doUpdate = true;
-        colorOutgoing = txColor;
     }
 
     // Has text changed?
@@ -407,8 +341,6 @@ void InterfaceIcon::updateIconText( bool doUpdate )
     QPainter p( &textIcon );
     p.setBrush( Qt::NoBrush );
     p.setOpacity( 1.0 );
-
-    KColorScheme scheme(QPalette::Active, KColorScheme::View);
 
     // rxFont and txFont should be the same size per poll period
     QFont rxFont = setIconFont( textIncoming, plasmaTheme->smallestFont(), iconWidth );

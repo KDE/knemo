@@ -25,6 +25,7 @@
 #include <QMouseEvent>
 #include <QApplication>
 #include <KConfigGroup>
+#include <KColorScheme>
 #include <KSharedConfig>
 
 #include "global.h"
@@ -46,8 +47,6 @@ static const char plot_showIncoming[] = "ShowIncoming";
 static const char plot_showOutgoing[] = "ShowOutgoing";
 static const char plot_automaticDetection[] = "AutomaticDetection";
 static const char plot_verticalLinesScroll[] = "VerticalLinesScroll";
-static const char plot_colorIncoming[] = "ColorIncoming";
-static const char plot_colorOutgoing[] = "ColorOutgoing";
 
 class FancyPlotterLabel : public QLabel {
   public:
@@ -416,8 +415,6 @@ void InterfacePlotterDialog::loadConfig()
     mSettings.horizontalLines = plotterGroup.readEntry( plot_horizontalLines, s.horizontalLines );
     mSettings.automaticDetection = plotterGroup.readEntry( plot_automaticDetection, s.automaticDetection );
     mSettings.verticalLinesScroll = plotterGroup.readEntry( plot_verticalLinesScroll, s.verticalLinesScroll );
-    mSettings.colorIncoming = plotterGroup.readEntry( plot_colorIncoming, s.colorIncoming );
-    mSettings.colorOutgoing = plotterGroup.readEntry( plot_colorOutgoing, s.colorOutgoing );
     configChanged();
 }
 
@@ -440,8 +437,6 @@ void InterfacePlotterDialog::saveConfig()
     plotterGroup.writeEntry( plot_showOutgoing, mSettings.showOutgoing );
     plotterGroup.writeEntry( plot_automaticDetection, mSettings.automaticDetection );
     plotterGroup.writeEntry( plot_verticalLinesScroll, mSettings.verticalLinesScroll );
-    plotterGroup.writeEntry( plot_colorIncoming, mSettings.colorIncoming );
-    plotterGroup.writeEntry( plot_colorOutgoing, mSettings.colorOutgoing );
     config->sync();
     configChanged();
 }
@@ -473,8 +468,8 @@ void InterfacePlotterDialog::configChanged()
     mPlotter->setUseAutoRange( mSettings.automaticDetection );
     mPlotter->setVerticalLinesScroll( mSettings.verticalLinesScroll );
 
-    mSentLabel->setLabel( i18nc( "network traffic", "Sending" ), mSettings.colorOutgoing);
-    mReceivedLabel->setLabel( i18nc( "network traffic", "Receiving" ), mSettings.colorIncoming);
+    mSentLabel->setLabel( i18nc( "network traffic", "Sending" ), KColorScheme(QPalette::Active).foreground(KColorScheme::NeutralText).color());
+    mReceivedLabel->setLabel( i18nc( "network traffic", "Receiving" ), KColorScheme(QPalette::Active).foreground(KColorScheme::ActiveText).color());
 
     addBeams();
 }
@@ -485,7 +480,7 @@ void InterfacePlotterDialog::addBeams()
     {
         if ( !mOutgoingVisible )
         {
-            mPlotter->addBeam( mSettings.colorOutgoing );
+            mPlotter->addBeam( KColorScheme(QPalette::Active).foreground(KColorScheme::NeutralText).color() );
             mSentLabel->show();
             mOutgoingVisible = true;
             if ( mIncomingVisible )
@@ -507,7 +502,7 @@ void InterfacePlotterDialog::addBeams()
     {
         if ( !mIncomingVisible )
         {
-            mPlotter->addBeam( mSettings.colorIncoming );
+            mPlotter->addBeam( KColorScheme(QPalette::Active).foreground(KColorScheme::ActiveText).color() );
             mReceivedLabel->show();
             mIncomingVisible = true;
         }

@@ -19,6 +19,8 @@
 
 #include "themeconfig.h"
 
+#include <QPushButton>
+
 ThemeConfig::ThemeConfig( const InterfaceSettings s ) : QDialog(),
     mSettings( s )
 {
@@ -39,16 +41,12 @@ ThemeConfig::ThemeConfig( const InterfaceSettings s ) : QDialog(),
     mDlg.rxMaxRate->setValue( mSettings.inMaxRate );
 
     mDlg.checkBarScale->setChecked( mSettings.barScale );
-    mDlg.checkDynColor->setChecked( mSettings.dynamicColor );
-    mDlg.colorIncomingMax->setColor( mSettings.colorIncomingMax );
-    mDlg.colorOutgoingMax->setColor( mSettings.colorOutgoingMax );
     updateRateGroup();
 
     connect( mDlg.buttonBox, SIGNAL( accepted() ), SLOT( accept() ) );
     connect( mDlg.buttonBox, SIGNAL( rejected() ), SLOT( reject() ) );
     connect( mDlg.buttonBox, SIGNAL( clicked( QAbstractButton* ) ), SLOT( setDefaults( QAbstractButton* ) ) );
     connect( mDlg.checkBarScale, SIGNAL( toggled( bool ) ), SLOT( updateRateGroup() ) );
-    connect( mDlg.checkDynColor, SIGNAL( toggled( bool ) ), SLOT( updateRateGroup() ) );
 }
 
 void ThemeConfig::setDefaults( QAbstractButton* button )
@@ -62,15 +60,12 @@ void ThemeConfig::setDefaults( QAbstractButton* button )
         mDlg.rxMaxRate->setValue( s.inMaxRate );
 
         mDlg.checkBarScale->setChecked( s.barScale );
-        mDlg.checkDynColor->setChecked( s.dynamicColor );
-        mDlg.colorIncomingMax->setColor( s.colorIncomingMax );
-        mDlg.colorOutgoingMax->setColor( s.colorOutgoingMax );
     }
 }
 
 void ThemeConfig::updateRateGroup()
 {
-    if ( mDlg.checkBarScale->isChecked() || mDlg.checkDynColor->isChecked() )
+    if ( mDlg.checkBarScale->isChecked() )
         mDlg.maxRateGroup->setEnabled( true );
     else
         mDlg.maxRateGroup->setEnabled( false );
@@ -85,9 +80,6 @@ InterfaceSettings ThemeConfig::settings()
     mSettings.inMaxRate = mDlg.rxMaxRate->value();
 
     mSettings.barScale = mDlg.checkBarScale->isChecked();
-    mSettings.dynamicColor = mDlg.checkDynColor->isChecked();
-    mSettings.colorIncomingMax = mDlg.colorIncomingMax->color();
-    mSettings.colorOutgoingMax = mDlg.colorOutgoingMax->color();
 
     return mSettings;
 }

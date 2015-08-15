@@ -100,7 +100,6 @@ private Q_SLOTS:
     void comboHidingChanged( int val );
     void checkBoxStatisticsToggled( bool on );
     void checkBoxStartKNemoToggled( bool on );
-    void colorButtonChanged();
     void advancedButtonClicked();
     void addStatsClicked();
     void modifyStatsClicked();

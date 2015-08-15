@@ -260,63 +260,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
             </layout>
            </item>
            <item>
-            <widget class="QGroupBox" name="themeColorBox">
-             <property name="title">
-              <string>Theme Settings</string>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <item>
-               <layout class="QVBoxLayout" name="verticalLayout_8">
-                <item>
-                 <widget class="QLabel" name="colorIncomingLabel">
-                  <property name="text">
-                   <string>Incoming traffic:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="colorOutgoingLabel">
-                  <property name="text">
-                   <string>Outgoing traffic:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="colorDisabledLabel">
-                  <property name="text">
-                   <string>Disconnected:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="colorUnavailableLabel">
-                  <property name="text">
-                   <string>Unavailable:</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QVBoxLayout" name="verticalLayout_5">
-                <item>
-                 <widget class="KColorButton" name="colorIncoming"/>
-                </item>
-                <item>
-                 <widget class="KColorButton" name="colorOutgoing"/>
-                </item>
-                <item>
-                 <widget class="KColorButton" name="colorDisabled"/>
-                </item>
-                <item>
-                 <widget class="KColorButton" name="colorUnavailable"/>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_11">
              <item>
               <spacer name="horizontalSpacer_11">
@@ -877,13 +820,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>KColorButton</class>
-   <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>checkBoxStartKNemo</tabstop>
   <tabstop>tabWidgetConfiguration</tabstop>
@@ -895,10 +831,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
   <tabstop>ifaceTab</tabstop>
   <tabstop>comboHiding</tabstop>
   <tabstop>comboBoxIconTheme</tabstop>
-  <tabstop>colorIncoming</tabstop>
-  <tabstop>colorOutgoing</tabstop>
-  <tabstop>colorDisabled</tabstop>
-  <tabstop>colorUnavailable</tabstop>
   <tabstop>advancedButton</tabstop>
   <tabstop>checkBoxStatistics</tabstop>
   <tabstop>statsView</tabstop>

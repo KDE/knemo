@@ -20,6 +20,7 @@
 
 #include "plotterconfigdialog.h"
 #include "global.h"
+#include <QPushButton>
 
 PlotterConfigDialog::PlotterConfigDialog( QWidget * parent, const QString& iface, PlotterSettings* settings ) : QDialog( parent ),
       mName( iface ),
@@ -69,10 +70,6 @@ PlotterConfigDialog::PlotterConfigDialog( QWidget * parent, const QString& iface
              this, SLOT( changed() ) );
     connect( ui.spinBoxMaxValue, SIGNAL( valueChanged( double ) ),
              this, SLOT( changed() ) );
-    connect( ui.kColorButtonIncoming, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
-    connect( ui.kColorButtonOutgoing, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
 }
 
 PlotterConfigDialog::~PlotterConfigDialog()
@@ -93,8 +90,6 @@ void PlotterConfigDialog::load()
     ui.checkBoxOutgoing->setChecked( mSettings->showOutgoing );
     ui.checkBoxAutoDetection->setChecked( !mSettings->automaticDetection );
     ui.checkBoxVLinesScroll->setChecked( mSettings->verticalLinesScroll );
-    ui.kColorButtonIncoming->setColor( mSettings->colorIncoming );
-    ui.kColorButtonOutgoing->setColor( mSettings->colorOutgoing );
 }
 
 void PlotterConfigDialog::save()
@@ -111,8 +106,6 @@ void PlotterConfigDialog::save()
     mSettings->showOutgoing = ui.checkBoxOutgoing->isChecked();
     mSettings->automaticDetection = !ui.checkBoxAutoDetection->isChecked();
     mSettings->verticalLinesScroll = ui.checkBoxVLinesScroll->isChecked();
-    mSettings->colorIncoming = ui.kColorButtonIncoming->color();
-    mSettings->colorOutgoing = ui.kColorButtonOutgoing->color();
     ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
     emit saved();
 }
@@ -135,8 +128,6 @@ void PlotterConfigDialog::defaults( QAbstractButton* button )
         ui.checkBoxOutgoing->setChecked( s.showOutgoing );
         ui.checkBoxAutoDetection->setChecked( !s.automaticDetection );
         ui.checkBoxVLinesScroll->setChecked( s.verticalLinesScroll );
-        ui.kColorButtonIncoming->setColor( s.colorIncoming );
-        ui.kColorButtonOutgoing->setColor( s.colorOutgoing );
     } else if (static_cast<QPushButton*>(button) == ui.buttonBox->button(QDialogButtonBox::Ok) ) {
         QDialog::accept();
     } else if (static_cast<QPushButton*>(button) == ui.buttonBox->button(QDialogButtonBox::Apply) ) {

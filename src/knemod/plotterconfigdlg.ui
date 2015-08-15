@@ -44,7 +44,7 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Minimum value:</string>
+             <string>Minim&amp;um value:</string>
             </property>
             <property name="wordWrap">
              <bool>false</bool>
@@ -73,7 +73,7 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Maximum value:</string>
+             <string>Ma&amp;ximum value:</string>
             </property>
             <property name="wordWrap">
              <bool>false</bool>
@@ -267,7 +267,7 @@
             <item>
              <widget class="QLabel" name="textLabel3_2">
               <property name="text">
-               <string>Font size:</string>
+               <string>Font si&amp;ze:</string>
               </property>
               <property name="wordWrap">
                <bool>false</bool>
@@ -310,46 +310,18 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <item>
-          <widget class="QCheckBox" name="checkBoxIncoming">
-           <property name="text">
-            <string>Show incoming traffic</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="KColorButton" name="kColorButtonIncoming">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QCheckBox" name="checkBoxIncoming">
+         <property name="text">
+          <string>Show incoming traffic</string>
+         </property>
+        </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_8">
-         <item>
-          <widget class="QCheckBox" name="checkBoxOutgoing">
-           <property name="text">
-            <string>Show outgoing traffic</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="KColorButton" name="kColorButtonOutgoing">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QCheckBox" name="checkBoxOutgoing">
+         <property name="text">
+          <string>Show outgoing traffic</string>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer">
@@ -377,13 +349,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>KColorButton</class>
-   <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>tabWidget_2</tabstop>
   <tabstop>checkBoxAutoDetection</tabstop>
@@ -397,9 +362,7 @@
   <tabstop>checkBoxLabels</tabstop>
   <tabstop>spinBoxFontSize</tabstop>
   <tabstop>checkBoxIncoming</tabstop>
-  <tabstop>kColorButtonIncoming</tabstop>
   <tabstop>checkBoxOutgoing</tabstop>
-  <tabstop>kColorButtonOutgoing</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -512,38 +475,6 @@
     <hint type="destinationlabel">
      <x>109</x>
      <y>67</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxIncoming</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>kColorButtonIncoming</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>64</x>
-     <y>62</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>109</x>
-     <y>67</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxOutgoing</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>kColorButtonOutgoing</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>66</x>
-     <y>74</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>109</x>
-     <y>74</y>
     </hint>
    </hints>
   </connection>

@@ -22,7 +22,6 @@
 #define PLOTTERCONFIGDIALOG_H
 
 #include <QDialog>
-#include <QColor>
 #include "ui_plotterconfigdlg.h"
 
 struct PlotterSettings
@@ -39,9 +38,7 @@ struct PlotterSettings
         verticalLines( false ),
         horizontalLines( true ),
         automaticDetection( true ),
-        verticalLinesScroll( false ),
-        colorIncoming( 0x1889FF ),
-        colorOutgoing( 0xFF7F08 )
+        verticalLinesScroll( false )
     {}
 
     int pixel;
@@ -56,8 +53,6 @@ struct PlotterSettings
     bool horizontalLines;
     bool automaticDetection;
     bool verticalLinesScroll;
-    QColor colorIncoming;
-    QColor colorOutgoing;
 };
 
 class PlotterConfigDialog : public QDialog

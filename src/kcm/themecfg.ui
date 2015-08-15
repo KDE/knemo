@@ -3,7 +3,16 @@
  <class>ThemeCfg</class>
  <widget class="QWidget" name="ThemeCfg">
   <layout class="QVBoxLayout" name="verticalLayout_4">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -45,16 +54,6 @@
       <string>Traffic Rate Visualization</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <widget class="QCheckBox" name="checkDynColor">
-        <property name="whatsThis">
-         <string>If checked, the transmit and receive colors will change according to the traffic rate.  As the traffic rate increases, the color will change from the default color, to the max rate color.</string>
-        </property>
-        <property name="text">
-         <string>Change color according to max visual rate</string>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QCheckBox" name="checkBarScale">
         <property name="whatsThis">
@@ -105,23 +104,6 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Color:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="KColorButton" name="colorIncomingMax">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
       <item>
@@ -152,23 +134,6 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Color:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="KColorButton" name="colorOutgoingMax">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
      </layout>
@@ -196,87 +161,12 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>KColorButton</class>
-   <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>spinBoxTrafficThreshold</tabstop>
   <tabstop>checkBarScale</tabstop>
-  <tabstop>checkDynColor</tabstop>
   <tabstop>rxMaxRate</tabstop>
-  <tabstop>colorIncomingMax</tabstop>
   <tabstop>txMaxRate</tabstop>
-  <tabstop>colorOutgoingMax</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>checkDynColor</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>label</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>175</x>
-     <y>172</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>204</x>
-     <y>201</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkDynColor</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>label_2</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>136</x>
-     <y>172</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>206</x>
-     <y>231</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkDynColor</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>colorIncomingMax</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>319</x>
-     <y>172</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>335</x>
-     <y>201</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkDynColor</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>colorOutgoingMax</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>305</x>
-     <y>172</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>335</x>
-     <y>231</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

@@ -21,7 +21,6 @@
 #include <math.h>
 
 #include <KCalendarSystem>
-#include <KColorScheme>
 #include <KConfigGroup>
 #include <KNotification>
 #include <KWindowSystem>
@@ -98,15 +97,6 @@ void Interface::configChanged()
     if ( !themeNames.contains( mSettings.iconTheme ) )
         mSettings.iconTheme = TEXT_THEME;
 
-    mSettings.colorIncoming = interfaceGroup.readEntry( conf_colorIncoming, s.colorIncoming );
-    mSettings.colorOutgoing = interfaceGroup.readEntry( conf_colorOutgoing, s.colorOutgoing );
-    KColorScheme scheme(QPalette::Active, KColorScheme::View);
-    mSettings.colorDisabled = interfaceGroup.readEntry( conf_colorDisabled, scheme.foreground( KColorScheme::InactiveText ).color() );
-    mSettings.colorUnavailable = interfaceGroup.readEntry( conf_colorUnavailable, scheme.foreground( KColorScheme::InactiveText ).color() );
-    mSettings.colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-    mSettings.dynamicColor = interfaceGroup.readEntry( conf_dynamicColor, s.dynamicColor );
-    mSettings.colorIncomingMax = interfaceGroup.readEntry( conf_colorIncomingMax, s.colorIncomingMax );
-    mSettings.colorOutgoingMax = interfaceGroup.readEntry( conf_colorOutgoingMax, s.colorOutgoingMax );
     mSettings.barScale = interfaceGroup.readEntry( conf_barScale, s.barScale );
     mSettings.inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate )*1024;
     mSettings.outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate )*1024;

@@ -21,6 +21,8 @@
 #ifndef INTERFACEICON_H
 #define INTERFACEICON_H
 
+#include <QColor>
+
 class Interface;
 class InterfaceTray;
 class KActionCollection;
@@ -93,7 +95,7 @@ private:
      */
     void updateIconImage( int status );
 
-    QColor calcColor( QList<unsigned long>& hist, const QColor& low, const QColor& high, int hival );
+    QColor calcColor( const QColor& low );
     int calcHeight( QList<unsigned long>& hist, unsigned int& net_max );
     void updateBars( bool doUpdate = false );
     void updateIconText( bool doUpdate = false );
@@ -109,7 +111,6 @@ private:
     QString textIncoming;
     QString textOutgoing;
     QColor colorIncoming;
-    QColor colorOutgoing;
     int iconWidth;
     int histSize;
     int barIncoming;

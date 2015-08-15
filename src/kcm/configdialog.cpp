@@ -289,8 +289,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     mDlg->pushButtonAddToolTip->setIcon( QIcon::fromTheme( QLatin1String("arrow-right") ) );
     mDlg->pushButtonRemoveToolTip->setIcon( QIcon::fromTheme( QLatin1String("arrow-left") ) );
 
-    mDlg->themeColorBox->setEnabled( false );
-
     setButtons( KCModule::Default | KCModule::Apply );
 
     connect( mDlg->checkBoxStartKNemo, SIGNAL( toggled( bool ) ),
@@ -313,14 +311,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( comboHidingChanged( int ) ) );
     connect( mDlg->comboBoxIconTheme, SIGNAL( activated( int ) ),
              this, SLOT( iconThemeChanged( int ) ) );
-    connect( mDlg->colorIncoming, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->colorOutgoing, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->colorDisabled, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->colorUnavailable, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( colorButtonChanged() ) );
     connect( mDlg->advancedButton, SIGNAL( clicked() ),
              this, SLOT( advancedButtonClicked() ) );
 
@@ -397,15 +387,7 @@ void ConfigDialog::load()
             settings->minVisibleState = interfaceGroup.readEntry( conf_minVisibleState, s.minVisibleState );
             settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
             settings->iconTheme = interfaceGroup.readEntry( conf_iconTheme, s.iconTheme );
-            settings->colorIncoming = interfaceGroup.readEntry( conf_colorIncoming, s.colorIncoming );
-            settings->colorOutgoing = interfaceGroup.readEntry( conf_colorOutgoing, s.colorOutgoing );
             KColorScheme scheme(QPalette::Active, KColorScheme::View);
-            settings->colorDisabled = interfaceGroup.readEntry( conf_colorDisabled, scheme.foreground( KColorScheme::InactiveText ).color() );
-            settings->colorUnavailable = interfaceGroup.readEntry( conf_colorUnavailable, scheme.foreground( KColorScheme::InactiveText ).color() );
-            settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-            settings->dynamicColor = interfaceGroup.readEntry( conf_dynamicColor, s.dynamicColor );
-            settings->colorIncomingMax = interfaceGroup.readEntry( conf_colorIncomingMax, s.colorIncomingMax );
-            settings->colorOutgoingMax = interfaceGroup.readEntry( conf_colorOutgoingMax, s.colorOutgoingMax );
             settings->barScale = interfaceGroup.readEntry( conf_barScale, s.barScale );
             settings->inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate );
             settings->outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate );
@@ -582,23 +564,11 @@ void ConfigDialog::save()
              settings->iconTheme == NETLOAD_THEME
            )
         {
-            interfaceGroup.writeEntry( conf_colorIncoming, settings->colorIncoming );
-            interfaceGroup.writeEntry( conf_colorOutgoing, settings->colorOutgoing );
-            interfaceGroup.writeEntry( conf_colorDisabled, settings->colorDisabled );
-            interfaceGroup.writeEntry( conf_colorUnavailable, settings->colorUnavailable );
-            interfaceGroup.writeEntry( conf_dynamicColor, settings->dynamicColor );
-            if ( settings->dynamicColor )
-            {
-                interfaceGroup.writeEntry( conf_colorIncomingMax, settings->colorIncomingMax );
-                interfaceGroup.writeEntry( conf_colorOutgoingMax, settings->colorOutgoingMax );
-            }
             if ( settings->iconTheme == NETLOAD_THEME )
             {
                 interfaceGroup.writeEntry( conf_barScale, settings->barScale );
             }
-            if ( settings->dynamicColor ||
-                 ( settings->iconTheme == NETLOAD_THEME && settings->barScale )
-               )
+            if ( settings->iconTheme == NETLOAD_THEME && settings->barScale )
             {
                 interfaceGroup.writeEntry( conf_inMaxRate, settings->inMaxRate );
                 interfaceGroup.writeEntry( conf_outMaxRate, settings->outMaxRate );
@@ -710,10 +680,6 @@ void ConfigDialog::defaults()
     else
     {
         InterfaceSettings* settings = new InterfaceSettings();
-        KColorScheme scheme(QPalette::Active, KColorScheme::View);
-        settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
@@ -825,10 +791,6 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     if ( index < 0 )
         index = findIndexFromName( TEXT_THEME );
     mDlg->comboBoxIconTheme->setCurrentIndex( index );
-    mDlg->colorIncoming->setColor( settings->colorIncoming );
-    mDlg->colorOutgoing->setColor( settings->colorOutgoing );
-    mDlg->colorDisabled->setColor( settings->colorDisabled );
-    mDlg->colorUnavailable->setColor( settings->colorUnavailable );
     iconThemeChanged( index );
     switch ( settings->minVisibleState )
     {
@@ -911,9 +873,6 @@ void ConfigDialog::buttonNewSelected()
         mDlg->listBoxInterfaces->addItem( item );
         InterfaceSettings *settings = new InterfaceSettings();
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
-        settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->setCurrentRow( mDlg->listBoxInterfaces->row( item ) );
         mDlg->pushButtonDelete->setEnabled( true );
@@ -967,9 +926,6 @@ void ConfigDialog::buttonAllSelected()
         if ( mSettingsMap.contains( ifname ) )
             continue;
         InterfaceSettings* settings = new InterfaceSettings();
-        settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->addItem( ifname );
     }
@@ -1050,15 +1006,15 @@ QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, int 
         rxFont.setPointSizeF( txFont.pointSizeF() );
     p.setFont( rxFont );
     if ( status >= KNemoIface::Connected )
-        p.setPen( mDlg->colorIncoming->color() );
+        p.setPen( KColorScheme(QPalette::Active).foreground(KColorScheme::ActiveText).color() );
     else if ( status == KNemoIface::Available )
-        p.setPen( mDlg->colorDisabled->color() );
+        p.setPen( KColorScheme(QPalette::Active).foreground(KColorScheme::InactiveText).color() );
     else
-        p.setPen( mDlg->colorUnavailable->color() );
+        p.setPen( KColorScheme(QPalette::Active).foreground(KColorScheme::NegativeText).color() );
     p.drawText( topRect, Qt::AlignCenter | Qt::AlignRight, incomingText );
     p.setFont( rxFont );
     if ( status >= KNemoIface::Connected )
-        p.setPen( mDlg->colorOutgoing->color() );
+        p.setPen( KColorScheme(QPalette::Active).foreground(KColorScheme::NeutralText).color() );
     p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, outgoingText );
     return sampleIcon;
 }
@@ -1070,41 +1026,26 @@ QPixmap ConfigDialog::barIcon( int status )
     QPixmap barIcon( 22, 22 );
     barIcon.fill( Qt::transparent );
     QPainter p( &barIcon );
-
-    QLinearGradient inGrad( 12, 0, 19, 0 );
-    QLinearGradient topInGrad( 12, 0, 19, 0 );
-    QLinearGradient outGrad( 3, 0, 10, 0 );
-    QLinearGradient topOutGrad( 3, 0, 10, 0 );
-
-    QColor topColor = getItemSettings()->colorBackground;
-    QColor topColorD = getItemSettings()->colorBackground.darker();
-    topColor.setAlpha( 128 );
-    topColorD.setAlpha( 128 );
-    topInGrad.setColorAt(0, topColorD);
-    topInGrad.setColorAt(1, topColor );
-    topOutGrad.setColorAt(0, topColorD);
-    topOutGrad.setColorAt(1, topColor );
+    QColor rxColor;
+    QColor txColor;
+    QColor bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::InactiveText).color();
+    bgColor.setAlpha( 77 );
 
     if ( status & KNemoIface::Connected )
     {
-        inGrad.setColorAt(0, mDlg->colorIncoming->color() );
-        inGrad.setColorAt(1, mDlg->colorIncoming->color().darker() );
-        outGrad.setColorAt(0, mDlg->colorOutgoing->color() );
-        outGrad.setColorAt(1, mDlg->colorOutgoing->color().darker() );
+        rxColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::ActiveText).color();
+        txColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::NeutralText).color();
     }
     else if ( status & KNemoIface::Available )
     {
-        inGrad.setColorAt(0, mDlg->colorDisabled->color());
-        inGrad.setColorAt(1, mDlg->colorDisabled->color().darker() );
-        outGrad.setColorAt(0, mDlg->colorDisabled->color() );
-        outGrad.setColorAt(1, mDlg->colorDisabled->color().darker() );
+        rxColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::InactiveText).color();
+        rxColor.setAlpha( 153 );
+        txColor = rxColor;
     }
     else
     {
-        inGrad.setColorAt(0, mDlg->colorUnavailable->color() );
-        inGrad.setColorAt(1, mDlg->colorUnavailable->color().darker() );
-        outGrad.setColorAt(0, mDlg->colorUnavailable->color() );
-        outGrad.setColorAt(1, mDlg->colorUnavailable->color().darker() );
+        rxColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::NegativeText).color();
+        txColor = rxColor;
     }
     if ( status & KNemoIface::Available || status & KNemoIface::Unavailable )
     {
@@ -1123,15 +1064,10 @@ QPixmap ConfigDialog::barIcon( int status )
     QRect topRightRect( 12, 0, 7, top );
     QRect rightRect( 12, top, 7, 22 );
 
-    QBrush brush( inGrad );
-    p.setBrush( brush );
-    p.fillRect( rightRect, inGrad );
-    brush = QBrush( topInGrad );
-    p.fillRect( topRightRect, topInGrad );
-    brush = QBrush( outGrad );
-    p.fillRect( leftRect, outGrad );
-    brush = QBrush( topOutGrad );
-    p.fillRect( topLeftRect, topOutGrad );
+    p.fillRect( rightRect, rxColor );
+    p.fillRect( leftRect, txColor );
+    p.fillRect( topRightRect, bgColor );
+    p.fillRect( topLeftRect, bgColor );
     return barIcon;
 }
 
@@ -1199,8 +1135,6 @@ void ConfigDialog::iconThemeChanged( int set )
             mDlg->pixmapOutgoing->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::TxTraffic ) );
             mDlg->pixmapTraffic->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::RxTraffic | KNemoIface::TxTraffic ) );
         }
-
-        mDlg->themeColorBox->setEnabled( true );
     }
     else
     {
@@ -1216,31 +1150,8 @@ void ConfigDialog::iconThemeChanged( int set )
         mDlg->pixmapIncoming->setPixmap( QIcon::fromTheme( iconName + ICON_RX ).pixmap( 22 ) );
         mDlg->pixmapOutgoing->setPixmap( QIcon::fromTheme( iconName + ICON_TX ).pixmap( 22 ) );
         mDlg->pixmapTraffic->setPixmap( QIcon::fromTheme( iconName + ICON_RX_TX ).pixmap( 22 ) );
-        mDlg->themeColorBox->setEnabled( false );
     }
     if (!mLock) changed( true );
-}
-
-void ConfigDialog::colorButtonChanged()
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    if ( mDlg->colorIncoming->color().isValid() )
-        settings->colorIncoming = mDlg->colorIncoming->color();
-    if ( mDlg->colorOutgoing->color().isValid() )
-        settings->colorOutgoing = mDlg->colorOutgoing->color();
-    if ( mDlg->colorDisabled->color().isValid() )
-        settings->colorDisabled = mDlg->colorDisabled->color();
-    if ( mDlg->colorUnavailable->color().isValid() )
-        settings->colorUnavailable = mDlg->colorUnavailable->color();
-
-    KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
-    if ( curTheme.internalName == TEXT_THEME ||
-         curTheme.internalName == NETLOAD_THEME )
-        iconThemeChanged( mDlg->comboBoxIconTheme->currentIndex() );
-    if ( !mLock) changed( true );
 }
 
 void ConfigDialog::advancedButtonClicked()
@@ -1254,9 +1165,6 @@ void ConfigDialog::advancedButtonClicked()
     {
         InterfaceSettings s = dlg.settings();
         settings->trafficThreshold = s.trafficThreshold;
-        settings->dynamicColor = s.dynamicColor;
-        settings->colorIncomingMax = s.colorIncomingMax;
-        settings->colorOutgoingMax = s.colorOutgoingMax;
 
         settings->barScale = s.barScale;
         settings->inMaxRate = s.inMaxRate;

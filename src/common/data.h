@@ -21,7 +21,6 @@
 #ifndef DATA_H
 #define DATA_H
 
-#include <QColor>
 #include <QDate>
 #include <QList>
 #include <QMap>
@@ -137,13 +136,6 @@ static const QLatin1String conf_alias("Alias");
 static const QLatin1String conf_minVisibleState("MinVisibleState");
 static const QLatin1String conf_trafficThreshold("TrafficThreshold");
 static const QLatin1String conf_iconTheme("IconSet");
-static const QLatin1String conf_colorIncoming("ColorIncoming");
-static const QLatin1String conf_colorOutgoing("ColorOutgoing");
-static const QLatin1String conf_colorDisabled("ColorDisabled");
-static const QLatin1String conf_colorUnavailable("ColorUnavailable");
-static const QLatin1String conf_dynamicColor("DynamicColor");
-static const QLatin1String conf_colorIncomingMax("ColorIncomingMax");
-static const QLatin1String conf_colorOutgoingMax("ColorOutgoingMax");
 static const QLatin1String conf_barScale("BarScale");
 static const QLatin1String conf_inMaxRate("InMaxRate");
 static const QLatin1String conf_outMaxRate("OutMaxRate");
@@ -381,15 +373,7 @@ struct WarnRule
 struct InterfaceSettings
 {
     InterfaceSettings()
-      : colorIncoming( 0x1889FF ),
-        colorOutgoing( 0xFF7F08 ),
-        colorDisabled( 0x888786 ),
-        colorUnavailable( 0x888786 ),
-        colorBackground( 0x888786 ),
-        dynamicColor( false ),
-        colorIncomingMax( 0x96FFFF ),
-        colorOutgoingMax( 0xFFC868 ),
-        barScale( false ),
+      : barScale( false ),
         inMaxRate( 4 ),
         outMaxRate( 4 ),
         trafficThreshold( 0 ),
@@ -399,14 +383,6 @@ struct InterfaceSettings
     {}
 
     QString iconTheme;
-    QColor colorIncoming;
-    QColor colorOutgoing;
-    QColor colorDisabled;
-    QColor colorUnavailable;
-    QColor colorBackground;
-    bool dynamicColor;
-    QColor colorIncomingMax;
-    QColor colorOutgoingMax;
     bool barScale;
     unsigned int inMaxRate;
     unsigned int outMaxRate;
