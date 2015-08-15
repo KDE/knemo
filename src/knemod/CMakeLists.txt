@@ -49,6 +49,7 @@ target_link_libraries( knemo
     KF5::GlobalAccel
     KF5::KDELibs4Support
     KF5::Notifications
+    KF5::Plasma
     KF5::SignalPlotter
     KF5::XmlGui
     KF5::WindowSystem

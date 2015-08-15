@@ -40,6 +40,7 @@ QString KNemoDaemon::sSelectedInterface = QString::null;
 
 BackendBase *backend = NULL;
 GeneralSettings *generalSettings = NULL;
+Plasma::Theme *plasmaTheme = NULL;
 
 KNemoDaemon::KNemoDaemon()
     : QObject()
@@ -47,6 +48,7 @@ KNemoDaemon::KNemoDaemon()
     migrateKde4Conf();
 
     generalSettings = new GeneralSettings();
+    plasmaTheme = new Plasma::Theme( this );
     backend = BackendFactory::backend();
     QDBusConnection::sessionBus().registerObject(QLatin1String("/knemo"), this, QDBusConnection::ExportScriptableSlots);
     mPollTimer = new QTimer();

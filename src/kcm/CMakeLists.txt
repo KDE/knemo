@@ -26,6 +26,7 @@ target_link_libraries( kcm_knemo
     KF5::KCMUtils
     KF5::KIOWidgets
     KF5::NotifyConfig
+    KF5::Plasma
     KF5::I18n
     ${LIBNL_LIBRARIES}
 )

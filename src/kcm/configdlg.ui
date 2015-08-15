@@ -295,16 +295,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                   </property>
                  </widget>
                 </item>
-                <item>
-                 <widget class="QLabel" name="iconFontLabel">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="text">
-                   <string>Icon Font:</string>
-                  </property>
-                 </widget>
-                </item>
                </layout>
               </item>
               <item>
@@ -320,9 +310,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
                 </item>
                 <item>
                  <widget class="KColorButton" name="colorUnavailable"/>
-                </item>
-                <item>
-                 <widget class="QFontComboBox" name="iconFont"/>
                 </item>
                </layout>
               </item>
@@ -912,7 +899,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
   <tabstop>colorOutgoing</tabstop>
   <tabstop>colorDisabled</tabstop>
   <tabstop>colorUnavailable</tabstop>
-  <tabstop>iconFont</tabstop>
   <tabstop>advancedButton</tabstop>
   <tabstop>checkBoxStatistics</tabstop>
   <tabstop>statsView</tabstop>

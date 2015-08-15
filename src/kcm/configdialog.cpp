@@ -32,6 +32,7 @@
 #include <KMessageBox>
 #include <KPluginFactory>
 #include <KNotifyConfigWidget>
+#include <Plasma/Theme>
 #include <math.h>
 
 #include "ui_configdlg.h"
@@ -320,8 +321,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( colorButtonChanged() ) );
     connect( mDlg->colorUnavailable, SIGNAL( changed( const QColor& ) ),
              this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->iconFont, SIGNAL( currentFontChanged( const QFont& ) ),
-             this, SLOT( iconFontChanged( const QFont& ) ) );
     connect( mDlg->advancedButton, SIGNAL( clicked() ),
              this, SLOT( advancedButtonClicked() ) );
 
@@ -404,7 +403,6 @@ void ConfigDialog::load()
             settings->colorDisabled = interfaceGroup.readEntry( conf_colorDisabled, scheme.foreground( KColorScheme::InactiveText ).color() );
             settings->colorUnavailable = interfaceGroup.readEntry( conf_colorUnavailable, scheme.foreground( KColorScheme::InactiveText ).color() );
             settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-            settings->iconFont = interfaceGroup.readEntry( conf_iconFont, s.iconFont );
             settings->dynamicColor = interfaceGroup.readEntry( conf_dynamicColor, s.dynamicColor );
             settings->colorIncomingMax = interfaceGroup.readEntry( conf_colorIncomingMax, s.colorIncomingMax );
             settings->colorOutgoingMax = interfaceGroup.readEntry( conf_colorOutgoingMax, s.colorOutgoingMax );
@@ -598,10 +596,6 @@ void ConfigDialog::save()
             {
                 interfaceGroup.writeEntry( conf_barScale, settings->barScale );
             }
-            if ( settings->iconTheme == TEXT_THEME && settings->iconFont != QFontDatabase::systemFont( QFontDatabase::GeneralFont ) )
-            {
-                interfaceGroup.writeEntry( conf_iconFont, settings->iconFont );
-            }
             if ( settings->dynamicColor ||
                  ( settings->iconTheme == NETLOAD_THEME && settings->barScale )
                )
@@ -720,7 +714,6 @@ void ConfigDialog::defaults()
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->iconFont = QFontDatabase::systemFont( QFontDatabase::GeneralFont );
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
@@ -836,7 +829,6 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
     mDlg->colorOutgoing->setColor( settings->colorOutgoing );
     mDlg->colorDisabled->setColor( settings->colorDisabled );
     mDlg->colorUnavailable->setColor( settings->colorUnavailable );
-    mDlg->iconFont->setCurrentFont( settings->iconFont );
     iconThemeChanged( index );
     switch ( settings->minVisibleState )
     {
@@ -922,7 +914,6 @@ void ConfigDialog::buttonNewSelected()
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->iconFont = QFontDatabase::systemFont( QFontDatabase::GeneralFont );
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->setCurrentRow( mDlg->listBoxInterfaces->row( item ) );
         mDlg->pushButtonDelete->setEnabled( true );
@@ -979,7 +970,6 @@ void ConfigDialog::buttonAllSelected()
         settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
         settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->iconFont = QFontDatabase::systemFont( QFontDatabase::GeneralFont );
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->addItem( ifname );
     }
@@ -1053,8 +1043,9 @@ QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, int 
     QPainter p( &sampleIcon );
     p.setBrush( Qt::NoBrush );
     p.setOpacity( 1.0 );
-    QFont rxFont = setIconFont( incomingText, mDlg->iconFont->currentFont(), 22 );
-    QFont txFont = setIconFont( outgoingText, mDlg->iconFont->currentFont(), 22 );
+    Plasma::Theme theme;
+    QFont rxFont = setIconFont( incomingText, theme.smallestFont(), 22 );
+    QFont txFont = setIconFont( outgoingText, theme.smallestFont(), 22 );
     if ( rxFont.pointSizeF() > txFont.pointSizeF() )
         rxFont.setPointSizeF( txFont.pointSizeF() );
     p.setFont( rxFont );
@@ -1181,12 +1172,6 @@ void ConfigDialog::iconThemeChanged( int set )
 
     KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
 
-    if ( curTheme.internalName != TEXT_THEME )
-    {
-        mDlg->iconFontLabel->setEnabled( false );
-        mDlg->iconFont->setEnabled( false );
-    }
-
     if ( curTheme.internalName == TEXT_THEME ||
          curTheme.internalName == NETLOAD_THEME )
     {
@@ -1203,8 +1188,6 @@ void ConfigDialog::iconThemeChanged( int set )
             mDlg->pixmapIncoming->setPixmap( textIcon( f2, f1, KNemoIface::Connected ) );
             mDlg->pixmapOutgoing->setPixmap( textIcon( f1, f3, KNemoIface::Connected ) );
             mDlg->pixmapTraffic->setPixmap( textIcon( f2, f3, KNemoIface::Connected ) );
-            mDlg->iconFontLabel->setEnabled( true );
-            mDlg->iconFont->setEnabled( true );
         }
         else
         {
@@ -1258,20 +1241,6 @@ void ConfigDialog::colorButtonChanged()
          curTheme.internalName == NETLOAD_THEME )
         iconThemeChanged( mDlg->comboBoxIconTheme->currentIndex() );
     if ( !mLock) changed( true );
-}
-
-void ConfigDialog::iconFontChanged( const QFont &font )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    if ( font != settings->iconFont )
-    {
-        settings->iconFont = font;
-        iconThemeChanged( mDlg->comboBoxIconTheme->currentIndex() );
-    }
-    if ( !mLock ) changed( true );
 }
 
 void ConfigDialog::advancedButtonClicked()

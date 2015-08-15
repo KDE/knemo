@@ -33,6 +33,7 @@ find_package(KF5 REQUIRED COMPONENTS
     KIO
     Notifications
     NotifyConfig
+    Plasma
     SysGuard
     WidgetsAddons
     WindowSystem

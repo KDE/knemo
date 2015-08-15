@@ -104,7 +104,6 @@ void Interface::configChanged()
     mSettings.colorDisabled = interfaceGroup.readEntry( conf_colorDisabled, scheme.foreground( KColorScheme::InactiveText ).color() );
     mSettings.colorUnavailable = interfaceGroup.readEntry( conf_colorUnavailable, scheme.foreground( KColorScheme::InactiveText ).color() );
     mSettings.colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-    mSettings.iconFont = interfaceGroup.readEntry( conf_iconFont, s.iconFont );
     mSettings.dynamicColor = interfaceGroup.readEntry( conf_dynamicColor, s.dynamicColor );
     mSettings.colorIncomingMax = interfaceGroup.readEntry( conf_colorIncomingMax, s.colorIncomingMax );
     mSettings.colorOutgoingMax = interfaceGroup.readEntry( conf_colorOutgoingMax, s.colorOutgoingMax );

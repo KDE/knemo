@@ -23,8 +23,6 @@
 
 #include <QColor>
 #include <QDate>
-#include <QFont>
-#include <QFontDatabase>
 #include <QList>
 #include <QMap>
 #include <QStandardPaths>
@@ -149,7 +147,6 @@ static const QLatin1String conf_colorOutgoingMax("ColorOutgoingMax");
 static const QLatin1String conf_barScale("BarScale");
 static const QLatin1String conf_inMaxRate("InMaxRate");
 static const QLatin1String conf_outMaxRate("OutMaxRate");
-static const QLatin1String conf_iconFont("IconFont");
 
 // interface statistics
 static const QLatin1String conf_activateStatistics("ActivateStatistics");
@@ -395,7 +392,6 @@ struct InterfaceSettings
         barScale( false ),
         inMaxRate( 4 ),
         outMaxRate( 4 ),
-        iconFont( QFontDatabase::systemFont( QFontDatabase::GeneralFont ) ),
         trafficThreshold( 0 ),
         minVisibleState( KNemoIface::UnknownState ),
         activateStatistics( false ),
@@ -414,7 +410,6 @@ struct InterfaceSettings
     bool barScale;
     unsigned int inMaxRate;
     unsigned int outMaxRate;
-    QFont iconFont;
     unsigned int trafficThreshold;
     int minVisibleState;
     bool activateStatistics;

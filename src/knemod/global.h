@@ -22,6 +22,7 @@
 #define GLOBAL_H
 
 #include "data.h"
+#include <Plasma/Theme>
 
 /**
  * This file contains data structures and enums used in the knemo daemon.
@@ -32,6 +33,8 @@
 
 // application wide settings are stored here
 extern GeneralSettings *generalSettings;
+
+extern Plasma::Theme *plasmaTheme;
 
 QString formattedRate( quint64 data, bool useBits );
 

@@ -101,7 +101,6 @@ private Q_SLOTS:
     void checkBoxStatisticsToggled( bool on );
     void checkBoxStartKNemoToggled( bool on );
     void colorButtonChanged();
-    void iconFontChanged( const QFont &font );
     void advancedButtonClicked();
     void addStatsClicked();
     void modifyStatsClicked();

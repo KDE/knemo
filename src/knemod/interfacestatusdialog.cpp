@@ -22,6 +22,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <QAbstractItemView>
+#include <QFontDatabase>
 #include <KConfigGroup>
 #include <KSharedConfig>
 
