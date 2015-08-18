@@ -34,6 +34,7 @@
 #include <QMenu>
 #include <KAboutData>
 #include <KProcess>
+#include <Plasma/Theme>
 
 #include "global.h"
 #include "utils.h"
@@ -77,15 +78,6 @@ InterfaceIcon::~InterfaceIcon()
 
 void InterfaceIcon::configChanged()
 {
-    KConfigGroup cg( KSharedConfig::openConfig(), "System Tray" );
-    iconWidth = cg.readEntry( "systrayIconWidth", 22 );
-
-    barWidth = iconWidth/3;
-    int margins = iconWidth - (barWidth*2);
-    midMargin = margins/3;
-    int rightMargin = (margins - midMargin)/2;
-    leftMargin = margins-midMargin - rightMargin;
-    midMargin = leftMargin + barWidth+ midMargin;
     histSize = HISTSIZE_STORE/generalSettings->pollInterval;
     if ( histSize < 2 )
         histSize = 2;
@@ -151,7 +143,7 @@ void InterfaceIcon::updateIconImage( int status )
     mTray->setIconByName( iconName );
 }
 
-int InterfaceIcon::calcHeight( QList<unsigned long>& hist, unsigned int& net_max )
+int InterfaceIcon::calcHeight( int iconHeight, QList<unsigned long>& hist, unsigned int& net_max )
 {
     unsigned long histcalculate = 0;
     unsigned long rate = 0;
@@ -184,7 +176,7 @@ int InterfaceIcon::calcHeight( QList<unsigned long>& hist, unsigned int& net_max
     qreal ratio = static_cast<double>(rate)/net_max;
     if ( ratio > 1.0 )
         ratio = 1.0;
-    return ratio*iconWidth;
+    return ratio*iconHeight;
 }
 
 QColor InterfaceIcon::calcColor( const QColor& low )
@@ -210,9 +202,11 @@ void InterfaceIcon::updateBars( bool doUpdate )
         colorIncoming = rxColor;
     }
 
+    QSize iconSize = getIconSize();
+
     // Has height changed?
-    int rateIn = calcHeight( inHist, inMaxRate );
-    int rateOut = calcHeight( outHist, outMaxRate );
+    int rateIn = calcHeight( iconSize.height(), inHist, inMaxRate );
+    int rateOut = calcHeight( iconSize.height(), outHist, outMaxRate );
     if ( rateIn != barIncoming )
     {
         doUpdate = true;
@@ -227,20 +221,23 @@ void InterfaceIcon::updateBars( bool doUpdate )
     if ( !doUpdate )
         return;
 
-    QPixmap barIcon(iconWidth, iconWidth);
+    int barWidth = static_cast<int>(round(iconSize.width()/3.0) + 0.5);
+    int margins = iconSize.width() - (barWidth*2);
+    int midMargin = static_cast<int>(round(margins/3.0) + 0.5);
+    int outerMargin = static_cast<int>(round((margins - midMargin)/2.0) + 0.5);
+    midMargin = outerMargin + barWidth + midMargin;
+    QPixmap barIcon(iconSize);
     barIcon.fill( Qt::transparent );
-    QPainter p( &barIcon );
-    QColor bgColor;
 
-    int top = iconWidth - barOutgoing;
-
-    QRect topLeftRect( leftMargin, 0, barWidth, top );
-    QRect leftRect( leftMargin, top, barWidth, iconWidth );
-    top = iconWidth - barIncoming;
+    int top = iconSize.height() - barOutgoing;
+    QRect topLeftRect( outerMargin, 0, barWidth, top );
+    QRect leftRect( outerMargin, top, barWidth, iconSize.height() );
+    top = iconSize.height() - barIncoming;
     QRect topRightRect( midMargin, 0, barWidth, top );
-    QRect rightRect( midMargin, top, barWidth, iconWidth );
+    QRect rightRect( midMargin, top, barWidth, iconSize.height() );
 
     const BackendData * data = mInterface->backendData();
+    QColor bgColor;
     if ( data->status & KNemoIface::Connected )
     {
         bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::InactiveText).color();
@@ -256,6 +253,7 @@ void InterfaceIcon::updateBars( bool doUpdate )
         bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::NegativeText).color();
     }
 
+    QPainter p( &barIcon );
     p.fillRect( leftRect, txColor );
     p.fillRect( rightRect, rxColor );
     p.fillRect( topLeftRect, bgColor );
@@ -334,17 +332,18 @@ void InterfaceIcon::updateIconText( bool doUpdate )
     if ( !doUpdate )
         return;
 
-    QPixmap textIcon(iconWidth, iconWidth);
-    QRect topRect( 0, 0, iconWidth, iconWidth/2 );
-    QRect bottomRect( 0, iconWidth/2, iconWidth, iconWidth/2 );
+    QSize iconSize = getIconSize();
+    QPixmap textIcon(iconSize);
+    QRect topRect( 0, 0, iconSize.width(), iconSize.height()/2 );
+    QRect bottomRect( 0, iconSize.width()/2, iconSize.width(), iconSize.height()/2 );
     textIcon.fill( Qt::transparent );
     QPainter p( &textIcon );
     p.setBrush( Qt::NoBrush );
     p.setOpacity( 1.0 );
 
     // rxFont and txFont should be the same size per poll period
-    QFont rxFont = setIconFont( textIncoming, plasmaTheme->smallestFont(), iconWidth );
-    QFont txFont = setIconFont( textOutgoing, plasmaTheme->smallestFont(), iconWidth );
+    QFont rxFont = setIconFont( textIncoming, plasmaTheme->smallestFont(), iconSize.height() );
+    QFont txFont = setIconFont( textOutgoing, plasmaTheme->smallestFont(), iconSize.height() );
     if ( rxFont.pointSizeF() > txFont.pointSizeF() )
         rxFont.setPointSizeF( txFont.pointSizeF() );
 

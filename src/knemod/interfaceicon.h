@@ -96,7 +96,7 @@ private:
     void updateIconImage( int status );
 
     QColor calcColor( const QColor& low );
-    int calcHeight( QList<unsigned long>& hist, unsigned int& net_max );
+    int calcHeight( int iconHeight, QList<unsigned long>& hist, unsigned int& net_max );
     void updateBars( bool doUpdate = false );
     void updateIconText( bool doUpdate = false );
     // the interface this icon belongs to

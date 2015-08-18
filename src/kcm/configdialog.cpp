@@ -992,16 +992,18 @@ void ConfigDialog::aliasChanged( const QString& text )
 
 QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, int status )
 {
-    QPixmap sampleIcon( 22, 22 );
+    QSize iconSize = getIconSize();
+    QPixmap sampleIcon( iconSize );
     sampleIcon.fill( Qt::transparent );
-    QRect topRect( 0, 0, 22, 11 );
-    QRect bottomRect( 0, 11, 22, 11 );
+    QRect topRect( 0, 0, iconSize.width(), iconSize.height()/2 );
+    QRect bottomRect( 0, iconSize.width()/2, iconSize.width(), iconSize.height()/2 );
     QPainter p( &sampleIcon );
     p.setBrush( Qt::NoBrush );
     p.setOpacity( 1.0 );
     Plasma::Theme theme;
-    QFont rxFont = setIconFont( incomingText, theme.smallestFont(), 22 );
-    QFont txFont = setIconFont( outgoingText, theme.smallestFont(), 22 );
+    QFont rxFont = setIconFont( incomingText, theme.smallestFont(), iconSize.height() );
+    QFont txFont = setIconFont( outgoingText, theme.smallestFont(), iconSize.height() );
+
     if ( rxFont.pointSizeF() > txFont.pointSizeF() )
         rxFont.setPointSizeF( txFont.pointSizeF() );
     p.setFont( rxFont );
@@ -1023,7 +1025,13 @@ QPixmap ConfigDialog::barIcon( int status )
 {
     int barIncoming = 0;
     int barOutgoing = 0;
-    QPixmap barIcon( 22, 22 );
+    QSize iconSize = getIconSize();
+    int barWidth = static_cast<int>(round(iconSize.width()/3.0) + 0.5);
+    int margins = iconSize.width() - (barWidth*2);
+    int midMargin = static_cast<int>(round(margins/3.0) + 0.5);
+    int outerMargin = static_cast<int>(round((margins - midMargin)/2.0) + 0.5);
+    midMargin = outerMargin + barWidth + midMargin;
+    QPixmap barIcon( iconSize );
     barIcon.fill( Qt::transparent );
     QPainter p( &barIcon );
     QColor rxColor;
@@ -1049,20 +1057,20 @@ QPixmap ConfigDialog::barIcon( int status )
     }
     if ( status & KNemoIface::Available || status & KNemoIface::Unavailable )
     {
-        barIncoming = 22;
-        barOutgoing = 22;
+        barIncoming = iconSize.height();
+        barOutgoing = iconSize.height();
     }
     if ( status & KNemoIface::RxTraffic )
-        barIncoming = 17;
+        barIncoming = static_cast<int>(round(iconSize.height()*.75) + 0.5);
     if ( status & KNemoIface::TxTraffic )
-        barOutgoing = 17;
+        barOutgoing = static_cast<int>(round(iconSize.height()*.75) + 0.5);
 
-    int top = 22 - barOutgoing;
-    QRect topLeftRect( 3, 0, 7, top );
-    QRect leftRect( 3, top, 7, 22 );
-    top = 22 - barIncoming;
-    QRect topRightRect( 12, 0, 7, top );
-    QRect rightRect( 12, top, 7, 22 );
+    int top = iconSize.height() - barOutgoing;
+    QRect topLeftRect( outerMargin, 0, barWidth, top );
+    QRect leftRect( outerMargin, top, barWidth, iconSize.height() );
+    top = iconSize.height() - barIncoming;
+    QRect topRightRect( midMargin, 0, barWidth, top );
+    QRect rightRect( midMargin, top, barWidth, iconSize.height() );
 
     p.fillRect( rightRect, rxColor );
     p.fillRect( leftRect, txColor );
@@ -1134,6 +1142,7 @@ void ConfigDialog::iconThemeChanged( int set )
             mDlg->pixmapIncoming->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::RxTraffic ) );
             mDlg->pixmapOutgoing->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::TxTraffic ) );
             mDlg->pixmapTraffic->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::RxTraffic | KNemoIface::TxTraffic ) );
+            mDlg->pixmapError->setMinimumHeight(getIconSize().height());
         }
     }
     else
@@ -1144,12 +1153,13 @@ void ConfigDialog::iconThemeChanged( int set )
             iconName = QLatin1String("network-");
         else
             iconName = QLatin1String("knemo-") + settings->iconTheme + QLatin1Char('-');
-        mDlg->pixmapError->setPixmap( QIcon::fromTheme( iconName + ICON_ERROR ).pixmap( 22 ) );
-        mDlg->pixmapDisconnected->setPixmap( QIcon::fromTheme( iconName + ICON_OFFLINE ).pixmap( 22 ) );
-        mDlg->pixmapConnected->setPixmap( QIcon::fromTheme( iconName + ICON_IDLE ).pixmap( 22 ) );
-        mDlg->pixmapIncoming->setPixmap( QIcon::fromTheme( iconName + ICON_RX ).pixmap( 22 ) );
-        mDlg->pixmapOutgoing->setPixmap( QIcon::fromTheme( iconName + ICON_TX ).pixmap( 22 ) );
-        mDlg->pixmapTraffic->setPixmap( QIcon::fromTheme( iconName + ICON_RX_TX ).pixmap( 22 ) );
+        QSize iconSize = getIconSize();
+        mDlg->pixmapError->setPixmap( QIcon::fromTheme( iconName + ICON_ERROR ).pixmap( iconSize ) );
+        mDlg->pixmapDisconnected->setPixmap( QIcon::fromTheme( iconName + ICON_OFFLINE ).pixmap( iconSize ) );
+        mDlg->pixmapConnected->setPixmap( QIcon::fromTheme( iconName + ICON_IDLE ).pixmap( iconSize ) );
+        mDlg->pixmapIncoming->setPixmap( QIcon::fromTheme( iconName + ICON_RX ).pixmap( iconSize ) );
+        mDlg->pixmapOutgoing->setPixmap( QIcon::fromTheme( iconName + ICON_TX ).pixmap( iconSize ) );
+        mDlg->pixmapTraffic->setPixmap( QIcon::fromTheme( iconName + ICON_RX_TX ).pixmap( iconSize ) );
     }
     if (!mLock) changed( true );
 }

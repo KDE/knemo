@@ -36,6 +36,7 @@
 #include <Kdelibs4ConfigMigrator>
 #include <Kdelibs4Migration>
 #include <KSharedConfig>
+#include <Plasma/Theme>
 #include "data.h"
 #include "utils.h"
 
@@ -268,6 +269,34 @@ QList<KNemoTheme> findThemes()
         iconThemes << theme;
     }
     return iconThemes;
+}
+
+QSize getIconSize()
+{
+    // This is borrowed from the plasma system tray:
+    // plasma-workspace/applets/systemtray/package/contents/ui/main.qml
+    // plasma-workspace/applets/systemtray/package/contents/code/Layout.js
+    int preferredItemSize = 128;
+    Plasma::Theme theme;
+    int baseSize = theme.mSize(theme.defaultFont()).height();
+    int suggestedsize = min(baseSize * 2, preferredItemSize);
+    QSize resultingsize;
+
+    if (suggestedsize < 16 || suggestedsize >= 64) {
+        resultingsize = QSize(suggestedsize, suggestedsize);
+    } else if (suggestedsize < 22) {
+        resultingsize = QSize(16, 16);
+    } else if (suggestedsize < 24) {
+        resultingsize = QSize(22, 22);
+    } else if (suggestedsize < 32) {
+        resultingsize = QSize(24, 24);
+    } else if (suggestedsize < 48) {
+        resultingsize = QSize(32, 32);
+    } else if (suggestedsize < 64) {
+        resultingsize = QSize(48, 48);
+    }
+
+    return resultingsize;
 }
 
 QFont setIconFont( const QString& text, const QFont& font, int iconWidth )

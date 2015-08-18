@@ -50,6 +50,8 @@ QList<KNemoTheme> findThemes();
  */
 QFont setIconFont( const QString& text, const QFont& font, int iconWidth );
 
+QSize getIconSize();
+
 double validatePoll( double val );
 
 void migrateKde4Conf();
