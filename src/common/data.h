@@ -255,6 +255,7 @@ struct BackendData
     {}
 
     int status;
+    int prevStatus;
     int index;
     KNemoIface::Type interfaceType;
     bool isWireless;

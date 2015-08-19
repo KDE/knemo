@@ -187,6 +187,7 @@ void NetlinkBackend::updateIfaceData( const QString& ifName, BackendData* data )
     if ( !linkCache || !addrCache )
         return;
 
+    data->prevStatus = data->status;
     data->status = KNemoIface::UnknownState;
     data->incomingBytes = 0;
     data->outgoingBytes = 0;

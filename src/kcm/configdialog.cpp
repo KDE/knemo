@@ -20,7 +20,6 @@
 
 #include <QDBusInterface>
 #include <QDBusMessage>
-#include <QPainter>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 
@@ -988,94 +987,6 @@ void ConfigDialog::aliasChanged( const QString& text )
  *                                        *
  ******************************************/
 
-QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, int status )
-{
-    QSize iconSize = getIconSize();
-    QPixmap sampleIcon( iconSize );
-    sampleIcon.fill( Qt::transparent );
-    QRect topRect( 0, 0, iconSize.width(), iconSize.height()/2 );
-    QRect bottomRect( 0, iconSize.width()/2, iconSize.width(), iconSize.height()/2 );
-    QPainter p( &sampleIcon );
-    p.setBrush( Qt::NoBrush );
-    p.setOpacity( 1.0 );
-    Plasma::Theme theme;
-    QFont rxFont = setIconFont( incomingText, theme.smallestFont(), iconSize.height() );
-    QFont txFont = setIconFont( outgoingText, theme.smallestFont(), iconSize.height() );
-
-    if ( rxFont.pointSizeF() > txFont.pointSizeF() )
-        rxFont.setPointSizeF( txFont.pointSizeF() );
-    p.setFont( rxFont );
-    if ( status >= KNemoIface::Connected )
-        p.setPen( KColorScheme(QPalette::Active).foreground(KColorScheme::ActiveText).color() );
-    else if ( status == KNemoIface::Available )
-        p.setPen( KColorScheme(QPalette::Active).foreground(KColorScheme::InactiveText).color() );
-    else
-        p.setPen( KColorScheme(QPalette::Active).foreground(KColorScheme::NegativeText).color() );
-    p.drawText( topRect, Qt::AlignCenter | Qt::AlignRight, incomingText );
-    p.setFont( rxFont );
-    if ( status >= KNemoIface::Connected )
-        p.setPen( KColorScheme(QPalette::Active).foreground(KColorScheme::NeutralText).color() );
-    p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, outgoingText );
-    return sampleIcon;
-}
-
-QPixmap ConfigDialog::barIcon( int status )
-{
-    int barIncoming = 0;
-    int barOutgoing = 0;
-    QSize iconSize = getIconSize();
-    int barWidth = static_cast<int>(round(iconSize.width()/3.0) + 0.5);
-    int margins = iconSize.width() - (barWidth*2);
-    int midMargin = static_cast<int>(round(margins/3.0) + 0.5);
-    int outerMargin = static_cast<int>(round((margins - midMargin)/2.0) + 0.5);
-    midMargin = outerMargin + barWidth + midMargin;
-    QPixmap barIcon( iconSize );
-    barIcon.fill( Qt::transparent );
-    QPainter p( &barIcon );
-    QColor rxColor;
-    QColor txColor;
-    QColor bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::InactiveText).color();
-    bgColor.setAlpha( 77 );
-
-    if ( status & KNemoIface::Connected )
-    {
-        rxColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::ActiveText).color();
-        txColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::NeutralText).color();
-    }
-    else if ( status & KNemoIface::Available )
-    {
-        rxColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::InactiveText).color();
-        rxColor.setAlpha( 153 );
-        txColor = rxColor;
-    }
-    else
-    {
-        rxColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::NegativeText).color();
-        txColor = rxColor;
-    }
-    if ( status & KNemoIface::Available || status & KNemoIface::Unavailable )
-    {
-        barIncoming = iconSize.height();
-        barOutgoing = iconSize.height();
-    }
-    if ( status & KNemoIface::RxTraffic )
-        barIncoming = static_cast<int>(round(iconSize.height()*.75) + 0.5);
-    if ( status & KNemoIface::TxTraffic )
-        barOutgoing = static_cast<int>(round(iconSize.height()*.75) + 0.5);
-
-    int top = iconSize.height() - barOutgoing;
-    QRect topLeftRect( outerMargin, 0, barWidth, top );
-    QRect leftRect( outerMargin, top, barWidth, iconSize.height() );
-    top = iconSize.height() - barIncoming;
-    QRect topRightRect( midMargin, 0, barWidth, top );
-    QRect rightRect( midMargin, top, barWidth, iconSize.height() );
-
-    p.fillRect( rightRect, rxColor );
-    p.fillRect( leftRect, txColor );
-    p.fillRect( topRightRect, bgColor );
-    p.fillRect( topLeftRect, bgColor );
-    return barIcon;
-}
 
 void ConfigDialog::comboHidingChanged( int val )
 {
@@ -1124,22 +1035,23 @@ void ConfigDialog::iconThemeChanged( int set )
             QString f3 = QStringLiteral("12K");
 
             settings->iconTheme = TEXT_THEME;
-            mDlg->pixmapError->setPixmap( textIcon( f1, f1, KNemoIface::Unavailable ) );
-            mDlg->pixmapDisconnected->setPixmap( textIcon( f1, f1, KNemoIface::Available ) );
-            mDlg->pixmapConnected->setPixmap( textIcon( f1, f1, KNemoIface::Connected ) );
-            mDlg->pixmapIncoming->setPixmap( textIcon( f2, f1, KNemoIface::Connected ) );
-            mDlg->pixmapOutgoing->setPixmap( textIcon( f1, f3, KNemoIface::Connected ) );
-            mDlg->pixmapTraffic->setPixmap( textIcon( f2, f3, KNemoIface::Connected ) );
+            Plasma::Theme theme;
+            mDlg->pixmapError->setPixmap( genTextIcon( f1, f1, theme.smallestFont(), KNemoIface::Unavailable ) );
+            mDlg->pixmapDisconnected->setPixmap( genTextIcon( f1, f1, theme.smallestFont(), KNemoIface::Available ) );
+            mDlg->pixmapConnected->setPixmap( genTextIcon( f1, f1, theme.smallestFont(), KNemoIface::Connected ) );
+            mDlg->pixmapIncoming->setPixmap( genTextIcon( f2, f1, theme.smallestFont(), KNemoIface::Connected ) );
+            mDlg->pixmapOutgoing->setPixmap( genTextIcon( f1, f3, theme.smallestFont(), KNemoIface::Connected ) );
+            mDlg->pixmapTraffic->setPixmap( genTextIcon( f2, f3, theme.smallestFont(), KNemoIface::Connected ) );
         }
         else
         {
             settings->iconTheme = NETLOAD_THEME;
-            mDlg->pixmapError->setPixmap( barIcon( KNemoIface::Unavailable ) );
-            mDlg->pixmapDisconnected->setPixmap( barIcon( KNemoIface::Available ) );
-            mDlg->pixmapConnected->setPixmap( barIcon( KNemoIface::Connected ) );
-            mDlg->pixmapIncoming->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::RxTraffic ) );
-            mDlg->pixmapOutgoing->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::TxTraffic ) );
-            mDlg->pixmapTraffic->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::RxTraffic | KNemoIface::TxTraffic ) );
+            mDlg->pixmapError->setPixmap( genBarIcon( 0, 0, KNemoIface::Unavailable ) );
+            mDlg->pixmapDisconnected->setPixmap( genBarIcon( 0, 0, KNemoIface::Available ) );
+            mDlg->pixmapConnected->setPixmap( genBarIcon( 0, 0, KNemoIface::Connected ) );
+            mDlg->pixmapIncoming->setPixmap( genBarIcon( 0.75, 0, KNemoIface::Connected ) );
+            mDlg->pixmapOutgoing->setPixmap( genBarIcon( 0, 0.75, KNemoIface::Connected ) );
+            mDlg->pixmapTraffic->setPixmap( genBarIcon( 0.75, 0.75, KNemoIface::Connected ) );
             mDlg->pixmapError->setMinimumHeight(getIconSize().height());
         }
     }

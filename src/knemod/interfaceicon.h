@@ -21,8 +21,6 @@
 #ifndef INTERFACEICON_H
 #define INTERFACEICON_H
 
-#include <QColor>
-
 class Interface;
 class InterfaceTray;
 class KActionCollection;
@@ -95,10 +93,10 @@ private:
      */
     void updateIconImage( int status );
 
-    QColor calcColor( const QColor& low );
-    int calcHeight( int iconHeight, QList<unsigned long>& hist, unsigned int& net_max );
-    void updateBars( bool doUpdate = false );
-    void updateIconText( bool doUpdate = false );
+    bool conStatusChanged();
+    QList<qreal> barLevels( QList<unsigned long>& rxHist, QList<unsigned long>& txHist );
+    void updateBarIcon( bool doUpdate = false );
+    void updateTextIcon( bool doUpdate = false );
     // the interface this icon belongs to
     Interface* mInterface;
     // the real tray icon
@@ -108,19 +106,18 @@ private:
     QAction* plotterAction;
     QAction* statisticsAction;
     QAction* configAction;
-    QString textIncoming;
-    QString textOutgoing;
-    QColor colorIncoming;
+    QString m_rxText;
+    QString m_txText;
     int iconWidth;
     int histSize;
-    int barIncoming;
-    int barOutgoing;
+    int m_rxPrevBarHeight;
+    int m_txPrevBarHeight;
     int barWidth;
     int leftMargin;
     int midMargin;
-    QList<unsigned long>inHist;
-    QList<unsigned long>outHist;
-    unsigned int maxRate;
+    QList<unsigned long>m_rxHist;
+    QList<unsigned long>m_txHist;
+    unsigned int m_maxRate;
 };
 
 #endif // INTERFACEICON_H

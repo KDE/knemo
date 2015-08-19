@@ -29,9 +29,12 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <QDir>
+#include <QPainter>
+#include <QPalette>
 #include <QUrl>
 #include <QFontMetrics>
 #include <QStandardPaths>
+#include <KColorScheme>
 #include <KConfigGroup>
 #include <Kdelibs4ConfigMigrator>
 #include <Kdelibs4Migration>
@@ -298,6 +301,86 @@ QSize getIconSize()
 
     return resultingsize;
 }
+
+QPixmap genTextIcon(const QString& incomingText, const QString& outgoingText, const QFont& font, int status)
+{
+    QSize iconSize = getIconSize();
+    QPixmap textIcon(iconSize);
+    QRect topRect( 0, 0, iconSize.width(), iconSize.height()/2 );
+    QRect bottomRect( 0, iconSize.width()/2, iconSize.width(), iconSize.height()/2 );
+    textIcon.fill( Qt::transparent );
+    QPainter p( &textIcon );
+    p.setBrush( Qt::NoBrush );
+    p.setOpacity( 1.0 );
+    QColor textColor;
+
+    // rxFont and txFont should be the same size per poll period
+    QFont rxFont = setIconFont( incomingText, font, iconSize.height() );
+    QFont txFont = setIconFont( outgoingText, font, iconSize.height() );
+    rxFont.setPointSizeF( qMin(rxFont.pointSizeF(), txFont.pointSizeF()) );
+
+    if ( status & KNemoIface::Connected )
+        textColor = KColorScheme(QPalette::Active).foreground(KColorScheme::NormalText).color();
+    else if ( status & KNemoIface::Available )
+        textColor = KColorScheme(QPalette::Active).foreground(KColorScheme::InactiveText).color();
+    else
+        textColor = KColorScheme(QPalette::Active).foreground(KColorScheme::NegativeText).color();
+
+    p.setFont( rxFont );
+    p.setPen( textColor );
+    p.drawText( topRect, Qt::AlignCenter | Qt::AlignRight, incomingText );
+    p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, outgoingText );
+    return textIcon;
+}
+
+QPixmap genBarIcon(qreal rxLevel, qreal txLevel, int status)
+{
+    QSize iconSize = getIconSize();
+
+    QColor rxColor;
+    QColor txColor;
+    QColor bgColor;
+    if ( status & KNemoIface::Connected )
+    {
+        rxColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::ActiveText).color();
+        txColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::NeutralText).color();
+        bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::InactiveText).color();
+        bgColor.setAlpha( 77 );
+    }
+    else if ( status & KNemoIface::Available )
+    {
+        bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::InactiveText).color();
+        bgColor.setAlpha( 153 );
+    }
+    else
+    {
+        bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::NegativeText).color();
+    }
+
+    int barWidth = static_cast<int>(round(iconSize.width()/3.0) + 0.5);
+    int margins = iconSize.width() - (barWidth*2);
+    int midMargin = static_cast<int>(round(margins/3.0) + 0.5);
+    int outerMargin = static_cast<int>(round((margins - midMargin)/2.0) + 0.5);
+    midMargin = outerMargin + barWidth + midMargin;
+    QPixmap barIcon( iconSize );
+    barIcon.fill( Qt::transparent );
+
+    int top = iconSize.height() - static_cast<int>(round(iconSize.height() * txLevel) + 0.5);
+    QRect topLeftRect( outerMargin, 0, barWidth, top );
+    QRect leftRect( outerMargin, top, barWidth, iconSize.height() );
+    top = iconSize.height() - static_cast<int>(round(iconSize.height() * rxLevel) + 0.5);
+    QRect topRightRect( midMargin, 0, barWidth, top );
+    QRect rightRect( midMargin, top, barWidth, iconSize.height() );
+
+    QPainter p( &barIcon );
+    p.fillRect( leftRect, txColor );
+    p.fillRect( rightRect, rxColor );
+    p.fillRect( topLeftRect, bgColor );
+    p.fillRect( topRightRect, bgColor );
+    return barIcon;
+}
+
+
 
 QFont setIconFont( const QString& text, const QFont& font, int iconWidth )
 {
