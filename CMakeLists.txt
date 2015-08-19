@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 2.8.9)
 project( knemo )
 
 set( KNEMO_VERSION 0.7.6+svn )
