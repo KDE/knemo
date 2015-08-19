@@ -389,8 +389,7 @@ void ConfigDialog::load()
             settings->iconTheme = interfaceGroup.readEntry( conf_iconTheme, s.iconTheme );
             KColorScheme scheme(QPalette::Active, KColorScheme::View);
             settings->barScale = interfaceGroup.readEntry( conf_barScale, s.barScale );
-            settings->inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate );
-            settings->outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate );
+            settings->maxRate = interfaceGroup.readEntry( conf_maxRate, s.maxRate );
             settings->calendarSystem = static_cast<KLocale::CalendarSystem>(interfaceGroup.readEntry( conf_calendarSystem, static_cast<int>(KLocale::QDateCalendar) ));
             settings->activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
             int statsRuleCount = interfaceGroup.readEntry( conf_statsRules, 0 );
@@ -570,8 +569,7 @@ void ConfigDialog::save()
             }
             if ( settings->iconTheme == NETLOAD_THEME && settings->barScale )
             {
-                interfaceGroup.writeEntry( conf_inMaxRate, settings->inMaxRate );
-                interfaceGroup.writeEntry( conf_outMaxRate, settings->outMaxRate );
+                interfaceGroup.writeEntry( conf_maxRate, settings->maxRate );
             }
         }
         interfaceGroup.writeEntry( conf_activateStatistics, settings->activateStatistics );
@@ -1177,8 +1175,7 @@ void ConfigDialog::advancedButtonClicked()
         settings->trafficThreshold = s.trafficThreshold;
 
         settings->barScale = s.barScale;
-        settings->inMaxRate = s.inMaxRate;
-        settings->outMaxRate = s.outMaxRate;
+        settings->maxRate = s.maxRate;
 
         changed( true );
     }

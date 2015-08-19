@@ -88,8 +88,7 @@ void InterfaceIcon::configChanged()
         outHist.append( 0 );
     }
 
-    inMaxRate = mInterface->settings().inMaxRate;
-    outMaxRate = mInterface->settings().outMaxRate;
+    maxRate = mInterface->settings().maxRate;
 
     updateTrayStatus();
 
@@ -205,8 +204,9 @@ void InterfaceIcon::updateBars( bool doUpdate )
     QSize iconSize = getIconSize();
 
     // Has height changed?
-    int rateIn = calcHeight( iconSize.height(), inHist, inMaxRate );
-    int rateOut = calcHeight( iconSize.height(), outHist, outMaxRate );
+    // FIXME: they should have same scale!!
+    int rateIn = calcHeight( iconSize.height(), inHist, maxRate );
+    int rateOut = calcHeight( iconSize.height(), outHist, maxRate );
     if ( rateIn != barIncoming )
     {
         doUpdate = true;

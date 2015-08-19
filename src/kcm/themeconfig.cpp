@@ -27,26 +27,20 @@ ThemeConfig::ThemeConfig( const InterfaceSettings s ) : QDialog(),
     mDlg.setupUi( this );
 
     if ( mSettings.iconTheme != NETLOAD_THEME )
-        mDlg.checkBarScale->hide();
-    if ( mSettings.iconTheme != NETLOAD_THEME &&
-         mSettings.iconTheme != TEXT_THEME )
     {
+        mDlg.checkBarScale->hide();
         mDlg.rateGroup->hide();
-        mDlg.maxRateGroup->hide();
     }
 
     mDlg.spinBoxTrafficThreshold->setValue( mSettings.trafficThreshold );
 
-    mDlg.txMaxRate->setValue( mSettings.outMaxRate );
-    mDlg.rxMaxRate->setValue( mSettings.inMaxRate );
+    mDlg.maxRate->setValue( mSettings.maxRate );
 
     mDlg.checkBarScale->setChecked( mSettings.barScale );
-    updateRateGroup();
 
     connect( mDlg.buttonBox, SIGNAL( accepted() ), SLOT( accept() ) );
     connect( mDlg.buttonBox, SIGNAL( rejected() ), SLOT( reject() ) );
     connect( mDlg.buttonBox, SIGNAL( clicked( QAbstractButton* ) ), SLOT( setDefaults( QAbstractButton* ) ) );
-    connect( mDlg.checkBarScale, SIGNAL( toggled( bool ) ), SLOT( updateRateGroup() ) );
 }
 
 void ThemeConfig::setDefaults( QAbstractButton* button )
@@ -56,28 +50,17 @@ void ThemeConfig::setDefaults( QAbstractButton* button )
 
         mDlg.spinBoxTrafficThreshold->setValue( s.trafficThreshold );
 
-        mDlg.txMaxRate->setValue( s.outMaxRate );
-        mDlg.rxMaxRate->setValue( s.inMaxRate );
+        mDlg.maxRate->setValue( s.maxRate );
 
         mDlg.checkBarScale->setChecked( s.barScale );
     }
 }
 
-void ThemeConfig::updateRateGroup()
-{
-    if ( mDlg.checkBarScale->isChecked() )
-        mDlg.maxRateGroup->setEnabled( true );
-    else
-        mDlg.maxRateGroup->setEnabled( false );
-}
-
-
 InterfaceSettings ThemeConfig::settings()
 {
     mSettings.trafficThreshold = mDlg.spinBoxTrafficThreshold->value();
 
-    mSettings.outMaxRate = mDlg.txMaxRate->value();
-    mSettings.inMaxRate = mDlg.rxMaxRate->value();
+    mSettings.maxRate = mDlg.maxRate->value();
 
     mSettings.barScale = mDlg.checkBarScale->isChecked();
 

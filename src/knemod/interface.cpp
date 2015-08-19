@@ -98,8 +98,7 @@ void Interface::configChanged()
         mSettings.iconTheme = TEXT_THEME;
 
     mSettings.barScale = interfaceGroup.readEntry( conf_barScale, s.barScale );
-    mSettings.inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate )*1024;
-    mSettings.outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate )*1024;
+    mSettings.maxRate = interfaceGroup.readEntry( conf_maxRate, s.maxRate )*1024;
     mSettings.minVisibleState = interfaceGroup.readEntry( conf_minVisibleState, s.minVisibleState );
     mSettings.activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
     mSettings.trafficThreshold = clamp<unsigned int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );

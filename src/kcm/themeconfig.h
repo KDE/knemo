@@ -32,7 +32,6 @@ public:
     InterfaceSettings settings();
 private Q_SLOTS:
     void setDefaults( QAbstractButton* );
-    void updateRateGroup();
 private:
     Ui::ThemeCfg mDlg;
     InterfaceSettings mSettings;

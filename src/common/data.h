@@ -137,8 +137,7 @@ static const QLatin1String conf_minVisibleState("MinVisibleState");
 static const QLatin1String conf_trafficThreshold("TrafficThreshold");
 static const QLatin1String conf_iconTheme("IconSet");
 static const QLatin1String conf_barScale("BarScale");
-static const QLatin1String conf_inMaxRate("InMaxRate");
-static const QLatin1String conf_outMaxRate("OutMaxRate");
+static const QLatin1String conf_maxRate("MaxRate");
 
 // interface statistics
 static const QLatin1String conf_activateStatistics("ActivateStatistics");
@@ -374,8 +373,7 @@ struct InterfaceSettings
 {
     InterfaceSettings()
       : barScale( false ),
-        inMaxRate( 4 ),
-        outMaxRate( 4 ),
+        maxRate( 4 ),
         trafficThreshold( 0 ),
         minVisibleState( KNemoIface::UnknownState ),
         activateStatistics( false ),
@@ -384,8 +382,7 @@ struct InterfaceSettings
 
     QString iconTheme;
     bool barScale;
-    unsigned int inMaxRate;
-    unsigned int outMaxRate;
+    unsigned int maxRate;
     unsigned int trafficThreshold;
     int minVisibleState;
     bool activateStatistics;

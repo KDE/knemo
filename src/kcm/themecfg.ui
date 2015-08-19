@@ -64,61 +64,25 @@
         </property>
        </widget>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="maxRateGroup">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="title">
-      <string>Max Visual Rate</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QLabel" name="inMaxText">
+         <widget class="QLabel" name="maxText">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
-           <string>Incoming traffic:</string>
+           <string>Max visual rate:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="rxMaxRate">
+         <widget class="QSpinBox" name="maxRate">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="whatsThis">
-           <string>&lt;p&gt;The maximum incoming rate for this connection.&lt;/p&gt;&lt;p&gt;This does &lt;b&gt;not&lt;/b&gt; affect the actual traffic rate, only how KNemo displays it.&lt;/p&gt;</string>
-          </property>
-          <property name="suffix">
-           <string> KiB/sec</string>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>1048576</number>
-          </property>
-          <property name="value">
-           <number>4</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QLabel" name="outMaxText">
-          <property name="text">
-           <string>Outgoing traffic:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="txMaxRate">
-          <property name="whatsThis">
-           <string>&lt;p&gt;The maximum outgoing rate for this connection.&lt;/p&gt;&lt;p&gt;This does &lt;b&gt;not&lt;/b&gt; affect the actual traffic rate, only how KNemo displays it.&lt;/p&gt;</string>
+           <string>&lt;p&gt;The maximum rate for this connection.&lt;/p&gt;&lt;p&gt;This does &lt;b&gt;not&lt;/b&gt; affect the actual traffic rate, only how KNemo displays it.&lt;/p&gt;</string>
           </property>
           <property name="suffix">
            <string> KiB/sec</string>
@@ -164,9 +128,41 @@
  <tabstops>
   <tabstop>spinBoxTrafficThreshold</tabstop>
   <tabstop>checkBarScale</tabstop>
-  <tabstop>rxMaxRate</tabstop>
-  <tabstop>txMaxRate</tabstop>
+  <tabstop>maxRate</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>checkBarScale</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>maxText</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>87</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>81</x>
+     <y>155</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBarScale</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>maxRate</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>262</x>
+     <y>155</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

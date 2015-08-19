@@ -120,8 +120,7 @@ private:
     int midMargin;
     QList<unsigned long>inHist;
     QList<unsigned long>outHist;
-    unsigned int inMaxRate;
-    unsigned int outMaxRate;
+    unsigned int maxRate;
 };
 
 #endif // INTERFACEICON_H
