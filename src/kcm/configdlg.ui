@@ -93,32 +93,7 @@
         </spacer>
        </item>
        <item row="0" column="1">
-        <layout class="QHBoxLayout">
-         <item>
-          <widget class="QLabel" name="aliasLabel">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Alias:</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEditAlias">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="whatsThis">
-            <string>You can enter an alias for the interface.
-KNemo will use it to differentiate interfaces when it displays tooltips, dialogs, etc.</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <layout class="QHBoxLayout"/>
        </item>
        <item row="1" column="1">
         <widget class="QTabWidget" name="ifaceTab">
@@ -827,7 +802,6 @@ KNemo will use it to differentiate interfaces when it displays tooltips, dialogs
   <tabstop>pushButtonNew</tabstop>
   <tabstop>pushButtonAll</tabstop>
   <tabstop>pushButtonDelete</tabstop>
-  <tabstop>lineEditAlias</tabstop>
   <tabstop>ifaceTab</tabstop>
   <tabstop>comboHiding</tabstop>
   <tabstop>comboBoxIconTheme</tabstop>

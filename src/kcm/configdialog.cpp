@@ -302,8 +302,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( buttonAllSelected() ) );
     connect( mDlg->pushButtonDelete, SIGNAL( clicked() ),
              this, SLOT( buttonDeleteSelected() ) );
-    connect( mDlg->lineEditAlias, SIGNAL( textChanged( const QString& ) ),
-             this, SLOT( aliasChanged( const QString& ) ) );
 
     // Interface - Icon Appearance
     connect( mDlg->comboHiding, SIGNAL( activated( int ) ),
@@ -382,7 +380,6 @@ void ConfigDialog::load()
         if ( config->hasGroup( group ) )
         {
             KConfigGroup interfaceGroup( config, group );
-            settings->alias = interfaceGroup.readEntry( conf_alias ).trimmed();
             settings->minVisibleState = interfaceGroup.readEntry( conf_minVisibleState, s.minVisibleState );
             settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
             settings->iconTheme = interfaceGroup.readEntry( conf_iconTheme, s.iconTheme );
@@ -540,8 +537,6 @@ void ConfigDialog::save()
             interfaceGroup.writeEntry( conf_statusPos, statusPos );
         if ( !statusSize.isEmpty() )
             interfaceGroup.writeEntry( conf_statusSize, statusSize );
-        if ( !settings->alias.trimmed().isEmpty() )
-            interfaceGroup.writeEntry( conf_alias, settings->alias );
         if ( !hourState.isNull() )
             interfaceGroup.writeEntry( conf_hourState, hourState );
         if ( !dayState.isNull() )
@@ -664,8 +659,6 @@ void ConfigDialog::defaults()
 
     if ( interface.isEmpty() )
     {
-        mDlg->aliasLabel->setEnabled( false );
-        mDlg->lineEditAlias->setEnabled( false );
         mDlg->ifaceTab->setEnabled( false );
         mDlg->pixmapError->clear();
         mDlg->pixmapDisconnected->clear();
@@ -681,8 +674,6 @@ void ConfigDialog::defaults()
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
         mDlg->pushButtonDelete->setEnabled( true );
-        mDlg->aliasLabel->setEnabled( true );
-        mDlg->lineEditAlias->setEnabled( true );
         mDlg->ifaceTab->setEnabled( true );
     }
 
@@ -783,7 +774,6 @@ void ConfigDialog::updateWarnText( int oldCount )
 void ConfigDialog::updateControls( InterfaceSettings *settings )
 {
     mLock = true;
-    mDlg->lineEditAlias->setText( settings->alias );
     int index = findIndexFromName( settings->iconTheme );
     if ( index < 0 )
         index = findIndexFromName( TEXT_THEME );
@@ -850,8 +840,6 @@ void ConfigDialog::interfaceSelected( int row )
     QString interface = mDlg->listBoxInterfaces->item( row )->text();
     InterfaceSettings* settings = mSettingsMap[interface];
     mDlg->ifaceTab->setEnabled( true );
-    mDlg->aliasLabel->setEnabled( true );
-    mDlg->lineEditAlias->setEnabled( true );
     updateControls( settings );
 }
 
@@ -957,8 +945,6 @@ void ConfigDialog::buttonDeleteSelected()
         InterfaceSettings emptySettings;
         updateControls( &emptySettings );
         mDlg->pushButtonDelete->setEnabled( false );
-        mDlg->aliasLabel->setEnabled( false );
-        mDlg->lineEditAlias->setEnabled( false );
         mDlg->ifaceTab->setEnabled( false );
         mDlg->pixmapError->clear();
         mDlg->pixmapDisconnected->clear();
@@ -968,16 +954,6 @@ void ConfigDialog::buttonDeleteSelected()
         mDlg->pixmapTraffic->clear();
     }
     changed( true );
-}
-
-void ConfigDialog::aliasChanged( const QString& text )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    settings->alias = text;
-    if (!mLock) changed( true );
 }
 
 

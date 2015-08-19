@@ -129,9 +129,6 @@ static const QLatin1String conf_firstStart("FirstStart");
 static const QLatin1String conf_autoStart("AutoStart");
 static const QLatin1String conf_interfaces("Interfaces");
 
-// interface
-static const QLatin1String conf_alias("Alias");
-
 // interface icon
 static const QLatin1String conf_minVisibleState("MinVisibleState");
 static const QLatin1String conf_trafficThreshold("TrafficThreshold");
@@ -190,7 +187,7 @@ static const QLatin1String conf_yearState("YearState");
 enum ToolTipEnums
 {
     INTERFACE        = 0x00000001,
-    ALIAS            = 0x00000002,
+    //ALIAS            = 0x00000002,
     STATUS           = 0x00000004,
     UPTIME           = 0x00000008,
     IP_ADDRESS       = 0x00000010,
@@ -390,7 +387,6 @@ struct InterfaceSettings
     QList<StatsRule> statsRules;
     QList<WarnRule> warnRules;
     KLocale::CalendarSystem calendarSystem;
-    QString alias;
 };
 
 #ifndef __linux__

@@ -131,11 +131,9 @@ void InterfaceStatusDialog::updateDialog()
     const BackendData* data = mInterface->backendData();
     if ( !data )
         return;
-    InterfaceSettings& settings = mInterface->settings();
 
     // connection tab
     ui.textLabelInterface->setText( mInterface->ifaceName() );
-    ui.textLabelAlias->setText( settings.alias );
     ui.textLabelUptime->setText( mInterface->uptimeString() );
 
     if ( data->status & KNemoIface::Connected )

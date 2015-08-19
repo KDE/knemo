@@ -59,7 +59,7 @@ public Q_SLOTS:
     void updateTrayStatus();
 
     /*
-     * Change the tooltip according to the alias of the interface
+     * Update tool tip text
      */
     void updateToolTip();
 

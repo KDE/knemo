@@ -57,7 +57,7 @@ WarnConfig::WarnConfig( const InterfaceSettings *settings, const WarnRule &warn,
         mDlg.periodUnits->addItem( i18n( "Billing Periods" ), KNemoStats::BillPeriod );
     //mDlg.periodUnits->addItem( i18n( "Years" ), KNemoStats::Year );
 
-    mDlg.legend->setText( i18n( "<i>%i</i> = interface, <i>%a</i> = interface alias,<br/>"
+    mDlg.legend->setText( i18n( "<i>%i</i> = interface,<br/>"
                 "<i>%t</i> = traffic threshold, <i>%c</i> = current traffic" ) );
 
     connect( mDlg.buttonBox, SIGNAL( accepted() ), SLOT( accept() ) );

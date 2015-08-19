@@ -62,10 +62,7 @@ InterfaceTray::~InterfaceTray()
 void InterfaceTray::updateToolTip()
 {
     QString currentTip;
-    QString title = mInterface->settings().alias;
-    if ( title.isEmpty() )
-        title = mInterface->ifaceName();
-    title = i18n( "KNemo - %1", title );
+    QString title = i18n( "KNemo - %1", mInterface->ifaceName() );
     if ( toolTipTitle() != title )
         setToolTipTitle( title );
     currentTip = toolTipData();

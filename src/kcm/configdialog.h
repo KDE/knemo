@@ -95,7 +95,6 @@ private Q_SLOTS:
     void buttonRemoveToolTipSelected();
     void buttonNotificationsSelected();
     void interfaceSelected( int row );
-    void aliasChanged( const QString& text );
     void iconThemeChanged( int set );
     void comboHidingChanged( int val );
     void checkBoxStatisticsToggled( bool on );

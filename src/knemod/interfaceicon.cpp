@@ -343,9 +343,7 @@ void InterfaceIcon::updateTrayStatus()
     int currentStatus = data->status;
     int minVisibleState = mInterface->settings().minVisibleState;
 
-    QString title = mInterface->settings().alias;
-    if ( title.isEmpty() )
-        title = ifaceName;
+    QString title = ifaceName;
 
     if ( mTray != 0L && currentStatus < minVisibleState )
     {

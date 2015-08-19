@@ -74,7 +74,6 @@ void Interface::configChanged()
     group += mIfaceName;
     KConfigGroup interfaceGroup( config, group );
     InterfaceSettings s;
-    mSettings.alias = interfaceGroup.readEntry( conf_alias ).trimmed();
     mSettings.iconTheme = interfaceGroup.readEntry( conf_iconTheme, s.iconTheme );
 
     // If the theme is not configured, use a sensible default
@@ -195,9 +194,7 @@ void Interface::processUpdate()
     mRxRateStr = formattedRate( mRxRate, generalSettings->useBitrate );
     mTxRateStr = formattedRate( mTxRate, generalSettings->useBitrate );
 
-    QString title = mSettings.alias;
-    if ( title.isEmpty() )
-        title = mIfaceName;
+    QString title = mIfaceName;
 
     if ( mIfaceState & KNemoIface::Connected )
     {
@@ -366,7 +363,6 @@ void Interface::warnTraffic( QString warnText, quint64 threshold, quint64 curren
     if ( !warnText.isEmpty() )
     {
         warnText = warnText.replace( QRegExp(QLatin1String("%i")), mIfaceName );
-        warnText = warnText.replace( QRegExp(QLatin1String("%a")), mSettings.alias );
         warnText = warnText.replace( QRegExp(QLatin1String("%t")), KIO::convertSize( threshold ) );
         warnText = warnText.replace( QRegExp(QLatin1String("%c")), KIO::convertSize( threshold ) );
     }
