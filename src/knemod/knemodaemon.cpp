@@ -120,7 +120,7 @@ void KNemoDaemon::readConfig()
     QString ifaceName = backend->defaultRouteIface( AF_INET );
     if ( ifaceName.isEmpty() )
         ifaceName = backend->defaultRouteIface( AF_INET6 );
-    if ( !ifaceName.isEmpty() )
+    if ( !ifaceName.isEmpty() && !interfaceList.contains( ifaceName ) )
     {
         interfaceList << ifaceName;
     }

@@ -4,12 +4,11 @@ set( knemo_SRCS
     main.cpp
     global.cpp
     interface.cpp
-    interfaceicon.cpp
     interfaceplotterdialog.cpp
     interfacestatistics.cpp
     interfacestatisticsdialog.cpp
     interfacestatusdialog.cpp
-    interfacetray.cpp
+    trayicon.cpp
     knemodaemon.cpp
     plotterconfigdialog.cpp
     statisticsmodel.cpp

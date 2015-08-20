@@ -22,13 +22,13 @@
 #define INTERFACE_H
 
 #include <time.h>
-#include "interfaceicon.h"
 #include "data.h"
 
 class InterfacePlotterDialog;
 class InterfaceStatistics;
 class InterfaceStatusDialog;
 class InterfaceStatisticsDialog;
+class TrayIcon;
 
 /**
  * This class is the central place for all things that belong to an
@@ -128,14 +128,14 @@ public Q_SLOTS:
      * Toggles the status dialog by showing it on the first click and
      * hiding it on the second click.
      */
-    void showStatusDialog( bool fromContextMenu );
+    void showStatusDialog( bool onlyActivate = true );
 
     /*
      * Called when the user middle-clicks on the tray icon
      * Toggles the signal plotter that displays the incoming and
      * outgoing traffic.
      */
-    void showSignalPlotter( bool fromContextMenu );
+    void showSignalPlotter( bool onlyActivate = true );
 
     void toggleSignalPlotter( bool show );
 
@@ -182,7 +182,7 @@ private:
     unsigned long mTxRate;
     QString mRxRateStr;
     QString mTxRateStr;
-    InterfaceIcon mIcon;
+    TrayIcon *mIcon;
     InterfaceSettings mSettings;
     InterfaceStatistics* mIfaceStatistics;
     InterfaceStatusDialog* mStatusDialog;

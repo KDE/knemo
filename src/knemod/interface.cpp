@@ -18,6 +18,8 @@
    Boston, MA 02110-1301, USA.
 */
 
+#include "interface.h"
+
 #include <math.h>
 
 #include <KCalendarSystem>
@@ -29,11 +31,11 @@
 #include "backends/backendbase.h"
 #include "global.h"
 #include "utils.h"
-#include "interface.h"
 #include "interfaceplotterdialog.h"
 #include "interfacestatistics.h"
 #include "interfacestatusdialog.h"
 #include "interfacestatisticsdialog.h"
+#include "trayicon.h"
 
 Interface::Interface( const QString &ifname,
                       const BackendData* data )
@@ -46,7 +48,7 @@ Interface::Interface( const QString &ifname,
       mUptimeString( QStringLiteral("00:00:00") ),
       mRxRate( 0 ),
       mTxRate( 0 ),
-      mIcon( this ),
+      mIcon( 0 ),
       mIfaceStatistics( 0 ),
       mStatusDialog( 0 ),
       mStatisticsDialog(  0 ),
@@ -54,9 +56,6 @@ Interface::Interface( const QString &ifname,
       mBackendData( data )
 {
     mPlotterDialog = new InterfacePlotterDialog( mIfaceName );
-
-    connect( &mIcon, SIGNAL( statisticsSelected() ),
-             this, SLOT( showStatisticsDialog() ) );
 }
 
 Interface::~Interface()
@@ -65,6 +64,7 @@ Interface::~Interface()
     delete mPlotterDialog;
     delete mStatisticsDialog;
     delete mIfaceStatistics;
+    delete mIcon;
 }
 
 void Interface::configChanged()
@@ -153,13 +153,10 @@ void Interface::configChanged()
         }
     }
 
-    // This prevents needless regeneration of icon when first shown in tray
-    if ( mIfaceState == KNemoIface::UnknownState )
+    if (mIcon)
     {
-        mIfaceState = mBackendData->status;
-        mPreviousIfaceState = mIfaceState;
+        mIcon->configChanged();
     }
-    mIcon.configChanged();
 
     if ( mIfaceStatistics )
     {
@@ -183,7 +180,6 @@ void Interface::configChanged()
 void Interface::processUpdate()
 {
     mPreviousIfaceState = mIfaceState;
-    unsigned int trafficThreshold = mSettings.trafficThreshold;
     mIfaceState = mBackendData->status;
 
     int units = 1;
@@ -199,9 +195,9 @@ void Interface::processUpdate()
     if ( mIfaceState & KNemoIface::Connected )
     {
         // the interface is connected, look for traffic
-        if ( ( mBackendData->rxPackets - mBackendData->prevRxPackets ) > trafficThreshold )
+        if ( ( mBackendData->rxPackets - mBackendData->prevRxPackets ) > mSettings.trafficThreshold )
             mIfaceState |= KNemoIface::RxTraffic;
-        if ( ( mBackendData->txPackets - mBackendData->prevTxPackets ) > trafficThreshold )
+        if ( ( mBackendData->txPackets - mBackendData->prevTxPackets ) > mSettings.trafficThreshold )
             mIfaceState |= KNemoIface::TxTraffic;
 
         if ( mIfaceStatistics )
@@ -253,12 +249,25 @@ void Interface::processUpdate()
     }
 
     if ( mPreviousIfaceState != mIfaceState )
-        mIcon.updateTrayStatus();
+    {
+        if ( mIcon && mIfaceState < mSettings.minVisibleState )
+        {
+            delete mIcon;
+            mIcon = 0L;
+        }
+        else if ( !mIcon && mIfaceState >= mSettings.minVisibleState )
+        {
+            mIcon = new TrayIcon( this, mIfaceName );
+        }
+    }
 
     if ( mPlotterDialog )
         mPlotterDialog->updatePlotter( mRxRate, mTxRate );
 
-    mIcon.updateToolTip();
+    if ( mIcon )
+    {
+        mIcon->processUpdate();
+    }
     if ( mStatusDialog )
         mStatusDialog->updateDialog();
 }
@@ -274,7 +283,7 @@ void Interface::resetUptime()
     mTxRateStr = formattedRate( mTxRate, generalSettings->useBitrate );
 }
 
-void Interface::showStatusDialog( bool fromContextMenu )
+void Interface::showStatusDialog( bool onlyActivate )
 {
     // Toggle the status dialog.
     // First click will show the status dialog, second will hide it.
@@ -289,13 +298,13 @@ void Interface::showStatusDialog( bool fromContextMenu )
         }
     }
 
-    activateOrHide( mStatusDialog, fromContextMenu );
+    activateOrHide( mStatusDialog, onlyActivate );
 }
 
-void Interface::showSignalPlotter( bool fromContextMenu )
+void Interface::showSignalPlotter( bool onlyActivate )
 {
     // Toggle the signal plotter.
-    activateOrHide( mPlotterDialog, fromContextMenu );
+    activateOrHide( mPlotterDialog, onlyActivate );
 }
 
 void Interface::showStatisticsDialog()
