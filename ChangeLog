@@ -1,3 +1,14 @@
+Version 0.7.7
+  Features:
+    * Add a global shortcut to toggle traffic plotters.
+
+  Bugfixes:
+   * Find the interface of the default gateway again. (BR 328752)
+   * Log statistics to the correct time if we're resuming from suspend.
+     (BR 332086)
+   * Fix translation word puzzles, missing contexts. (BR 329095, BR 329097)
+   * Add an include to fix broken compilation when using libnl >= 3.2.26.
+
 Version 0.7.6
  * Tweak the dialogs to make them a bit more compact
  * Make the traffic plotter widgets behave more like those in the KDE System
