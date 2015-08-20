@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 project( knemo )
 
-set( KNEMO_VERSION 0.7.6+svn )
+set( KNEMO_VERSION 0.7.7 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
