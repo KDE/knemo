@@ -1000,7 +1000,7 @@ void InterfaceStatistics::checkWarnings()
     QList<WarnRule> warn = mInterface->settings().warnRules;
     for ( int wi=0; wi < warn.count(); ++wi )
     {
-        if ( warn[wi].warnDone || !warn[wi].threshold > 0.0 )
+        if ( warn[wi].warnDone || warn[wi].threshold == 0 )
             continue;
 
         quint64 total = 0;

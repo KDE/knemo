@@ -105,7 +105,7 @@ namespace KNemoStats
         OffpeakTraffic = 1
     };
 
-};
+}
 
 static const QLatin1String NETLOAD_THEME("netloadtheme");
 static const QLatin1String TEXT_THEME("texttheme");
