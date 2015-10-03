@@ -41,7 +41,7 @@ QString formattedRate( quint64 data, bool useBits )
     if ( units )
         precision = 1;
     QLocale locale;
-    QString formattedNum = locale.toString( bits, 'g', precision );
+    QString formattedNum = locale.toString( bits, 'f', precision );
     switch (units)
     {
         case 0:
