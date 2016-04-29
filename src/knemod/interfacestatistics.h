@@ -120,7 +120,7 @@ private:
     QTimer* mWarnTimer;
     QTimer* mEntryTimer;
     bool mTrafficChanged;
-    int mWeekStartDay;
+    //int mWeekStartDay;
     StorageData mStorageData;
     QHash<int, StatisticsModel*> mModels;
     QList<StatsRule> mStatsRules;

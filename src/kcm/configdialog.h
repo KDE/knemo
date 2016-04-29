@@ -132,7 +132,7 @@ private:
     bool mLock;
     Ui::ConfigDlg* mDlg;
     const KCalendarSystem* mCalendar;
-    int mMaxDay;
+    //int mMaxDay;
     StatsRuleModel *statsModel;
     WarnModel *warnModel;
 
