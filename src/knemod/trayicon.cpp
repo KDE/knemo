@@ -28,6 +28,7 @@
 #include <netlink/netlink.h>
 #endif
 
+#include <cmath>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <kio/global.h>

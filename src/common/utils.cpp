@@ -25,6 +25,7 @@
        copyright notice and this permission notice appear in all copies.
 */
 
+#include <cmath>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <net/if.h>
