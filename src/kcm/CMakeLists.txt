@@ -1,3 +1,5 @@
+add_definitions(-DTRANSLATION_DOMAIN=\"kcm_knemo\")
+
 include_directories( ../common )
 
 set( kcm_knemo_SRCS
