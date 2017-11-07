@@ -2,7 +2,7 @@
 Name=Wireless
 Name[bg]=Безжично
 Name[bs]=Bežično
-Name[ca]=Sense fils
+Name[ca]=Sense fil
 Name[ca@valencia]=Sense fils
 Name[cs]=Bezdrátové
 Name[da]=Trådløst
@@ -47,7 +47,7 @@ Name[zh_TW]=無線
 Comment=KNemo wireless icon theme
 Comment[bg]=Набор икони в стил "безжично" за KNemo
 Comment[bs]=Bežična tema ikona K‑nema
-Comment[ca]=Tema d'icona pel sense fils al KNemo
+Comment[ca]=Tema d'icona pel sense fil al KNemo
 Comment[ca@valencia]=Tema d'icona pel sense fils al KNemo
 Comment[cs]=KNemo set ikon - bezdrátová síť
 Comment[da]=KNemo ikontema til trådløst
