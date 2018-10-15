@@ -352,7 +352,7 @@ void BSDBackend::updateIfaceData( struct ifaddrs * ifap, const QString& ifName, 
                 // Check here too for non-ethernet interfaces
                 struct ifmediareq ifmr;
                 memset( &ifmr, 0, sizeof( ifmr ) );
-                strncpy( ifmr.ifm_name, ifName.toLatin1(), sizeof( ifmr.ifm_name ) );
+                strncpy( ifmr.ifm_name, ifName.toLatin1().constData(), sizeof( ifmr.ifm_name ) );
                 if ( ioctl( m_fd, SIOCGIFMEDIA, &ifmr ) >= 0 &&
                      ifmr.ifm_status & IFM_AVALID &&
                      ifmr.ifm_status & IFM_ACTIVE &&
@@ -519,7 +519,7 @@ int BSDBackend::get80211( const QString &ifName, int type, void *data, int len )
     struct ieee80211req ireq;
 
     memset( &ireq, 0, sizeof( ireq ) );
-    strncpy( ireq.i_name, ifName.toLatin1(), sizeof( ireq.i_name ) );
+    strncpy( ireq.i_name, ifName.toLatin1().constData(), sizeof( ireq.i_name ) );
     ireq.i_type = type;
     ireq.i_data = data;
     ireq.i_len = len;
@@ -531,7 +531,7 @@ int BSDBackend::get80211len( const QString &ifName, int type, void *data, int le
     struct ieee80211req ireq;
 
     memset( &ireq, 0, sizeof( ireq ) );
-    strncpy( ireq.i_name, ifName.toLatin1(), sizeof( ireq.i_name ) );
+    strncpy( ireq.i_name, ifName.toLatin1().constData(), sizeof( ireq.i_name ) );
     ireq.i_type = type;
     ireq.i_len = len;
     if ( ireq.i_len == len )
@@ -549,7 +549,7 @@ int BSDBackend::get80211id( const QString &ifName, int ix, void *data, size_t le
     struct ieee80211req ireq;
 
     memset( &ireq, 0, sizeof( ireq ) );
-    strncpy( ireq.i_name, ifName.toLatin1(), sizeof( ireq.i_name ) );
+    strncpy( ireq.i_name, ifName.toLatin1().constData(), sizeof( ireq.i_name ) );
     ireq.i_type = mesh ? IEEE80211_IOC_MESH_ID : IEEE80211_IOC_SSID;
     ireq.i_val = ix;
     ireq.i_data = data;
@@ -567,7 +567,7 @@ int BSDBackend::get80211val( const QString &ifName, int type, int *val )
     struct ieee80211req ireq;
 
     memset( &ireq, 0, sizeof( ireq ) );
-    strncpy( ireq.i_name, ifName.toLatin1(), sizeof( ireq.i_name ) );
+    strncpy( ireq.i_name, ifName.toLatin1().constData(), sizeof( ireq.i_name ) );
     ireq.i_type = type;
 
     if ( ioctl( m_fd, SIOCG80211, &ireq ) < 0 )
@@ -582,7 +582,7 @@ enum ieee80211_opmode BSDBackend::get80211opmode( const QString &ifName )
     struct ifmediareq ifmr;
 
     memset( &ifmr, 0, sizeof( ifmr ) );
-    strncpy( ifmr.ifm_name, ifName.toLatin1(), sizeof( ifmr.ifm_name ) );
+    strncpy( ifmr.ifm_name, ifName.toLatin1().constData(), sizeof( ifmr.ifm_name ) );
 
     if ( ioctl( m_fd, SIOCGIFMEDIA, &ifmr ) >= 0 )
     {
