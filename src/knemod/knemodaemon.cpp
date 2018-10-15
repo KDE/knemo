@@ -22,15 +22,14 @@
 #include <QtDBus/QDBusConnection>
 #include <QTimer>
 
-#include <KAboutData>
-#include <KAction>
+#include <QAction>
 #include <KActionCollection>
 #include <KConfigGroup>
-#include <KLocale>
+#include <KGlobalAccel>
+#include <KLocalizedString>
 #include <KMessageBox>
-#include <KStandardDirs>
+#include <KSharedConfig>
 
-#include "config-knemo.h"
 #include "global.h"
 #include "knemodaemon.h"
 #include "interface.h"
@@ -41,23 +40,25 @@ QString KNemoDaemon::sSelectedInterface = QString::null;
 
 BackendBase *backend = NULL;
 GeneralSettings *generalSettings = NULL;
+Plasma::Theme *plasmaTheme = NULL;
 
 KNemoDaemon::KNemoDaemon()
-    : QObject(),
-      mConfig( KGlobal::config() ),
-      mHaveInterfaces( false )
+    : QObject()
 {
+    migrateKde4Conf();
+
     generalSettings = new GeneralSettings();
+    plasmaTheme = new Plasma::Theme( this );
     backend = BackendFactory::backend();
-    QDBusConnection::sessionBus().registerObject("/knemo", this, QDBusConnection::ExportScriptableSlots);
+    QDBusConnection::sessionBus().registerObject(QLatin1String("/knemo"), this, QDBusConnection::ExportScriptableSlots);
     mPollTimer = new QTimer();
     connect( mPollTimer, SIGNAL( timeout() ), this, SLOT( updateInterfaces() ) );
 
     KActionCollection* ac = new KActionCollection( this );
-    KAction* action = new KAction( i18n( "Toggle Traffic Plotters" ), this );
-    ac->addAction( "toggleTrafficPlotters", action );
+    QAction* action = new QAction( i18n( "Toggle Traffic Plotters" ), this );
+    ac->addAction( QLatin1String("toggleTrafficPlotters"), action );
     connect( action, SIGNAL( triggered() ), SLOT( togglePlotters() ) );
-    action->setGlobalShortcut( KShortcut() );
+    KGlobalAccel::setGlobalShortcut( action, QKeySequence() );
 
     readConfig();
 }
@@ -78,8 +79,8 @@ KNemoDaemon::~KNemoDaemon()
 void KNemoDaemon::readConfig()
 {
     mPollTimer->stop();
-    KConfig *config = mConfig.data();
 
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     // For when reparseConfiguration() is called
     config->reparseConfiguration();
 
@@ -90,12 +91,8 @@ void KNemoDaemon::readConfig()
     generalSettings->pollInterval = validatePoll( generalSettings->pollInterval );
     generalSettings->useBitrate = generalGroup.readEntry( conf_useBitrate, g.useBitrate );
     generalSettings->saveInterval = clamp<int>(generalGroup.readEntry( conf_saveInterval, g.saveInterval ), 0, 300 );
-    generalSettings->statisticsDir = generalGroup.readEntry( conf_statisticsDir, g.statisticsDir );
+    generalSettings->statisticsDir = g.statisticsDir;
     generalSettings->toolTipContent = generalGroup.readEntry( conf_toolTipContent, g.toolTipContent );
-    // If we already have an Interfaces key--even if its empty--then we
-    // shouldn't try to set up a default interface
-    if ( generalGroup.hasKey( conf_interfaces ) )
-        mHaveInterfaces = true;
     QStringList interfaceList = generalGroup.readEntry( conf_interfaces, QStringList() );
 
     // Remove interfaces that are no longer monitored
@@ -117,16 +114,15 @@ void KNemoDaemon::readConfig()
         }
     }
 
-    if ( !mHaveInterfaces )
+    // If an interface has the default route, add it even if it's not
+    // explicitly configured.  It will just use the default settings.
+    // This should minimize user confusion.
+    QString ifaceName = backend->defaultRouteIface( AF_INET );
+    if ( ifaceName.isEmpty() )
+        ifaceName = backend->defaultRouteIface( AF_INET6 );
+    if ( !ifaceName.isEmpty() && !interfaceList.contains( ifaceName ) )
     {
-        QString ifaceName = backend->defaultRouteIface( AF_INET );
-        if ( ifaceName.isEmpty() )
-            ifaceName = backend->defaultRouteIface( AF_INET6 );
-        if ( !ifaceName.isEmpty() )
-        {
-            interfaceList << ifaceName;
-            mHaveInterfaces = true;
-        }
+        interfaceList << ifaceName;
     }
 
     // Add/update those that do need to be monitored
@@ -167,7 +163,7 @@ void KNemoDaemon::readConfig()
     if ( statsActivated )
     {
         QStringList drivers = QSqlDatabase::drivers();
-        if ( !drivers.contains( "QSQLITE" ) )
+        if ( !drivers.contains( QLatin1String("QSQLITE") ) )
         {
             KMessageBox::sorry( 0, i18n( "The Qt4 SQLite database plugin is not available.\n"
                                          "Please install it to store traffic statistics." ) );
@@ -214,41 +210,4 @@ void KNemoDaemon::togglePlotters()
     }
 }
 
-static const char * const description =
-    I18N_NOOP( "The KDE Network Monitor" );
-
-void KNemoDaemon::createAboutData()
-{
-    mAboutData = new KAboutData( "knemo", 0, ki18n( "KNemo" ), KNEMO_VERSION,
-                      ki18n( description ),
-                      KAboutData::License_GPL_V2,
-                      KLocalizedString(),
-                      ki18n( "Copyright (C) 2004, 2005, 2006 Percy Leonhardt\nCopyright (C) 2009, 2010 John Stamp\n\nSignal plotter taken from KSysGuard\nCopyright (C) 2006 - 2009 John Tapsell" ),
-                      "http://extragear.kde.org/apps/knemo/");
-
-    mAboutData->addAuthor( ki18n( "Percy Leonhardt" ), ki18n( "Original Author" ),
-                    "percy@eris23.de" );
-    mAboutData->addAuthor( ki18n( "John Stamp" ), ki18n( "Current maintainer" ),
-                    "jstamp@users.sourceforge.net" );
-    mAboutData->addCredit( ki18n( "Michael Olbrich" ), ki18n( "Threshold support" ),
-                    "michael.olbrich@gmx.net" );
-    mAboutData->addCredit( ki18n( "Chris Schlaeger" ), ki18n( "Signal plotter" ),
-                    "cs@kde.org" );
-    mAboutData->addCredit( ki18n( "John Tapsell" ), ki18n( "Signal plotter" ),
-                    "tapsell@kde.org" );
-}
-
-void KNemoDaemon::destroyAboutData()
-{
-    delete mAboutData;
-    mAboutData = NULL;
-}
-
-KAboutData* KNemoDaemon::mAboutData;
-
-KAboutData* KNemoDaemon::aboutData()
-{
-    return mAboutData;
-}
-
-#include "knemodaemon.moc"
+#include "moc_knemodaemon.cpp"

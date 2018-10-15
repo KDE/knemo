@@ -19,15 +19,15 @@
 
 #include <math.h>
 #include "warnconfig.h"
+#include <QPushButton>
 #include <KMessageBox>
 
 WarnConfig::WarnConfig( const InterfaceSettings *settings, const WarnRule &warn, bool addRule )
-    : KDialog(),
+    : QDialog(),
     mSettings( settings ),
     mAddRule( addRule )
 {
-    mDlg.setupUi( mainWidget() );
-    setButtons( KDialog::Default | KDialog::Ok | KDialog::Cancel );
+    mDlg.setupUi( this );
 
     QList<StatsRule> statsRules = settings->statsRules;
     bool offpeakTracking = false;
@@ -57,10 +57,12 @@ WarnConfig::WarnConfig( const InterfaceSettings *settings, const WarnRule &warn,
         mDlg.periodUnits->addItem( i18n( "Billing Periods" ), KNemoStats::BillPeriod );
     //mDlg.periodUnits->addItem( i18n( "Years" ), KNemoStats::Year );
 
-    mDlg.legend->setText( i18n( "<i>%i</i> = interface, <i>%a</i> = interface alias,<br/>"
+    mDlg.legend->setText( i18n( "<i>%i</i> = interface,<br/>"
                 "<i>%t</i> = traffic threshold, <i>%c</i> = current traffic" ) );
 
-    connect( this, SIGNAL( defaultClicked() ), SLOT( setDefaults() ) );
+    connect( mDlg.buttonBox, SIGNAL( accepted() ), SLOT( accept() ) );
+    connect( mDlg.buttonBox, SIGNAL( rejected() ), SLOT( reject() ) );
+    connect( mDlg.buttonBox, SIGNAL( clicked( QAbstractButton* ) ), SLOT( setDefaults( QAbstractButton* ) ) );
     connect( mDlg.threshold, SIGNAL( valueChanged( double ) ), this, SLOT( thresholdChanged( double ) ) );
 
     setControls( warn );
@@ -107,34 +109,31 @@ void WarnConfig::thresholdChanged( double val )
         mDlg.threshold->setValue( test );
 }
 
-void WarnConfig::setDefaults()
+void WarnConfig::setDefaults(QAbstractButton* button)
 {
-    WarnRule warn;
-    setControls( warn );
+    if (static_cast<QPushButton*>(button) == mDlg.buttonBox->button(QDialogButtonBox::RestoreDefaults) ) {
+        WarnRule warn;
+        setControls( warn );
+    }
 }
 
-void WarnConfig::slotButtonClicked( int button )
+void WarnConfig::accept()
 {
     WarnRule testRule = settings();
-    if ( mAddRule && ( (button == Ok) || (button == Apply) ) )
+    bool duplicateEntry = false;
+    QList<WarnRule> warnRules = mSettings->warnRules;
+    foreach ( WarnRule rule, warnRules )
     {
-        bool duplicateEntry = false;
-        QList<WarnRule> warnRules = mSettings->warnRules;
-        foreach ( WarnRule rule, warnRules )
+        if ( rule == testRule )
         {
-            if ( rule == testRule )
-            {
-                duplicateEntry = true;
-                break;
-            }
+            duplicateEntry = true;
+            break;
         }
-        if ( duplicateEntry )
-            KMessageBox::sorry( 0, i18n( "This traffic notification rule already exists." ) );
-        else
-            KDialog::slotButtonClicked( button );
     }
+    if ( duplicateEntry )
+        KMessageBox::sorry( 0, i18n( "This traffic notification rule already exists." ) );
     else
-        KDialog::slotButtonClicked( button );
+        QDialog::accept();
 }
 
-#include "warnconfig.moc"
+#include "moc_warnconfig.cpp"

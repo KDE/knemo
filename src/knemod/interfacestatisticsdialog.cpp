@@ -22,6 +22,9 @@
 
 #include <kio/global.h>
 #include <KMessageBox>
+#include <KSharedConfig>
+#include <KConfigGroup>
+#include <QPushButton>
 #include <QSortFilterProxyModel>
 
 #include "data.h"
@@ -32,16 +35,14 @@
 
 
 InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWidget* parent )
-    : KDialog( parent ),
+    : QDialog( parent ),
       mWasShown( false ),
       mSetPos( true ),
-      mConfig( KGlobal::config() ),
       mInterface( interface )
 {
-    setCaption( i18n( "%1 Statistics", interface->ifaceName() ) );
-    setButtons( Reset | Close );
+    setWindowTitle( i18n( "%1 Statistics", interface->ifaceName() ) );
 
-    ui.setupUi( mainWidget() );
+    ui.setupUi( this );
 
     mBillingWidget = new QWidget();
     QVBoxLayout *bl = new QVBoxLayout( mBillingWidget );
@@ -61,7 +62,7 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
 
     configChanged();
 
-    KConfig *config = mConfig.data();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
 
     InterfaceStatistics *stat = mInterface->ifaceStatistics();
@@ -72,7 +73,8 @@ InterfaceStatisticsDialog::InterfaceStatisticsDialog( Interface* interface, QWid
     setupTable( &interfaceGroup, ui.tableYearly,  stat->getStatistics( KNemoStats::Year ) );
     setupTable( &interfaceGroup, mBillingView,    stat->getStatistics( KNemoStats::BillPeriod ) );
 
-    connect( this, SIGNAL( resetClicked() ), SLOT( confirmReset() ) );
+    connect( ui.buttonBox, SIGNAL( rejected() ), SLOT( reject() ) );
+    connect( ui.buttonBox, SIGNAL( clicked( QAbstractButton* ) ), SLOT( confirmReset( QAbstractButton* ) ) );
 
     if ( interfaceGroup.hasKey( conf_statisticsPos ) )
     {
@@ -98,7 +100,7 @@ InterfaceStatisticsDialog::~InterfaceStatisticsDialog()
 {
     if ( mWasShown )
     {
-        KConfig *config = mConfig.data();
+        KSharedConfig::Ptr config = KSharedConfig::openConfig();
         KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
 
         interfaceGroup.writeEntry( conf_statisticsPos, pos() );
@@ -190,13 +192,15 @@ bool InterfaceStatisticsDialog::event( QEvent *e )
         ui.tableHourly->horizontalHeader()->setStretchLastSection( true );
     }
 
-    return KDialog::event( e );
+    return QDialog::event( e );
 }
 
-void InterfaceStatisticsDialog::confirmReset()
+void InterfaceStatisticsDialog::confirmReset( QAbstractButton* button)
 {
-    if ( KMessageBox::questionYesNo( this, i18n( "Do you want to reset all statistics?" ) ) == KMessageBox::Yes )
-        emit clearStatistics();
+    if (static_cast<QPushButton*>(button) == ui.buttonBox->button(QDialogButtonBox::Reset) ) {
+        if ( KMessageBox::questionYesNo( this, i18n( "Do you want to reset all statistics?" ) ) == KMessageBox::Yes )
+            emit clearStatistics();
+    }
 }
 
 void InterfaceStatisticsDialog::setCurrentSel()
@@ -209,4 +213,4 @@ void InterfaceStatisticsDialog::setCurrentSel()
 }
 
 
-#include "interfacestatisticsdialog.moc"
+#include "moc_interfacestatisticsdialog.cpp"

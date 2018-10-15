@@ -44,7 +44,7 @@ Q_OBJECT
         virtual void mousePressEvent( QMouseEvent * );
         virtual bool viewportEvent( QEvent * );
 
-    private slots:
+    private Q_SLOTS:
         void updateSum();
         void showSum( const QPoint &p );
 };

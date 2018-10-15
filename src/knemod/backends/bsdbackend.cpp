@@ -302,6 +302,7 @@ void BSDBackend::updateIfaceData( struct ifaddrs * ifap, const QString& ifName, 
 {
     struct ifaddrs *ifa;
     unsigned long rx_bytes = 0, tx_bytes = 0;
+    data->prevStatus = data->status;
     for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next)
     {
         QString ifaddrName( ifa->ifa_name );

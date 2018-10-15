@@ -19,22 +19,14 @@
 
 #include "statsfactory.h"
 #include "stats_vnstat.h"
-#include <cstdlib>
-#include <QDir>
-#include <QFile>
+#include <QStandardPaths>
 
 ExternalStats * StatsFactory::stats( Interface * iface, KCalendarSystem * calendar )
 {
     ExternalStats * s = NULL;
-    QStringList paths = QString( getenv("PATH")).split( ':' );
-    for ( int i = 0; i < paths.count(); i++ )
+    if ( ! QStandardPaths::findExecutable(QLatin1String("vnstat")).isEmpty() )
     {
-        if ( QFile::exists( paths[i] + "/" + "vnstat" ) )
-            s = new StatsVnstat( iface, calendar );
-        /* else if others */
-
-        if ( s )
-            return s;
+        s = new StatsVnstat( iface, calendar );
     }
     return s;
 }

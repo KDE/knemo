@@ -21,7 +21,7 @@
 #ifndef INTERFACESTATUSDIALOG_H
 #define INTERFACESTATUSDIALOG_H
 
-#include <KDialog>
+#include <QDialog>
 
 #include "ui_interfacestatusdlg.h"
 
@@ -35,7 +35,7 @@ class Interface;
  * @author Percy Leonhardt <percy@eris23.de>
  */
 
-class InterfaceStatusDialog : public KDialog
+class InterfaceStatusDialog : public QDialog
 {
     Q_OBJECT
 public:
@@ -50,7 +50,7 @@ public:
      */
     virtual ~InterfaceStatusDialog();
 
-public slots:
+public Q_SLOTS:
     /**
      * Update the statistics tab when data changed
      */
@@ -74,7 +74,6 @@ private:
     bool mWasShown;
     bool mSetPos;
 
-    KSharedConfigPtr mConfig;
     Interface* mInterface;
 };
 

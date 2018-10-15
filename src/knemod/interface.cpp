@@ -18,23 +18,24 @@
    Boston, MA 02110-1301, USA.
 */
 
+#include "interface.h"
+
 #include <math.h>
 
 #include <KCalendarSystem>
-#include <KColorScheme>
+#include <KConfigGroup>
 #include <KNotification>
 #include <KWindowSystem>
-#include <kdeversion.h>
 #include <kio/global.h>
 
 #include "backends/backendbase.h"
 #include "global.h"
 #include "utils.h"
-#include "interface.h"
 #include "interfaceplotterdialog.h"
 #include "interfacestatistics.h"
 #include "interfacestatusdialog.h"
 #include "interfacestatisticsdialog.h"
+#include "trayicon.h"
 
 Interface::Interface( const QString &ifname,
                       const BackendData* data )
@@ -44,10 +45,10 @@ Interface::Interface( const QString &ifname,
       mIfaceName( ifname ),
       mRealSec( 0.0 ),
       mUptime( 0 ),
-      mUptimeString( "00:00:00" ),
+      mUptimeString( QStringLiteral("00:00:00") ),
       mRxRate( 0 ),
       mTxRate( 0 ),
-      mIcon( this ),
+      mIcon( 0 ),
       mIfaceStatistics( 0 ),
       mStatusDialog( 0 ),
       mStatisticsDialog(  0 ),
@@ -55,9 +56,6 @@ Interface::Interface( const QString &ifname,
       mBackendData( data )
 {
     mPlotterDialog = new InterfacePlotterDialog( mIfaceName );
-
-    connect( &mIcon, SIGNAL( statisticsSelected() ),
-             this, SLOT( showStatisticsDialog() ) );
 }
 
 Interface::~Interface()
@@ -66,47 +64,48 @@ Interface::~Interface()
     delete mPlotterDialog;
     delete mStatisticsDialog;
     delete mIfaceStatistics;
+    delete mIcon;
 }
 
 void Interface::configChanged()
 {
-    KSharedConfigPtr config = KGlobal::config();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     QString group( confg_interface );
     group += mIfaceName;
     KConfigGroup interfaceGroup( config, group );
     InterfaceSettings s;
-    mSettings.alias = interfaceGroup.readEntry( conf_alias ).trimmed();
     mSettings.iconTheme = interfaceGroup.readEntry( conf_iconTheme, s.iconTheme );
+
+    // If the theme is not configured, use a sensible default
+    if (mSettings.iconTheme.isEmpty()) {
+        if ( mBackendData->isWireless ) {
+            mSettings.iconTheme = QLatin1String("wireless");
+        } else {
+            mSettings.iconTheme = QLatin1String("network");
+        }
+    }
+
+    // Let's check that the theme is available
     QStringList themeNames;
     QList<KNemoTheme> themes = findThemes();
-    // Let's check that it's available
     foreach( KNemoTheme theme, themes )
         themeNames << theme.internalName;
     themeNames << NETLOAD_THEME;
+
+    // If that's not available, default to the text theme
     if ( !themeNames.contains( mSettings.iconTheme ) )
         mSettings.iconTheme = TEXT_THEME;
-    mSettings.colorIncoming = interfaceGroup.readEntry( conf_colorIncoming, s.colorIncoming );
-    mSettings.colorOutgoing = interfaceGroup.readEntry( conf_colorOutgoing, s.colorOutgoing );
-    KColorScheme scheme(QPalette::Active, KColorScheme::View);
-    mSettings.colorDisabled = interfaceGroup.readEntry( conf_colorDisabled, scheme.foreground( KColorScheme::InactiveText ).color() );
-    mSettings.colorUnavailable = interfaceGroup.readEntry( conf_colorUnavailable, scheme.foreground( KColorScheme::InactiveText ).color() );
-    mSettings.colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-    mSettings.iconFont = interfaceGroup.readEntry( conf_iconFont, s.iconFont );
-    mSettings.dynamicColor = interfaceGroup.readEntry( conf_dynamicColor, s.dynamicColor );
-    mSettings.colorIncomingMax = interfaceGroup.readEntry( conf_colorIncomingMax, s.colorIncomingMax );
-    mSettings.colorOutgoingMax = interfaceGroup.readEntry( conf_colorOutgoingMax, s.colorOutgoingMax );
+
     mSettings.barScale = interfaceGroup.readEntry( conf_barScale, s.barScale );
-    mSettings.inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate )*1024;
-    mSettings.outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate )*1024;
-    mSettings.hideWhenDisconnected = interfaceGroup.readEntry( conf_hideWhenNotAvail, s.hideWhenDisconnected );
-    mSettings.hideWhenUnavailable = interfaceGroup.readEntry( conf_hideWhenNotExist, s.hideWhenUnavailable );
+    mSettings.maxRate = interfaceGroup.readEntry( conf_maxRate, s.maxRate )*1024;
+    mSettings.minVisibleState = interfaceGroup.readEntry( conf_minVisibleState, s.minVisibleState );
     mSettings.activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
     mSettings.trafficThreshold = clamp<unsigned int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
     mSettings.warnRules.clear();
     int warnRuleCount = interfaceGroup.readEntry( conf_warnRules, 0 );
     for ( int i = 0; i < warnRuleCount; ++i )
     {
-        group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( mIfaceName ).arg( i );
+        group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_warnRule ).arg( mIfaceName ).arg( i );
         if ( config->hasGroup( group ) )
         {
             KConfigGroup warnGroup( config, group );
@@ -123,23 +122,14 @@ void Interface::configChanged()
         }
     }
 
-    if ( interfaceGroup.hasKey( conf_calendar ) )
-    {
-        QString oldSetting = interfaceGroup.readEntry( conf_calendar );
-        mSettings.calendarSystem = KCalendarSystem::calendarSystem( oldSetting );
-        interfaceGroup.writeEntry( conf_calendarSystem, static_cast<int>(mSettings.calendarSystem) );
-        interfaceGroup.deleteEntry( conf_calendar );
-        config->sync();
-    }
-    else
-        mSettings.calendarSystem = static_cast<KLocale::CalendarSystem>(interfaceGroup.readEntry( conf_calendarSystem, static_cast<int>(KLocale::QDateCalendar) ));
+    mSettings.calendarSystem = static_cast<KLocale::CalendarSystem>(interfaceGroup.readEntry( conf_calendarSystem, static_cast<int>(KLocale::QDateCalendar) ));
 
     mSettings.statsRules.clear();
     int statsRuleCount = interfaceGroup.readEntry( conf_statsRules, 0 );
     KCalendarSystem *testCal = KCalendarSystem::create( mSettings.calendarSystem );
     for ( int i = 0; i < statsRuleCount; ++i )
     {
-        group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( mIfaceName ).arg( i );
+        group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_statsRule ).arg( mIfaceName ).arg( i );
         if ( config->hasGroup( group ) )
         {
             KConfigGroup statsGroup( config, group );
@@ -163,28 +153,10 @@ void Interface::configChanged()
         }
     }
 
-    mSettings.commands.clear();
-    int numCommands = interfaceGroup.readEntry( conf_numCommands, s.numCommands );
-    for ( int i = 0; i < numCommands; i++ )
+    if (mIcon)
     {
-        QString entry;
-        InterfaceCommand cmd;
-        entry = QString( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
-        cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
-        entry = QString( "%1%2" ).arg( conf_command ).arg( i + 1 );
-        cmd.command = interfaceGroup.readEntry( entry );
-        entry = QString( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
-        cmd.menuText = interfaceGroup.readEntry( entry );
-        mSettings.commands.append( cmd );
+        mIcon->configChanged();
     }
-
-    // This prevents needless regeneration of icon when first shown in tray
-    if ( mIfaceState == KNemoIface::UnknownState )
-    {
-        mIfaceState = mBackendData->status;
-        mPreviousIfaceState = mIfaceState;
-    }
-    mIcon.configChanged();
 
     if ( mIfaceStatistics )
     {
@@ -208,7 +180,6 @@ void Interface::configChanged()
 void Interface::processUpdate()
 {
     mPreviousIfaceState = mIfaceState;
-    unsigned int trafficThreshold = mSettings.trafficThreshold;
     mIfaceState = mBackendData->status;
 
     int units = 1;
@@ -219,16 +190,14 @@ void Interface::processUpdate()
     mRxRateStr = formattedRate( mRxRate, generalSettings->useBitrate );
     mTxRateStr = formattedRate( mTxRate, generalSettings->useBitrate );
 
-    QString title = mSettings.alias;
-    if ( title.isEmpty() )
-        title = mIfaceName;
+    QString title = mIfaceName;
 
     if ( mIfaceState & KNemoIface::Connected )
     {
         // the interface is connected, look for traffic
-        if ( ( mBackendData->rxPackets - mBackendData->prevRxPackets ) > trafficThreshold )
+        if ( ( mBackendData->rxPackets - mBackendData->prevRxPackets ) > mSettings.trafficThreshold )
             mIfaceState |= KNemoIface::RxTraffic;
-        if ( ( mBackendData->txPackets - mBackendData->prevTxPackets ) > trafficThreshold )
+        if ( ( mBackendData->txPackets - mBackendData->prevTxPackets ) > mSettings.trafficThreshold )
             mIfaceState |= KNemoIface::TxTraffic;
 
         if ( mIfaceStatistics )
@@ -253,14 +222,14 @@ void Interface::processUpdate()
             else
                 connectedStr = i18n( "%1 is connected", title );
             if ( mPreviousIfaceState != KNemoIface::UnknownState )
-                KNotification::event( "connected", connectedStr );
+                KNotification::event( QLatin1String("connected"), connectedStr );
         }
     }
     else if ( mIfaceState & KNemoIface::Available )
     {
         if ( mPreviousIfaceState & KNemoIface::Connected )
         {
-            KNotification::event( "disconnected", i18n( "%1 has disconnected", title ) );
+            KNotification::event( QLatin1String("disconnected"), i18n( "%1 has disconnected", title ) );
             if ( mBackendData->interfaceType == KNemoIface::PPP )
                 backend->clearTraffic( mIfaceName );
             resetUptime();
@@ -268,24 +237,37 @@ void Interface::processUpdate()
         else if ( mPreviousIfaceState < KNemoIface::Available )
         {
             if ( mPreviousIfaceState != KNemoIface::UnknownState )
-                KNotification::event( "available", i18n( "%1 is available", title ) );
+                KNotification::event( QLatin1String("available"), i18n( "%1 is available", title ) );
         }
     }
     else if ( mIfaceState == KNemoIface::Unavailable &&
               mPreviousIfaceState > KNemoIface::Unavailable )
     {
-        KNotification::event( "unavailable", i18n( "%1 is unavailable", title ) );
+        KNotification::event( QLatin1String("unavailable"), i18n( "%1 is unavailable", title ) );
         backend->clearTraffic( mIfaceName );
         resetUptime();
     }
 
     if ( mPreviousIfaceState != mIfaceState )
-        mIcon.updateTrayStatus();
+    {
+        if ( mIcon && mIfaceState < mSettings.minVisibleState )
+        {
+            delete mIcon;
+            mIcon = 0L;
+        }
+        else if ( !mIcon && mIfaceState >= mSettings.minVisibleState )
+        {
+            mIcon = new TrayIcon( this, mIfaceName );
+        }
+    }
 
     if ( mPlotterDialog )
         mPlotterDialog->updatePlotter( mRxRate, mTxRate );
 
-    mIcon.updateToolTip();
+    if ( mIcon )
+    {
+        mIcon->processUpdate();
+    }
     if ( mStatusDialog )
         mStatusDialog->updateDialog();
 }
@@ -294,14 +276,14 @@ void Interface::resetUptime()
 {
     mUptime = 0;
     mRealSec = 0.0;
-    mUptimeString = "00:00:00";
+    mUptimeString = QStringLiteral("00:00:00");
     mRxRate = 0;
     mTxRate = 0;
     mRxRateStr = formattedRate( mRxRate, generalSettings->useBitrate );
     mTxRateStr = formattedRate( mTxRate, generalSettings->useBitrate );
 }
 
-void Interface::showStatusDialog( bool fromContextMenu )
+void Interface::showStatusDialog( bool onlyActivate )
 {
     // Toggle the status dialog.
     // First click will show the status dialog, second will hide it.
@@ -316,13 +298,13 @@ void Interface::showStatusDialog( bool fromContextMenu )
         }
     }
 
-    activateOrHide( mStatusDialog, fromContextMenu );
+    activateOrHide( mStatusDialog, onlyActivate );
 }
 
-void Interface::showSignalPlotter( bool fromContextMenu )
+void Interface::showSignalPlotter( bool onlyActivate )
 {
     // Toggle the signal plotter.
-    activateOrHide( mPlotterDialog, fromContextMenu );
+    activateOrHide( mPlotterDialog, onlyActivate );
 }
 
 void Interface::showStatisticsDialog()
@@ -389,10 +371,9 @@ void Interface::warnTraffic( QString warnText, quint64 threshold, quint64 curren
 {
     if ( !warnText.isEmpty() )
     {
-        warnText = warnText.replace( QRegExp("%i"), mIfaceName );
-        warnText = warnText.replace( QRegExp("%a"), mSettings.alias );
-        warnText = warnText.replace( QRegExp("%t"), KIO::convertSize( threshold ) );
-        warnText = warnText.replace( QRegExp("%c"), KIO::convertSize( threshold ) );
+        warnText = warnText.replace( QRegExp(QLatin1String("%i")), mIfaceName );
+        warnText = warnText.replace( QRegExp(QLatin1String("%t")), KIO::convertSize( threshold ) );
+        warnText = warnText.replace( QRegExp(QLatin1String("%c")), KIO::convertSize( threshold ) );
     }
     else
     {
@@ -403,7 +384,7 @@ void Interface::warnTraffic( QString warnText, quint64 threshold, quint64 curren
                                 KIO::convertSize( threshold ),
                                 KIO::convertSize( current ) );
     }
-    KNotification::event( "exceededTraffic", warnText );
+    KNotification::event( QLatin1String("exceededTraffic"), warnText );
 }
 
 void Interface::toggleSignalPlotter( bool show )
@@ -429,7 +410,7 @@ void Interface::activateOrHide( QWidget* widget, bool onlyActivate )
     if ( !widget )
 	return;
 
-    KWindowInfo info1 = KWindowSystem::windowInfo( widget->winId(), NET::XAWMState | NET::WMState );
+    KWindowInfo info1 = KWindowInfo( widget->winId(), NET::XAWMState | NET::WMState );
     // mapped = visible (but possibly obscured)
     bool mapped = (info1.mappingState() == NET::Visible) && !info1.isMinimized();
 //    - not mapped -> show, raise, focus
@@ -451,7 +432,7 @@ void Interface::activateOrHide( QWidget* widget, bool onlyActivate )
             WId id = it.previous();
             if( id == widget->winId() )
                 break;
-            KWindowInfo info2 = KWindowSystem::windowInfo( id,
+            KWindowInfo info2 = KWindowInfo( id,
                 NET::WMGeometry | NET::XAWMState | NET::WMState | NET::WMWindowType );
             if( info2.mappingState() != NET::Visible )
                 continue; // not visible on current desktop -> ignore
@@ -475,4 +456,4 @@ void Interface::activateOrHide( QWidget* widget, bool onlyActivate )
     }
 }
 
-#include "interface.moc"
+#include "moc_interface.cpp"

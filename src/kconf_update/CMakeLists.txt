@@ -6,4 +6,5 @@ install( PROGRAMS
          knemo-0.6.1-misc.pl
          knemo-0.6.3-misc.pl
          knemo-0.7.0-misc.pl
+         knemo-0.7.4-misc.pl
          DESTINATION ${KCONF_UPDATE_INSTALL_DIR} )

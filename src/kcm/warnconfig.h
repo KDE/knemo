@@ -20,11 +20,11 @@
 #ifndef WARNCONFIG_H
 #define WARNCONFIG_H
 
-#include <KDialog>
+#include <QDialog>
 #include "data.h"
 #include "ui_warncfg.h"
 
-class WarnConfig : public KDialog
+class WarnConfig : public QDialog
 {
 Q_OBJECT
 public:
@@ -35,11 +35,10 @@ private:
     const InterfaceSettings *mSettings;
     bool mAddRule;
     void setControls( const WarnRule &warn );
-private slots:
-    void setDefaults();
+private Q_SLOTS:
+    void accept();
+    void setDefaults(QAbstractButton* button);
     void thresholdChanged( double );
-protected:
-    virtual void slotButtonClicked( int button );
 };
 
 #endif

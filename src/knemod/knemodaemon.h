@@ -22,10 +22,9 @@
 #define KNEMODAEMON_H
 
 #include <QHash>
-#include <KApplication>
+#include <QApplication>
 
 class QTimer;
-class KAboutData;
 class Interface;
 class BackendBase;
 
@@ -56,10 +55,6 @@ public:
     // tell the control center module which interface the user selected
     static QString sSelectedInterface;
 
-    static void createAboutData();
-    static void destroyAboutData();
-    static KAboutData* aboutData();
-
 
 public Q_SLOTS:
     /*
@@ -83,7 +78,7 @@ private:
      */
     void readConfig();
 
-private slots:
+private Q_SLOTS:
     /**
      * trigger the backend to update the interface informations
      */
@@ -92,9 +87,6 @@ private slots:
     void togglePlotters();
 
 private:
-    KSharedConfigPtr mConfig;
-    bool mHaveInterfaces;
-
     // every time this timer expires we will
     // gather new informations from the backend
     QTimer* mPollTimer;
@@ -102,8 +94,6 @@ private:
     QString mBackendName;
     // a list of all interfaces the user wants to monitor
     QHash<QString, Interface *> mInterfaceHash;
-
-    static KAboutData* mAboutData;
 };
 
 #endif // KNEMODAEMON_H

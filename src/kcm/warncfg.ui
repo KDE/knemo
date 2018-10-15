@@ -3,7 +3,16 @@
  <class>WarnCfg</class>
  <widget class="QWidget" name="WarnCfg">
   <layout class="QVBoxLayout" name="verticalLayout_5">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -123,27 +132,21 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
-             <widget class="KDoubleNumInput" name="threshold">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+             <widget class="QDoubleSpinBox" name="threshold">
               <property name="whatsThis">
                <string>When traffic for a month or billing period exceeds this limit, KNemo will emit a notification. The notification will appear once per session.</string>
+              </property>
+              <property name="decimals">
+               <number>1</number>
               </property>
               <property name="minimum">
                <double>0.100000000000000</double>
               </property>
+              <property name="maximum">
+               <double>9999.000000000000000</double>
+              </property>
               <property name="singleStep">
                <double>0.100000000000000</double>
-              </property>
-              <property name="specialValueText">
-               <string/>
-              </property>
-              <property name="decimals">
-               <number>1</number>
               </property>
              </widget>
             </item>
@@ -165,7 +168,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="KIntSpinBox" name="periodCount">
+             <widget class="QSpinBox" name="periodCount">
               <property name="minimum">
                <number>1</number>
               </property>
@@ -207,7 +210,7 @@
        </widget>
       </item>
       <item>
-       <widget class="KTextEdit" name="customTextEdit">
+       <widget class="QTextEdit" name="customTextEdit">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -223,25 +226,15 @@
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>KDoubleNumInput</class>
-   <extends>QWidget</extends>
-   <header>knuminput.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KIntSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>knuminput.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KTextEdit</class>
-   <extends>QTextEdit</extends>
-   <header>ktextedit.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>trafficType</tabstop>
   <tabstop>trafficDirection</tabstop>

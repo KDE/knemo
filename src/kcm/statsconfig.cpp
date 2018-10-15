@@ -18,19 +18,19 @@
 */
 
 #include "statsconfig.h"
+#include <QPushButton>
 #include <KCalendarSystem>
 #include <KMessageBox>
 
-StatsConfig::StatsConfig( const InterfaceSettings * settings, const KCalendarSystem *calendar, const StatsRule &rule, bool addRule ) : KDialog(),
+StatsConfig::StatsConfig( const InterfaceSettings * settings, const KCalendarSystem *calendar, const StatsRule &rule, bool addRule ) : QDialog(),
     mSettings( settings ),
     mCal( calendar ),
     mAddRule( addRule )
 {
     // Do this for the sake of KDateEdit
-    KGlobal::locale()->setCalendarSystem( mCal->calendarSystem() );
+    KLocale::global()->setCalendarSystem( mCal->calendarSystem() );
 
-    mDlg.setupUi( mainWidget() );
-    setButtons( KDialog::Default | KDialog::Ok | KDialog::Cancel );
+    mDlg.setupUi( this );
 
     for ( int i = 1; i <= mCal->daysInWeek( QDate::currentDate() ); ++i )
     {
@@ -43,7 +43,9 @@ StatsConfig::StatsConfig( const InterfaceSettings * settings, const KCalendarSys
     mDlg.periodUnits->addItem( i18n( "Months" ), KNemoStats::Month );
     //mDlg.periodUnits->addItem( i18n( "Years" ), KNemoStats::Year );
 
-    connect( this, SIGNAL( defaultClicked() ), SLOT( setDefaults() ) );
+    connect( mDlg.buttonBox, SIGNAL( accepted() ), SLOT( accept() ) );
+    connect( mDlg.buttonBox, SIGNAL( rejected() ), SLOT( reject() ) );
+    connect( mDlg.buttonBox, SIGNAL( clicked( QAbstractButton* ) ), SLOT( setDefaults( QAbstractButton* ) ) );
     connect( mDlg.logOffpeak, SIGNAL( toggled( bool ) ), SLOT( enableItems() ) );
     connect( mDlg.doWeekend, SIGNAL( toggled( bool ) ), SLOT( enableItems() ) );
 
@@ -69,11 +71,13 @@ void StatsConfig::setControls( const StatsRule &s )
     mDlg.weekendStopTime->setTime( s.weekendTimeEnd );
 }
 
-void StatsConfig::setDefaults()
+void StatsConfig::setDefaults( QAbstractButton* button )
 {
-    StatsRule s;
-    mDlg.startDate->setDate( QDate::currentDate().addDays( 1 - mCal->day( QDate::currentDate() ) ) );
-    setControls( s );
+    if (static_cast<QPushButton*>(button) == mDlg.buttonBox->button(QDialogButtonBox::RestoreDefaults) ) {
+        StatsRule s;
+        mDlg.startDate->setDate( QDate::currentDate().addDays( 1 - mCal->day( QDate::currentDate() ) ) );
+        setControls( s );
+    }
 }
 
 StatsRule StatsConfig::settings()
@@ -113,32 +117,29 @@ void StatsConfig::enableItems()
     mDlg.weekendStopTime->setEnabled( enabledItems );
 }
 
-void StatsConfig::slotButtonClicked( int button )
+void StatsConfig::accept()
 {
-    if ( mAddRule && ( (button == Ok) || (button == Apply) ) )
+    bool duplicateEntry = false;
+    StatsRule testRule = settings();
+    QList<StatsRule> statsRules = mSettings->statsRules;
+    foreach ( StatsRule rule, statsRules )
     {
-        bool duplicateEntry = false;
-        StatsRule testRule = settings();
-        QList<StatsRule> statsRules = mSettings->statsRules;
-        foreach ( StatsRule rule, statsRules )
+        if ( rule == testRule )
         {
-            if ( rule == testRule )
-            {
-                duplicateEntry = true;
-                break;
-            }
+            duplicateEntry = true;
+            break;
         }
-        if ( duplicateEntry )
-            KMessageBox::sorry( 0,
-                                i18n( "Another rule already starts on %1. "
-                                      "Please choose another date.",
-                                      mCal->formatDate( mDlg.startDate->date(), KLocale::LongDate ) )
-                              );
-        else
-            KDialog::slotButtonClicked( button );
     }
-    else
-        KDialog::slotButtonClicked( button );
+    if ( duplicateEntry )
+    {
+        KMessageBox::sorry( 0,
+                            i18n( "Another rule already starts on %1. "
+                                  "Please choose another date.",
+                                  mCal->formatDate( mDlg.startDate->date(), KLocale::LongDate ) )
+                          );
+    } else {
+        QDialog::accept();
+    }
 }
 
-#include "statsconfig.moc"
+#include "moc_statsconfig.cpp"

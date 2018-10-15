@@ -20,19 +20,18 @@
 #ifndef THEMECONFIG_H
 #define THEMECONFIG_H
 
-#include <KDialog>
+#include <QDialog>
 #include "data.h"
 #include "ui_themecfg.h"
 
-class ThemeConfig : public KDialog
+class ThemeConfig : public QDialog
 {
 Q_OBJECT
 public:
     ThemeConfig( const InterfaceSettings s );
     InterfaceSettings settings();
-private slots:
-    void setDefaults();
-    void updateRateGroup();
+private Q_SLOTS:
+    void setDefaults( QAbstractButton* );
 private:
     Ui::ThemeCfg mDlg;
     InterfaceSettings mSettings;

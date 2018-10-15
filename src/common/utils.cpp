@@ -25,14 +25,22 @@
        copyright notice and this permission notice appear in all copies.
 */
 
+#include <cmath>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <net/if.h>
+#include <QDir>
+#include <QPainter>
+#include <QPalette>
+#include <QUrl>
 #include <QFontMetrics>
-#include <KGlobalSettings>
+#include <QStandardPaths>
+#include <KColorScheme>
+#include <KConfigGroup>
+#include <Kdelibs4ConfigMigrator>
+#include <Kdelibs4Migration>
 #include <KSharedConfig>
-#include <KSharedConfigPtr>
-#include <KStandardDirs>
+#include <Plasma/Theme>
 #include "data.h"
 #include "utils.h"
 
@@ -88,13 +96,13 @@ void parseNetlinkRoute( struct nl_object *object, void * )
 
             if ( rtfamily == AF_INET )
             {
-                ipv4gw = gwaddr;
-                ipv4gwi = gwname;
+                ipv4gw = QLatin1String(gwaddr);
+                ipv4gwi = QLatin1String(gwname);
             }
             else if ( rtfamily == AF_INET6 )
             {
-                ipv6gw = gwaddr;
-                ipv6gwi = gwname;
+                ipv6gw = QLatin1String(gwaddr);
+                ipv6gwi = QLatin1String(gwname);
             }
         }
     }
@@ -244,23 +252,136 @@ QString getDefaultRoute( int afType, QString *defaultGateway, void *data  __attr
 
 QList<KNemoTheme> findThemes()
 {
-    KStandardDirs themes;
-    themes.addResourceType("knemo_themes", "data", "knemo/themes");
-    QStringList themelist = themes.findAllResources( "knemo_themes", "*.desktop" );
+    const QStringList dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("knemo/themes"), QStandardPaths::LocateDirectory);
+    QStringList themelist;
+    Q_FOREACH (const QString& dir, dirs) {
+        const QStringList fileNames = QDir(dir).entryList(QStringList() << QLatin1String("*.desktop"));
+        Q_FOREACH (const QString& file, fileNames) {
+            themelist.append(dir + QLatin1Char('/') + file);
+        }
+    }
 
     QList<KNemoTheme> iconThemes;
     foreach ( QString themeFile, themelist )
     {
-        KSharedConfigPtr conf = KSharedConfig::openConfig( themeFile );
-        KConfigGroup cfg( conf, "Desktop Entry" );
+        KSharedConfig::Ptr conf = KSharedConfig::openConfig( themeFile );
+        KConfigGroup cfg( conf, QLatin1String("Desktop Entry") );
         KNemoTheme theme;
-        theme.name = cfg.readEntry("Name");
-        theme.comment = cfg.readEntry("Comment");
-        theme.internalName = cfg.readEntry( "X-KNemo-Theme" );
+        theme.name = cfg.readEntry(QLatin1String("Name"));
+        theme.comment = cfg.readEntry(QLatin1String("Comment"));
+        theme.internalName = cfg.readEntry( QLatin1String("X-KNemo-Theme") );
         iconThemes << theme;
     }
     return iconThemes;
 }
+
+QSize getIconSize()
+{
+    // This is borrowed from the plasma system tray:
+    // plasma-workspace/applets/systemtray/package/contents/ui/main.qml
+    // plasma-workspace/applets/systemtray/package/contents/code/Layout.js
+    int preferredItemSize = 128;
+    Plasma::Theme theme;
+    int baseSize = theme.mSize(theme.defaultFont()).height();
+    int suggestedsize = min(baseSize * 2, preferredItemSize);
+    QSize resultingsize;
+
+    if (suggestedsize < 16 || suggestedsize >= 64) {
+        resultingsize = QSize(suggestedsize, suggestedsize);
+    } else if (suggestedsize < 22) {
+        resultingsize = QSize(16, 16);
+    } else if (suggestedsize < 24) {
+        resultingsize = QSize(22, 22);
+    } else if (suggestedsize < 32) {
+        resultingsize = QSize(24, 24);
+    } else if (suggestedsize < 48) {
+        resultingsize = QSize(32, 32);
+    } else if (suggestedsize < 64) {
+        resultingsize = QSize(48, 48);
+    }
+
+    return resultingsize;
+}
+
+QPixmap genTextIcon(const QString& incomingText, const QString& outgoingText, const QFont& font, int status)
+{
+    QSize iconSize = getIconSize();
+    QPixmap textIcon(iconSize);
+    QRect topRect( 0, 0, iconSize.width(), iconSize.height()/2 );
+    QRect bottomRect( 0, iconSize.width()/2, iconSize.width(), iconSize.height()/2 );
+    textIcon.fill( Qt::transparent );
+    QPainter p( &textIcon );
+    p.setBrush( Qt::NoBrush );
+    p.setOpacity( 1.0 );
+    QColor textColor;
+
+    // rxFont and txFont should be the same size per poll period
+    QFont rxFont = setIconFont( incomingText, font, iconSize.height() );
+    QFont txFont = setIconFont( outgoingText, font, iconSize.height() );
+    rxFont.setPointSizeF( qMin(rxFont.pointSizeF(), txFont.pointSizeF()) );
+
+    if ( status & KNemoIface::Connected )
+        textColor = KColorScheme(QPalette::Active).foreground(KColorScheme::NormalText).color();
+    else if ( status & KNemoIface::Available )
+        textColor = KColorScheme(QPalette::Active).foreground(KColorScheme::InactiveText).color();
+    else
+        textColor = KColorScheme(QPalette::Active).foreground(KColorScheme::NegativeText).color();
+
+    p.setFont( rxFont );
+    p.setPen( textColor );
+    p.drawText( topRect, Qt::AlignCenter | Qt::AlignRight, incomingText );
+    p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, outgoingText );
+    return textIcon;
+}
+
+QPixmap genBarIcon(qreal rxLevel, qreal txLevel, int status)
+{
+    QSize iconSize = getIconSize();
+
+    QColor rxColor;
+    QColor txColor;
+    QColor bgColor;
+    if ( status & KNemoIface::Connected )
+    {
+        rxColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::ActiveText).color();
+        txColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::NeutralText).color();
+        bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::InactiveText).color();
+        bgColor.setAlpha( 77 );
+    }
+    else if ( status & KNemoIface::Available )
+    {
+        bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::InactiveText).color();
+        bgColor.setAlpha( 153 );
+    }
+    else
+    {
+        bgColor = KColorScheme(QPalette::Active, KColorScheme::Window).foreground(KColorScheme::NegativeText).color();
+    }
+
+    int barWidth = static_cast<int>(round(iconSize.width()/3.0) + 0.5);
+    int margins = iconSize.width() - (barWidth*2);
+    int midMargin = static_cast<int>(round(margins/3.0) + 0.5);
+    int outerMargin = static_cast<int>(round((margins - midMargin)/2.0) + 0.5);
+    midMargin = outerMargin + barWidth + midMargin;
+    QPixmap barIcon( iconSize );
+    barIcon.fill( Qt::transparent );
+
+    int top = iconSize.height() - static_cast<int>(round(iconSize.height() * txLevel) + 0.5);
+    QRect topLeftRect( outerMargin, 0, barWidth, top );
+    QRect leftRect( outerMargin, top, barWidth, iconSize.height() );
+    top = iconSize.height() - static_cast<int>(round(iconSize.height() * rxLevel) + 0.5);
+    QRect topRightRect( midMargin, 0, barWidth, top );
+    QRect rightRect( midMargin, top, barWidth, iconSize.height() );
+
+    QPainter p( &barIcon );
+    p.fillRect( leftRect, txColor );
+    p.fillRect( rightRect, rxColor );
+    p.fillRect( topLeftRect, bgColor );
+    p.fillRect( topRightRect, bgColor );
+    return barIcon;
+}
+
+
 
 QFont setIconFont( const QString& text, const QFont& font, int iconWidth )
 {
@@ -314,4 +435,34 @@ double validatePoll( double val )
         }
     }
     return GeneralSettings().pollInterval;
+}
+
+void migrateKde4Conf()
+{
+    // Kdelibs4Migration
+    QStringList configFiles;
+    configFiles << QLatin1String("knemorc") << QLatin1String("knemo.notifyrc");
+    Kdelibs4ConfigMigrator migrator(QLatin1String("knemo")); // the same name defined in the aboutData
+    migrator.setConfigFiles(configFiles);
+
+    if (migrator.migrate()) {
+        // look in knemorc; find configured stats path (or KDE4 default); migrate stats.
+        KConfigGroup generalGroup( KSharedConfig::openConfig(), confg_general );
+        Kdelibs4Migration dataMigrator;
+        QString sourceBasePath = generalGroup.readEntry( QLatin1String("StatisticsDir"), dataMigrator.saveLocation("data", QLatin1String("knemo")) );
+        QUrl testUrl(sourceBasePath);
+        if ( testUrl.isLocalFile() )
+            sourceBasePath = testUrl.toLocalFile();
+        const QString targetBasePath = GeneralSettings().statisticsDir.absolutePath() + QLatin1Char('/');
+
+        QDir sourceDir(sourceBasePath);
+        if(sourceDir.exists()) {
+            QStringList fileNames = sourceDir.entryList(QDir::Files);
+            if (QDir().mkpath(targetBasePath)) {
+                foreach (const QString &fileName, fileNames) {
+                    QFile::copy(sourceBasePath + fileName, targetBasePath + fileName);
+                }
+            }
+        }
+    }
 }

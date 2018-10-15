@@ -20,8 +20,9 @@
 #include "statisticsmodel.h"
 #include "global.h"
 #include <QStringList>
-#include <KLocale>
+#include <KLocalizedString>
 #include <kio/global.h>
+#include <QLocale>
 
 StatisticsModel::StatisticsModel( enum KNemoStats::PeriodUnits t, QObject *parent ) :
     QStandardItemModel( parent ),
@@ -111,17 +112,23 @@ void StatisticsModel::updateDateText( int row )
     if ( row < 0 || !rowCount() || !mCalendar )
         return;
 
+    QLocale locale;
     QString dateStr;
     QDateTime dt = dateTime( row );
     int dy = days( row );
     switch ( mPeriodType )
     {
         case KNemoStats::Hour:
-            dateStr = KGlobal::locale()->formatTime( dt.time() );
-            dateStr += " " + mCalendar->formatDate( dt.date(), KLocale::FancyShortDate );
+            dateStr = locale.toString( dt.time(), QLocale::ShortFormat );
+            if ( dt.date() == QDate::currentDate() )
+            {
+                dateStr += QLatin1Char(' ') + i18n("Today");
+            } else {
+                dateStr += QLatin1Char(' ') + i18n("Yesterday");
+            }
             break;
         case KNemoStats::Month:
-            dateStr = QString( "%1 %2" )
+            dateStr = QString::fromUtf8( "%1 %2" )
                         .arg( mCalendar->monthName( dt.date(), KCalendarSystem::ShortName ) )
                         .arg( mCalendar->year( dt.date() ) );
             break;
@@ -133,14 +140,14 @@ void StatisticsModel::updateDateText( int row )
             // Starts on the first of the month, lasts exactly one month
             if ( mCalendar->day( dt.date() ) == 1 &&
                  dy == mCalendar->daysInMonth( dt.date() ) )
-                dateStr = QString( "%1 %2" )
+                dateStr = QString::fromUtf8( "%1 %2" )
                             .arg( mCalendar->monthName( dt.date(), KCalendarSystem::ShortName ) )
                             .arg( mCalendar->year( dt.date() ) );
             // Format for complex period
             else
             {
                 QDate endDate = dt.date().addDays( dy - 1 );
-                dateStr = QString( "%1 %2 - %4 %5 %6" )
+                dateStr = QString::fromUtf8( "%1 %2 - %4 %5 %6" )
                             .arg( mCalendar->day( dt.date() ) )
                             .arg( mCalendar->monthName( dt.date(), KCalendarSystem::ShortName ) )
                             .arg( mCalendar->day( endDate ) )
@@ -332,4 +339,4 @@ void StatisticsModel::setTraffic( int row, quint64 rx, quint64 tx, KNemoStats::T
     }
 }
 
-#include "statisticsmodel.moc"
+#include "moc_statisticsmodel.cpp"

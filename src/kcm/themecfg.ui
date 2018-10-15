@@ -3,7 +3,16 @@
  <class>ThemeCfg</class>
  <widget class="QWidget" name="ThemeCfg">
   <layout class="QVBoxLayout" name="verticalLayout_4">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -22,7 +31,7 @@
          </widget>
         </item>
         <item>
-         <widget class="KIntSpinBox" name="spinBoxTrafficThreshold">
+         <widget class="QSpinBox" name="spinBoxTrafficThreshold">
           <property name="whatsThis">
            <string>If you are on a network with a lot of low-level traffic, you can increase this value so the tray icon does not constantly report activity.</string>
           </property>
@@ -46,16 +55,6 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QCheckBox" name="checkDynColor">
-        <property name="whatsThis">
-         <string>If checked, the transmit and receive colors will change according to the traffic rate.  As the traffic rate increases, the color will change from the default color, to the max rate color.</string>
-        </property>
-        <property name="text">
-         <string>Change color according to max visual rate</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="checkBarScale">
         <property name="whatsThis">
          <string>If this is checked, the Netload bar graphs will use a constant scale based on the maximum rates below.  If unchecked, the bar graphs will change scale according to recent traffic rates.</string>
@@ -65,31 +64,25 @@
         </property>
        </widget>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="maxRateGroup">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="title">
-      <string>Max Visual Rate</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QLabel" name="inMaxText">
+         <widget class="QLabel" name="maxText">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
-           <string>Incoming traffic:</string>
+           <string>Max visual rate:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="KIntSpinBox" name="rxMaxRate">
+         <widget class="QSpinBox" name="maxRate">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="whatsThis">
-           <string>&lt;p&gt;The maximum incoming rate for this connection.&lt;/p&gt;&lt;p&gt;This does &lt;b&gt;not&lt;/b&gt; affect the actual traffic rate, only how KNemo displays it.&lt;/p&gt;</string>
+           <string>&lt;p&gt;The maximum rate for this connection.&lt;/p&gt;&lt;p&gt;This does &lt;b&gt;not&lt;/b&gt; affect the actual traffic rate, only how KNemo displays it.&lt;/p&gt;</string>
           </property>
           <property name="suffix">
            <string> KiB/sec</string>
@@ -102,70 +95,6 @@
           </property>
           <property name="value">
            <number>4</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Color:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="KColorButton" name="colorIncomingMax">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QLabel" name="outMaxText">
-          <property name="text">
-           <string>Outgoing traffic:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="KIntSpinBox" name="txMaxRate">
-          <property name="whatsThis">
-           <string>&lt;p&gt;The maximum outgoing rate for this connection.&lt;/p&gt;&lt;p&gt;This does &lt;b&gt;not&lt;/b&gt; affect the actual traffic rate, only how KNemo displays it.&lt;/p&gt;</string>
-          </property>
-          <property name="suffix">
-           <string> KiB/sec</string>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>1048576</number>
-          </property>
-          <property name="value">
-           <number>4</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Color:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="KColorButton" name="colorOutgoingMax">
-          <property name="enabled">
-           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -187,92 +116,51 @@
      </property>
     </spacer>
    </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>KColorButton</class>
-   <extends>QPushButton</extends>
-   <header>kcolorbutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KIntSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>knuminput.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>spinBoxTrafficThreshold</tabstop>
   <tabstop>checkBarScale</tabstop>
-  <tabstop>checkDynColor</tabstop>
-  <tabstop>rxMaxRate</tabstop>
-  <tabstop>colorIncomingMax</tabstop>
-  <tabstop>txMaxRate</tabstop>
-  <tabstop>colorOutgoingMax</tabstop>
+  <tabstop>maxRate</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>checkDynColor</sender>
+   <sender>checkBarScale</sender>
    <signal>toggled(bool)</signal>
-   <receiver>label</receiver>
+   <receiver>maxText</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>175</x>
-     <y>172</y>
+     <x>87</x>
+     <y>124</y>
     </hint>
     <hint type="destinationlabel">
-     <x>204</x>
-     <y>201</y>
+     <x>81</x>
+     <y>155</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>checkDynColor</sender>
+   <sender>checkBarScale</sender>
    <signal>toggled(bool)</signal>
-   <receiver>label_2</receiver>
+   <receiver>maxRate</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>136</x>
-     <y>172</y>
+     <x>258</x>
+     <y>127</y>
     </hint>
     <hint type="destinationlabel">
-     <x>206</x>
-     <y>231</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkDynColor</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>colorIncomingMax</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>319</x>
-     <y>172</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>335</x>
-     <y>201</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkDynColor</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>colorOutgoingMax</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>305</x>
-     <y>172</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>335</x>
-     <y>231</y>
+     <x>262</x>
+     <y>155</y>
     </hint>
    </hints>
   </connection>

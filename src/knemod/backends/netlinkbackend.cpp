@@ -27,7 +27,7 @@
 #include <net/if.h>
 #endif
 
-#include <KLocale>
+#include <KLocalizedString>
 #include <kio/global.h>
 
 #include "config-knemo.h"
@@ -78,8 +78,7 @@ QStringList NetlinkBackend::ifaceList()
           rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_next( reinterpret_cast<struct nl_object *>(rtlink) ))
         )
     {
-        QString ifname( rtnl_link_get_name( rtlink ) );
-        ifaces << ifname;
+        ifaces << QLatin1String(rtnl_link_get_name( rtlink ));
     }
     return ifaces;
 }
@@ -131,11 +130,11 @@ void NetlinkBackend::updateAddresses( BackendData *data )
         AddrData addrVal;
 
         addrVal.afType = rtnl_addr_get_family( rtaddr );
-        addrVal.label = rtnl_addr_get_label( rtaddr );
+        addrVal.label = QLatin1String(rtnl_addr_get_label( rtaddr ));
         addrVal.scope = rtnl_addr_get_scope( rtaddr );
 
         nl_addr2str( addr, buf, sizeof( buf ) );
-        addrKey = buf;
+        addrKey = QLatin1String(buf);
 
         QString strFlags;
         int flags = rtnl_addr_get_flags( rtaddr );
@@ -161,10 +160,10 @@ void NetlinkBackend::updateAddresses( BackendData *data )
         {
             nl_addr2str( addr, buf, sizeof( buf ) );
             addrVal.hasPeer = true;
-            addrVal.broadcastAddress = buf;
+            addrVal.broadcastAddress = QLatin1String(buf);
             int prefixlen = rtnl_addr_get_prefixlen( rtaddr );
-            if ( prefixlen >= 0 && !addrVal.broadcastAddress.contains( '/' ) )
-                addrVal.broadcastAddress = addrVal.broadcastAddress + "/" + QString::number( prefixlen );
+            if ( prefixlen >= 0 && !addrVal.broadcastAddress.contains( QLatin1Char('/') ) )
+                addrVal.broadcastAddress = addrVal.broadcastAddress + QLatin1Char('/') + QString::number( prefixlen );
         }
         else
         {
@@ -172,11 +171,11 @@ void NetlinkBackend::updateAddresses( BackendData *data )
             if ( addr )
             {
                 nl_addr2str( addr, buf, sizeof( buf ) );
-                addrVal.broadcastAddress = buf;
+                addrVal.broadcastAddress = QLatin1String(buf);
             }
             int prefixlen = rtnl_addr_get_prefixlen( rtaddr );
-            if ( prefixlen >= 0 && !addrKey.contains( '/' ) )
-                addrKey = addrKey + "/" + QString::number( prefixlen );
+            if ( prefixlen >= 0 && !addrKey.contains( QLatin1Char('/') ) )
+                addrKey = addrKey + QLatin1Char('/') + QString::number( prefixlen );
         }
 
         data->addrData.insert( addrKey, addrVal );
@@ -188,6 +187,7 @@ void NetlinkBackend::updateIfaceData( const QString& ifName, BackendData* data )
     if ( !linkCache || !addrCache )
         return;
 
+    data->prevStatus = data->status;
     data->status = KNemoIface::UnknownState;
     data->incomingBytes = 0;
     data->outgoingBytes = 0;
@@ -215,7 +215,7 @@ void NetlinkBackend::updateIfaceData( const QString& ifName, BackendData* data )
         struct nl_addr * addr = rtnl_link_get_addr( link );
         if ( addr && nl_addr_get_len( addr ) )
             nl_addr2str( addr, mac, sizeof( mac ) );
-        data->hwAddress = mac;
+        data->hwAddress = QLatin1String(mac);
 
         // traffic statistics
         data->rxPackets = rtnl_link_get_stat( link, RTNL_LINK_RX_PACKETS );
@@ -248,4 +248,4 @@ void NetlinkBackend::updateIfaceData( const QString& ifName, BackendData* data )
         data->status = KNemoIface::Unavailable;
 }
 
-#include "netlinkbackend.moc"
+#include "moc_netlinkbackend.cpp"

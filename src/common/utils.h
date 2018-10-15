@@ -44,12 +44,19 @@ QString getDefaultRoute( int afType, QString * defaultGateway = NULL, void * dat
 
 QList<KNemoTheme> findThemes();
 
+QPixmap genTextIcon(const QString& incomingText, const QString& outgoingText, const QFont& font, int status);
+QPixmap genBarIcon(qreal rxLevel, qreal txLevel, int status);
+
 /*
  * Given a string and tray icon width, return a font size that fits the text
  * in the tray.
  */
 QFont setIconFont( const QString& text, const QFont& font, int iconWidth );
 
+QSize getIconSize();
+
 double validatePoll( double val );
+
+void migrateKde4Conf();
 
 #endif

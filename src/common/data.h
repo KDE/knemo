@@ -21,17 +21,14 @@
 #ifndef DATA_H
 #define DATA_H
 
-#include <QColor>
 #include <QDate>
-#include <QFont>
 #include <QList>
 #include <QMap>
+#include <QStandardPaths>
 #include <QString>
 
-#include <KGlobalSettings>
 #include <KLocale>
-#include <KStandardDirs>
-#include <KUrl>
+#include <QDir>
 
 class KCalendarSystem;
 
@@ -61,7 +58,8 @@ namespace KNemoIface {
         Up           =  4,
         Connected    =  8,
         RxTraffic    = 16,
-        TxTraffic    = 32
+        TxTraffic    = 32,
+        MaxState     = 256
     };
 }
 
@@ -107,110 +105,89 @@ namespace KNemoStats
         OffpeakTraffic = 1
     };
 
-};
+}
 
-static const char NETLOAD_THEME[] = "netloadtheme";
-static const char TEXT_THEME[] = "texttheme";
-static const char SYSTEM_THEME[] = "systemtheme";
-static const char ICON_ERROR[] = "error";
-static const char ICON_OFFLINE[] = "offline";
-static const char ICON_IDLE[] = "idle";
-static const char ICON_RX[] = "receive";
-static const char ICON_TX[] = "transmit";
-static const char ICON_RX_TX[] = "transmit-receive";
+static const QLatin1String NETLOAD_THEME("netloadtheme");
+static const QLatin1String TEXT_THEME("texttheme");
+static const QLatin1String SYSTEM_THEME("systemtheme");
+static const QLatin1String ICON_ERROR("error");
+static const QLatin1String ICON_OFFLINE("offline");
+static const QLatin1String ICON_IDLE("idle");
+static const QLatin1String ICON_RX("receive");
+static const QLatin1String ICON_TX("transmit");
+static const QLatin1String ICON_RX_TX("transmit-receive");
 
 // config groups
 
-static const char confg_general[] = "General";
-static const char confg_interface[] = "Interface_";
-static const char confg_plotter[] = "Plotter_";
-static const char confg_statsRule[] = "StatsRule_";
-static const char confg_warnRule[] = "WarnRule_";
+static const QLatin1String confg_general("General");
+static const QLatin1String confg_interface("Interface_");
+static const QLatin1String confg_plotter("Plotter_");
+static const QLatin1String confg_statsRule("StatsRule_");
+static const QLatin1String confg_warnRule("WarnRule_");
 
-static const char conf_firstStart[] = "FirstStart";
-static const char conf_autoStart[] = "AutoStart";
-static const char conf_interfaces[] = "Interfaces";
-
-// interface
-static const char conf_alias[] = "Alias";
+static const QLatin1String conf_firstStart("FirstStart");
+static const QLatin1String conf_autoStart("AutoStart");
+static const QLatin1String conf_interfaces("Interfaces");
 
 // interface icon
-static const char conf_hideWhenNotAvail[] = "HideWhenNotAvailable";
-static const char conf_hideWhenNotExist[] = "HideWhenNotExisting";
-static const char conf_trafficThreshold[] = "TrafficThreshold";
-static const char conf_iconTheme[] = "IconSet";
-static const char conf_colorIncoming[] = "ColorIncoming";
-static const char conf_colorOutgoing[] = "ColorOutgoing";
-static const char conf_colorDisabled[] = "ColorDisabled";
-static const char conf_colorUnavailable[] = "ColorUnavailable";
-static const char conf_dynamicColor[] = "DynamicColor";
-static const char conf_colorIncomingMax[] = "ColorIncomingMax";
-static const char conf_colorOutgoingMax[] = "ColorOutgoingMax";
-static const char conf_barScale[] = "BarScale";
-static const char conf_inMaxRate[] = "InMaxRate";
-static const char conf_outMaxRate[] = "OutMaxRate";
-static const char conf_iconFont[] = "IconFont";
+static const QLatin1String conf_minVisibleState("MinVisibleState");
+static const QLatin1String conf_trafficThreshold("TrafficThreshold");
+static const QLatin1String conf_iconTheme("IconSet");
+static const QLatin1String conf_barScale("BarScale");
+static const QLatin1String conf_maxRate("MaxRate");
 
 // interface statistics
-static const char conf_activateStatistics[] = "ActivateStatistics";
-static const char conf_calendar[] = "Calendar";
-static const char conf_calendarSystem[] = "CalendarSystem";
-static const char conf_statsRules[] = "StatsRules";
-static const char conf_warnRules[] = "WarnRules";
+static const QLatin1String conf_activateStatistics("ActivateStatistics");
+static const QLatin1String conf_calendarSystem("CalendarSystem");
+static const QLatin1String conf_statsRules("StatsRules");
+static const QLatin1String conf_warnRules("WarnRules");
 
 // interface billing
-static const char conf_statsStartDate[] = "StartDate";
-static const char conf_statsPeriodUnits[] = "PeriodUnits";
-static const char conf_statsPeriodCount[] = "PeriodCount";
-static const char conf_logOffpeak[] = "LogOffpeak";
-static const char conf_offpeakStartTime[] = "OffpeakStartTime";
-static const char conf_offpeakEndTime[] = "OffpeakEndTime";
-static const char conf_weekendIsOffpeak[] = "WeekendIsOffpeak";
-static const char conf_weekendDayStart[] = "WeekendDayStart";
-static const char conf_weekendDayEnd[] = "WeekendDayEnd";
-static const char conf_weekendTimeStart[] = "WeekendTimeStart";
-static const char conf_weekendTimeEnd[] = "WeekendTimeEnd";
+static const QLatin1String conf_statsStartDate("StartDate");
+static const QLatin1String conf_statsPeriodUnits("PeriodUnits");
+static const QLatin1String conf_statsPeriodCount("PeriodCount");
+static const QLatin1String conf_logOffpeak("LogOffpeak");
+static const QLatin1String conf_offpeakStartTime("OffpeakStartTime");
+static const QLatin1String conf_offpeakEndTime("OffpeakEndTime");
+static const QLatin1String conf_weekendIsOffpeak("WeekendIsOffpeak");
+static const QLatin1String conf_weekendDayStart("WeekendDayStart");
+static const QLatin1String conf_weekendDayEnd("WeekendDayEnd");
+static const QLatin1String conf_weekendTimeStart("WeekendTimeStart");
+static const QLatin1String conf_weekendTimeEnd("WeekendTimeEnd");
 
 // warning
-static const char conf_warnPeriodUnits[] = "PeriodUnits";
-static const char conf_warnPeriodCount[] = "PeriodCount";
-static const char conf_warnTrafficType[] = "TrafficType";
-static const char conf_warnTrafficDirection[] = "TrafficDirection";
-static const char conf_warnTrafficUnits[] = "TrafficUnits";
-static const char conf_warnThreshold[] = "Threshold";
-static const char conf_warnCustomText[] = "CustomText";
-
-// interface context menu
-static const char conf_numCommands[] = "NumCommands";
-static const char conf_runAsRoot[] = "RunAsRoot";
-static const char conf_command[] = "Command";
-static const char conf_menuText[] = "MenuText";
+static const QLatin1String conf_warnPeriodUnits("PeriodUnits");
+static const QLatin1String conf_warnPeriodCount("PeriodCount");
+static const QLatin1String conf_warnTrafficType("TrafficType");
+static const QLatin1String conf_warnTrafficDirection("TrafficDirection");
+static const QLatin1String conf_warnTrafficUnits("TrafficUnits");
+static const QLatin1String conf_warnThreshold("Threshold");
+static const QLatin1String conf_warnCustomText("CustomText");
 
 // tooltip
-static const char conf_toolTipContent[] = "ToolTipContent";
+static const QLatin1String conf_toolTipContent("ToolTipContent");
 
 // general
-static const char conf_pollInterval[] = "PollInterval";
-static const char conf_saveInterval[] = "SaveInterval";
-static const char conf_statisticsDir[] = "StatisticsDir";
-static const char conf_useBitrate[] = "UseBitrate";
-static const char conf_plotterPos[] = "PlotterPos";
-static const char conf_plotterSize[] = "PlotterSize";
-static const char conf_statisticsPos[] = "StatisticsPos";
-static const char conf_statisticsSize[] = "StatisticsSize";
-static const char conf_statusPos[] = "StatusPos";
-static const char conf_statusSize[] = "StatusSize";
-static const char conf_hourState[] = "HourState";
-static const char conf_dayState[] = "DayState";
-static const char conf_weekState[] = "WeekState";
-static const char conf_monthState[] = "MonthState";
-static const char conf_billingState[] = "BillingState";
-static const char conf_yearState[] = "YearState";
+static const QLatin1String conf_pollInterval("PollInterval");
+static const QLatin1String conf_saveInterval("SaveInterval");
+static const QLatin1String conf_useBitrate("UseBitrate");
+static const QLatin1String conf_plotterPos("PlotterPos");
+static const QLatin1String conf_plotterSize("PlotterSize");
+static const QLatin1String conf_statisticsPos("StatisticsPos");
+static const QLatin1String conf_statisticsSize("StatisticsSize");
+static const QLatin1String conf_statusPos("StatusPos");
+static const QLatin1String conf_statusSize("StatusSize");
+static const QLatin1String conf_hourState("HourState");
+static const QLatin1String conf_dayState("DayState");
+static const QLatin1String conf_weekState("WeekState");
+static const QLatin1String conf_monthState("MonthState");
+static const QLatin1String conf_billingState("BillingState");
+static const QLatin1String conf_yearState("YearState");
 
 enum ToolTipEnums
 {
     INTERFACE        = 0x00000001,
-    ALIAS            = 0x00000002,
+    //ALIAS            = 0x00000002,
     STATUS           = 0x00000004,
     UPTIME           = 0x00000008,
     IP_ADDRESS       = 0x00000010,
@@ -275,6 +252,7 @@ struct BackendData
     {}
 
     int status;
+    int prevStatus;
     int index;
     KNemoIface::Type interfaceType;
     bool isWireless;
@@ -307,13 +285,6 @@ struct BackendData
     bool isEncrypted;
 };
 
-struct InterfaceCommand
-{
-    bool runAsRoot;
-    QString command;
-    QString menuText;
-};
-
 struct GeneralSettings
 {
     GeneralSettings()
@@ -321,13 +292,13 @@ struct GeneralSettings
         pollInterval( 1.0 ),
         saveInterval( 60 ),
         useBitrate( false ),
-        statisticsDir( KGlobal::dirs()->saveLocation( "data", "knemo/" ) )
+        statisticsDir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QLatin1String("/knemo") )
     {}
     int toolTipContent;
     double pollInterval;
     int saveInterval;
     bool useBitrate;
-    KUrl statisticsDir;
+    QDir statisticsDir;
 };
 
 class StatsRule
@@ -399,50 +370,23 @@ struct WarnRule
 struct InterfaceSettings
 {
     InterfaceSettings()
-      : iconTheme( "monitor" ),
-        colorIncoming( 0x1889FF ),
-        colorOutgoing( 0xFF7F08 ),
-        colorDisabled( 0x888786 ),
-        colorUnavailable( 0x888786 ),
-        colorBackground( 0x888786 ),
-        dynamicColor( false ),
-        colorIncomingMax( 0x96FFFF ),
-        colorOutgoingMax( 0xFFC868 ),
-        barScale( false ),
-        inMaxRate( 4 ),
-        outMaxRate( 4 ),
-        iconFont( KGlobalSettings::generalFont() ),
-        numCommands( 0 ),
+      : barScale( false ),
+        maxRate( 4 ),
         trafficThreshold( 0 ),
-        hideWhenUnavailable( false ),
-        hideWhenDisconnected( false ),
+        minVisibleState( KNemoIface::UnknownState ),
         activateStatistics( false ),
         calendarSystem( KLocale::QDateCalendar )
     {}
 
     QString iconTheme;
-    QColor colorIncoming;
-    QColor colorOutgoing;
-    QColor colorDisabled;
-    QColor colorUnavailable;
-    QColor colorBackground;
-    bool dynamicColor;
-    QColor colorIncomingMax;
-    QColor colorOutgoingMax;
     bool barScale;
-    unsigned int inMaxRate;
-    unsigned int outMaxRate;
-    QFont iconFont;
-    int numCommands;
+    unsigned int maxRate;
     unsigned int trafficThreshold;
-    bool hideWhenUnavailable;
-    bool hideWhenDisconnected;
+    int minVisibleState;
     bool activateStatistics;
     QList<StatsRule> statsRules;
     QList<WarnRule> warnRules;
     KLocale::CalendarSystem calendarSystem;
-    QString alias;
-    QList<InterfaceCommand> commands;
 };
 
 #ifndef __linux__

@@ -18,9 +18,8 @@
 */
 
 #include <QString>
-#include <KGlobal>
 #include <QDebug>
-#include <KLocale>
+#include <KLocalizedString>
 #include <kio/global.h>
 #include "global.h"
 
@@ -41,20 +40,21 @@ QString formattedRate( quint64 data, bool useBits )
     int precision = 0;
     if ( units )
         precision = 1;
-    QString formattedNum = KGlobal::locale()->formatNumber( bits, precision );
+    QLocale locale;
+    QString formattedNum = locale.toString( bits, 'f', precision );
     switch (units)
     {
         case 0:
-            fmtString = QString( "%1 bit/s" ).arg( formattedNum );
+            fmtString = i18n( "%1 bit/s", formattedNum );
             break;
         case 1:
-            fmtString = QString( "%1 kbit/s" ).arg( formattedNum );
+            fmtString = i18n( "%1 kbit/s", formattedNum );
             break;
         case 2:
-            fmtString = QString( "%1 Mbit/s" ).arg( formattedNum );
+            fmtString = i18n( "%1 Mbit/s", formattedNum );
             break;
         case 3:
-            fmtString = QString( "%1 Gbit/s" ).arg( formattedNum );
+            fmtString = i18n( "%1 Gbit/s", formattedNum );
             break;
     }
     return fmtString;

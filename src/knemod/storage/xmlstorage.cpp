@@ -27,11 +27,11 @@
 #include <KCalendarSystem>
 
 // xml storage
-static const char doc_name[]        = "statistics";
-static const char attrib_calendar[] = "calendar";
-static const char attrib_updated[]  = "lastUpdated";
-static const char attrib_rx[]       = "rxBytes";
-static const char attrib_tx[]       = "txBytes";
+static const QLatin1String doc_name("statistics");
+static const QLatin1String attrib_calendar("calendar");
+static const QLatin1String attrib_updated("lastUpdated");
+static const QLatin1String attrib_rx("rxBytes");
+static const QLatin1String attrib_tx("txBytes");
 
 
 XmlStorage::XmlStorage()
@@ -41,7 +41,7 @@ XmlStorage::XmlStorage()
 void XmlStorage::loadGroup( StorageData *sd, const QDomElement& parentItem,
     StatisticsModel* statistics )
 {
-    QDomNode n = parentItem.namedItem( periods.at( statistics->periodType() ) + "s" );
+    QDomNode n = parentItem.namedItem( periods.at( statistics->periodType() ) + QLatin1Char('s') );
     if ( !n.isNull() )
     {
         QDomNode node = n.firstChild();
@@ -54,8 +54,8 @@ void XmlStorage::loadGroup( StorageData *sd, const QDomElement& parentItem,
                 QTime time;
 
                 int year = element.attribute( periods.at( KNemoStats::Year ) ).toInt();
-                int month = element.attribute( periods.at( KNemoStats::Month ), "1" ).toInt();
-                int day = element.attribute( periods.at( KNemoStats::Day ), "1" ).toInt();
+                int month = element.attribute( periods.at( KNemoStats::Month ), QLatin1String("1") ).toInt();
+                int day = element.attribute( periods.at( KNemoStats::Day ), QLatin1String("1") ).toInt();
                 sd->calendar->setDate( date, year, month, day );
 
                 if ( date.isValid() )
@@ -86,9 +86,8 @@ void XmlStorage::loadGroup( StorageData *sd, const QDomElement& parentItem,
 
 bool XmlStorage::loadStats( QString name, StorageData *sd, QHash<int, StatisticsModel*> *models )
 {
-    KUrl dir( generalSettings->statisticsDir );
     QDomDocument doc( doc_name );
-    QFile file( dir.path() + statistics_prefix + name );
+    QFile file( generalSettings->statisticsDir.absoluteFilePath( statistics_prefix + name ) );
 
     if ( !file.open( QIODevice::ReadOnly ) )
         return false;
@@ -101,8 +100,8 @@ bool XmlStorage::loadStats( QString name, StorageData *sd, QHash<int, Statistics
 
     QDomElement root = doc.documentElement();
 
-    // If unknown or empty calendar it will default to gregorian
-    sd->calendar = KCalendarSystem::create( KCalendarSystem::calendarSystem( root.attribute( attrib_calendar ) ) );
+    // If unknown, empty, or still using calendar names, use the default calendar
+    sd->calendar = KCalendarSystem::create( KLocale::QDateCalendar );
     foreach( StatisticsModel * s, *models )
     {
         s->setCalendar( sd->calendar );

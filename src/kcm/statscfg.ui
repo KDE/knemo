@@ -3,7 +3,16 @@
  <class>StatsCfg</class>
  <widget class="QWidget" name="StatsCfg">
   <layout class="QVBoxLayout" name="verticalLayout_3">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -42,7 +51,7 @@
           </widget>
          </item>
          <item>
-          <widget class="KDateEdit" name="startDate">
+          <widget class="DateEditWidget" name="startDate" native="true">
            <property name="whatsThis">
             <string>&lt;p&gt;By default, this shows the start date of the current month or billing period. If you change the date, KNemo will recalculate billing periods from that date forward. Any billing periods before that date will remain unmodified.&lt;/p&gt;&lt;p&gt;If you set an erroneous date, just select an earlier good billing date, and KNemo will repair it.&lt;/p&gt;</string>
            </property>
@@ -76,7 +85,7 @@
           </widget>
          </item>
          <item>
-          <widget class="KIntSpinBox" name="periodCount">
+          <widget class="QSpinBox" name="periodCount">
            <property name="minimum">
             <number>1</number>
            </property>
@@ -351,18 +360,20 @@
      </property>
     </spacer>
    </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>KIntSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>knuminput.h</header>
-  </customwidget>
-  <customwidget>
-   <class>KDateEdit</class>
-   <extends>QComboBox</extends>
-   <header>kdateedit.h</header>
+   <class>DateEditWidget</class>
+   <extends>QWidget</extends>
+   <header>dateeditwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

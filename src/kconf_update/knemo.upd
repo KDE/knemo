@@ -32,3 +32,7 @@ Script=knemo-0.6.3-misc.pl,perl
 Id=0.7.0-misc
 File=knemorc
 Script=knemo-0.7.0-misc.pl,perl
+
+Id=0.7.4-misc
+File=knemorc
+Script=knemo-0.7.4-misc.pl,perl

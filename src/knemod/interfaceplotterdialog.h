@@ -21,8 +21,7 @@
 #ifndef INTERFACEPLOTTERDIALOG_H
 #define INTERFACEPLOTTERDIALOG_H
 
-#include <KDialog>
-#include <KSharedConfig>
+#include <QDialog>
 
 #include "plotterconfigdialog.h"
 
@@ -30,7 +29,7 @@ class FancyPlotterLabel;
 class KSignalPlotter;
 class QBoxLayout;
 
-class InterfacePlotterDialog : public KDialog
+class InterfacePlotterDialog : public QDialog
 {
 Q_OBJECT
 public:
@@ -47,7 +46,7 @@ protected:
     bool event( QEvent *e );
     void resizeEvent( QResizeEvent* );
 
-private slots:
+private Q_SLOTS:
     void configFinished();
     void saveConfig();
     void setPlotterUnits();
@@ -59,7 +58,6 @@ private:
     void configPlotter();
     void addBeams();
 
-    KSharedConfigPtr mConfig;
     PlotterConfigDialog *mConfigDlg;
     QWidget *mLabelsWidget;
     bool mSetPos;

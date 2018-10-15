@@ -21,8 +21,7 @@
 #ifndef PLOTTERCONFIGDIALOG_H
 #define PLOTTERCONFIGDIALOG_H
 
-#include <KDialog>
-#include <QColor>
+#include <QDialog>
 #include "ui_plotterconfigdlg.h"
 
 struct PlotterSettings
@@ -39,9 +38,7 @@ struct PlotterSettings
         verticalLines( false ),
         horizontalLines( true ),
         automaticDetection( true ),
-        verticalLinesScroll( false ),
-        colorIncoming( 0x1889FF ),
-        colorOutgoing( 0xFF7F08 )
+        verticalLinesScroll( false )
     {}
 
     int pixel;
@@ -56,21 +53,19 @@ struct PlotterSettings
     bool horizontalLines;
     bool automaticDetection;
     bool verticalLinesScroll;
-    QColor colorIncoming;
-    QColor colorOutgoing;
 };
 
-class PlotterConfigDialog : public KDialog
+class PlotterConfigDialog : public QDialog
 {
     Q_OBJECT
     public:
         PlotterConfigDialog( QWidget *parent, const QString& iface, PlotterSettings* settings );
         virtual ~PlotterConfigDialog();
-    signals:
+    Q_SIGNALS:
         void saved();
-    private slots:
+    private Q_SLOTS:
         void changed();
-        void defaults();
+        void defaults(QAbstractButton*);
         void save();
     private:
         void load();

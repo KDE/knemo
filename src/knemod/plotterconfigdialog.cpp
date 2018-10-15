@@ -20,15 +20,12 @@
 
 #include "plotterconfigdialog.h"
 #include "global.h"
+#include <QPushButton>
 
-#include <KConfig>
-
-PlotterConfigDialog::PlotterConfigDialog( QWidget * parent, const QString& iface, PlotterSettings* settings ) : KDialog( parent ),
+PlotterConfigDialog::PlotterConfigDialog( QWidget * parent, const QString& iface, PlotterSettings* settings ) : QDialog( parent ),
       mName( iface ),
       mSettings( settings )
 {
-    setButtons( Ok | Apply | Default | Close );
-    ui.setupUi( mainWidget() );
     QString suffix;
     if ( generalSettings->useBitrate )
     {
@@ -38,15 +35,15 @@ PlotterConfigDialog::PlotterConfigDialog( QWidget * parent, const QString& iface
     {
         suffix = i18n( " KiB/s" );
     }
+    ui.setupUi( this );
     ui.spinBoxMinValue->setSuffix( suffix );
     ui.spinBoxMaxValue->setSuffix( suffix );
     load();
-    enableButtonApply( false );
+    ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
     //enableButtonDefault( true );
 
-    connect( this, SIGNAL( defaultClicked() ), SLOT( defaults() ) );
-    connect( this, SIGNAL( applyClicked() ), SLOT( save() ) );
-    connect( this, SIGNAL( okClicked() ), SLOT( save() ) );
+    connect( ui.buttonBox, SIGNAL( accepted() ), SLOT( save() ) );
+    connect( ui.buttonBox, SIGNAL( clicked( QAbstractButton* ) ), SLOT( defaults( QAbstractButton* ) ) );
 
     // connect the plotter widgets
     connect( ui.checkBoxLabels, SIGNAL( toggled( bool ) ),
@@ -73,10 +70,6 @@ PlotterConfigDialog::PlotterConfigDialog( QWidget * parent, const QString& iface
              this, SLOT( changed() ) );
     connect( ui.spinBoxMaxValue, SIGNAL( valueChanged( double ) ),
              this, SLOT( changed() ) );
-    connect( ui.kColorButtonIncoming, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
-    connect( ui.kColorButtonOutgoing, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( changed() ) );
 }
 
 PlotterConfigDialog::~PlotterConfigDialog()
@@ -97,8 +90,6 @@ void PlotterConfigDialog::load()
     ui.checkBoxOutgoing->setChecked( mSettings->showOutgoing );
     ui.checkBoxAutoDetection->setChecked( !mSettings->automaticDetection );
     ui.checkBoxVLinesScroll->setChecked( mSettings->verticalLinesScroll );
-    ui.kColorButtonIncoming->setColor( mSettings->colorIncoming );
-    ui.kColorButtonOutgoing->setColor( mSettings->colorOutgoing );
 }
 
 void PlotterConfigDialog::save()
@@ -115,36 +106,42 @@ void PlotterConfigDialog::save()
     mSettings->showOutgoing = ui.checkBoxOutgoing->isChecked();
     mSettings->automaticDetection = !ui.checkBoxAutoDetection->isChecked();
     mSettings->verticalLinesScroll = ui.checkBoxVLinesScroll->isChecked();
-    mSettings->colorIncoming = ui.kColorButtonIncoming->color();
-    mSettings->colorOutgoing = ui.kColorButtonOutgoing->color();
+    ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
     emit saved();
 }
 
-void PlotterConfigDialog::defaults()
+void PlotterConfigDialog::defaults( QAbstractButton* button )
 {
-    enableButtonApply( true );
-    PlotterSettings s;
-    // Default plotter settings
-    ui.spinBoxPixel->setValue( s.pixel );
-    ui.spinBoxDistance->setValue( s.distance );
-    ui.spinBoxFontSize->setValue( s.fontSize );
-    ui.spinBoxMinValue->setValue( s.minimumValue );
-    ui.spinBoxMaxValue->setValue( s.maximumValue );
-    ui.checkBoxLabels->setChecked( s.labels );
-    ui.checkBoxVLines->setChecked( s.verticalLines );
-    ui.checkBoxHLines->setChecked( s.horizontalLines );
-    ui.checkBoxIncoming->setChecked( s.showIncoming );
-    ui.checkBoxOutgoing->setChecked( s.showOutgoing );
-    ui.checkBoxAutoDetection->setChecked( !s.automaticDetection );
-    ui.checkBoxVLinesScroll->setChecked( s.verticalLinesScroll );
-    ui.kColorButtonIncoming->setColor( s.colorIncoming );
-    ui.kColorButtonOutgoing->setColor( s.colorOutgoing );
+    if (static_cast<QPushButton*>(button) == ui.buttonBox->button(QDialogButtonBox::RestoreDefaults) ) {
+        ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
+        PlotterSettings s;
+        // Default plotter settings
+        ui.spinBoxPixel->setValue( s.pixel );
+        ui.spinBoxDistance->setValue( s.distance );
+        ui.spinBoxFontSize->setValue( s.fontSize );
+        ui.spinBoxMinValue->setValue( s.minimumValue );
+        ui.spinBoxMaxValue->setValue( s.maximumValue );
+        ui.checkBoxLabels->setChecked( s.labels );
+        ui.checkBoxVLines->setChecked( s.verticalLines );
+        ui.checkBoxHLines->setChecked( s.horizontalLines );
+        ui.checkBoxIncoming->setChecked( s.showIncoming );
+        ui.checkBoxOutgoing->setChecked( s.showOutgoing );
+        ui.checkBoxAutoDetection->setChecked( !s.automaticDetection );
+        ui.checkBoxVLinesScroll->setChecked( s.verticalLinesScroll );
+    } else if (static_cast<QPushButton*>(button) == ui.buttonBox->button(QDialogButtonBox::Ok) ) {
+        QDialog::accept();
+    } else if (static_cast<QPushButton*>(button) == ui.buttonBox->button(QDialogButtonBox::Apply) ) {
+        save();
+    } else if (static_cast<QPushButton*>(button) == ui.buttonBox->button(QDialogButtonBox::Cancel) ) {
+        QDialog::reject();
+    }
+
 }
 
 void PlotterConfigDialog::changed()
 {
-    enableButtonApply( true );
+    ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
 }
 
-#include "plotterconfigdialog.moc"
+#include "moc_plotterconfigdialog.cpp"
 

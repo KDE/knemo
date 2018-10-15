@@ -22,7 +22,9 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <QAbstractItemView>
-#include <KGlobalSettings>
+#include <QFontDatabase>
+#include <KConfigGroup>
+#include <KSharedConfig>
 
 #ifdef __linux__
   #include <netlink/netlink.h>
@@ -35,16 +37,14 @@
 #include "statisticsmodel.h"
 
 InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* parent )
-    : KDialog( parent ),
+    : QDialog( parent ),
       mWasShown( false ),
       mSetPos( true ),
-      mConfig( KGlobal::config() ),
       mInterface( interface )
 {
-    setCaption( i18nc( "interface name", "%1 Interface Status", interface->ifaceName() ) );
-    setButtons( None );
+    setWindowTitle( i18nc( "interface name", "%1 Interface Status", interface->ifaceName() ) );
 
-    ui.setupUi( mainWidget() );
+    ui.setupUi( this );
     configChanged();
 
     // FreeBSD doesn't have these
@@ -69,7 +69,7 @@ InterfaceStatusDialog::InterfaceStatusDialog( Interface* interface, QWidget* par
     }
 
     // Restore window size and position.
-    KConfig *config = mConfig.data();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
     if ( interfaceGroup.hasKey( conf_statusPos ) )
     {
@@ -93,7 +93,7 @@ InterfaceStatusDialog::~InterfaceStatusDialog()
 {
     if ( mWasShown )
     {
-        KConfig *config = mConfig.data();
+        KSharedConfig::Ptr config = KSharedConfig::openConfig();
         KConfigGroup interfaceGroup( config, confg_interface + mInterface->ifaceName() );
         interfaceGroup.writeEntry( conf_statusPos, pos() );
         interfaceGroup.writeEntry( conf_statusSize, size() );
@@ -120,7 +120,7 @@ bool InterfaceStatusDialog::event( QEvent *e )
         updateDialog();
     }
 
-    return KDialog::event( e );
+    return QDialog::event( e );
 }
 
 void InterfaceStatusDialog::updateDialog()
@@ -131,11 +131,9 @@ void InterfaceStatusDialog::updateDialog()
     const BackendData* data = mInterface->backendData();
     if ( !data )
         return;
-    InterfaceSettings& settings = mInterface->settings();
 
     // connection tab
     ui.textLabelInterface->setText( mInterface->ifaceName() );
-    ui.textLabelAlias->setText( settings.alias );
     ui.textLabelUptime->setText( mInterface->uptimeString() );
 
     if ( data->status & KNemoIface::Connected )
@@ -206,7 +204,7 @@ void InterfaceStatusDialog::doConnected( const BackendData *data )
         ui.textLabelAccessPoint->setText( data->accessPoint );
         ui.textLabelNickName->setText( data->nickName );
         ui.textLabelMode->setText( data->mode );
-        ui.textLabelFreqChannel->setText( data->frequency + " [" + data->channel + "]" );
+        ui.textLabelFreqChannel->setText( data->frequency + QLatin1String(" [") + data->channel + QLatin1Char(']') );
         ui.textLabelBitRate->setText( data->bitRate );
         ui.textLabelLinkQuality->setText( data->linkQuality );
         if ( data->isEncrypted == true )
@@ -236,7 +234,7 @@ void InterfaceStatusDialog::doUp( const BackendData *data )
         else
             ui.comboBoxIP->removeItem( i );
     }
-    QFont f = KGlobalSettings::generalFont();
+    QFont f = QFontDatabase::systemFont( QFontDatabase::GeneralFont );
     QFontMetrics fm( f );
     int w = 0;
     int keyCounter = 0;
@@ -411,4 +409,4 @@ void InterfaceStatusDialog::statisticsChanged()
     ui.textLabelYearTotal->setText( statistics->totalText() );
 }
 
-#include "interfacestatusdialog.moc"
+#include "moc_interfacestatusdialog.cpp"

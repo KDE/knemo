@@ -25,6 +25,7 @@
 
 #include "data.h"
 #include "ui_configdlg.h"
+#include <QStandardItemModel>
 
 class QTreeWidgetItem;
 class KCalendarSystem;
@@ -86,26 +87,18 @@ public:
     void save();
     void defaults();
 
-private slots:
+private Q_SLOTS:
     void buttonNewSelected();
     void buttonAllSelected();
     void buttonDeleteSelected();
-    void buttonAddCommandSelected();
-    void buttonRemoveCommandSelected();
-    void setUpDownButtons( QTreeWidgetItem* item );
-    void buttonCommandUpSelected();
-    void buttonCommandDownSelected();
     void buttonAddToolTipSelected();
     void buttonRemoveToolTipSelected();
     void buttonNotificationsSelected();
     void interfaceSelected( int row );
-    void aliasChanged( const QString& text );
     void iconThemeChanged( int set );
     void comboHidingChanged( int val );
     void checkBoxStatisticsToggled( bool on );
     void checkBoxStartKNemoToggled( bool on );
-    void colorButtonChanged();
-    void iconFontChanged( const QFont &font );
     void advancedButtonClicked();
     void addStatsClicked();
     void modifyStatsClicked();
@@ -113,8 +106,6 @@ private slots:
     void addWarnClicked();
     void modifyWarnClicked();
     void removeWarnClicked();
-    void listViewCommandsSelectionChanged( QTreeWidgetItem *current, QTreeWidgetItem *previous );
-    void listViewCommandsChanged( QTreeWidgetItem* item, int column );
     void moveTips( QListWidget *from, QListWidget *to );
 
 private:
@@ -124,8 +115,6 @@ private:
     InterfaceSettings * getItemSettings();
     int findIndexFromName( const QString& internalName );
     QString findNameFromIndex( int index );
-    QPixmap textIcon( QString incomingText, QString outgoingText, int status );
-    QPixmap barIcon( int status );
     void updateWarnText( int oldCount );
 
     int mToolTipContent;
@@ -136,7 +125,6 @@ private:
     StatsRuleModel *statsModel;
     WarnModel *warnModel;
 
-    KSharedConfigPtr mConfig;
     QMap<QString, InterfaceSettings *> mSettingsMap;
     QMap<quint32, QString> mToolTips;
     QList<QString> mDeletedIfaces;

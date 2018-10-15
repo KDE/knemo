@@ -68,7 +68,7 @@ public:
      */
     KCalendarSystem *calendar() { return mStorageData.calendar; }
 
-signals:
+Q_SIGNALS:
     /**
      * Emitted when an entry is updated (i.e. when new bytes are transmitted,
      * received, or the stats are cleared).
@@ -80,11 +80,11 @@ signals:
      */
     void warnTraffic( QString warnText, quint64 threshold, quint64 current );
 
-public slots:
+public Q_SLOTS:
     void clearStatistics();
     void checkValidEntry();
 
-private slots:
+private Q_SLOTS:
     void saveStatistics( bool fullSave = false );
     void checkWarnings();
 

@@ -23,7 +23,10 @@
 
 #include <QMenu>
 #include <QMouseEvent>
-#include <KApplication>
+#include <QApplication>
+#include <KConfigGroup>
+#include <KColorScheme>
+#include <KSharedConfig>
 
 #include "global.h"
 #include "interfaceplotterdialog.h"
@@ -44,8 +47,6 @@ static const char plot_showIncoming[] = "ShowIncoming";
 static const char plot_showOutgoing[] = "ShowOutgoing";
 static const char plot_automaticDetection[] = "AutomaticDetection";
 static const char plot_verticalLinesScroll[] = "VerticalLinesScroll";
-static const char plot_colorIncoming[] = "ColorIncoming";
-static const char plot_colorOutgoing[] = "ColorOutgoing";
 
 class FancyPlotterLabel : public QLabel {
   public:
@@ -65,7 +66,7 @@ class FancyPlotterLabel : public QLabel {
             if(fontMetrics().inFont(QChar(0x25CF)))
                 indicatorSymbol = QChar(0x25CF);
             else
-                indicatorSymbol = '#';
+                indicatorSymbol = QLatin1Char('#');
         }
         changeLabel(color);
 
@@ -111,15 +112,15 @@ class FancyPlotterLabel : public QLabel {
     void changeLabel(const QColor &_color) {
         color = _color;
 
-        if ( kapp->layoutDirection() == Qt::RightToLeft )
-            longHeadingText = QString(": ") + labelName + " <font color=\"" + color.name() + "\">" + indicatorSymbol + "</font>";
+        if ( qApp->layoutDirection() == Qt::RightToLeft )
+            longHeadingText = QLatin1String(": ") + labelName + QLatin1String(" <font color=\"") + color.name() + QLatin1String("\">") + indicatorSymbol + QLatin1String("</font>");
         else
-            longHeadingText = QString("<qt><font color=\"") + color.name() + "\">" + indicatorSymbol + "</font> " + labelName + " :";
-        shortHeadingText = QString("<qt><font color=\"") + color.name() + "\">" + indicatorSymbol + "</font>";
-        noHeadingText = QString("<qt><font color=\"") + color.name() + "\">";
+            longHeadingText = QLatin1String("<qt><font color=\"") + color.name() + QLatin1String("\">") + indicatorSymbol + QLatin1String("</font> ") + labelName + QLatin1String(" :");
+        shortHeadingText = QLatin1String("<qt><font color=\"") + color.name() + QLatin1String("\">") + indicatorSymbol + QLatin1String("</font>");
+        noHeadingText = QLatin1String("<qt><font color=\"") + color.name() + QLatin1String("\">");
 
-        textMargin = fontMetrics().width('x') + margin()*2 + frameWidth()*2;
-        longHeadingWidth = fontMetrics().boundingRect(labelName + " :" + indicatorSymbol + " x").width() + textMargin;
+        textMargin = fontMetrics().width(QLatin1Char('x')) + margin()*2 + frameWidth()*2;
+        longHeadingWidth = fontMetrics().boundingRect(labelName + QLatin1String(" :") + indicatorSymbol + QLatin1String(" x")).width() + textMargin;
         shortHeadingWidth = fontMetrics().boundingRect(indicatorSymbol).width() + textMargin;
         setMinimumWidth(shortHeadingWidth);
         update();
@@ -127,9 +128,9 @@ class FancyPlotterLabel : public QLabel {
   private:
     void setBothText(const QString &heading, const QString & value) {
         if(QApplication::layoutDirection() == Qt::LeftToRight)
-            setText(heading + ' ' + value);
+            setText(heading + QLatin1Char(' ') + value);
         else
-            setText("<qt>" + value + ' ' + heading);
+            setText(QLatin1String("<qt>") + value + QLatin1Char(' ') + heading);
     }
     int textMargin;
     QString longHeadingText;
@@ -147,8 +148,7 @@ QChar FancyPlotterLabel::indicatorSymbol;
 
 
 InterfacePlotterDialog::InterfacePlotterDialog( QString name )
-    : KDialog(),
-      mConfig( KGlobal::config() ),
+    : QDialog(),
       mConfigDlg( 0 ),
       mLabelsWidget( NULL ),
       mSetPos( true ),
@@ -159,14 +159,13 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
       mIncomingVisible( false ),
       mName( name )
 {
-    setCaption( i18nc( "interface name", "%1 Traffic", mName ) );
-    setButtons( None );
+    setWindowTitle( i18nc( "interface name", "%1 Traffic", mName ) );
     setContextMenuPolicy( Qt::DefaultContextMenu );
 
     mByteUnits << ki18n( "%1 B/s" ) << ki18n( "%1 KiB/s" ) << ki18n( "%1 MiB/s" ) << ki18n( "%1 GiB/s" );
     mBitUnits << ki18n( "%1 bit/s" ) << ki18n( "%1 kbit/s" ) << ki18n( "%1 Mbit/s" ) << ki18n( "%1 Gbit/s" );
 
-    mIndicatorSymbol = '#';
+    mIndicatorSymbol = QLatin1Char('#');
     QFontMetrics fm(font());
     if (fm.inFont(QChar(0x25CF)))
         mIndicatorSymbol = QChar(0x25CF);
@@ -174,7 +173,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     QBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
-    mainWidget()->setLayout( layout );
+    setLayout( layout );
     mPlotter = new KSignalPlotter( this );
     int axisTextWidth = fontMetrics().width(i18nc("Largest axis title", "99999 XXXX"));
     mPlotter->setMaxAxisTextWidth( axisTextWidth );
@@ -201,7 +200,7 @@ InterfacePlotterDialog::InterfacePlotterDialog( QString name )
     mLabelLayout->addWidget( mReceivedLabel );
 
     // Restore window size and position.
-    KConfig *config = mConfig.data();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     KConfigGroup interfaceGroup( config, confg_interface + mName );
     if ( interfaceGroup.hasKey( conf_plotterPos ) )
     {
@@ -236,7 +235,7 @@ InterfacePlotterDialog::~InterfacePlotterDialog()
     {
         // If the dialog was never shown, then the position
         // will be wrong
-        KConfig *config = mConfig.data();
+        KSharedConfig::Ptr config = KSharedConfig::openConfig();
         KConfigGroup interfaceGroup( config, confg_interface + mName );
         interfaceGroup.writeEntry( conf_plotterSize, size() );
         interfaceGroup.writeEntry( conf_plotterPos, pos() );
@@ -274,14 +273,14 @@ bool InterfacePlotterDialog::event( QEvent *e )
             ;;
     }
 
-    return KDialog::event( e );
+    return QDialog::event( e );
 }
 
 void InterfacePlotterDialog::resizeEvent( QResizeEvent* )
 {
     bool showLabels = true;;
 
-    if( mainWidget()->height() <= mLabelsWidget->sizeHint().height() + mPlotter->minimumHeight() )
+    if( this->height() <= mLabelsWidget->sizeHint().height() + mPlotter->minimumHeight() )
         showLabels = false;
     mLabelsWidget->setVisible(showLabels);
 }
@@ -312,14 +311,15 @@ void InterfacePlotterDialog::configPlotter()
         return;
 
     mConfigDlg = new PlotterConfigDialog( this, mName, &mSettings );
-    connect( mConfigDlg, SIGNAL( finished() ), this, SLOT( configFinished() ) );
+    connect( mConfigDlg, SIGNAL( finished(int) ), this, SLOT( configFinished() ) );
     connect( mConfigDlg, SIGNAL( saved() ), this, SLOT( saveConfig() ) );
     mConfigDlg->show();
 }
 
 void InterfacePlotterDialog::configFinished()
 {
-    mConfigDlg->delayedDestruct();
+    // FIXME
+    mConfigDlg->close();
     mConfigDlg = 0;
 }
 
@@ -397,7 +397,7 @@ void InterfacePlotterDialog::updatePlotter( const double incomingBytes, const do
 
 void InterfacePlotterDialog::loadConfig()
 {
-    KSharedConfigPtr config = KGlobal::config();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     // Set the plotter widgets
     QString group = confg_plotter + mName;
     // Plotter
@@ -415,14 +415,12 @@ void InterfacePlotterDialog::loadConfig()
     mSettings.horizontalLines = plotterGroup.readEntry( plot_horizontalLines, s.horizontalLines );
     mSettings.automaticDetection = plotterGroup.readEntry( plot_automaticDetection, s.automaticDetection );
     mSettings.verticalLinesScroll = plotterGroup.readEntry( plot_verticalLinesScroll, s.verticalLinesScroll );
-    mSettings.colorIncoming = plotterGroup.readEntry( plot_colorIncoming, s.colorIncoming );
-    mSettings.colorOutgoing = plotterGroup.readEntry( plot_colorOutgoing, s.colorOutgoing );
     configChanged();
 }
 
 void InterfacePlotterDialog::saveConfig()
 {
-    KSharedConfigPtr config = KGlobal::config();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig();
     // Set the plotter widgets
     QString group = confg_plotter + mName;
     // Plotter
@@ -439,8 +437,6 @@ void InterfacePlotterDialog::saveConfig()
     plotterGroup.writeEntry( plot_showOutgoing, mSettings.showOutgoing );
     plotterGroup.writeEntry( plot_automaticDetection, mSettings.automaticDetection );
     plotterGroup.writeEntry( plot_verticalLinesScroll, mSettings.verticalLinesScroll );
-    plotterGroup.writeEntry( plot_colorIncoming, mSettings.colorIncoming );
-    plotterGroup.writeEntry( plot_colorOutgoing, mSettings.colorOutgoing );
     config->sync();
     configChanged();
 }
@@ -472,8 +468,8 @@ void InterfacePlotterDialog::configChanged()
     mPlotter->setUseAutoRange( mSettings.automaticDetection );
     mPlotter->setVerticalLinesScroll( mSettings.verticalLinesScroll );
 
-    mSentLabel->setLabel( i18nc( "network traffic", "Sending" ), mSettings.colorOutgoing);
-    mReceivedLabel->setLabel( i18nc( "network traffic", "Receiving" ), mSettings.colorIncoming);
+    mSentLabel->setLabel( i18nc( "network traffic", "Sending" ), KColorScheme(QPalette::Active).foreground(KColorScheme::NeutralText).color());
+    mReceivedLabel->setLabel( i18nc( "network traffic", "Receiving" ), KColorScheme(QPalette::Active).foreground(KColorScheme::ActiveText).color());
 
     addBeams();
 }
@@ -484,7 +480,7 @@ void InterfacePlotterDialog::addBeams()
     {
         if ( !mOutgoingVisible )
         {
-            mPlotter->addBeam( mSettings.colorOutgoing );
+            mPlotter->addBeam( KColorScheme(QPalette::Active).foreground(KColorScheme::NeutralText).color() );
             mSentLabel->show();
             mOutgoingVisible = true;
             if ( mIncomingVisible )
@@ -506,7 +502,7 @@ void InterfacePlotterDialog::addBeams()
     {
         if ( !mIncomingVisible )
         {
-            mPlotter->addBeam( mSettings.colorIncoming );
+            mPlotter->addBeam( KColorScheme(QPalette::Active).foreground(KColorScheme::ActiveText).color() );
             mReceivedLabel->show();
             mIncomingVisible = true;
         }
@@ -519,4 +515,4 @@ void InterfacePlotterDialog::addBeams()
     }
 }
 
-#include "interfaceplotterdialog.moc"
+#include "moc_interfaceplotterdialog.cpp"

@@ -19,18 +19,19 @@
 */
 
 #include <QDBusInterface>
-#include <QPainter>
+#include <QDBusMessage>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 
 #include <KCalendarSystem>
 #include <KColorScheme>
-#include <KGenericFactory>
-#include <KInputDialog>
+#include <KConfigGroup>
+#include <QInputDialog>
 #include <kio/global.h>
 #include <KMessageBox>
+#include <KPluginFactory>
 #include <KNotifyConfigWidget>
-#include <KStandardDirs>
+#include <Plasma/Theme>
 #include <math.h>
 
 #include "ui_configdlg.h"
@@ -53,7 +54,7 @@
 #endif
 
 
-K_PLUGIN_FACTORY(KNemoFactory, registerPlugin<ConfigDialog>();)
+K_PLUGIN_FACTORY(KNemoFactory, registerPlugin<ConfigDialog>(QLatin1String("knemo"));)
 K_EXPORT_PLUGIN(KNemoFactory("kcm_knemo"))
 
 Q_DECLARE_METATYPE( KNemoTheme )
@@ -216,12 +217,12 @@ void WarnModel::modifyWarn( const QModelIndex &index, const WarnRule &warn )
 
 
 ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
-    : KCModule( KNemoFactory::componentData(), parent, args ),
+    : KCModule( parent, args ),
       mLock( false ),
       mDlg( new Ui::ConfigDlg() ),
       mCalendar( 0 )
 {
-    mConfig = KSharedConfig::openConfig( "knemorc" );
+    migrateKde4Conf();
 
     setupToolTipMap();
 
@@ -281,19 +282,11 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
     for ( size_t i = 0; i < sizeof(pollIntervals)/sizeof(double); i++ )
         mDlg->comboBoxPoll->addItem( i18n( "%1 sec", pollIntervals[i] ), pollIntervals[i] );
 
-    mDlg->pushButtonNew->setIcon( SmallIcon( "list-add" ) );
-    mDlg->pushButtonAll->setIcon( SmallIcon( "document-new" ) );
-    mDlg->pushButtonDelete->setIcon( SmallIcon( "list-remove" ) );
-    mDlg->pushButtonAddCommand->setIcon( SmallIcon( "list-add" ) );
-    mDlg->pushButtonRemoveCommand->setIcon( SmallIcon( "list-remove" ) );
-    mDlg->pushButtonUp->setIcon( SmallIcon( "arrow-up" ) );
-    mDlg->pushButtonDown->setIcon( SmallIcon( "arrow-down" ) );
-    mDlg->pushButtonAddToolTip->setIcon( SmallIcon( "arrow-right" ) );
-    mDlg->pushButtonRemoveToolTip->setIcon( SmallIcon( "arrow-left" ) );
-
-    mDlg->themeColorBox->setEnabled( false );
-
-    //mDlg->listViewCommands->setSorting( -1 );
+    mDlg->pushButtonNew->setIcon( QIcon::fromTheme( QLatin1String("list-add") ) );
+    mDlg->pushButtonAll->setIcon( QIcon::fromTheme( QLatin1String("document-new") ) );
+    mDlg->pushButtonDelete->setIcon( QIcon::fromTheme( QLatin1String("list-remove") ) );
+    mDlg->pushButtonAddToolTip->setIcon( QIcon::fromTheme( QLatin1String("arrow-right") ) );
+    mDlg->pushButtonRemoveToolTip->setIcon( QIcon::fromTheme( QLatin1String("arrow-left") ) );
 
     setButtons( KCModule::Default | KCModule::Apply );
 
@@ -309,24 +302,12 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( buttonAllSelected() ) );
     connect( mDlg->pushButtonDelete, SIGNAL( clicked() ),
              this, SLOT( buttonDeleteSelected() ) );
-    connect( mDlg->lineEditAlias, SIGNAL( textChanged( const QString& ) ),
-             this, SLOT( aliasChanged( const QString& ) ) );
 
     // Interface - Icon Appearance
     connect( mDlg->comboHiding, SIGNAL( activated( int ) ),
              this, SLOT( comboHidingChanged( int ) ) );
     connect( mDlg->comboBoxIconTheme, SIGNAL( activated( int ) ),
              this, SLOT( iconThemeChanged( int ) ) );
-    connect( mDlg->colorIncoming, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->colorOutgoing, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->colorDisabled, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->colorUnavailable, SIGNAL( changed( const QColor& ) ),
-             this, SLOT( colorButtonChanged() ) );
-    connect( mDlg->iconFont, SIGNAL( currentFontChanged( const QFont& ) ),
-             this, SLOT( iconFontChanged( const QFont& ) ) );
     connect( mDlg->advancedButton, SIGNAL( clicked() ),
              this, SLOT( advancedButtonClicked() ) );
 
@@ -345,20 +326,6 @@ ConfigDialog::ConfigDialog( QWidget *parent, const QVariantList &args )
              this, SLOT( modifyWarnClicked() ) );
     connect( mDlg->removeWarn, SIGNAL( clicked() ),
              this, SLOT( removeWarnClicked() ) );
-
-    // Interface - Context Menu
-    connect( mDlg->listViewCommands, SIGNAL( currentItemChanged( QTreeWidgetItem*, QTreeWidgetItem* ) ),
-             this, SLOT( listViewCommandsSelectionChanged( QTreeWidgetItem*, QTreeWidgetItem* ) ) );
-    connect( mDlg->listViewCommands, SIGNAL( itemChanged( QTreeWidgetItem*, int ) ),
-             this, SLOT( listViewCommandsChanged( QTreeWidgetItem*, int ) ) );
-    connect( mDlg->pushButtonAddCommand, SIGNAL( clicked() ),
-             this, SLOT( buttonAddCommandSelected() ) );
-    connect( mDlg->pushButtonRemoveCommand, SIGNAL( clicked() ),
-             this, SLOT( buttonRemoveCommandSelected() ) );
-    connect( mDlg->pushButtonUp, SIGNAL( clicked() ),
-             this, SLOT( buttonCommandUpSelected() ) );
-    connect( mDlg->pushButtonDown, SIGNAL( clicked() ),
-             this, SLOT( buttonCommandDownSelected() ) );
 
     // ToolTip
     connect( mDlg->pushButtonAddToolTip, SIGNAL( clicked() ),
@@ -386,7 +353,7 @@ void ConfigDialog::load()
 {
     mSettingsMap.clear();
     mDlg->listBoxInterfaces->clear();
-    KConfig *config = mConfig.data();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig( QLatin1String("knemorc") );
 
     KConfigGroup generalGroup( config, confg_general );
     bool startKNemo = generalGroup.readEntry( conf_autoStart, true );
@@ -399,7 +366,6 @@ void ConfigDialog::load()
         mDlg->comboBoxPoll->setCurrentIndex( index );
     mDlg->numInputSaveInterval->setValue( clamp<int>(generalGroup.readEntry( conf_saveInterval, g.saveInterval ), 0, 300 ) );
     mDlg->useBitrate->setChecked( generalGroup.readEntry( conf_useBitrate, g.useBitrate ) );
-    mDlg->lineEditStatisticsDir->setUrl( generalGroup.readEntry( conf_statisticsDir, g.statisticsDir ) );
     mToolTipContent = generalGroup.readEntry( conf_toolTipContent, g.toolTipContent );
 
     QStringList list = generalGroup.readEntry( conf_interfaces, QStringList() );
@@ -414,39 +380,18 @@ void ConfigDialog::load()
         if ( config->hasGroup( group ) )
         {
             KConfigGroup interfaceGroup( config, group );
-            settings->alias = interfaceGroup.readEntry( conf_alias ).trimmed();
-            settings->hideWhenDisconnected = interfaceGroup.readEntry( conf_hideWhenNotAvail, s.hideWhenDisconnected );
-            settings->hideWhenUnavailable = interfaceGroup.readEntry( conf_hideWhenNotExist, s.hideWhenUnavailable );
+            settings->minVisibleState = interfaceGroup.readEntry( conf_minVisibleState, s.minVisibleState );
             settings->trafficThreshold = clamp<int>(interfaceGroup.readEntry( conf_trafficThreshold, s.trafficThreshold ), 0, 1000 );
             settings->iconTheme = interfaceGroup.readEntry( conf_iconTheme, s.iconTheme );
-            settings->colorIncoming = interfaceGroup.readEntry( conf_colorIncoming, s.colorIncoming );
-            settings->colorOutgoing = interfaceGroup.readEntry( conf_colorOutgoing, s.colorOutgoing );
             KColorScheme scheme(QPalette::Active, KColorScheme::View);
-            settings->colorDisabled = interfaceGroup.readEntry( conf_colorDisabled, scheme.foreground( KColorScheme::InactiveText ).color() );
-            settings->colorUnavailable = interfaceGroup.readEntry( conf_colorUnavailable, scheme.foreground( KColorScheme::InactiveText ).color() );
-            settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-            settings->iconFont = interfaceGroup.readEntry( conf_iconFont, s.iconFont );
-            settings->dynamicColor = interfaceGroup.readEntry( conf_dynamicColor, s.dynamicColor );
-            settings->colorIncomingMax = interfaceGroup.readEntry( conf_colorIncomingMax, s.colorIncomingMax );
-            settings->colorOutgoingMax = interfaceGroup.readEntry( conf_colorOutgoingMax, s.colorOutgoingMax );
             settings->barScale = interfaceGroup.readEntry( conf_barScale, s.barScale );
-            settings->inMaxRate = interfaceGroup.readEntry( conf_inMaxRate, s.inMaxRate );
-            settings->outMaxRate = interfaceGroup.readEntry( conf_outMaxRate, s.outMaxRate );
-            if ( interfaceGroup.hasKey( conf_calendar ) )
-            {
-                QString oldSetting = interfaceGroup.readEntry( conf_calendar );
-                settings->calendarSystem = KCalendarSystem::calendarSystem( oldSetting );
-                interfaceGroup.writeEntry( conf_calendarSystem, static_cast<int>(settings->calendarSystem) );
-                interfaceGroup.deleteEntry( conf_calendar );
-                config->sync();
-            }
-            else
-                settings->calendarSystem = static_cast<KLocale::CalendarSystem>(interfaceGroup.readEntry( conf_calendarSystem, static_cast<int>(KLocale::QDateCalendar) ));
+            settings->maxRate = interfaceGroup.readEntry( conf_maxRate, s.maxRate );
+            settings->calendarSystem = static_cast<KLocale::CalendarSystem>(interfaceGroup.readEntry( conf_calendarSystem, static_cast<int>(KLocale::QDateCalendar) ));
             settings->activateStatistics = interfaceGroup.readEntry( conf_activateStatistics, s.activateStatistics );
             int statsRuleCount = interfaceGroup.readEntry( conf_statsRules, 0 );
             for ( int i = 0; i < statsRuleCount; ++i )
             {
-                group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( interface ).arg( i );
+                group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_statsRule ).arg( interface ).arg( i );
                 if ( config->hasGroup( group ) )
                 {
                     KConfigGroup statsGroup( config, group );
@@ -470,7 +415,7 @@ void ConfigDialog::load()
             int warnRuleCount = interfaceGroup.readEntry( conf_warnRules, 0 );
             for ( int i = 0; i < warnRuleCount; ++i )
             {
-                group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( interface ).arg( i );
+                group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_warnRule ).arg( interface ).arg( i );
                 if ( config->hasGroup( group ) )
                 {
                     KConfigGroup warnGroup( config, group );
@@ -487,20 +432,6 @@ void ConfigDialog::load()
                     settings->warnRules << warn;
                 }
             }
-
-            int numCommands = interfaceGroup.readEntry( conf_numCommands, s.numCommands );
-            for ( int i = 0; i < numCommands; i++ )
-            {
-                QString entry;
-                InterfaceCommand cmd;
-                entry = QString( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
-                cmd.runAsRoot = interfaceGroup.readEntry( entry, false );
-                entry = QString( "%1%2" ).arg( conf_command ).arg( i + 1 );
-                cmd.command = interfaceGroup.readEntry( entry );
-                entry = QString( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
-                cmd.menuText = interfaceGroup.readEntry( entry );
-                settings->commands.append( cmd );
-            }
         }
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
@@ -516,7 +447,7 @@ void ConfigDialog::load()
     // this call to the daemon will deliver the interface the menu
     // belongs to. This way we can preselect the appropriate entry in the list.
     QString selectedInterface = QString::null;
-    QDBusMessage reply = QDBusInterface("org.kde.knemo", "/knemo", "org.kde.knemo").call("getSelectedInterface");
+    QDBusMessage reply = QDBusInterface(QLatin1String("org.kde.knemo"), QLatin1String("/knemo"), QLatin1String("org.kde.knemo")).call(QLatin1String("getSelectedInterface"));
     if ( reply.arguments().count() )
     {
         selectedInterface = reply.arguments().first().toString();
@@ -550,7 +481,7 @@ void ConfigDialog::load()
 
 void ConfigDialog::save()
 {
-    KConfig *config = mConfig.data();
+    KSharedConfig::Ptr config = KSharedConfig::openConfig( QLatin1String("knemorc") );
 
     QStringList list;
 
@@ -606,8 +537,6 @@ void ConfigDialog::save()
             interfaceGroup.writeEntry( conf_statusPos, statusPos );
         if ( !statusSize.isEmpty() )
             interfaceGroup.writeEntry( conf_statusSize, statusSize );
-        if ( !settings->alias.trimmed().isEmpty() )
-            interfaceGroup.writeEntry( conf_alias, settings->alias );
         if ( !hourState.isNull() )
             interfaceGroup.writeEntry( conf_hourState, hourState );
         if ( !dayState.isNull() )
@@ -621,38 +550,20 @@ void ConfigDialog::save()
         if ( !yearState.isNull() )
             interfaceGroup.writeEntry( conf_yearState, yearState );
 
-        interfaceGroup.writeEntry( conf_hideWhenNotAvail, settings->hideWhenDisconnected );
-        interfaceGroup.writeEntry( conf_hideWhenNotExist, settings->hideWhenUnavailable );
+        interfaceGroup.writeEntry( conf_minVisibleState, settings->minVisibleState );
         interfaceGroup.writeEntry( conf_trafficThreshold, settings->trafficThreshold );
         interfaceGroup.writeEntry( conf_iconTheme, settings->iconTheme );
         if ( settings->iconTheme == TEXT_THEME ||
              settings->iconTheme == NETLOAD_THEME
            )
         {
-            interfaceGroup.writeEntry( conf_colorIncoming, settings->colorIncoming );
-            interfaceGroup.writeEntry( conf_colorOutgoing, settings->colorOutgoing );
-            interfaceGroup.writeEntry( conf_colorDisabled, settings->colorDisabled );
-            interfaceGroup.writeEntry( conf_colorUnavailable, settings->colorUnavailable );
-            interfaceGroup.writeEntry( conf_dynamicColor, settings->dynamicColor );
-            if ( settings->dynamicColor )
-            {
-                interfaceGroup.writeEntry( conf_colorIncomingMax, settings->colorIncomingMax );
-                interfaceGroup.writeEntry( conf_colorOutgoingMax, settings->colorOutgoingMax );
-            }
             if ( settings->iconTheme == NETLOAD_THEME )
             {
                 interfaceGroup.writeEntry( conf_barScale, settings->barScale );
             }
-            if ( settings->iconTheme == TEXT_THEME && settings->iconFont != KGlobalSettings::generalFont() )
+            if ( settings->iconTheme == NETLOAD_THEME && settings->barScale )
             {
-                interfaceGroup.writeEntry( conf_iconFont, settings->iconFont );
-            }
-            if ( settings->dynamicColor ||
-                 ( settings->iconTheme == NETLOAD_THEME && settings->barScale )
-               )
-            {
-                interfaceGroup.writeEntry( conf_inMaxRate, settings->inMaxRate );
-                interfaceGroup.writeEntry( conf_outMaxRate, settings->outMaxRate );
+                interfaceGroup.writeEntry( conf_maxRate, settings->maxRate );
             }
         }
         interfaceGroup.writeEntry( conf_activateStatistics, settings->activateStatistics );
@@ -660,7 +571,7 @@ void ConfigDialog::save()
         interfaceGroup.writeEntry( conf_statsRules, settings->statsRules.count() );
         for ( int i = 0; i < settings->statsRules.count(); i++ )
         {
-            QString group = QString( "%1%2 #%3" ).arg( confg_statsRule ).arg( it ).arg( i );
+            QString group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_statsRule ).arg( it ).arg( i );
             KConfigGroup statsGroup( config, group );
             statsGroup.writeEntry( conf_statsStartDate, settings->statsRules[i].startDate );
             statsGroup.writeEntry( conf_statsPeriodUnits, settings->statsRules[i].periodUnits );
@@ -683,7 +594,7 @@ void ConfigDialog::save()
         interfaceGroup.writeEntry( conf_warnRules, settings->warnRules.count() );
         for ( int i = 0; i < settings->warnRules.count(); i++ )
         {
-            QString group = QString( "%1%2 #%3" ).arg( confg_warnRule ).arg( it ).arg( i );
+            QString group = QString::fromLatin1( "%1%2 #%3" ).arg( confg_warnRule ).arg( it ).arg( i );
             KConfigGroup warnGroup( config, group );
             if ( settings->statsRules.count() == 0 && settings->warnRules[i].periodUnits == KNemoStats::BillPeriod )
             {
@@ -700,18 +611,6 @@ void ConfigDialog::save()
             warnGroup.writeEntry( conf_warnThreshold, settings->warnRules[i].threshold );
             warnGroup.writeEntry( conf_warnCustomText, settings->warnRules[i].customText.trimmed() );
         }
-
-        interfaceGroup.writeEntry( conf_numCommands, settings->commands.size() );
-        for ( int i = 0; i < settings->commands.size(); i++ )
-        {
-            QString entry;
-            entry = QString( "%1%2" ).arg( conf_runAsRoot ).arg( i + 1 );
-            interfaceGroup.writeEntry( entry, settings->commands[i].runAsRoot );
-            entry = QString( "%1%2" ).arg( conf_command ).arg( i + 1 );
-            interfaceGroup.writeEntry( entry, settings->commands[i].command );
-            entry = QString( "%1%2" ).arg( conf_menuText ).arg( i + 1 );
-            interfaceGroup.writeEntry( entry, settings->commands[i].menuText );
-        }
     }
 
     KConfigGroup generalGroup( config, confg_general );
@@ -720,12 +619,11 @@ void ConfigDialog::save()
     generalGroup.writeEntry( conf_pollInterval, mDlg->comboBoxPoll->itemData( mDlg->comboBoxPoll->currentIndex() ).value<double>() );
     generalGroup.writeEntry( conf_saveInterval, mDlg->numInputSaveInterval->value() );
     generalGroup.writeEntry( conf_useBitrate, mDlg->useBitrate->isChecked() );
-    generalGroup.writeEntry( conf_statisticsDir,  mDlg->lineEditStatisticsDir->url().url() );
     generalGroup.writeEntry( conf_toolTipContent, mToolTipContent );
     generalGroup.writeEntry( conf_interfaces, list );
 
     config->sync();
-    QDBusMessage reply = QDBusInterface("org.kde.knemo", "/knemo", "org.kde.knemo").call("reparseConfiguration");
+    QDBusMessage reply = QDBusInterface(QLatin1String("org.kde.knemo"), QLatin1String("/knemo"), QLatin1String("org.kde.knemo")).call(QLatin1String("reparseConfiguration"));
 }
 
 void ConfigDialog::defaults()
@@ -761,8 +659,6 @@ void ConfigDialog::defaults()
 
     if ( interface.isEmpty() )
     {
-        mDlg->aliasLabel->setEnabled( false );
-        mDlg->lineEditAlias->setEnabled( false );
         mDlg->ifaceTab->setEnabled( false );
         mDlg->pixmapError->clear();
         mDlg->pixmapDisconnected->clear();
@@ -774,17 +670,10 @@ void ConfigDialog::defaults()
     else
     {
         InterfaceSettings* settings = new InterfaceSettings();
-        KColorScheme scheme(QPalette::Active, KColorScheme::View);
-        settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->iconFont = KGlobalSettings::generalFont();
         mSettingsMap.insert( interface, settings );
         mDlg->listBoxInterfaces->addItem( interface );
         mDlg->listBoxInterfaces->setCurrentRow( 0 );
         mDlg->pushButtonDelete->setEnabled( true );
-        mDlg->aliasLabel->setEnabled( true );
-        mDlg->lineEditAlias->setEnabled( true );
         mDlg->ifaceTab->setEnabled( true );
     }
 
@@ -795,7 +684,6 @@ void ConfigDialog::defaults()
         mDlg->comboBoxPoll->setCurrentIndex( index );
     mDlg->numInputSaveInterval->setValue( g.saveInterval );
     mDlg->useBitrate->setChecked( g.useBitrate );
-    mDlg->lineEditStatisticsDir->setUrl( g.statisticsDir );
 
     // Default tool tips
     mToolTipContent = g.toolTipContent;
@@ -808,7 +696,7 @@ void ConfigDialog::checkBoxStartKNemoToggled( bool on )
 {
     if ( on )
     {
-        KConfig *config = mConfig.data();
+        KSharedConfig::Ptr config = KSharedConfig::openConfig( QLatin1String("knemorc") );
         KConfigGroup generalGroup( config, confg_general );
         if ( generalGroup.readEntry( conf_firstStart, true ) )
         {
@@ -886,23 +774,26 @@ void ConfigDialog::updateWarnText( int oldCount )
 void ConfigDialog::updateControls( InterfaceSettings *settings )
 {
     mLock = true;
-    mDlg->lineEditAlias->setText( settings->alias );
     int index = findIndexFromName( settings->iconTheme );
     if ( index < 0 )
         index = findIndexFromName( TEXT_THEME );
     mDlg->comboBoxIconTheme->setCurrentIndex( index );
-    mDlg->colorIncoming->setColor( settings->colorIncoming );
-    mDlg->colorOutgoing->setColor( settings->colorOutgoing );
-    mDlg->colorDisabled->setColor( settings->colorDisabled );
-    mDlg->colorUnavailable->setColor( settings->colorUnavailable );
-    mDlg->iconFont->setCurrentFont( settings->iconFont );
     iconThemeChanged( index );
-    if ( settings->hideWhenDisconnected )
-        index = 1;
-    else if ( settings->hideWhenUnavailable )
-        index = 2;
-    else
-        index = 0;
+    switch ( settings->minVisibleState )
+    {
+        case KNemoIface::Connected:
+            index = 1;
+            break;
+        case KNemoIface::Available:
+            index = 2;
+            break;
+        case KNemoIface::MaxState:
+            index = 3;
+            break;
+        default:
+            index = 0;
+    }
+
     mDlg->comboHiding->setCurrentIndex( index );
     comboHidingChanged( index );
     mDlg->checkBoxStatistics->setChecked( settings->activateStatistics );
@@ -939,32 +830,6 @@ void ConfigDialog::updateControls( InterfaceSettings *settings )
         mDlg->warnView->setCurrentIndex( warnModel->indexFromItem ( warnModel->item( 0, 0 ) ) );
     }
 
-    mDlg->listViewCommands->clear();
-    QList<QTreeWidgetItem *>items;
-    foreach ( InterfaceCommand command, settings->commands )
-    {
-        QTreeWidgetItem* item = new QTreeWidgetItem();
-        enum Qt::CheckState checkState = Qt::Unchecked;
-        if ( command.runAsRoot )
-            checkState = Qt::Checked;
-        item->setCheckState( 0, checkState );
-        item->setFlags( item->flags() | Qt::ItemIsEditable );
-        item->setText( 1, command.menuText );
-        item->setText( 2, command.command );
-        items << item;
-    }
-    if ( items.count() > 0 )
-    {
-        mDlg->listViewCommands->addTopLevelItems( items );
-        mDlg->listViewCommands->setCurrentItem( items[0] );
-        mDlg->pushButtonRemoveCommand->setEnabled( true );
-        setUpDownButtons( items[0] );
-    }
-    else
-    {
-        mDlg->pushButtonRemoveCommand->setEnabled( false );
-        setUpDownButtons( NULL );
-    }
     mLock = false;
 }
 
@@ -975,16 +840,15 @@ void ConfigDialog::interfaceSelected( int row )
     QString interface = mDlg->listBoxInterfaces->item( row )->text();
     InterfaceSettings* settings = mSettingsMap[interface];
     mDlg->ifaceTab->setEnabled( true );
-    mDlg->aliasLabel->setEnabled( true );
-    mDlg->lineEditAlias->setEnabled( true );
     updateControls( settings );
 }
 
 void ConfigDialog::buttonNewSelected()
 {
     bool ok = false;
-    QString ifname = KInputDialog::getText( i18n( "Add new interface" ),
+    QString ifname = QInputDialog::getText( this, i18n( "Add new interface" ),
                                             i18n( "Please enter the name of the interface to be monitored.\nIt should be something like 'eth1', 'wlan2' or 'ppp0'." ),
+                                            QLineEdit::Normal,
                                             QString::null,
                                             &ok );
 
@@ -994,10 +858,6 @@ void ConfigDialog::buttonNewSelected()
         mDlg->listBoxInterfaces->addItem( item );
         InterfaceSettings *settings = new InterfaceSettings();
         KColorScheme scheme(QPalette::Active, KColorScheme::View);
-        settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->iconFont = KGlobalSettings::generalFont();
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->setCurrentRow( mDlg->listBoxInterfaces->row( item ) );
         mDlg->pushButtonDelete->setEnabled( true );
@@ -1023,7 +883,7 @@ void ConfigDialog::buttonAllSelected()
               rtlink = reinterpret_cast<struct rtnl_link *>(nl_cache_get_next( reinterpret_cast<struct nl_object *>(rtlink) ))
             )
         {
-            QString ifname( rtnl_link_get_name( rtlink ) );
+            QString ifname( QLatin1String(rtnl_link_get_name( rtlink )) );
             ifaces << ifname;
         }
     }
@@ -1042,8 +902,8 @@ void ConfigDialog::buttonAllSelected()
     freeifaddrs( ifaddr );
 #endif
 
-    ifaces.removeAll( "lo" );
-    ifaces.removeAll( "lo0" );
+    ifaces.removeAll( QLatin1String("lo") );
+    ifaces.removeAll( QLatin1String("lo0") );
 
     const KColorScheme scheme(QPalette::Active, KColorScheme::View);
     foreach ( QString ifname, ifaces )
@@ -1051,10 +911,6 @@ void ConfigDialog::buttonAllSelected()
         if ( mSettingsMap.contains( ifname ) )
             continue;
         InterfaceSettings* settings = new InterfaceSettings();
-        settings->colorDisabled = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorUnavailable = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->colorBackground = scheme.foreground( KColorScheme::InactiveText ).color();
-        settings->iconFont = KGlobalSettings::generalFont();
         mSettingsMap.insert( ifname, settings );
         mDlg->listBoxInterfaces->addItem( ifname );
     }
@@ -1089,8 +945,6 @@ void ConfigDialog::buttonDeleteSelected()
         InterfaceSettings emptySettings;
         updateControls( &emptySettings );
         mDlg->pushButtonDelete->setEnabled( false );
-        mDlg->aliasLabel->setEnabled( false );
-        mDlg->lineEditAlias->setEnabled( false );
         mDlg->ifaceTab->setEnabled( false );
         mDlg->pixmapError->clear();
         mDlg->pixmapDisconnected->clear();
@@ -1102,16 +956,6 @@ void ConfigDialog::buttonDeleteSelected()
     changed( true );
 }
 
-void ConfigDialog::aliasChanged( const QString& text )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    settings->alias = text;
-    if (!mLock) changed( true );
-}
-
 
 /******************************************
  *                                        *
@@ -1119,105 +963,6 @@ void ConfigDialog::aliasChanged( const QString& text )
  *                                        *
  ******************************************/
 
-QPixmap ConfigDialog::textIcon( QString incomingText, QString outgoingText, int status )
-{
-    QPixmap sampleIcon( 22, 22 );
-    sampleIcon.fill( Qt::transparent );
-    QRect topRect( 0, 0, 22, 11 );
-    QRect bottomRect( 0, 11, 22, 11 );
-    QPainter p( &sampleIcon );
-    p.setBrush( Qt::NoBrush );
-    p.setOpacity( 1.0 );
-    QFont rxFont = setIconFont( incomingText, mDlg->iconFont->currentFont(), 22 );
-    QFont txFont = setIconFont( outgoingText, mDlg->iconFont->currentFont(), 22 );
-    if ( rxFont.pointSizeF() > txFont.pointSizeF() )
-        rxFont.setPointSizeF( txFont.pointSizeF() );
-    p.setFont( rxFont );
-    if ( status >= KNemoIface::Connected )
-        p.setPen( mDlg->colorIncoming->color() );
-    else if ( status == KNemoIface::Available )
-        p.setPen( mDlg->colorDisabled->color() );
-    else
-        p.setPen( mDlg->colorUnavailable->color() );
-    p.drawText( topRect, Qt::AlignCenter | Qt::AlignRight, incomingText );
-    p.setFont( rxFont );
-    if ( status >= KNemoIface::Connected )
-        p.setPen( mDlg->colorOutgoing->color() );
-    p.drawText( bottomRect, Qt::AlignCenter | Qt::AlignRight, outgoingText );
-    return sampleIcon;
-}
-
-QPixmap ConfigDialog::barIcon( int status )
-{
-    int barIncoming = 0;
-    int barOutgoing = 0;
-    QPixmap barIcon( 22, 22 );
-    barIcon.fill( Qt::transparent );
-    QPainter p( &barIcon );
-
-    QLinearGradient inGrad( 12, 0, 19, 0 );
-    QLinearGradient topInGrad( 12, 0, 19, 0 );
-    QLinearGradient outGrad( 3, 0, 10, 0 );
-    QLinearGradient topOutGrad( 3, 0, 10, 0 );
-
-    QColor topColor = getItemSettings()->colorBackground;
-    QColor topColorD = getItemSettings()->colorBackground.darker();
-    topColor.setAlpha( 128 );
-    topColorD.setAlpha( 128 );
-    topInGrad.setColorAt(0, topColorD);
-    topInGrad.setColorAt(1, topColor );
-    topOutGrad.setColorAt(0, topColorD);
-    topOutGrad.setColorAt(1, topColor );
-
-    if ( status & KNemoIface::Connected )
-    {
-        inGrad.setColorAt(0, mDlg->colorIncoming->color() );
-        inGrad.setColorAt(1, mDlg->colorIncoming->color().darker() );
-        outGrad.setColorAt(0, mDlg->colorOutgoing->color() );
-        outGrad.setColorAt(1, mDlg->colorOutgoing->color().darker() );
-    }
-    else if ( status & KNemoIface::Available )
-    {
-        inGrad.setColorAt(0, mDlg->colorDisabled->color());
-        inGrad.setColorAt(1, mDlg->colorDisabled->color().darker() );
-        outGrad.setColorAt(0, mDlg->colorDisabled->color() );
-        outGrad.setColorAt(1, mDlg->colorDisabled->color().darker() );
-    }
-    else
-    {
-        inGrad.setColorAt(0, mDlg->colorUnavailable->color() );
-        inGrad.setColorAt(1, mDlg->colorUnavailable->color().darker() );
-        outGrad.setColorAt(0, mDlg->colorUnavailable->color() );
-        outGrad.setColorAt(1, mDlg->colorUnavailable->color().darker() );
-    }
-    if ( status & KNemoIface::Available || status & KNemoIface::Unavailable )
-    {
-        barIncoming = 22;
-        barOutgoing = 22;
-    }
-    if ( status & KNemoIface::RxTraffic )
-        barIncoming = 17;
-    if ( status & KNemoIface::TxTraffic )
-        barOutgoing = 17;
-
-    int top = 22 - barOutgoing;
-    QRect topLeftRect( 3, 0, 7, top );
-    QRect leftRect( 3, top, 7, 22 );
-    top = 22 - barIncoming;
-    QRect topRightRect( 12, 0, 7, top );
-    QRect rightRect( 12, top, 7, 22 );
-
-    QBrush brush( inGrad );
-    p.setBrush( brush );
-    p.fillRect( rightRect, inGrad );
-    brush = QBrush( topInGrad );
-    p.fillRect( topRightRect, topInGrad );
-    brush = QBrush( outGrad );
-    p.fillRect( leftRect, outGrad );
-    brush = QBrush( topOutGrad );
-    p.fillRect( topLeftRect, topOutGrad );
-    return barIcon;
-}
 
 void ConfigDialog::comboHidingChanged( int val )
 {
@@ -1228,16 +973,20 @@ void ConfigDialog::comboHidingChanged( int val )
     switch ( val )
     {
         case 0:
-            settings->hideWhenDisconnected = false;
-            settings->hideWhenUnavailable = false;
+            // Do not hide
+            settings->minVisibleState = KNemoIface::UnknownState;
             break;
         case 1:
-            settings->hideWhenDisconnected = true;
-            settings->hideWhenUnavailable = true;
+            // Hide when disconnected
+            settings->minVisibleState = KNemoIface::Connected;
             break;
         case 2:
-            settings->hideWhenDisconnected = false;
-            settings->hideWhenUnavailable = true;
+            // Hide when unavailable
+            settings->minVisibleState = KNemoIface::Available;
+            break;
+        case 3:
+            // Always hide
+            settings->minVisibleState = KNemoIface::MaxState;
             break;
     }
 
@@ -1252,93 +1001,53 @@ void ConfigDialog::iconThemeChanged( int set )
 
     KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
 
-    if ( curTheme.internalName != TEXT_THEME )
-    {
-        mDlg->iconFontLabel->setEnabled( false );
-        mDlg->iconFont->setEnabled( false );
-    }
-
     if ( curTheme.internalName == TEXT_THEME ||
          curTheme.internalName == NETLOAD_THEME )
     {
         if ( curTheme.internalName == TEXT_THEME )
         {
+            QString f1 = QStringLiteral("0.0K");
+            QString f2 = QStringLiteral("123K");
+            QString f3 = QStringLiteral("12K");
+
             settings->iconTheme = TEXT_THEME;
-            mDlg->pixmapError->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Unavailable ) );
-            mDlg->pixmapDisconnected->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Available ) );
-            mDlg->pixmapConnected->setPixmap( textIcon( "0.0K", "0.0K", KNemoIface::Connected ) );
-            mDlg->pixmapIncoming->setPixmap( textIcon( "123K", "0.0K", KNemoIface::Connected ) );
-            mDlg->pixmapOutgoing->setPixmap( textIcon( "0.0K", "12K", KNemoIface::Connected ) );
-            mDlg->pixmapTraffic->setPixmap( textIcon( "123K", "12K", KNemoIface::Connected ) );
-            mDlg->iconFontLabel->setEnabled( true );
-            mDlg->iconFont->setEnabled( true );
+            Plasma::Theme theme;
+            mDlg->pixmapError->setPixmap( genTextIcon( f1, f1, theme.smallestFont(), KNemoIface::Unavailable ) );
+            mDlg->pixmapDisconnected->setPixmap( genTextIcon( f1, f1, theme.smallestFont(), KNemoIface::Available ) );
+            mDlg->pixmapConnected->setPixmap( genTextIcon( f1, f1, theme.smallestFont(), KNemoIface::Connected ) );
+            mDlg->pixmapIncoming->setPixmap( genTextIcon( f2, f1, theme.smallestFont(), KNemoIface::Connected ) );
+            mDlg->pixmapOutgoing->setPixmap( genTextIcon( f1, f3, theme.smallestFont(), KNemoIface::Connected ) );
+            mDlg->pixmapTraffic->setPixmap( genTextIcon( f2, f3, theme.smallestFont(), KNemoIface::Connected ) );
         }
         else
         {
             settings->iconTheme = NETLOAD_THEME;
-            mDlg->pixmapError->setPixmap( barIcon( KNemoIface::Unavailable ) );
-            mDlg->pixmapDisconnected->setPixmap( barIcon( KNemoIface::Available ) );
-            mDlg->pixmapConnected->setPixmap( barIcon( KNemoIface::Connected ) );
-            mDlg->pixmapIncoming->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::RxTraffic ) );
-            mDlg->pixmapOutgoing->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::TxTraffic ) );
-            mDlg->pixmapTraffic->setPixmap( barIcon( KNemoIface::Connected | KNemoIface::RxTraffic | KNemoIface::TxTraffic ) );
+            mDlg->pixmapError->setPixmap( genBarIcon( 0, 0, KNemoIface::Unavailable ) );
+            mDlg->pixmapDisconnected->setPixmap( genBarIcon( 0, 0, KNemoIface::Available ) );
+            mDlg->pixmapConnected->setPixmap( genBarIcon( 0, 0, KNemoIface::Connected ) );
+            mDlg->pixmapIncoming->setPixmap( genBarIcon( 0.75, 0, KNemoIface::Connected ) );
+            mDlg->pixmapOutgoing->setPixmap( genBarIcon( 0, 0.75, KNemoIface::Connected ) );
+            mDlg->pixmapTraffic->setPixmap( genBarIcon( 0.75, 0.75, KNemoIface::Connected ) );
+            mDlg->pixmapError->setMinimumHeight(getIconSize().height());
         }
-
-        mDlg->themeColorBox->setEnabled( true );
     }
     else
     {
         settings->iconTheme = findNameFromIndex( set );
         QString iconName;
         if ( settings->iconTheme == SYSTEM_THEME )
-            iconName = "network-";
+            iconName = QLatin1String("network-");
         else
-            iconName = "knemo-" + settings->iconTheme + "-";
-        mDlg->pixmapError->setPixmap( KIcon( iconName + ICON_ERROR ).pixmap( 22 ) );
-        mDlg->pixmapDisconnected->setPixmap( KIcon( iconName + ICON_OFFLINE ).pixmap( 22 ) );
-        mDlg->pixmapConnected->setPixmap( KIcon( iconName + ICON_IDLE ).pixmap( 22 ) );
-        mDlg->pixmapIncoming->setPixmap( KIcon( iconName + ICON_RX ).pixmap( 22 ) );
-        mDlg->pixmapOutgoing->setPixmap( KIcon( iconName + ICON_TX ).pixmap( 22 ) );
-        mDlg->pixmapTraffic->setPixmap( KIcon( iconName + ICON_RX_TX ).pixmap( 22 ) );
-        mDlg->themeColorBox->setEnabled( false );
+            iconName = QLatin1String("knemo-") + settings->iconTheme + QLatin1Char('-');
+        QSize iconSize = getIconSize();
+        mDlg->pixmapError->setPixmap( QIcon::fromTheme( iconName + ICON_ERROR ).pixmap( iconSize ) );
+        mDlg->pixmapDisconnected->setPixmap( QIcon::fromTheme( iconName + ICON_OFFLINE ).pixmap( iconSize ) );
+        mDlg->pixmapConnected->setPixmap( QIcon::fromTheme( iconName + ICON_IDLE ).pixmap( iconSize ) );
+        mDlg->pixmapIncoming->setPixmap( QIcon::fromTheme( iconName + ICON_RX ).pixmap( iconSize ) );
+        mDlg->pixmapOutgoing->setPixmap( QIcon::fromTheme( iconName + ICON_TX ).pixmap( iconSize ) );
+        mDlg->pixmapTraffic->setPixmap( QIcon::fromTheme( iconName + ICON_RX_TX ).pixmap( iconSize ) );
     }
     if (!mLock) changed( true );
-}
-
-void ConfigDialog::colorButtonChanged()
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    if ( mDlg->colorIncoming->color().isValid() )
-        settings->colorIncoming = mDlg->colorIncoming->color();
-    if ( mDlg->colorOutgoing->color().isValid() )
-        settings->colorOutgoing = mDlg->colorOutgoing->color();
-    if ( mDlg->colorDisabled->color().isValid() )
-        settings->colorDisabled = mDlg->colorDisabled->color();
-    if ( mDlg->colorUnavailable->color().isValid() )
-        settings->colorUnavailable = mDlg->colorUnavailable->color();
-
-    KNemoTheme curTheme = mDlg->comboBoxIconTheme->itemData( mDlg->comboBoxIconTheme->currentIndex() ).value<KNemoTheme>();
-    if ( curTheme.internalName == TEXT_THEME ||
-         curTheme.internalName == NETLOAD_THEME )
-        iconThemeChanged( mDlg->comboBoxIconTheme->currentIndex() );
-    if ( !mLock) changed( true );
-}
-
-void ConfigDialog::iconFontChanged( const QFont &font )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    if ( font != settings->iconFont )
-    {
-        settings->iconFont = font;
-        iconThemeChanged( mDlg->comboBoxIconTheme->currentIndex() );
-    }
-    if ( !mLock ) changed( true );
 }
 
 void ConfigDialog::advancedButtonClicked()
@@ -1352,13 +1061,9 @@ void ConfigDialog::advancedButtonClicked()
     {
         InterfaceSettings s = dlg.settings();
         settings->trafficThreshold = s.trafficThreshold;
-        settings->dynamicColor = s.dynamicColor;
-        settings->colorIncomingMax = s.colorIncomingMax;
-        settings->colorOutgoingMax = s.colorOutgoingMax;
 
         settings->barScale = s.barScale;
-        settings->inMaxRate = s.inMaxRate;
-        settings->outMaxRate = s.outMaxRate;
+        settings->maxRate = s.maxRate;
 
         changed( true );
     }
@@ -1506,184 +1211,6 @@ void ConfigDialog::checkBoxStatisticsToggled( bool on )
 
 /******************************************
  *                                        *
- * Interface tab - Context Menu           *
- *                                        *
- ******************************************/
-
-void ConfigDialog::buttonAddCommandSelected()
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    InterfaceCommand cmd;
-    cmd.runAsRoot = false;
-    cmd.menuText = QString();
-    cmd.command = QString();
-    settings->commands.append( cmd );
-
-    QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setCheckState( 0, Qt::Unchecked );
-    item->setFlags( item->flags() | Qt::ItemIsEditable );
-    mDlg->listViewCommands->addTopLevelItem( item );
-    mDlg->listViewCommands->setCurrentItem( item );
-
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::buttonRemoveCommandSelected()
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    if ( !mDlg->listViewCommands->currentItem() )
-        return;
-
-    QTreeWidgetItem *item = mDlg->listViewCommands->currentItem();
-    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
-    mDlg->listViewCommands->takeTopLevelItem( index );
-    delete item;
-
-    QList<InterfaceCommand> cmds;
-    QTreeWidgetItemIterator i( mDlg->listViewCommands );
-    while ( QTreeWidgetItem * item = *i )
-    {
-        InterfaceCommand cmd;
-        cmd.runAsRoot = item->checkState( 0 );
-        cmd.menuText = item->text( 1 );
-        cmd.command = item->text( 2 );
-        cmds.append( cmd );
-        ++i;
-    }
-
-    settings->commands = cmds;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::setUpDownButtons( QTreeWidgetItem* item )
-{
-    if ( !item )
-    {
-        mDlg->pushButtonUp->setEnabled( false );
-        mDlg->pushButtonDown->setEnabled( false );
-        return;
-    }
-
-    if (mDlg->listViewCommands->indexOfTopLevelItem( item ) == 0 )
-        mDlg->pushButtonUp->setEnabled( false );
-    else
-        mDlg->pushButtonUp->setEnabled( true );
-
-    if (mDlg->listViewCommands->indexOfTopLevelItem( item ) == mDlg->listViewCommands->topLevelItemCount() - 1 )
-        mDlg->pushButtonDown->setEnabled( false );
-    else
-        mDlg->pushButtonDown->setEnabled( true );
-}
-
-void ConfigDialog::buttonCommandUpSelected()
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    if ( !mDlg->listViewCommands->currentItem() )
-        return;
-
-    QTreeWidgetItem* item = mDlg->listViewCommands->currentItem();
-    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
-    if ( index == 0 )
-        return;
-
-    mDlg->listViewCommands->takeTopLevelItem( index );
-    mDlg->listViewCommands->insertTopLevelItem( index - 1, item );
-    mDlg->listViewCommands->setCurrentItem( item );
-    setUpDownButtons( item );
-
-    QList<InterfaceCommand> cmds;
-    QTreeWidgetItemIterator i( mDlg->listViewCommands );
-    while ( QTreeWidgetItem * item = *i )
-    {
-        InterfaceCommand cmd;
-        cmd.runAsRoot = item->checkState( 0 );
-        cmd.menuText = item->text( 1 );
-        cmd.command = item->text( 2 );
-        cmds.append( cmd );
-        ++i;
-    }
-
-    settings->commands = cmds;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::buttonCommandDownSelected()
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    if ( !mDlg->listViewCommands->currentItem() )
-        return;
-
-    QTreeWidgetItem* item = mDlg->listViewCommands->currentItem();
-    int index = mDlg->listViewCommands->indexOfTopLevelItem( item );
-    if ( index == mDlg->listViewCommands->topLevelItemCount() - 1 )
-        return;
-
-    mDlg->listViewCommands->takeTopLevelItem( index );
-    mDlg->listViewCommands->insertTopLevelItem( index + 1, item );
-    mDlg->listViewCommands->setCurrentItem( item );
-    setUpDownButtons( item );
-
-    QList<InterfaceCommand> cmds;
-    QTreeWidgetItemIterator i( mDlg->listViewCommands );
-    while ( QTreeWidgetItem * item = *i )
-    {
-        InterfaceCommand cmd;
-        cmd.runAsRoot = item->checkState( 0 );
-        cmd.menuText = item->text( 1 );
-        cmd.command = item->text( 2 );
-        cmds.append( cmd );
-        ++i;
-    }
-
-    settings->commands = cmds;
-    if (!mLock) changed( true );
-}
-
-void ConfigDialog::listViewCommandsSelectionChanged( QTreeWidgetItem* item, QTreeWidgetItem* )
-{
-    mDlg->pushButtonRemoveCommand->setEnabled( item != NULL );
-    setUpDownButtons( item );
-}
-
-void ConfigDialog::listViewCommandsChanged( QTreeWidgetItem* item, int column )
-{
-    InterfaceSettings* settings = getItemSettings();
-    if ( !settings )
-        return;
-
-    int row = mDlg->listViewCommands->indexOfTopLevelItem( item );
-    InterfaceCommand& cmd = settings->commands[row];
-    switch ( column )
-    {
-        case 0:
-            cmd.runAsRoot = item->checkState( 0 );
-            break;
-        case 1:
-            cmd.menuText = item->text( 1 );
-            break;
-        case 2:
-            cmd.command = item->text( 2 );
-    }
-
-    if (!mLock) changed( true );
-}
-
-
-
-/******************************************
- *                                        *
  * ToolTip tab                            *
  *                                        *
  ******************************************/
@@ -1804,7 +1331,7 @@ void ConfigDialog::buttonRemoveToolTipSelected()
 
 void ConfigDialog::buttonNotificationsSelected()
 {
-    KNotifyConfigWidget::configure( this, "knemo" );
+    KNotifyConfigWidget::configure( this, QLatin1String("knemo") );
 }
 
 #include "configdialog.moc"

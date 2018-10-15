@@ -21,7 +21,7 @@
 #include "statisticsmodel.h"
 #include <kio/global.h>
 
-#include <KApplication>
+#include <QApplication>
 #include <QDesktopWidget>
 #include <QEvent>
 #include <QHeaderView>
@@ -29,6 +29,8 @@
 #include <QMouseEvent>
 #include <QStylePainter>
 #include <QTimer>
+
+#include <KLocalizedString>
 
 
 class StatsTip : public QLabel
@@ -54,8 +56,8 @@ StatsTip::StatsTip() : QLabel( 0, Qt::ToolTip )
 
     setForegroundRole(QPalette::ToolTipText);
     setBackgroundRole(QPalette::ToolTipBase);
-    setStyleSheet( kapp->styleSheet() );
-    setPalette( kapp->palette() );
+    setStyleSheet( qApp->styleSheet() );
+    setPalette( qApp->palette() );
     ensurePolished();
     setMargin( 1 + style()->pixelMetric(QStyle::PM_ToolTipLabelFrameWidth, 0, this ) );
 }
@@ -151,7 +153,7 @@ StatisticsView::~StatisticsView()
 void StatisticsView::setModel( QAbstractItemModel *m )
 {
     QTableView::setModel( m );
-    horizontalHeader()->setMovable( true );
+    horizontalHeader()->setSectionsMovable( true );
     connect( selectionModel(), SIGNAL( selectionChanged ( const QItemSelection &, const QItemSelection & ) ),
              this, SLOT( updateSum() ) );
 }
@@ -183,9 +185,9 @@ void StatisticsView::showSum( const QPoint &p )
     QString opStr = i18n( "Off-Peak:" );
     QString tStr = i18n( "Total:" );
     if ( mOffpeak )
-        sumString = "<table><tr><td>%1</td><td>%2</td></tr><tr><td>%3</td><td>%4</td></tr><tr><td><b>%5</b></td><td><b>%6</b></td></tr></table>";
+        sumString = QStringLiteral("<table><tr><td>%1</td><td>%2</td></tr><tr><td>%3</td><td>%4</td></tr><tr><td><b>%5</b></td><td><b>%6</b></td></tr></table>");
     else
-        sumString = "<table><tr><td>%1</td><td>%2</td></tr></table>";
+        sumString = QStringLiteral("<table><tr><td>%1</td><td>%2</td></tr></table>");
 
 
     if ( selectionModel()->selectedIndexes().count() > 0 && selectionModel()->isSelected( indexAt( p ) ) )
@@ -257,4 +259,4 @@ bool StatisticsView::viewportEvent( QEvent * e )
     return QTableView::viewportEvent( e );
 }
 
-#include "statisticsview.moc"
+#include "moc_statisticsview.cpp"

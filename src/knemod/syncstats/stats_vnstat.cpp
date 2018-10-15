@@ -49,30 +49,30 @@ void StatsVnstat::importIfaceStats()
     mExternalDays->clear();
     KProcess vnstatProc;
     vnstatProc.setOutputChannelMode( KProcess::OnlyStdoutChannel );
-    vnstatProc.setEnv( "LANG", "C" );
-    vnstatProc.setEnv( "LC_ALL", "C" );
-    vnstatProc << "vnstat" << "--dumpdb" << "-i" << mInterface->ifaceName();
+    vnstatProc.setEnv( QLatin1String("LANG"), QLatin1String("C") );
+    vnstatProc.setEnv( QLatin1String("LC_ALL"), QLatin1String("C") );
+    vnstatProc << QLatin1String("vnstat") << QLatin1String("--dumpdb") << QLatin1String("-i") << mInterface->ifaceName();
     vnstatProc.execute();
 
-    parseOutput( vnstatProc.readAllStandardOutput() );
+    parseOutput( QLatin1String(vnstatProc.readAllStandardOutput()) );
     getBtime();
 }
 
 void StatsVnstat::getBtime()
 {
 #ifdef __linux__
-    QFile proc( "/proc/stat" );
+    QFile proc( QLatin1String("/proc/stat") );
     if ( proc.open( QIODevice::ReadOnly ) )
     {
-        QString routeData( proc.readAll().data() );
-        QStringList routes = routeData.split( "\n" );
+        QString routeData( QLatin1String(proc.readAll().data()) );
+        QStringList routes = routeData.split( QLatin1Char('\n') );
         QStringListIterator it( routes );
         while ( it.hasNext() )
         {
-            QStringList line = it.next().split( ' ' );
+            QStringList line = it.next().split( QLatin1Char(' ') );
             if ( line.count() < 2 )
                 continue;
-            if ( line[0] == "btime" )
+            if ( line[0] == QLatin1String("btime") )
             {
                 mSysBtime = line[1].toUInt();
                 break;
@@ -140,27 +140,27 @@ quint64 StatsVnstat::addBytes( quint64 rxBytes, quint64 syncBytes )
 
 void StatsVnstat::parseOutput( const QString &output )
 {
-    QStringList lines = output.split( '\n' );
+    QStringList lines = output.split( QLatin1Char('\n') );
     foreach ( QString line, lines )
     {
-        QStringList fields = line.split( ';' );
-        if ( fields[0] == "updated" )
+        QStringList fields = line.split( QLatin1Char(';') );
+        if ( fields[0] == QLatin1String("updated") )
         {
             mVnstatUpdated = fields[1].toUInt();
         }
-        else if ( fields[0] == "currx" )
+        else if ( fields[0] == QLatin1String("currx") )
         {
             mVnstatRx = fields[1].toULongLong();
         }
-        else if ( fields[0] == "curtx" )
+        else if ( fields[0] == QLatin1String("curtx") )
         {
             mVnstatTx = fields[1].toULongLong();
         }
-        else if ( fields[0] == "btime" )
+        else if ( fields[0] == QLatin1String("btime") )
         {
             mVnstatBtime = fields[1].toUInt();
         }
-        else if ( fields[0] == "d" )
+        else if ( fields[0] == QLatin1String("d") )
         {
             quint64 rx = fields[3].toULongLong() * 1024 * 1024;
             quint64 tx = fields[4].toULongLong() * 1024 * 1024;
@@ -172,7 +172,7 @@ void StatsVnstat::parseOutput( const QString &output )
                 mExternalDays->setTraffic( entryIndex, rx, tx );
             }
         }
-        else if ( fields[0] == "h" )
+        else if ( fields[0] == QLatin1String("h") )
         {
             quint64 rx = fields[3].toULongLong() * 1024;
             quint64 tx = fields[4].toULongLong() * 1024;
@@ -189,4 +189,4 @@ void StatsVnstat::parseOutput( const QString &output )
     mExternalDays->sort( 0 );
 }
 
-#include "stats_vnstat.moc"
+#include "moc_stats_vnstat.cpp"
