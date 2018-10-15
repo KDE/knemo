@@ -27,7 +27,9 @@
 
 #include <cstdlib>
 #ifndef __linux__
+#include <sys/types.h>
 #include <sys/sysctl.h>
+#include <sys/time.h>
 #endif
 
 StatsVnstat::StatsVnstat( Interface * interface, KCalendarSystem * calendar, QObject * parent )
