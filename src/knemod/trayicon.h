@@ -22,6 +22,7 @@
 
 #include "config-knemo.h"
 
+#include <QMap>
 #include <KStatusNotifierItem>
 
 class Interface;
